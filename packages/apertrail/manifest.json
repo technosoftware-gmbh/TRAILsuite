@@ -1,0 +1,10 @@
+{
+  "id": "apertrail",
+  "name": "APERtrail",
+  "version": "1.0.0",
+  "minAppVersion": "1.12.0",
+  "description": "Open the perfect path. A dedicated travel planner for photography: map journeys that rotate around vantage points, light, and perspective.",
+  "author": "Technosoftware GmbH",
+  "authorUrl": "https://technosoftware.com",
+  "isDesktopOnly": false
+}

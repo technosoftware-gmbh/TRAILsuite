@@ -1,0 +1,67 @@
+{
+  "name": "trail-core",
+  "version": "1.0.0",
+  "description": "The shared, Obsidian-free core behind APERtrail and CULItrail.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Technosoftware GmbH <support@technosoftware.com> (https://technosoftware.com)",
+  "homepage": "https://technosoftware.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/technosoftware-gmbh/TRAILsuite.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/technosoftware-gmbh/TRAILsuite/issues"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./obsidian": {
+      "types": "./dist/obsidian/index.d.ts",
+      "default": "./dist/obsidian/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "NOTICE.md",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "prepare": "npm run build",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "npm run typecheck && npm run lint && npm run test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "@types/node": "^26.4.0",
+    "eslint": "^9.39.4",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-prettier": "^5.2.6",
+    "eslint-plugin-unused-imports": "^4.1.4",
+    "globals": "^17.7.0",
+    "jiti": "^2.7.0",
+    "obsidian": "latest",
+    "prettier": "^3.5.3",
+    "typescript": "^7.0.2",
+    "typescript-eslint": "^8.69.0",
+    "vitest": "^4.1.10"
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "obsidian": "*"
+  },
+  "peerDependenciesMeta": {
+    "obsidian": {
+      "optional": true
+    }
+  }
+}

@@ -1,0 +1,4142 @@
+/*
+ * CULItrail styles.
+ *
+ * One prefix for the whole UI kit: every class this plugin adds starts with
+ * `culi-`. Exactly one prefix, with no exceptions: code arriving from
+ * elsewhere is renamed in a single pass rather than gradually, because a
+ * period with two live prefixes is a period where nobody can tell which of
+ * them a rule belongs to.
+ *
+ * Conventions, from CLAUDE.md:
+ *   - No direct `element.style.x = ...`. Toggle classes for binary states;
+ *     use Obsidian's setCssProps() only for genuinely dynamic runtime values
+ *     such as drag positions and computed popover coordinates.
+ *   - Prefer Obsidian's own CSS variables over hardcoded colours, so themes
+ *     and light/dark both work without a second stylesheet.
+ *
+ * Rules arrive with the area that needs them. Sections are ordered UI kit
+ * first, then per-area.
+ */
+
+/* ── Modal shell ─────────────────────────────────────────────────────────── */
+
+.culi-modal {
+  display: flex;
+  flex-direction: column;
+  /* Obsidian sets overflow-y: auto on .modal-content. Overriding it is what
+     makes only the body scroll, leaving the header and footer in place. */
+  overflow: hidden;
+  padding: 0;
+  /* Obsidian's .modal already caps height at roughly 80vh; this only keeps a
+     long body from filling the screen edge to edge. Raised from 75vh: the gap it
+     left below a form-shaped modal was height the form then had to scroll for. */
+  max-height: 85vh;
+}
+
+.culi-modal-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.culi-modal-icon {
+  color: var(--interactive-accent);
+  flex: 0 0 auto;
+}
+
+.culi-modal-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 0 0.15rem;
+  color: var(--text-normal);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.culi-modal-subtitle {
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+  margin: 0;
+  width: 100%;
+}
+
+.culi-modal-body {
+  flex: 1;
+  /* min-height: 0 is required for a flex child to scroll at all; flex items
+     default to min-height: auto and refuse to shrink below their content. */
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.25rem 0;
+}
+
+.culi-modal-footer {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--background-modifier-border);
+  /* One row, scrolling sideways if it has to. Wrapping would put the primary
+     action on its own line at narrow widths, where it reads as unrelated to
+     the dialog above it. */
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+/* A live-editing modal implements renderFooter() empty. Without this the
+   border and padding above still draw as a stray line. */
+.culi-modal-footer:empty {
+  display: none;
+}
+
+/* The adoption line sits in the same status block but reports history rather
+   than a count, so it carries no number and its icon never means "empty". */
+.culi-settings-adoption .culi-settings-status-icon {
+  color: var(--text-muted);
+}
+
+.culi-settings-adoption .culi-settings-status-detail {
+  font-family: var(--font-monospace);
+  font-size: var(--font-ui-smaller);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   The related-orders block
+   Rendered inside a Person or Company note, beside whatever else renders
+   there. Styled to sit quietly: it is a guest in somebody else's note, not a
+   panel of ours.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.culi-related-orders {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.culi-related-order {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.3rem 0.4rem;
+  border-radius: var(--radius-s);
+}
+
+.culi-related-order:hover {
+  background: var(--background-modifier-hover);
+}
+
+/* Fixed width and tabular figures, so the dates line up as a column down the
+   left rather than ragging with the month name's length. */
+.culi-related-order-date {
+  flex: 0 0 5.5rem;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  font-variant-numeric: tabular-nums;
+}
+
+.culi-related-order-icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--text-faint);
+}
+
+.culi-related-order-icon svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  flex-shrink: 0;
+}
+
+.culi-related-order-body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.culi-related-order-link {
+  color: var(--text-accent);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.culi-related-order-detail {
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+.culi-related-order-price {
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Full width, so a long list of meals wraps under the row rather than
+   pushing the price off the end of it. */
+.culi-related-order-meals {
+  flex: 1 0 100%;
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+}
+
+.culi-related-orders-total {
+  margin-top: 0.3rem;
+  padding: 0.3rem 0.4rem;
+  border-top: 1px solid var(--background-modifier-border);
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  font-variant-numeric: tabular-nums;
+}
+
+.culi-related-orders-empty {
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  font-style: italic;
+}
+
+/* ── Star row ────────────────────────────────────────────────────────────── */
+
+.culi-star-rating {
+  display: flex;
+  gap: 0.1rem;
+  margin: 0.4rem 0 0.1rem;
+}
+
+.culi-star {
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--text-faint);
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.1s;
+}
+
+.culi-star.culi-star-active {
+  color: var(--color-yellow);
+}
+
+.culi-star:hover {
+  color: var(--color-yellow);
+  transform: scale(1.1);
+}
+
+/* A read-only row ignores the pointer entirely, so a click on a rating inside
+   a gallery card falls through to the card's own open-meal handler rather
+   than landing on a star that cannot change. */
+.culi-star-rating-readonly .culi-star {
+  pointer-events: none;
+}
+
+/* Thumb-sized, and **only inside a dialog**. This used to apply to every star
+   on a phone, and it lost the plugin its own rating: `body.is-mobile .culi-star`
+   outweighs `.culi-mpv-card .culi-star` by one element selector, so a plan card's
+   stars rendered at twice their intended size and the fifth one was cut off the
+   card. Scoping the rule to where the big target is wanted beats out-specifying
+   it from the card's side, which would have been the start of an arms race. The
+   dialog is the one place a star is a control somebody aims at rather than a
+   value they read. */
+body.is-mobile .culi-modal .culi-star {
+  font-size: 1.6rem;
+  padding: 0.2rem;
+}
+
+/* ── Lightbox ────────────────────────────────────────────────────────────── */
+
+.culi-lightbox-trigger {
+  cursor: zoom-in;
+}
+
+.culi-lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+}
+
+.culi-lightbox-close {
+  position: absolute;
+  /* env() keeps the button clear of a phone's notch and rounded corners. */
+  top: max(1rem, env(safe-area-inset-top, 1rem));
+  right: max(1rem, env(safe-area-inset-right, 1rem));
+  z-index: 1;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.culi-lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.culi-lightbox-img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: var(--radius-l);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+  /* The overlay is zoom-out; the picture itself is not, since clicking it
+     does not close. */
+  cursor: default;
+}
+
+/* ── Meal image ────────────────────────────────────────────────────────── */
+
+.culi-image-card {
+  width: 200px;
+  flex-shrink: 0;
+}
+
+.culi-meal-image {
+  display: block;
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-l);
+}
+
+/* Same footprint as the image it stands in for, so a meal without a photo
+   lays out like one with a photo instead of shifting everything up. */
+.culi-image-placeholder {
+  width: 100%;
+  height: 140px;
+  background: var(--background-secondary);
+  border: 1px dashed var(--background-modifier-border);
+  border-radius: var(--radius-l);
+}
+
+/* ── Meal header badges and tags ───────────────────────────────────────── */
+
+.culi-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0.5rem 0 0.25rem;
+}
+
+/* Forces a wrap inside the flex row without adding visible height. A <br> is
+   ignored between flex items. */
+.culi-badge-newline {
+  flex-basis: 100%;
+  height: 0;
+}
+
+.culi-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  height: 1.75rem;
+  padding: 0 0.65rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  line-height: 1;
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  color: var(--text-normal);
+}
+
+.culi-badge-icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+
+.culi-badge-icon svg {
+  width: 0.8rem;
+  height: 0.8rem;
+}
+
+.culi-badge-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.culi-badge-value {
+  font-weight: 700;
+  color: var(--text-normal);
+}
+
+.culi-badge-prefix,
+.culi-badge-suffix {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.culi-badge-separator {
+  width: 1px;
+  height: 1rem;
+  margin: 0 0.1rem;
+  background: var(--background-modifier-border);
+}
+
+/* The colour variants tint background, text and border from one Obsidian
+   colour variable each, so a theme that redefines --color-green gets a
+   matching badge without a second rule here. */
+.culi-badge-green {
+  background: color-mix(in srgb, var(--color-green) 12%, transparent);
+  color: var(--color-green);
+  border-color: color-mix(in srgb, var(--color-green) 25%, transparent);
+}
+
+.culi-badge-blue {
+  background: color-mix(in srgb, var(--color-blue) 12%, transparent);
+  color: var(--color-blue);
+  border-color: color-mix(in srgb, var(--color-blue) 25%, transparent);
+}
+
+.culi-badge-purple {
+  background: color-mix(in srgb, var(--color-purple) 12%, transparent);
+  color: var(--color-purple);
+  border-color: color-mix(in srgb, var(--color-purple) 25%, transparent);
+}
+
+.culi-badge-yellow {
+  background: color-mix(in srgb, var(--color-yellow) 15%, transparent);
+  color: var(--color-yellow);
+  border-color: color-mix(in srgb, var(--color-yellow) 30%, transparent);
+}
+
+.culi-badge-red {
+  background: color-mix(in srgb, var(--color-red) 12%, transparent);
+  color: var(--color-red);
+  border-color: color-mix(in srgb, var(--color-red) 25%, transparent);
+}
+
+.culi-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-bottom: 0.35rem;
+}
+
+.culi-tag {
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+}
+
+/* ── Meal view ─────────────────────────────────────────────────────────── */
+
+.culi-meal-view {
+  padding: 1rem 1.25rem 3rem;
+  max-width: 100%;
+}
+
+.culi-meal-title {
+  margin: 0;
+  font-size: 1.9rem;
+  line-height: 1.2;
+}
+
+/* ── Meta banner ─────────────────────────────────────────────────────────── */
+
+.culi-meta-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.25rem;
+  margin: 0.75rem 0 1rem;
+  padding: 0.6rem 0.85rem;
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-l);
+}
+
+.culi-banner-cells {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.5rem;
+}
+
+.culi-banner-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.culi-servings-label {
+  font-size: var(--font-ui-smaller);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.culi-servings-value {
+  font-weight: 700;
+}
+
+.culi-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* A bordered 2.5rem square rather than a bare icon. The border is what makes a
+   row of these read as a toolbar instead of as decoration next to the title,
+   which matters because the row sits inside the meta banner rather than in a
+   chrome bar Obsidian has already framed. */
+.culi-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  background: var(--background-primary);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    background 0.12s,
+    color 0.12s,
+    border-color 0.12s;
+}
+
+.culi-action-btn svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.culi-action-btn:hover {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}
+
+/* Tinted fill plus a coloured border, not just a coloured glyph. An icon-only
+   colour change is easy to miss on a 2.5rem button; the whole pill changing is
+   not. */
+.culi-action-btn.culi-favorite-active {
+  color: var(--color-red);
+  border-color: var(--color-red);
+  background: rgba(var(--color-red-rgb), 0.1);
+}
+
+.culi-action-btn.culi-favorite-active svg {
+  fill: currentColor;
+}
+
+.culi-action-btn.culi-meal-plan-active {
+  color: var(--interactive-accent);
+  border-color: var(--interactive-accent);
+  background: color-mix(in srgb, var(--interactive-accent) 10%, transparent);
+}
+
+/* ── Stat strip ──────────────────────────────────────────────────────────── */
+
+/* A row of figures: small uppercase label, value under it, one column each.
+   Four call sites had written this three different ways before it was one
+   thing; see src/ui/stat-strip.ts.
+
+   Two rows shared by every column, filled down-then-across, rather than a
+   wrapper element per cell. That is what keeps the figures on one line across
+   the strip when a label wraps: with a wrapper per cell only that column's
+   value would drop, and the row would step. `Kohlenhydrate` in a column that
+   fits `Carbs` is the case that makes it happen. */
+.culi-stat-strip {
+  display: grid;
+  grid-template-rows: auto auto;
+  grid-auto-flow: column;
+  align-items: baseline;
+}
+
+/* Columns sized to their contents, spaced by a gap, no chrome. For a strip
+   inside a wider band that provides its own border and padding. */
+.culi-stat-strip--plain {
+  grid-auto-columns: auto;
+  column-gap: 1rem;
+}
+
+/* Equal columns in a bordered box with dividers, for a strip that is the whole
+   width of the view.
+
+   `minmax(0, 1fr)` rather than `1fr`, which is `minmax(auto, 1fr)` and therefore
+   floors each column at its own content width. Measured: with plain `1fr` the
+   German nutrition strip came out 78/78/78/123 because `Kohlenhydrate` pushed
+   its own column wider, and equal columns are the entire point of this variant. */
+.culi-stat-strip--boxed {
+  grid-auto-columns: minmax(0, 1fr);
+  margin: 0.5rem 0;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-l);
+  overflow: hidden;
+  text-align: center;
+}
+
+.culi-stat-label {
+  font-size: var(--font-ui-smaller);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  /* A label is one long word in German and the boxed strip clips its overflow,
+     so without this `Kohlenhydrate` in an 89px column is silently cut off rather
+     than wrapped. The two shared grid rows are what make wrapping safe: the
+     label growing to two lines drops every value together, so the figures stay
+     on one line across the strip. */
+  overflow-wrap: anywhere;
+}
+
+.culi-stat-value {
+  font-weight: 700;
+}
+
+/* The divider runs down both halves of a column rather than being one element's
+   border, because a column is two grid items and not a box. The first column's
+   two items are children 1 and 2, which is what the second selector exempts. */
+.culi-stat-strip--boxed > .culi-stat-label,
+.culi-stat-strip--boxed > .culi-stat-value {
+  border-left: 1px solid var(--background-modifier-border);
+}
+
+.culi-stat-strip--boxed > :nth-child(-n + 2) {
+  border-left: none;
+}
+
+/* Split so the pair reads as one cell with 0.5rem of air top and bottom and a
+   0.1rem gap between label and figure.
+
+   The label is smaller here than in the plain variant, matching `.culi-label-caps`
+   (0.65rem / 700 / 0.07em), which is what both boxed strips used before they were
+   one component. Unifying on the plain variant's 12px label instead made them
+   5px taller, which is how this was found. */
+.culi-stat-strip--boxed > .culi-stat-label {
+  padding: 0.5rem 0.25rem 0.1rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  color: var(--text-faint);
+}
+
+.culi-stat-strip--boxed > .culi-stat-value {
+  padding: 0 0.25rem 0.5rem;
+  font-size: 1.05rem;
+}
+
+/* The header's figure strip: the nutrition figures, then prep, cook, total, last
+   made and anything else configured as a single value. Wider column spacing than
+   a bare nutrition strip, because these labels are words rather than
+   abbreviations and 1rem between "Total" and "Last made" reads as one phrase. */
+.culi-badge-strip {
+  margin: 0.5rem 0 0.25rem;
+  column-gap: 1.5rem;
+}
+
+/* The boundary between the nutrition figures and the rest. The caption under the
+   strip describes only the columns to the left of this line, and without it the
+   caption reads as covering the times too. Applied to both halves of the column
+   because a column is two grid items rather than a box. */
+.culi-stat-strip--plain > .culi-stat-group-start {
+  border-left: 1px solid var(--background-modifier-border);
+  padding-left: 1.5rem;
+}
+
+/* The price. One element, two contexts: prominent under the meal header's
+   figures, quieter but still the largest thing in a card's info block. Always
+   rendered, empty when the note states no price, so a card keeps its height. */
+/* Under the price, and styled like it rather than like a badge: both are facts
+   about buying the meal. Muted, because the name of the company is context for
+   the price above it rather than something to read first. */
+.culi-supplier-line {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.15rem;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+.culi-supplier-icon {
+  display: flex;
+}
+
+.culi-supplier-icon svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.culi-supplier-name {
+  font-weight: 600;
+}
+
+/* A pill, because a line is one of a fixed set the company publishes, which is
+   the same thing a diet badge is. */
+.culi-supplier-line-name {
+  padding: 0.05rem 0.4rem;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 999px;
+}
+
+.culi-supplier-inferred {
+  font-style: italic;
+  color: var(--text-faint);
+}
+
+.culi-price {
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.culi-header-price {
+  margin: 0.35rem 0 0.1rem;
+  font-size: 1.25rem;
+}
+
+/* No `:empty { display: none }
+
+` here, and that was checked rather than assumed:
+   an empty block's top and bottom margins collapse through it, so a header with
+   no price measures the same with the element as without it. The card's price row
+   is the opposite case, where the reserved height is the point. */
+
+/* Says what the figures above are figures *of*. Small, but never hidden: the
+   numbers mean different things under different settings. */
+.culi-stat-caption {
+  margin-top: 0.15rem;
+  font-size: var(--font-ui-smaller);
+  color: var(--text-faint);
+}
+
+/* The strip's own bottom margin already provides the gap and the two collapse,
+   so this adds only the trailing space. An earlier attempt also set a negative
+   margin-top here, which pulled the caption 4px closer than it had been. */
+.culi-stat-strip--boxed + .culi-stat-caption {
+  margin-bottom: 0.75rem;
+}
+
+/* ── Sections ────────────────────────────────────────────────────────────── */
+
+.culi-section {
+  margin: 1rem 0;
+  min-width: 0;
+}
+
+/* The two parsed sections are cards, not bare runs of text. Everything else a
+   note carries is offered as a sidebar button instead, so these two are the
+   only body content that gets framed. */
+/* margin-top is zeroed rather than left to the cascade: each card is preceded
+   either by the title block or by the previous card, both of which already
+   supply the gap through their own margin-bottom. */
+.culi-reheating-section {
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-l);
+  padding: 1rem 1.25rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+/* The header: the facts on the left, the picture on the right. `flex-start`
+   so the card sits against the top of the block rather than stretching down
+   the height of it. */
+.culi-header-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+/* `min-width: 0` because a flex item's default minimum is its content, and the
+   figure strip would otherwise push the picture off the pane rather than
+   letting its own columns narrow. */
+.culi-title-block {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin-bottom: 1.25rem;
+}
+
+.culi-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.culi-section-icon {
+  display: flex;
+  align-items: center;
+  color: var(--text-accent);
+}
+
+.culi-section-title {
+  font-size: var(--font-ui-medium);
+  font-weight: 700;
+}
+
+.culi-group-header {
+  margin: 0.75rem 0 0.35rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+}
+
+.culi-collapsed .culi-group-steps {
+  display: none;
+}
+
+/* The heading's own depth, so a #### under a ### reads as subordinate to it
+   rather than as its equal. */
+.culi-heading-level-4,
+.culi-heading-level-5,
+.culi-heading-level-6 {
+  font-size: var(--font-ui-small);
+  padding-left: 0.5rem;
+}
+
+/* ── Per-100 g breakdown ─────────────────────────────────────────────────── */
+
+/* The second card of the meal view, framed exactly as the reheating one is: the
+   two are the same kind of thing to a reader, a parsed part of the meal drawn
+   in a shape of its own, and giving one of them its own frame would say they
+   were not. margin-top is zeroed here for the same reason it is there. */
+.culi-breakdown-section {
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-l);
+  padding: 1rem 1.25rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+/* Label and value are siblings of one grid rather than a row element each, so
+   the two columns are shared: a nutrient name that wraps to two lines pushes
+   its own figure down and no other, and the figures stay in one column. A
+   wrapper per row would let each row size its own columns and the figures would
+   step. `Pantothensäure` is why this is not hypothetical.
+
+   `max-content` on the value column, so the column is as wide as the longest
+   figure and no wider, and the labels get the rest. */
+.culi-breakdown-table {
+  display: grid;
+  grid-template-columns: 1fr max-content;
+  gap: 0.3rem 1rem;
+  font-size: var(--font-ui-small);
+}
+
+.culi-breakdown-label {
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+/* Right-aligned and tabular, so a column of figures lines up by magnitude
+   rather than by however many digits each one happens to have. */
+.culi-breakdown-value {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Where energy ends and the macronutrients begin, and where those end and the
+   micronutrients begin. A rule rather than two sub-headings, because a packet
+   prints one table: the groups are a grouping, not three separate claims, and
+   nothing here rearranges an entry between the two lists to make them true.
+   Applied to both halves of the row rather than to a wrapper, since a row is
+   two grid items and not a box. */
+.culi-breakdown-group-start {
+  padding-top: 0.3rem;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+/* ── Allergen warning ────────────────────────────────────────────────────── */
+
+.culi-allergen-warning {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  margin-bottom: 1rem;
+  background: rgba(var(--color-red-rgb), 0.08);
+  border: 1px solid rgba(var(--color-red-rgb), 0.3);
+  border-radius: var(--radius-m);
+  color: var(--color-red);
+  font-size: var(--font-ui-small);
+  font-weight: 500;
+}
+
+.culi-allergen-warning svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+/* ── Instructions ────────────────────────────────────────────────────────── */
+
+.culi-step-list {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.culi-step {
+  margin-bottom: 0.6rem;
+  padding-left: 0.25rem;
+}
+
+.culi-step > p:first-child {
+  margin-top: 0;
+}
+
+.culi-step > p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Trailing section buttons ────────────────────────────────────────────── */
+
+/* A vertical stack of full-width pills, because this sits under the image in a
+   200px column where a wrapping horizontal row would break every label onto
+   its own line anyway, just raggedly. The two-column layout re-lays it out as
+   a row via the jump-nav wrapper below. */
+.culi-section-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+/* The desktop row. The bar stacks by default, which is what a phone and a
+   narrow aside both want; this is the one place it runs across, so the
+   buttons size to their labels rather than to the column.
+
+   The margins are the row's own, matched top and bottom, so the reheating card
+   below it sits as far from the buttons as the buttons sit from the banner
+   above. The card states `margin-top: 0` and relies on whatever precedes it to
+   supply the gap, which is why it belongs here rather than there. */
+.culi-section-sidebar--row {
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+}
+
+.culi-section-sidebar--row .culi-sidebar-btn {
+  width: auto;
+}
+
+.culi-sidebar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 999px;
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.culi-sidebar-btn:hover {
+  background: var(--background-modifier-hover);
+}
+
+/* The eating history is the one section in this stack that is a feature rather
+   than whatever heading a note happened to carry, so it is the one that gets
+   the accent. */
+.culi-sidebar-btn--history {
+  border-color: color-mix(in srgb, var(--color-blue) 60%, transparent);
+  color: var(--text-accent);
+}
+
+.culi-sidebar-btn-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.culi-sidebar-btn-icon {
+  display: flex;
+  align-items: center;
+}
+
+/* The count on the eating-history chip. Accent-filled rather than grey, because
+   it is the one number in the sidebar and a grey pill on a grey button reads
+   as part of the label rather than as a quantity. */
+.culi-sidebar-btn-badge {
+  padding: 0.2em 0.5em;
+  border-radius: 999px;
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+/* ── Cook history log ────────────────────────────────────────────────────── */
+
+.culi-eating-log {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.culi-eating-log-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+/* Wide enough for the day and the clock time together, which is one element so
+   the pair cannot be split across a wrap and read as two facts. */
+.culi-eating-log-date {
+  min-width: 10rem;
+  font-weight: var(--font-medium);
+}
+
+.culi-eating-log-rating {
+  color: var(--text-accent);
+}
+
+.culi-eating-log-person {
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+/* Pushed to its own line on a narrow modal rather than truncated: a note is
+   the part of a log entry somebody wrote by hand. */
+.culi-eating-log-note {
+  flex: 1 1 12rem;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+/* ── Plan-a-meal modal ─────────────────────────────────────────────────── */
+
+.culi-mpv-plan-scope {
+  margin-bottom: 0.75rem;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+.culi-mpv-plan-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.culi-mpv-plan-label {
+  flex: 0 0 5rem;
+}
+
+.culi-mpv-plan-select {
+  flex: 1 1 auto;
+}
+
+/* The picture is a fixed 200px beside the header on a desktop. On a phone the
+   header is a card of its own and the picture fills the width it is given. */
+body.is-mobile .culi-image-card {
+  width: 100%;
+}
+
+/* ── Mobile layout ───────────────────────────────────────────────────────── */
+
+/* A small uppercase label. Used often enough on mobile, where labels have to
+   be short, that it is worth one class rather than six copies. */
+.culi-label-caps {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-faint);
+}
+
+.culi-servings-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.culi-mobile-desc-text {
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* Clamped to two lines with a link into the Info tab. The link hides itself
+   when the text turned out not to be clipped. */
+.culi-mobile-desc {
+  position: relative;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0.35rem 0 0.75rem;
+  color: var(--text-muted);
+}
+
+.culi-mobile-desc-more {
+  margin-left: 0.3rem;
+  color: var(--text-accent);
+  cursor: pointer;
+}
+
+.culi-mobile-native-card {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin-bottom: 0.75rem;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-l);
+  overflow: hidden;
+}
+
+/* The photo takes a fixed share of the row rather than a fixed width, so the
+   card looks the same on a small phone and a large one. */
+.culi-mobile-native-card .culi-image-card {
+  width: 44%;
+  flex-shrink: 0;
+}
+
+.culi-mobile-native-card .culi-meal-image,
+.culi-mobile-native-card .culi-image-placeholder {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 0;
+  object-fit: cover;
+}
+
+.culi-mobile-native-meta {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.75rem 0.9rem;
+  min-width: 0;
+}
+
+.culi-mobile-native-value {
+  font-weight: 600;
+}
+
+/* The row the action buttons sit in, with the breathing room the scale block
+   used to provide before it went. Stretched rather than clustered at one end:
+   four targets across the width is what a thumb wants, and there is nothing
+   else in the row to align against any more. */
+.culi-mobile-actions-row {
+  display: flex;
+  margin: 0.5rem 0 0.75rem;
+}
+
+.culi-mobile-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+/* The Info panel when it is the only one, so it keeps the spacing the tab
+   strip's own panel would have given it. */
+.culi-lone-panel {
+  margin-top: 1rem;
+}
+
+/* ── Tab strip ───────────────────────────────────────────────────────────── */
+
+.culi-tab-bar {
+  position: relative;
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+/* The underline follows the active tab's measured box, set through
+   setCssProps(), because the tabs are not all the same width: a label tab
+   flexes and an icon tab does not. */
+.culi-tab-bar::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: var(--culi-tab-indicator-left, 0);
+  width: var(--culi-tab-indicator-width, 0);
+  height: 2px;
+  background: var(--interactive-accent);
+  transition:
+    left 0.18s ease,
+    width 0.18s ease;
+}
+
+.culi-tab-btn {
+  flex: 1;
+  padding: 0.5rem 0.5rem 0.6rem;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.12s;
+  z-index: 1;
+}
+
+.culi-tab-btn:hover {
+  color: var(--text-normal);
+}
+
+.culi-tab-btn--icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+}
+
+.culi-tab-active {
+  color: var(--interactive-accent);
+  font-weight: 600;
+}
+
+/* Every panel occupies the same grid cell, so the wrapper is always as tall
+   as the tallest one and the page does not jump under a thumb mid-swipe. */
+.culi-tab-panels-wrapper {
+  display: grid;
+}
+
+.culi-tab-panel {
+  grid-area: 1 / 1;
+  /* Hidden by visibility rather than display, so it keeps contributing its
+     height to the grid cell above. */
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.culi-tab-panel--active {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* ── Mobile info tab ─────────────────────────────────────────────────────── */
+
+.culi-info-source {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin: 0.5rem 0;
+}
+
+/* ── Gallery ─────────────────────────────────────────────────────────────── */
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Toolbars
+
+   One row shape for every view that lists something: the gallery, the orders
+   view, the meal-plan header and the dashboard's top bar. There were four of
+   these once, and they looked identical on a desktop and nothing like each
+   other on an iPad, because each declared its own padding in a single-class
+   rule while Obsidian's mobile stylesheet reaches the same buttons with a
+   selector that outranks one class.
+
+   Hence two things here that look like over-engineering and are not. The sizes
+   come from custom properties on the row, so the mobile override is two
+   declarations rather than a second copy of every rule. And every rule that
+   sets a size is **two classes deep**, which is the specificity it takes to
+   beat the app's own button and input styling. `tests/stylesheet.test.ts`
+   pins both.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* How tall a control is, and how big the icon inside it is, for every control
+   this plugin draws: a toolbar button, a week-nav arrow, a person select. On
+   the body rather than on each row, because a header that is not a toolbar
+   still has to line its controls up with one that is. Touch targets are the
+   only place the numbers differ. */
+body {
+  --culi-control-height: 2rem;
+  --culi-control-icon: 1.05rem;
+}
+
+body.is-mobile {
+  --culi-control-height: 2.5rem;
+  --culi-control-icon: 1.2rem;
+}
+
+.culi-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.culi-toolbar-search-wrap {
+  position: relative;
+  flex: 1 1 12rem;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.culi-toolbar-search-icon {
+  position: absolute;
+  left: 0.6rem;
+  display: flex;
+  align-items: center;
+  color: var(--text-faint);
+  pointer-events: none;
+}
+
+.culi-toolbar .culi-toolbar-search-icon svg {
+  width: var(--culi-control-icon);
+  height: var(--culi-control-icon);
+}
+
+/* Two classes deep on purpose: Obsidian styles `input[type='search']` with an
+   attribute selector, which outranks a single class, so a one-class rule loses
+   its padding and the placeholder ends up underneath the magnifier. */
+.culi-toolbar .culi-toolbar-search {
+  width: 100%;
+  height: var(--culi-control-height);
+  padding-left: 2.1rem;
+}
+
+.culi-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* A view control: square, icon only. */
+.culi-toolbar .culi-toolbar-icon-btn {
+  --icon-size: var(--culi-control-icon);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--culi-control-height);
+  height: var(--culi-control-height);
+  min-height: 0;
+  padding: 0;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  background: var(--background-secondary);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+/* An action: labelled, because it writes a note rather than changing what is
+   on screen. */
+.culi-toolbar .culi-toolbar-btn {
+  --icon-size: var(--culi-control-icon);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: var(--culi-control-height);
+  min-height: 0;
+  padding: 0 0.7rem;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  background: var(--background-secondary);
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* Sized here rather than left to `--icon-size`, which is not defined in every
+   context an icon can end up in. */
+.culi-toolbar .culi-toolbar-icon-btn svg,
+.culi-toolbar .culi-toolbar-btn svg {
+  width: var(--culi-control-icon);
+  height: var(--culi-control-icon);
+}
+
+/* Every icon this plugin draws sits in one of these.
+   `setIcon()` on a button element renders nothing on iOS in some contexts and
+   fine in others, and the difference has never been pinned down; on a child
+   element it has always rendered, everywhere. So icons go in a slot, and
+   `tests/icon-slot.test.ts` fails on a `setIcon()` call aimed at a button. */
+.culi-icon-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.culi-toolbar .culi-toolbar-icon-btn:hover,
+.culi-toolbar .culi-toolbar-btn:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.culi-toolbar .culi-toolbar-icon-btn.culi-is-active {
+  background: var(--interactive-accent);
+  border-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+/* A dot on the filter button, so a collapsed panel still says that what is in
+   front of somebody is not everything. */
+.culi-toolbar .culi-toolbar-icon-btn.culi-has-active-filters::after {
+  content: '';
+  position: absolute;
+  top: 0.15rem;
+  right: 0.15rem;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--interactive-accent);
+}
+
+.culi-toolbar-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  padding: 0.6rem;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  background: var(--background-secondary);
+}
+
+.culi-toolbar-select {
+  font-size: var(--font-ui-small);
+}
+
+.culi-toolbar-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+.culi-toolbar-panel-footer {
+  display: flex;
+  gap: 0.35rem;
+  margin-left: auto;
+}
+
+.culi-toolbar-panel .culi-toolbar-panel-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 0;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  background: var(--background-primary);
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  cursor: pointer;
+}
+
+.culi-toolbar-panel .culi-toolbar-panel-btn:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.culi-toolbar-panel .culi-toolbar-panel-btn svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.culi-gallery-content {
+  padding: 0.75rem 1rem 3rem;
+}
+
+.culi-gallery-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.75rem;
+  margin-bottom: 0.6rem;
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+}
+
+.culi-gallery-stats-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.culi-gallery-stats-chip {
+  padding: 2px 8px;
+  border-radius: var(--radius-s);
+  background: var(--background-modifier-border);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.culi-gallery-stats-sort {
+  margin-left: auto;
+  color: var(--text-faint);
+}
+
+.culi-gallery-empty {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+/* auto-fill rather than auto-fit: a library of three meals should show
+   three cards at their intended size, not three cards stretched across the
+   whole pane. */
+.culi-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 0.85rem;
+}
+
+/* ── Gallery card ────────────────────────────────────────────────────────── */
+
+.culi-gallery-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-l);
+  overflow: hidden;
+  background: var(--background-primary);
+  cursor: pointer;
+  transition:
+    border-color 0.12s,
+    transform 0.12s;
+}
+
+.culi-gallery-card:hover,
+.culi-gallery-card:focus-visible {
+  border-color: var(--interactive-accent);
+  transform: translateY(-2px);
+}
+
+.culi-gallery-card-image {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--background-secondary);
+}
+
+.culi-gallery-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Keeps the card the same height while the lazy image pass is still running,
+   so the grid does not reflow under a pointer that is already moving. */
+.culi-gallery-card-image--empty::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--background-secondary);
+}
+
+.culi-gallery-card-favorite {
+  position: absolute;
+  top: 0.4rem;
+  left: 0.4rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: var(--color-red);
+}
+
+.culi-gallery-card-favorite svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  fill: currentColor;
+}
+
+/* Held back until the card is hovered or focused so it does not compete with
+   the photograph. Touch devices have no hover, so the coarse-pointer query at
+   the end of this file pins it visible there. */
+/* padding and box-shadow are reset explicitly, like every other icon button in
+   this file. Obsidian's default button padding is larger than this 1.6rem box,
+   which squeezed the glyph to nothing: the chip rendered and the dots did not. */
+.culi-gallery-card-menu-btn {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  box-shadow: none;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.1s ease-in-out;
+}
+
+.culi-gallery-card:hover .culi-gallery-card-menu-btn,
+.culi-gallery-card:focus-within .culi-gallery-card-menu-btn {
+  opacity: 1;
+}
+
+.culi-gallery-card-menu-btn svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+/* Always shown on the dashboard's strip. Those cards are 11rem wide and sit in
+   a horizontal scroller, where a control that only appears on hover is one
+   nobody finds. */
+.culi-dashboard-new-meals-strip .culi-gallery-card-menu-btn {
+  opacity: 1;
+}
+
+.culi-gallery-card-title-overlay {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 1;
+  padding: 1.5rem 0.6rem 0.5rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0));
+}
+
+.culi-gallery-card-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: #fff;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+/* Three rows, each a fixed height, and that is the whole point of this block.
+   A card is a grid item stretched to its row's height, so one card that is
+   taller than the rest makes every card beside it taller and leaves them with a
+   gap under their content. Same rule as the meal-plan week cards, arrived at the
+   same way: by measuring, not by looking. */
+.culi-gallery-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.5rem 0.6rem 0.6rem;
+  /* The sum of the four rows, their three gaps and the padding: 1.35 + 2.15 +
+     1.3 + 2.15 + 0.9 + 1.1. Fixed rather than reserved row by row, because a
+     strip with no figures in it is not rendered at all, and two of the 126 notes
+     this was measured against state no nutrition. Without this those two cards
+     would be shorter than the rest, which in a grid means their neighbours grow to
+     fill the row instead. `min-height` rather than `height` so a future row that
+     genuinely needs more space grows visibly rather than being silently cut.
+     **Adding a row means adding to this sum and re-running the harness.** */
+  min-height: 8.95rem;
+}
+
+/* One line, always present. `overflow: hidden` rather than wrapping: two diets
+   plus a ready-meal marker will not fit across 190px, and a second line of chips
+   would be the one thing on the card that changes its height. */
+.culi-gallery-card-chips {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  height: 1.35rem;
+  overflow: hidden;
+}
+
+/* `DIET` before the value is redundant on a card, where there is only one kind of
+   chip, and dropping it is what makes room for the preparation marker beside it. */
+.culi-gallery-card-chips .culi-badge-label {
+  display: none;
+}
+
+.culi-gallery-card-chips .culi-badge-row {
+  margin: 0;
+  gap: 0.25rem;
+  flex-wrap: nowrap;
+}
+
+/* The two strips. Equal columns rather than content-sized, because four
+   abbreviated nutrition labels of different lengths otherwise give four columns
+   of different widths, and a row of figures that does not line up reads as a
+   mistake on something this small. `minmax(0, 1fr)` for the reason the boxed
+   variant uses it: plain `1fr` floors each column at its content. */
+.culi-gallery-card-nutrition,
+.culi-gallery-card-info-strip {
+  grid-auto-columns: minmax(0, 1fr);
+  column-gap: 0.4rem;
+  min-height: 2.15rem;
+}
+
+.culi-gallery-card-nutrition > .culi-stat-label,
+.culi-gallery-card-info-strip > .culi-stat-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.culi-gallery-card-nutrition > .culi-stat-value,
+.culi-gallery-card-info-strip > .culi-stat-value {
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The lower strip is the quieter of the two: what has happened to the dish
+   rather than what is in it. */
+.culi-gallery-card-info-strip > .culi-stat-value {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* A fixed height whether or not there is a price, which is the whole reason this
+   element is rendered empty rather than skipped. */
+.culi-gallery-card-price {
+  height: 1.3rem;
+  font-size: 1rem;
+}
+
+.culi-gallery-card-info .culi-badge {
+  height: 1.3rem;
+  padding: 0 0.4rem;
+  gap: 0.2rem;
+  font-size: 0.65rem;
+}
+
+.culi-gallery-card-info .culi-badge-label {
+  font-size: 0.55rem;
+}
+
+.culi-gallery-card-info .culi-badge-icon svg {
+  width: 0.65rem;
+  height: 0.65rem;
+}
+
+/* ── Week navigator ──────────────────────────────────────────────────────── */
+
+.culi-week-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.culi-week-nav .culi-week-nav-step {
+  --icon-size: var(--culi-control-icon);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--culi-control-height);
+  height: var(--culi-control-height);
+  min-height: 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-s);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.culi-week-nav-step:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+/* Without this the chevrons render at zero size and the nav shows two empty
+   buttons. Same failure as the gallery card's overflow button: every setIcon()
+   host in this sheet sizes its own svg, and one that does not is invisible
+   rather than wrong-looking, which is why it survives a glance. */
+.culi-week-nav-step svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+/* The same 1.9rem box as the two step buttons, and centred the same way. It had
+   only vertical padding before, so its height came out of the font metrics and
+   did not match the arrows either side of it. */
+.culi-week-nav .culi-week-nav-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Enough that stepping between "This week" and a date does not shift the
+     arrows, but not so much that it crowds a narrow card's title. 7rem did. */
+  min-width: 4.5rem;
+  height: var(--culi-control-height);
+  min-height: 0;
+  padding: 0 0.5rem;
+  white-space: nowrap;
+  border: none;
+  border-radius: var(--radius-s);
+  box-shadow: none;
+  background: transparent;
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* Only when it does something: on the current week the label is a statement. */
+.culi-week-nav-label:not(.culi-week-nav-label-current):hover {
+  background: var(--background-modifier-hover);
+}
+
+/* Already on this week, so the label is a statement rather than a control. */
+.culi-week-nav-label-current {
+  color: var(--text-accent);
+  cursor: default;
+}
+
+/* ── Meal picker ─────────────────────────────────────────────────────────── */
+
+/* Only the marked rows get this. Obsidian's own suggestion row is a block, and
+   turning every row into a flex line to suit the few that carry a mark would
+   change the layout of a list that is fine as it is. */
+.culi-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Pushed to the far edge, because it answers a different question from the
+   title and reading past it to the next title should not cost anything. */
+.culi-picker-delivered {
+  margin-left: auto;
+  flex: none;
+  padding: 0.05rem 0.4rem;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 999px;
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+}
+
+/* ── Meal plan view ──────────────────────────────────────────────────────── */
+
+.culi-meal-plan-view {
+  padding: 0.75rem 1rem 3rem;
+}
+
+.culi-mpv-top-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.culi-toolbar .culi-mpv-person-select {
+  height: var(--culi-control-height);
+  min-height: 0;
+  max-width: 12rem;
+}
+
+/* A plan note opened as its week states which week and whose rather than
+   offering a picker: the note is one of each and cannot be navigated away
+   from. */
+.culi-mpv-note-week {
+  font-weight: 700;
+}
+
+.culi-mpv-note-person {
+  margin-right: auto;
+  color: var(--text-muted);
+}
+
+/* The queue is a full-width strip above the days: it fills and empties on a
+   different rhythm from them, and it holds the meals with no day yet. */
+.culi-mpv-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Monday to Friday on one row, Saturday and Sunday on the next. Five fixed
+   columns rather than `auto-fit`, which is what makes the split predictable: at
+   this pane width auto-fit produced seven columns of 230px, narrow enough that
+   an ordinary meal title wrapped to three lines. The weekend keeps the same
+   column width as the weekdays rather than stretching to fill the row, so every
+   day is one size. `stretch` equalises the columns within a row. */
+.culi-mpv-days-row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.6rem;
+  align-items: stretch;
+}
+
+/* Five columns need room. Below it, fall back to as many as fit: a 150px column
+   is cramped but readable, whereas five columns squeezed into a narrow pane are
+   not. A media query rather than a container query, matching how the rest of this
+   file handles width; it keys off the window instead of the pane, which is close
+   enough for a view that occupies a whole tab. */
+@media (max-width: 1000px) {
+  .culi-mpv-days-row {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+}
+
+/* Wider columns on a touch screen, at every width rather than below a
+   breakpoint, because a card there carries more than a card on the desktop does:
+   the two action buttons have no hover to hide behind, so they are always on the
+   card and always take a column of their own. 150px minus a thumbnail minus that
+   column left the text 38px, which is not a meal title and not five stars. 13rem
+   is the floor at which the tightest column the grid can produce still holds all
+   three, measured across every viewport from 360px to 1400px. Fewer columns per
+   row is the price, and on a tablet that is the cheaper direction: scrolling
+   down a week costs less than a card nothing fits on. */
+body.is-mobile .culi-mpv-days-row {
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+
+.culi-mpv-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-l);
+  background: var(--background-secondary);
+  overflow: hidden;
+}
+
+.culi-mpv-col-header {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.culi-mpv-col-day {
+  font-weight: 700;
+  font-size: var(--font-ui-small);
+}
+
+.culi-mpv-col-count {
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: var(--background-modifier-border);
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+}
+
+.culi-mpv-col-add {
+  margin-left: auto;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-s);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.culi-mpv-col-add:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.culi-mpv-col-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.45rem;
+  min-height: 4rem;
+}
+
+.culi-mpv-col-empty {
+  padding: 0.75rem 0.25rem;
+  text-align: center;
+  color: var(--text-faint);
+  font-size: var(--font-ui-smaller);
+}
+
+/* Highlights the whole column, header included: a column holding one card is
+   mostly header, and a drop onto it has to look like it will land. */
+.culi-mpv-drop-active {
+  border-color: var(--interactive-accent);
+  background: color-mix(in srgb, var(--interactive-accent) 8%, var(--background-secondary));
+}
+
+/* ── Meal plan card ──────────────────────────────────────────────────────── */
+
+/* Every card the same height, the way the gallery cards on the dashboard are.
+   Two things are needed for that and neither works alone: the title is clamped
+   so a long name cannot push a card taller (one meal title ran to four lines
+   and a 126px card next to a 61px one), and `min-height` lifts the short cards
+   to meet it. Without the floor, uniformity would depend on every meal having
+   a two-line name. */
+.culi-mpv-card {
+  position: relative;
+  display: flex;
+  gap: 0.5rem;
+  min-height: 5rem;
+  padding: 0.35rem;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  background: var(--background-primary);
+  cursor: pointer;
+}
+
+.culi-mpv-card:hover {
+  border-color: var(--interactive-accent);
+}
+
+.culi-mpv-card--leftovers {
+  border-style: dashed;
+}
+
+.culi-mpv-card-thumb {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-s);
+  overflow: hidden;
+  background: var(--background-secondary);
+  color: var(--text-faint);
+}
+
+.culi-mpv-card-thumb--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--background-modifier-border);
+  color: var(--text-faint);
+}
+
+.culi-mpv-card-thumb--empty svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.culi-mpv-card-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.culi-mpv-card-body {
+  min-width: 0;
+  flex: 1;
+}
+
+.culi-mpv-card-name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  /* Exactly two lines tall whether the title fills them or not: `line-clamp`
+     alone caps the maximum, and a one-line title would still make a shorter card
+     than a two-line one. 2.5em is two lines at the line-height below, and pinning
+     it also stops a clamped line box measuring a couple of pixels taller than an
+     unclamped one. */
+  height: 2.5em;
+  font-size: var(--font-ui-small);
+  font-weight: 600;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+/* One line, always present, never wrapping. The height of a card must not depend
+   on which of these two labels it carries or on how wide the column is. A label
+   too long for the row is clipped rather than folded onto a second line. */
+.culi-mpv-card-tags {
+  display: flex;
+  gap: 0.4rem;
+  align-items: baseline;
+  height: 1.15em;
+  overflow: hidden;
+  font-size: var(--font-ui-smaller);
+}
+
+.culi-mpv-card-meal,
+.culi-mpv-card-leftovers-badge {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Small enough to sit on a card, and read-only-looking until hovered.
+   `flex-wrap` is the guard rather than the layout: five stars fit on one line at
+   every width the grid produces, and if a narrower pane ever changes that, the
+   fifth one drops to a second line instead of being cut off the card. Losing a
+   star silently is how a five-star meal read as a four-star one. */
+.culi-mpv-card .culi-star-rating {
+  margin: 0.15rem 0 0;
+  flex-wrap: wrap;
+}
+
+.culi-mpv-card .culi-star {
+  font-size: 0.8rem;
+  padding: 0;
+}
+
+/* Bigger on a touch screen, because these stars are a control somebody aims a
+   thumb at rather than a value they read: 0.8rem is an 11px target. Not the
+   dialog's 1.6rem, which is twice as wide as the card's text column can hold.
+   The exact size is what the narrowest column the mobile grid produces has room
+   for: at 0.95rem the five stars are 84px in a 91px text column, so they stay on
+   one line at every viewport from 360px to 1400px, and 1rem is the size at which
+   they start to fold onto two. */
+body.is-mobile .culi-mpv-card .culi-star {
+  font-size: 0.95rem;
+  padding: 0.15rem 0.1rem;
+}
+
+/* Held back until the card is hovered so a grid of twenty cards is not a grid
+   of forty buttons. Focus-within keeps them reachable by keyboard. */
+.culi-mpv-card-actions {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1rem;
+  opacity: 0;
+}
+
+.culi-mpv-card:hover .culi-mpv-card-actions,
+.culi-mpv-card:focus-within .culi-mpv-card-actions {
+  opacity: 1;
+}
+
+/* On a touch screen they are always visible, because there is no hover to
+   reveal them with, and that changes where they can sit. Floating over the card
+   is fine while they only appear under a pointer; permanently, they cover the
+   meal's name, which on a tablet left a title reading "Beef Stro  t  mit
+   Spätzli". So on mobile they leave the overlay and become a column of their
+   own at the right of the card, in the flow, where they overlap nothing. That
+   column has to come out of the card's width, which is what the wider mobile
+   grid floor above pays for. */
+body.is-mobile .culi-mpv-card-actions {
+  position: static;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-self: flex-start;
+  gap: 0.15rem;
+  opacity: 1;
+}
+
+.culi-mpv-card-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-s);
+  background: transparent;
+  color: var(--text-faint);
+  cursor: pointer;
+}
+
+.culi-mpv-card-action-btn:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.culi-mpv-card-action-btn--danger:hover {
+  background: color-mix(in srgb, var(--text-error) 12%, transparent);
+  color: var(--text-error);
+}
+
+.culi-mpv-card-action-btn svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+/* Every box property stated again, from two classes rather than one, and the
+   reason is the same one `.culi-order-cost-price` documents: Obsidian's mobile
+   stylesheet styles a bare `button` with a selector that beats a single class of
+   ours, so a button meant to be a transparent 1.4rem square came out with a
+   filled background and a size of the app's choosing. `min-width` and
+   `min-height` are in the list because that is what a mobile stylesheet reaches
+   for to make a tap target, and neither `width` nor `height` can override one.
+   The glyph is bigger here than on the desktop card for the ordinary reason: a
+   thumb is not a pointer. */
+body.is-mobile .culi-mpv-card-actions .culi-mpv-card-action-btn {
+  width: 1.75rem;
+  height: 1.75rem;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  color: var(--text-muted);
+}
+
+body.is-mobile .culi-mpv-card-actions .culi-mpv-card-action-btn svg {
+  display: block;
+  width: 1.1rem;
+  height: 1.1rem;
+  color: currentColor;
+}
+
+/* ── Meal-slot popover ───────────────────────────────────────────────────── */
+
+/* Floating rather than in the flow, and positioned by hand, because it anchors
+   to the point a card was dropped at. */
+.culi-meal-slot-popover {
+  position: fixed;
+  z-index: var(--layer-popover, 30);
+  min-width: 12rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  background: var(--background-primary);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.culi-meal-slot-close {
+  position: absolute;
+  top: 0.15rem;
+  right: 0.25rem;
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  color: var(--text-faint);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.culi-meal-slot-label {
+  margin-bottom: 0.4rem;
+  padding-right: 1rem;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+.culi-meal-slot-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.culi-meal-slot-chip {
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 999px;
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+  cursor: pointer;
+}
+
+.culi-meal-slot-chip:hover {
+  background: var(--interactive-accent);
+  border-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+/* Under the chips and quieter than them: leaving the slot unset is a real
+   answer, but it is not the one being suggested. */
+.culi-meal-slot-skip {
+  margin-top: 0.4rem;
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  cursor: pointer;
+}
+
+/* ── Dragging ────────────────────────────────────────────────────────────── */
+
+.culi-mpv-card--dragging {
+  opacity: 0.4;
+}
+
+/* The ghost follows the finger, so its position is genuinely dynamic and set
+   through setCssProps() rather than a class. */
+.culi-mpv-card--ghost {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.9;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+
+/* ── Orders ──────────────────────────────────────────────────────────────── */
+
+.culi-orders-view {
+  padding: 0.75rem 1rem 3rem;
+}
+
+.culi-orders-empty {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.culi-orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.culi-order {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-l);
+  background: var(--background-secondary);
+}
+
+.culi-order-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.culi-order-company {
+  font-weight: 700;
+}
+
+.culi-order-number {
+  color: var(--text-faint);
+  font-size: var(--font-ui-small);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The buttons keep the far edge as a group. One `margin-left: auto` on the
+   group rather than one per button: two auto margins in the same flex row
+   share the free space between them, which put the first button in the middle
+   of the card. */
+.culi-order-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.culi-order-edit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-s);
+  background: transparent;
+  color: var(--text-faint);
+  cursor: pointer;
+}
+
+.culi-order-edit svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  flex-shrink: 0;
+}
+
+.culi-order:hover .culi-order-edit {
+  color: var(--text-muted);
+}
+
+.culi-order-edit:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+/* When, from whom, how much: the row somebody scans before reading the
+   picks underneath. */
+.culi-order-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0.3rem 0;
+}
+
+.culi-order-fact {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  font-size: var(--font-ui-small);
+}
+
+.culi-order-fact-icon {
+  display: flex;
+  align-items: center;
+  color: var(--text-faint);
+}
+
+.culi-order-fact-icon svg {
+  width: 0.8rem;
+  height: 0.8rem;
+}
+
+.culi-order-fact-value {
+  font-variant-numeric: tabular-nums;
+}
+
+.culi-order-picks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-top: 0.35rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.culi-order-pick {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-size: var(--font-ui-small);
+}
+
+.culi-order-pick-person {
+  min-width: 7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.culi-order-pick-meals a {
+  color: var(--text-accent);
+  cursor: pointer;
+}
+
+/* ── Order editor ────────────────────────────────────────────────────────── */
+
+.culi-order-costs {
+  margin-top: 1rem;
+}
+
+/* One row per dish: its name, how many portions, and one price for it. */
+.culi-order-cost-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+}
+
+/* `min-width: 0` is what lets a flex child shrink below its content and show an
+   ellipsis. Without it the name would push the row wider instead. */
+.culi-order-cost-dish {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.culi-order-cost-count {
+  flex: 0 0 auto;
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+}
+
+/* `flex: 0 0 5.5rem` rather than `width: 5.5rem`, and that is the fix for a real
+   bug rather than a stylistic preference. On the iPad this field rendered about
+   590px wide while the dish name beside it vanished entirely, and the placeholder
+   was still right-aligned, so this rule was applying and only its width was being
+   beaten. Obsidian's mobile stylesheet sets a width on a text input with a
+   selector more specific than one class. A flex item's main size comes from its
+   basis, which no `width` declaration can override, so stating the basis makes the
+   field the same size on every platform. Anything laid out in a flex row here
+   should state a basis for the same reason. */
+.culi-order-cost-price {
+  flex: 0 0 5.5rem;
+  min-width: 0;
+  text-align: right;
+}
+
+/* A derived total is still a number somebody reads off, so it stays legible
+   rather than taking the browser's greyed-out disabled look. The cursor is what
+   says it cannot be typed into; editing a meal's price is what changes it. */
+.culi-order-total-derived {
+  font-weight: 600;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.culi-order-currency {
+  width: 4rem;
+}
+
+.culi-order-selections {
+  margin-top: 0.75rem;
+}
+
+.culi-order-hint {
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+.culi-order-search {
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.culi-order-person {
+  margin-bottom: 0.75rem;
+}
+
+.culi-order-person-name {
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+}
+
+/* The meal list scrolls inside the block rather than growing the modal:
+   with several people and a large library the body would otherwise be
+   thousands of pixels tall. */
+.culi-order-meal-list {
+  max-height: 9rem;
+  overflow-y: auto;
+  padding: 0.25rem 0.4rem;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  background: var(--background-primary);
+}
+
+.culi-order-meal {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.1rem 0;
+  font-size: var(--font-ui-small);
+  cursor: pointer;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Deliveries
+
+   The dialog borrows the order editor's proportions deliberately: the two are
+   filled in one after the other, and a second set of spacings would make them
+   read as two plugins.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.culi-delivery-orders {
+  margin-top: 0.75rem;
+}
+
+.culi-delivery-hint {
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+.culi-delivery-order {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.1rem 0;
+  font-size: var(--font-ui-small);
+  cursor: pointer;
+}
+
+.culi-delivery-items {
+  margin-top: 1rem;
+}
+
+.culi-delivery-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+}
+
+/* `min-width: 0` is what lets the name shrink and ellipsis rather than pushing
+   the quantity field off the row, the same as the cost row above. */
+.culi-delivery-meal {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A stated basis rather than a width, for the reason `.culi-order-cost-price`
+   documents at length: Obsidian's mobile stylesheet beats a plain width here. */
+.culi-delivery-quantity {
+  flex: 0 0 4.5rem;
+  min-width: 0;
+  text-align: right;
+}
+
+.culi-delivery-remove {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  padding: 0.2rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.culi-delivery-remove svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.culi-delivery-add {
+  margin-top: 0.4rem;
+}
+
+.culi-delivery-select {
+  width: 100%;
+}
+
+.culi-deliveries {
+  margin-top: 1.5rem;
+}
+
+.culi-deliveries-heading {
+  margin-bottom: 0.5rem;
+}
+
+.culi-delivery-card {
+  padding: 0.6rem 0.75rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  background: var(--background-primary);
+}
+
+.culi-delivery-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.culi-delivery-date {
+  font-weight: 600;
+}
+
+/* Pushed to the right of the date, so the edit button keeps the far edge and
+   the two cards' buttons line up down the list. */
+.culi-delivery-count {
+  margin-right: auto;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+.culi-delivery-card-meals {
+  margin-top: 0.3rem;
+  font-size: var(--font-ui-small);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Order note, rendered as an invoice
+
+   The compact card in the orders list and this are two different documents on
+   purpose: a row in a list of everything bought, against one order read end to
+   end. Both take their figures from `orders/order-total.ts`, so they cannot
+   disagree about the money.
+
+   Everything here is `culi-invoice-*` and knows nothing about orders, matching
+   the renderer it styles: a sibling plugin copying `ui/invoice/` gets the look
+   with it.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.culi-document-note-view {
+  padding: 1rem 1.25rem 3rem;
+  overflow-y: auto;
+}
+
+/* Capped and centred, because this reads as a document rather than as a view
+   that fills whatever width it is given. */
+.culi-invoice {
+  max-width: 44rem;
+  margin: 0 auto;
+}
+
+.culi-invoice-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.4rem 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--background-modifier-border);
+}
+
+.culi-invoice-doc {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+/* Uppercased here rather than in the translation table, so the German word is
+   still written as a word. */
+.culi-invoice-doc-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.culi-invoice-reference {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-faint);
+}
+
+.culi-invoice-counterparty {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.culi-invoice-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  margin: 0.6rem 0 1rem;
+}
+
+.culi-invoice-fact {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  font-size: var(--font-ui-small);
+}
+
+.culi-invoice-fact-icon {
+  display: flex;
+  align-items: center;
+  color: var(--text-faint);
+}
+
+.culi-invoice-fact-icon svg {
+  width: 0.8rem;
+  height: 0.8rem;
+}
+
+.culi-invoice-fact-value {
+  font-variant-numeric: tabular-nums;
+}
+
+/* The table scrolls sideways inside the document rather than widening it. On a
+   phone the dish column alone can be wider than the pane, and a view that grows
+   past its own edge takes the header and the totals with it. */
+.culi-invoice-table-scroll {
+  overflow-x: auto;
+}
+
+.culi-invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-ui-small);
+}
+
+.culi-invoice-col-label {
+  text-align: left;
+}
+
+/* Numbers right-aligned and tabular, which is what makes a column of figures
+   readable as a column rather than as a list of strings. */
+.culi-invoice-col-num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.culi-invoice-table th {
+  padding: 0.3rem 0.5rem;
+  border-bottom: 1px solid var(--background-modifier-border);
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-faint);
+}
+
+.culi-invoice-table td {
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.culi-invoice-line:last-child td {
+  border-bottom: none;
+}
+
+/* The label column takes every pixel the numeric columns do not, so those stay
+   as narrow as their content. */
+.culi-invoice-cell-label {
+  width: 100%;
+}
+
+.culi-invoice-cell-num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.culi-invoice-link {
+  color: var(--text-accent);
+  cursor: pointer;
+}
+
+.culi-invoice-totals {
+  margin: 0.75rem 0 0 auto;
+  max-width: 26rem;
+}
+
+/* Three columns for every row, including the ones with nothing to remark, so
+   the amounts line up down the block. */
+.culi-invoice-total-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 8rem;
+  gap: 0.5rem;
+  align-items: baseline;
+  padding: 0.1rem 0.5rem;
+  font-size: var(--font-ui-small);
+}
+
+.culi-invoice-total-label {
+  white-space: nowrap;
+}
+
+.culi-invoice-total-amount {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Said rather than coloured alone: a mismatch is information, not an error, and
+   it is as likely to be a discount nobody recorded as a typo. */
+.culi-invoice-total-note {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-warning);
+  text-align: right;
+}
+
+.culi-invoice-total-subtotal {
+  color: var(--text-muted);
+}
+
+.culi-invoice-total-adjustment {
+  color: var(--text-muted);
+}
+
+/* The rule above it and the weight are what make this read as the bottom line.
+   Drawn on the row rather than under the one before it, so it is still there
+   when there is no subtotal above. */
+.culi-invoice-total-total {
+  margin-top: 0.2rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid var(--text-muted);
+  font-size: var(--font-ui-medium);
+  font-weight: 700;
+}
+
+/* Beside the computed total, never instead of it, and emphasised because on an
+   order with no line prices it is the only figure there is. */
+.culi-invoice-total-stated {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.culi-invoice-footer {
+  margin-top: 1.5rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.culi-invoice-footer-heading {
+  margin-bottom: 0.4rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-faint);
+}
+
+.culi-invoice-group {
+  display: grid;
+  grid-template-columns: 9rem minmax(0, 1fr);
+  gap: 0.2rem 0.75rem;
+  padding: 0.15rem 0;
+  font-size: var(--font-ui-small);
+}
+
+.culi-invoice-group-label {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.culi-invoice-group-entries {
+  min-width: 0;
+}
+
+/* At this width the head cannot hold the document label and the supplier on one
+   line, and a fixed name column leaves the dishes beside it too narrow to read.
+   Both give up their row rather than being ellipsised. */
+@media (max-width: 600px) {
+  .culi-document-note-view {
+    padding: 0.75rem 0.75rem 3rem;
+  }
+
+  .culi-invoice-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+  }
+
+  .culi-invoice-group {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .culi-invoice-total-row {
+    grid-template-columns: auto minmax(0, 1fr) 6rem;
+    padding-left: 0;
+  }
+
+  .culi-invoice-table th,
+  .culi-invoice-table td {
+    padding: 0.3rem 0.35rem;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Dashboard
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.culi-dashboard-view {
+  padding: 1rem 1.2rem 2rem;
+  overflow-y: auto;
+}
+
+/* Above the grid, with room around it, so the view opens with some air rather
+   than straight into dense cards. */
+.culi-dashboard-greeting {
+  padding: 1.5rem 0 2rem;
+}
+
+.culi-dashboard-greeting-text {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+/* One grid for the whole dashboard, so column arithmetic lives in one place
+   rather than in a nest of flex rows that each have their own idea of a half. */
+.culi-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1rem;
+}
+
+.culi-dashboard-span-4 {
+  grid-column: span 4;
+}
+
+.culi-dashboard-span-8 {
+  grid-column: span 8;
+}
+
+.culi-dashboard-span-12 {
+  grid-column: span 12;
+}
+
+.culi-dashboard-card {
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-l);
+  background: var(--background-primary);
+  min-width: 0;
+}
+
+.culi-dashboard-card-header {
+  display: flex;
+  align-items: center;
+  /* Roomier than the 0.5rem it was. This row holds a person select, two text
+     links and the week nav; at 8px apart the two links read as one run-on line
+     of purple text rather than as two things to click. */
+  gap: 0.75rem;
+  margin-bottom: 0.6rem;
+  /* Wraps rather than overflowing. The meal-plan header carries a title, a
+     person select, two links and the week nav, which does not fit on a phone,
+     and the failure mode without this is a control pushed off the right edge
+     where nothing hints that it is there. `justify-content: space-between` is
+     gone with it: the title's auto margin does that job and survives wrapping,
+     which space-between does not. */
+  flex-wrap: wrap;
+}
+
+.culi-dashboard-card-label {
+  margin-bottom: 0.6rem;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Inside a header the label sits on the row's own baseline, so its bottom
+   margin would push the row apart. */
+.culi-dashboard-card-header .culi-dashboard-card-label {
+  margin-bottom: 0;
+}
+
+/* A link rather than a button: it goes somewhere, and Obsidian's default button
+   chrome beside a card label reads as an action on the card. */
+.culi-dashboard-footer-btn {
+  margin-top: 0.6rem;
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  color: var(--text-accent);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+/* In a header row the chip earns a hit area of its own. At the foot of a card a
+   link is the only thing on its line, so text-sized is fine; in a header it sits
+   between a select and the week nav, where a target exactly as tall as its own
+   text is both hard to hit and hard to tell apart from the link next to it. The
+   background stays transparent until hover, so it still reads as a link. */
+.culi-dashboard-card-header .culi-dashboard-footer-btn {
+  margin-top: 0;
+  flex-shrink: 0;
+  padding: 0.2rem 0.45rem;
+  border-radius: var(--radius-s);
+}
+
+.culi-dashboard-card-header .culi-dashboard-footer-btn:hover {
+  background: var(--background-modifier-hover);
+}
+
+/* The controls on the right are fixed-size and the title is not, so the title
+   is what gives way when the card is narrow. Truncated rather than wrapped: a
+   two-line title pushes the header taller and, before this, pushed the week
+   nav past the card's right edge. */
+.culi-dashboard-card-header .culi-week-nav {
+  flex-shrink: 0;
+}
+
+/* One auto margin, on the title, rather than one on each control. The meal-plan
+   header holds a person select, two links and the week nav; giving each of those
+   `margin-left: auto` would put a gap before every one of them rather than a
+   single gap before the group. */
+.culi-dashboard-card-header .culi-dashboard-card-label {
+  margin-right: auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.culi-dashboard-empty-text {
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+.culi-dashboard-empty-cta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.6rem;
+  /* Wraps rather than overflowing: this row can hold the empty text, its
+     button and the card's footer link, which is more than fits on a phone. */
+  flex-wrap: wrap;
+}
+
+/* The link is on this row, so it must not also carry the gap it would need
+   sitting on its own line underneath. */
+.culi-dashboard-empty-cta .culi-dashboard-footer-btn {
+  margin-top: 0;
+}
+
+.culi-dashboard-empty-cta-btn {
+  cursor: pointer;
+}
+
+/* The empty-vault card has nothing to show, so it centres its buttons rather
+   than leaving them in an otherwise blank corner. */
+.culi-dashboard-empty-vault-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 6rem;
+}
+
+/* ── Top bar ─────────────────────────────────────────────────────────────── */
+
+.culi-dashboard-quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+/* The search on its own row under the buttons, so it keeps its width on a
+   narrow window instead of being squeezed by them. */
+.culi-dashboard-search-row {
+  margin-top: 0.6rem;
+}
+
+/* ── Hero: the eating-activity chart ────────────────────────────────────── */
+
+.culi-dashboard-hero {
+  display: flex;
+  flex-direction: column;
+}
+
+.culi-dashboard-chart-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.culi-dashboard-chart-label-row .culi-dashboard-card-label {
+  margin-bottom: 0;
+}
+
+.culi-dashboard-chart-range-select {
+  font-size: 0.8rem;
+}
+
+.culi-dashboard-chart-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.culi-dashboard-chart-plot {
+  display: flex;
+  gap: 0.4rem;
+}
+
+/* Fixed width so the bars start at the same x whatever the tick numbers are,
+   and the x-axis spacer below can match it. */
+.culi-dashboard-chart-yaxis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 1.6rem;
+  height: 6rem;
+  text-align: right;
+}
+
+.culi-dashboard-chart-yaxis-tick {
+  color: var(--text-faint);
+  font-size: 0.6rem;
+  line-height: 1;
+}
+
+.culi-dashboard-chart {
+  flex: 1 1 auto;
+  width: 100%;
+  height: 6rem;
+}
+
+/* Scaled from the bottom, so a bar grows upward out of the axis rather than
+   from the middle. transform-box makes the fill box the origin, without which
+   the whole SVG's box is used and short bars float. */
+.culi-dashboard-chart-bar {
+  fill: var(--interactive-accent);
+  transform: scaleY(var(--culi-bar-scale, 0));
+  transform-box: fill-box;
+  transform-origin: bottom;
+}
+
+.culi-dashboard-chart-bar--clickable {
+  cursor: pointer;
+}
+
+.culi-dashboard-chart-gridline {
+  stroke: var(--background-modifier-border);
+  stroke-width: 0.3;
+}
+
+.culi-dashboard-chart-xaxis {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.2rem;
+}
+
+.culi-dashboard-chart-xaxis-spacer {
+  min-width: 1.6rem;
+}
+
+.culi-dashboard-chart-xaxis-label {
+  flex: 1 1 0;
+  overflow: hidden;
+  color: var(--text-faint);
+  font-size: 0.6rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ── Stats column ────────────────────────────────────────────────────────── */
+
+.culi-dashboard-stats-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Nested in the column above, which already claims the grid track. */
+.culi-dashboard-stats-col .culi-dashboard-card {
+  grid-column: auto;
+}
+
+.culi-dashboard-stat-card--number {
+  cursor: pointer;
+}
+
+.culi-dashboard-stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.culi-dashboard-most-eaten-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.culi-dashboard-most-eaten-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.culi-dashboard-most-eaten-count {
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.culi-dashboard-recently-made-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.culi-dashboard-recently-made-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.culi-dashboard-recently-made-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.culi-dashboard-recently-made-date {
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  white-space: nowrap;
+}
+
+/* ── Meal-plan mini grid ─────────────────────────────────────────────────── */
+
+.culi-dashboard-mpg {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+}
+
+.culi-dashboard-mpg-col {
+  padding: 0.5rem 0.4rem;
+  border-radius: var(--radius-s);
+  background: var(--background-secondary);
+  min-width: 0;
+}
+
+.culi-dashboard-mpg-col--empty {
+  cursor: pointer;
+}
+
+.culi-dashboard-mpg-day {
+  margin-bottom: 4px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--background-modifier-border-hover);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.culi-dashboard-mpg-empty {
+  color: var(--text-faint);
+  text-align: center;
+}
+
+/* Capped and scrollable rather than growing: seven columns of different heights
+   would make the card's own height depend on the busiest day. */
+.culi-dashboard-mpg-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  max-height: 12rem;
+  overflow-y: auto;
+}
+
+.culi-dashboard-mpg-entry {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.culi-dashboard-mpg-entry-thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--radius-s);
+  overflow: hidden;
+}
+
+.culi-dashboard-mpg-entry-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.culi-dashboard-mpg-entry-thumb--empty {
+  background: var(--background-modifier-border);
+  color: var(--text-faint);
+}
+
+.culi-dashboard-mpg-entry-thumb--empty svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.culi-dashboard-mpg-entry-text {
+  min-width: 0;
+}
+
+.culi-dashboard-mpg-entry-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--font-ui-smaller);
+}
+
+.culi-dashboard-mpg-entry-meal {
+  color: var(--text-faint);
+  font-size: 0.6rem;
+}
+
+.culi-dashboard-mpg-more {
+  color: var(--text-faint);
+  font-size: 0.8rem;
+}
+
+/* In the meal-plan card's header, beside two buttons and the week nav. A
+   select is styled by the app through an element selector, so this needs the
+   same two-class depth the buttons do. */
+.culi-dashboard-card-header .culi-dashboard-person {
+  height: var(--culi-control-height);
+  min-height: 0;
+  font-size: var(--font-ui-small);
+}
+
+/* The card header's own actions. Text links on a desktop, which the app turns
+   into pills on a touch screen; either way they line up with the nav beside
+   them. */
+.culi-dashboard-card-header .culi-dashboard-footer-btn {
+  height: var(--culi-control-height);
+  min-height: 0;
+  margin-top: 0;
+}
+
+/* ── New meals strip ───────────────────────────────────────────────────── */
+
+/* Scrolls sideways rather than wrapping, so the strip is always one row tall
+   whatever the card's width. */
+.culi-dashboard-new-meals-strip {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.culi-dashboard-new-meals-strip .culi-gallery-card {
+  flex: 0 0 11rem;
+  width: 11rem;
+}
+
+/* Below this a twelve-column grid is a column of slivers, so every card takes
+   the full width and the day columns get a floor instead of collapsing. */
+@media (max-width: 700px) {
+  .culi-dashboard-span-4,
+  .culi-dashboard-span-8 {
+    grid-column: span 12;
+  }
+
+  .culi-dashboard-mpg {
+    grid-template-columns: repeat(7, minmax(2.2rem, 1fr));
+  }
+}
+
+.culi-hidden {
+  display: none;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Settings page
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* One scrolling page of cards, plus sub-pages a row drills into. The cards are
+   the only real styling here: everything inside one is Obsidian's own
+   `setting-item`, so a theme keeps control of the rows and this stylesheet only
+   says where a group begins and ends. */
+.culi-settings-card {
+  background: var(--background-secondary);
+  border-radius: var(--radius-m);
+  padding: 0 0.9rem;
+  margin: 0 0 1.4rem;
+}
+
+/* Obsidian draws a top border on every setting-item; inside a card the first
+   one would sit against the card's own edge. */
+.culi-settings-card .setting-item:first-child {
+  border-top: none;
+}
+
+/* A heading and its card, so the filter on the property-keys page can hide
+   both together rather than leaving a heading over nothing. */
+.culi-settings-group {
+  display: block;
+}
+
+.culi-settings-rows {
+  display: block;
+}
+
+.culi-is-hidden {
+  display: none;
+}
+
+/* A row that opens a sub-page is a place to go, so the whole row is the target
+   rather than a control at the end of it. */
+.culi-settings-nav-row {
+  cursor: pointer;
+}
+
+.culi-settings-nav-row:hover {
+  background: var(--background-modifier-hover);
+}
+
+.culi-settings-nav-row:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: -2px;
+  border-radius: var(--radius-s);
+}
+
+.culi-settings-nav-value {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+}
+
+.culi-settings-nav-chevron {
+  display: flex;
+  align-items: center;
+  color: var(--text-faint);
+}
+
+.culi-settings-subheader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.culi-settings-back {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+}
+
+.culi-settings-back-icon {
+  display: flex;
+  align-items: center;
+}
+
+.culi-settings-subtitle {
+  font-size: var(--font-ui-large);
+  font-weight: var(--font-semibold);
+}
+
+.culi-settings-filter {
+  width: 100%;
+}
+
+/* Links out of Obsidian, dressed as the buttons they sit beside. */
+.culi-settings-link-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: var(--size-4-1) var(--size-4-3);
+  border-radius: var(--button-radius);
+  background: var(--interactive-normal);
+  box-shadow: var(--input-shadow);
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+  text-decoration: none;
+}
+
+.culi-settings-link-button:hover {
+  background: var(--interactive-hover);
+  text-decoration: none;
+}
+
+.culi-settings-link-icon {
+  display: flex;
+  align-items: center;
+}
+
+.culi-whats-new-body {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.culi-whats-new-release {
+  border-bottom: 1px solid var(--background-modifier-border);
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.culi-whats-new-release:last-child {
+  border-bottom: none;
+}
+
+/* Explanatory paragraphs under a section heading, distinct from a row's own
+   description so the two do not read as one run-on sentence. */
+.culi-settings-note {
+  margin: -0.2rem 0 0.8rem;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+.culi-settings-textarea {
+  width: 100%;
+  min-height: 6em;
+  font-family: var(--font-monospace);
+  font-size: var(--font-ui-small);
+  resize: vertical;
+}
+
+/* A locked property-name field has to look locked, not merely refuse to type.
+   Obsidian's own styling for a disabled input is faint enough on some themes
+   that clicking one and getting nothing reads as a broken settings page rather
+   than as a guard, and the switch that unlocks it is at the top of the page
+   where an unexplained dead field would not send anybody. */
+.culi-settings input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.culi-settings-status {
+  margin-bottom: 1rem;
+}
+
+.culi-settings-status-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: var(--radius-s);
+  background: var(--background-secondary);
+  margin-bottom: 0.3rem;
+  font-size: var(--font-ui-small);
+}
+
+/* A zero count is what this block exists to make visible. */
+.culi-settings-status-row.is-empty {
+  background: var(--background-modifier-error);
+}
+
+.culi-settings-status-icon {
+  display: flex;
+}
+
+.culi-settings-status-label {
+  font-weight: 600;
+}
+
+.culi-settings-status-detail {
+  color: var(--text-muted);
+}
+
+.culi-settings-status-count {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.culi-settings-about div {
+  margin-bottom: 0.2rem;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Settings list editors
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.culi-list-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.4rem;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.culi-list-handle {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Small enough that two stack in one row's height, so a list of ten does not
+   become a page of its own. */
+.culi-list-move {
+  display: flex;
+  padding: 0;
+  height: 1em;
+  background: none;
+  border: none;
+  box-shadow: none;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.culi-list-move:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.culi-list-body {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.culi-list-name {
+  font-weight: 600;
+}
+
+.culi-list-detail {
+  color: var(--text-muted);
+  font-family: var(--font-monospace);
+  font-size: var(--font-ui-smaller);
+}
+
+.culi-list-input,
+.culi-list-edit {
+  margin-left: auto;
+  cursor: pointer;
+}
+
+.culi-list-remove {
+  display: flex;
+  background: none;
+  border: none;
+  box-shadow: none;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+/* ── The field picker ──────────────────────────────────────────────────────
+   A button that opens a menu, styled as the input it replaces so a settings
+   row does not change height depending on whether its field is picked or
+   typed. */
+
+.culi-field-picker-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex: 1;
+  min-width: 8rem;
+  padding: 0.3rem 0.5rem;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  box-shadow: none;
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.1s;
+}
+
+.culi-field-picker-btn:hover,
+.culi-field-picker-btn:focus {
+  border-color: var(--interactive-accent);
+  outline: none;
+}
+
+.culi-field-picker-icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+
+.culi-field-picker-icon svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.culi-field-picker-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Reads as a placeholder rather than as a chosen value, which is what an
+   unset field is. */
+.culi-field-picker-name--empty {
+  color: var(--text-faint);
+}
+
+.culi-field-picker-chevron {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--text-faint);
+}
+
+.culi-field-picker-chevron svg {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.culi-field-picker-custom-input {
+  width: 100%;
+}
+
+/* Keeps a built-in row the same width as a removable one, so nothing shifts
+   left where the bin would be. */
+.culi-list-remove-spacer {
+  width: var(--icon-size, 1rem);
+}
+
+.culi-list-add {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin: 0.5rem 0 1rem;
+  cursor: pointer;
+}
+
+/* ── Meal editor ───────────────────────────────────────────────────────── */
+
+/* Wider than the default modal: the ingredients and instructions textareas
+   are the point of this dialog, and a narrow one wraps every line. */
+/* On the dialog container, never on `.modal-content`: a width there widens the
+   box inside the dialog while the dialog stays put, so the content overflows and
+   the right-hand half of every row is cut off behind a horizontal scrollbar.
+   Wide, because the form is two columns of text at this size, and that is what
+   keeps it from scrolling vertically as well. */
+.culi-edit-modal {
+  width: min(64rem, 94vw);
+  max-width: min(64rem, 94vw);
+}
+
+.culi-edit-group {
+  /* Tight rather than roomy, and deliberately so: every rem of vertical padding
+     in this form is a rem the dialog may have to scroll for. */
+  margin: 0.6rem 0;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  overflow: hidden;
+}
+
+.culi-edit-group-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--background-secondary);
+  cursor: pointer;
+}
+
+.culi-edit-group-chevron {
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+}
+
+.culi-edit-group-title {
+  font-weight: var(--font-medium);
+}
+
+.culi-edit-group-content {
+  padding: 0.5rem 0.75rem 0.6rem;
+}
+
+.culi-edit-group.culi-collapsed .culi-edit-group-content {
+  display: none;
+}
+
+.culi-edit-label {
+  margin: 0.35rem 0 0.2rem;
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.culi-edit-input {
+  width: 100%;
+}
+
+/* Monospace, because ingredient lines and numbered steps line up when the
+   digits do, and a proportional font makes a list of quantities ragged. */
+.culi-edit-textarea {
+  width: 100%;
+  min-height: 4rem;
+  /* Grows with its content (see textArea()'s row counting) up to a ceiling, then
+     scrolls inside itself. Uncapped, a meal with thirty ingredients pushed the
+     whole form past the bottom of the dialog, which is a worse two-scrollbar
+     problem than this one: here the form stays still and only the box being typed
+     into moves. */
+  max-height: 38vh;
+  resize: vertical;
+  font-family: var(--font-monospace);
+  font-size: var(--font-ui-small);
+}
+
+.culi-edit-number-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Short fields sharing a line. `min-width: 0` on the cell is what lets them
+   shrink: a flex item defaults to its content's minimum width and would push the
+   row wider than the dialog instead of narrowing. */
+.culi-edit-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.75rem;
+}
+
+.culi-edit-row-cell {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+/* The two tall groups side by side, one column below the width where two
+   columns of text stop being readable. `minmax(0, 1fr)` rather than `1fr`, for
+   the same reason the cell above needs `min-width: 0`: a grid track sized `1fr`
+   still refuses to go below its content's minimum, and a monospace textarea's
+   minimum is wide. */
+.culi-edit-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(22rem, 100%), 1fr));
+  gap: 0 0.75rem;
+  align-items: start;
+}
+
+.culi-edit-columns > .culi-edit-group {
+  min-width: 0;
+}
+
+.culi-edit-number-cell {
+  display: flex;
+  flex: 1 1 6rem;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.culi-edit-number-label {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+}
+
+/* The live readout of what the per-100 g figures work out to for one
+   serving. Muted because it is the arithmetic, not a field to fill in. */
+.culi-edit-computed {
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--radius-s);
+  background: var(--background-secondary);
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+.culi-edit-secondary {
+  margin-top: 0.5rem;
+}
+
+/* ── The two nutrient lists ────────────────────────────────────────────────
+   Rows built by the shared list editor, so the frame, the move buttons and the
+   bin are styled already. What is left is the three fields inside one row.
+
+   `flex-basis` and never `width`: Obsidian's mobile stylesheet sets a width on
+   a text input with a selector more specific than one class, so a width here
+   loses on a phone and one field eats the row. A flex item's main size comes
+   from its basis, which no width can override. The same bug once drew the order
+   editor's price field 590px wide on an iPad. */
+
+.culi-nutrient-list {
+  margin-bottom: 0.5rem;
+}
+
+/* The nutrient is the row, so its name takes whatever the other two leave. */
+.culi-nutrient-name {
+  flex: 1 1 8rem;
+  min-width: 0;
+}
+
+.culi-nutrient-unit {
+  flex: 0 0 3.5rem;
+  min-width: 0;
+}
+
+/* Right-aligned, so a column of figures lines up by magnitude rather than by
+   however many digits each one happens to have. */
+.culi-nutrient-value {
+  flex: 0 0 5rem;
+  min-width: 0;
+  text-align: right;
+}
+
+/* ══ Touch and viewport adaptations ═══════════════════════════════════════ */
+
+/* Obsidian sets body.is-mobile from the platform, not from the pane width, so
+   these are about fingers: bigger targets and flatter chrome. The width-based
+   queries below are a separate question, and a narrow pane on a desktop needs
+   them just as much as a phone does. */
+
+body.is-mobile .culi-action-btn {
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+/* Obsidian's mobile theme gives every button a background and a radius, which
+   turns a tab strip into a row of pills sitting on top of the indicator. */
+body.is-mobile .workspace-leaf-content .culi-tab-btn,
+body.is-mobile .view-content .culi-tab-btn {
+  padding: 0.7rem 0.5rem;
+  font-size: 0.9rem;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Inside a tab panel the card framing is redundant: the panel is already the
+   frame, and on a narrow screen the padding is width the steps need. */
+body.is-mobile .culi-reheating-section {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  margin-bottom: 0;
+}
+
+/* The tab label already says Reheating, so the heading inside says it twice. */
+body.is-mobile .culi-reheating-section .culi-section-header {
+  display: none;
+}
+
+/* The same, for the same reason. The heading is deliberately NOT hidden with
+   it: the tab is labelled "Nutrition" and the heading is what says those
+   figures are per 100 g, which is exactly the thing a strip of numbers must
+   never be shown without. */
+body.is-mobile .culi-breakdown-section {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  margin-bottom: 0;
+}
+
+@media (max-width: 600px) {
+  .culi-meal-view {
+    padding: 1rem 1rem 2rem;
+  }
+
+  .culi-image-card {
+    width: 100%;
+  }
+
+  .culi-meal-image {
+    width: 100%;
+    max-height: 200px;
+  }
+}
+
+/* A coarse pointer has no hover, so anything revealed on hover would be
+   unreachable. */
+@media (pointer: coarse) {
+  .culi-gallery-card-menu-btn {
+    opacity: 1;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Mark as eaten
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* The allergen chips: the vocabulary and the answer in one control. */
+.culi-edit-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35em;
+  margin-block-end: 0.6em;
+}
+
+.culi-edit-chip {
+  background-color: var(--background-modifier-form-field);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-l);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: var(--font-ui-smaller);
+  /* Sized for a fingertip: on a tablet these are the only controls on the form
+     whose whole use is tapping, and there is no hover to find them by. */
+  min-height: 2em;
+  padding: 0.25em 0.8em;
+}
+
+.culi-edit-chip:hover {
+  border-color: var(--interactive-accent);
+}
+
+.culi-edit-chip-on {
+  background-color: var(--interactive-accent);
+  border-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+/* The picture row: the value, and the two ways to change it. */
+.culi-edit-image {
+  align-items: center;
+  display: flex;
+  gap: 0.35em;
+}
+
+.culi-edit-image-button {
+  align-items: center;
+  background-color: var(--background-modifier-form-field);
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  min-height: 2em;
+  min-width: 2.4em;
+  padding: 0.2em 0.4em;
+}
+
+.culi-edit-image-button:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+.culi-edit-image-preview {
+  margin-block: 0.5em;
+  max-width: 12rem;
+}
+
+/* Everything below the gallery toolbar. Its own element so a search-driven
+   render can replace the results without touching the field being typed in. */
+.culi-gallery-results {
+  display: contents;
+}
+
+/* Opens the supplier's line list from the field that offers it. A link rather
+   than a button: it navigates away from the form rather than changing it. */
+.culi-edit-lines-link {
+  background: none;
+  box-shadow: none;
+  color: var(--text-accent);
+  cursor: pointer;
+  font-size: var(--font-ui-smaller);
+  padding: 0;
+  text-align: start;
+}
+
+.culi-edit-lines-link:hover {
+  text-decoration: underline;
+}
+
+/* The sample-vault preview. Each block is one answer -- what would be created,
+   what is already there, what would gain a block -- so they are separated by
+   space rather than by a rule, which would read as a table. */
+.culi-sample-section {
+  margin-bottom: 1rem;
+}
+
+/* A refusal is not a list of work, it is the reason there is none. The accent
+   border is what stops it reading as another section of the preview. */
+.culi-sample-refusal {
+  border-inline-start: 3px solid var(--text-error);
+  padding-inline-start: 0.6rem;
+}
+
+.culi-sample-heading {
+  font-size: var(--font-ui-small);
+  font-weight: var(--font-semibold);
+  margin: 0 0 0.3rem;
+}
+
+.culi-sample-folder {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  margin-top: 0.4rem;
+}
+
+.culi-sample-item {
+  font-size: var(--font-ui-small);
+  line-height: 1.5;
+}
+
+/* A shared folder is neither a refusal nor a warning, so it takes the muted
+   accent rather than the error colour the refusal block uses. It sits above
+   the plan because it changes how the list below should be read. */
+.culi-sample-shared {
+  border-inline-start: 3px solid var(--text-accent);
+  padding-inline-start: 0.6rem;
+}

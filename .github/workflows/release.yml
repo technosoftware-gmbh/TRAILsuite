@@ -1,0 +1,71 @@
+# What a release attaches, built by the thing that will be attaching it.
+#
+# `docs/releasing.md` step 5 says to attach `main.js`, `manifest.json` and
+# `styles.css` to a plugin's release: those three files are what a vault
+# installs and nothing else in the package is needed at runtime. Doing that by
+# hand means the files somebody uploads are the files that happened to be in
+# their working copy, which is the one thing nobody can check afterwards.
+# Here they are built from the tag, by `npm ci` and `npm run build`, and the
+# release is drafted from the same run.
+#
+# Tags name their package, because four packages share this repository:
+# `nodatrail-v1.0.0`, not `v1.0.0`. `core-v*` is deliberately not matched --
+# trail-core has no manifest and no bundle, and it ships by `npm publish`.
+name: release
+
+on:
+  push:
+    tags:
+      - 'apertrail-v*'
+      - 'culitrail-v*'
+      - 'nodatrail-v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      # The whole suite, not just the one package: a plugin bundle is only
+      # trustworthy if the core it was built against passed its own tests.
+      - run: npm run check
+      - run: npm run build
+
+      # The tag says which package this is. Everything below reads it rather
+      # than being told twice.
+      - name: Read the tag
+        id: tag
+        run: |
+          plugin="${GITHUB_REF_NAME%%-v*}"
+          version="${GITHUB_REF_NAME#*-v}"
+          echo "plugin=$plugin" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      # A tag whose version does not match the manifest would publish a build
+      # that reports a different version to every user who installs it, which
+      # is the failure `sync-version.js` exists to prevent at the other end.
+      - name: Refuse a tag the manifest does not agree with
+        run: |
+          manifest=$(node -p "require('./packages/${{ steps.tag.outputs.plugin }}/manifest.json').version")
+          if [ "$manifest" != "${{ steps.tag.outputs.version }}" ]; then
+            echo "tag says ${{ steps.tag.outputs.version }}, manifest says $manifest"
+            exit 1
+          fi
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ steps.tag.outputs.plugin }} ${{ steps.tag.outputs.version }}
+          files: |
+            packages/${{ steps.tag.outputs.plugin }}/main.js
+            packages/${{ steps.tag.outputs.plugin }}/manifest.json
+            packages/${{ steps.tag.outputs.plugin }}/styles.css

@@ -1,0 +1,2351 @@
+/* ==============================
+ * APERtrail styles
+ *
+ * One stylesheet for the whole plugin, and one class prefix: apt-. Every
+ * selector here carries it, so nothing this plugin draws can collide with
+ * another plugin's styles or with a theme's own class names.
+ * ============================== */
+
+/* Direction-aware by construction: every inline offset in this file is
+   written as inline-start/inline-end rather than left/right, so a
+   right-to-left locale lays out correctly rather than mirroring the text
+   inside a left-anchored frame. */
+
+/* ------------------------------
+ * Settings page
+ *
+ * One scrolling page of cards, plus sub-pages a row drills into. The cards
+ * are the only real styling here: everything inside one is Obsidian's own
+ * `setting-item`, so a theme keeps control of the rows and this stylesheet
+ * only says where the groups begin and end.
+ * ------------------------------ */
+
+.apt-settings-intro {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  margin: 0 0 8px;
+}
+
+.apt-settings-card {
+  background: var(--background-secondary);
+  border-radius: var(--radius-m);
+  padding: 0 14px;
+  margin: 0 0 22px;
+}
+
+/* Obsidian draws a top border on every setting-item; inside a card the first
+   one would sit against the card's own edge. */
+.apt-settings-card .setting-item:first-child {
+  border-top: none;
+}
+
+.apt-settings-note {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  margin: 0 0 14px;
+  padding: 0 2px 10px;
+}
+
+.apt-settings-card .apt-settings-note {
+  padding-bottom: 14px;
+  margin-bottom: 0;
+}
+
+/* A row that opens a sub-page is a place to go, so the whole row is the
+   target rather than a control at the end of it. */
+.apt-settings-nav-row {
+  cursor: pointer;
+}
+
+.apt-settings-nav-row:hover {
+  background: var(--background-modifier-hover);
+}
+
+.apt-settings-nav-row:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: -2px;
+  border-radius: var(--radius-s);
+}
+
+.apt-settings-nav-value {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+}
+
+.apt-settings-nav-chevron {
+  display: flex;
+  align-items: center;
+  color: var(--text-faint);
+}
+
+.apt-settings-subheader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.apt-settings-back {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px 4px 6px;
+  cursor: pointer;
+}
+
+.apt-settings-back-icon {
+  display: flex;
+  align-items: center;
+}
+
+.apt-settings-subtitle {
+  font-size: var(--font-ui-large);
+  font-weight: var(--font-semibold);
+}
+
+/* Links out of Obsidian, dressed as the buttons they sit beside. */
+.apt-settings-link-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--size-4-1) var(--size-4-3);
+  border-radius: var(--button-radius);
+  background: var(--interactive-normal);
+  box-shadow: var(--input-shadow);
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+  text-decoration: none;
+}
+
+.apt-settings-link-button:hover {
+  background: var(--interactive-hover);
+  text-decoration: none;
+}
+
+.apt-settings-link-button.mod-cta {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+.apt-settings-link-icon {
+  display: flex;
+  align-items: center;
+}
+
+.apt-settings-link-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.apt-settings-about p {
+  margin: 0 0 10px;
+}
+
+.apt-settings-about-links {
+  margin: 0 0 10px;
+  padding-inline-start: 20px;
+}
+
+/* A locked property-name field has to look locked, not merely refuse to type.
+   Obsidian's own styling for a disabled input is faint enough on some themes
+   that clicking one and getting nothing reads as a broken settings page rather
+   than as a guard, and the switch that unlocks it is at the top of the page,
+   where an unexplained dead field would not send anybody. */
+.apt-settings input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.apt-whats-new-body {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.apt-whats-new-release {
+  border-bottom: 1px solid var(--background-modifier-border);
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.apt-whats-new-release:last-child {
+  border-bottom: none;
+}
+
+@media (max-width: 768px) {
+  .apt-settings-card {
+    padding: 0 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .apt-settings-nav-row {
+    transition: none;
+  }
+}
+
+.apt-star-rating {
+  display: flex;
+  gap: 0.1rem;
+  margin: 0.4rem 0 0.1rem;
+}
+
+.apt-star {
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: var(--text-faint);
+  line-height: 1;
+  user-select: none;
+  transition: color 0.1s;
+}
+
+.apt-star.apt-star-active {
+  color: var(--color-yellow);
+}
+
+.apt-star:hover {
+  color: var(--color-yellow);
+  transform: scale(1.1);
+}
+
+@media (max-width: 1100px) {
+}
+
+.apt-image-card {
+  width: 200px;
+  flex-shrink: 0;
+}
+
+.apt-entity-image {
+  width: 100%;
+  border-radius: var(--radius-l);
+  object-fit: cover;
+  max-height: 220px;
+  border: 1px solid var(--background-modifier-border);
+  display: block;
+}
+
+.apt-image-placeholder {
+  width: 100%;
+  height: 140px;
+  border-radius: var(--radius-l);
+  background: var(--background-secondary);
+  border: 1px dashed var(--background-modifier-border);
+}
+
+.apt-lightbox-trigger {
+  cursor: zoom-in;
+}
+
+.apt-lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+}
+
+.apt-lightbox-close {
+  position: absolute;
+  top: max(1rem, env(safe-area-inset-top, 1rem));
+  inset-inline-end: max(1rem, env(safe-area-inset-right, 1rem));
+  z-index: 1;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.apt-lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.apt-lightbox-img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: var(--radius-l);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+  cursor: default;
+}
+
+.apt-modal-shell {
+  display: flex;
+  flex-direction: column;
+  /* Override Obsidian's overflow-y: auto on .modal-content so only
+     apt-shell-body scrolls, not the whole content area. */
+  overflow: hidden;
+  padding: 0;
+  /* Most modals don't need an explicit max-height here -- Obsidian's
+     .modal already constrains to roughly 80vh. On very-short-content
+     modals this just means no extra blank space. */
+  max-height: 75vh;
+}
+
+.apt-modal-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.apt-modal-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 0 0.15rem;
+  color: var(--text-normal);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.apt-modal-subtitle {
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+  margin: 0;
+  width: 100%;
+}
+
+/* A sentence under a form saying what the action will and will not do. Muted
+   and narrow, because it is read once and then never again. */
+.apt-modal-note {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  margin: 0.75rem 0 0 0;
+  max-width: 52ch;
+  line-height: 1.5;
+}
+
+.apt-modal-icon {
+  color: var(--interactive-accent);
+  flex: 0 0 auto;
+}
+
+/*
+ * An icon goes in a slot inside a button, never straight into the button.
+ * `setIcon()` on a button renders on a desktop every time and on iOS only in
+ * some contexts; a child element has never failed. tests/icon-slot.test.ts
+ * checks the shape.
+ */
+.apt-icon-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.apt-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  /* min-height: 0 is required for flex children to actually scroll in
+     some browsers (flex items default to min-height: auto). */
+  min-height: 0;
+  padding: 0.25rem 0;
+}
+
+.apt-modal-footer {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--background-modifier-border);
+  /* Horizontal scroll if buttons overflow on very narrow viewports,
+     keeping them in one row without wrapping or truncating labels. */
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.apt-modal-footer:empty {
+  display: none;
+}
+
+.apt-modal-fields {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.25rem;
+}
+
+.apt-modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1;
+  min-width: 120px;
+}
+
+.apt-modal-field-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-faint);
+}
+
+.apt-modal-select,
+.apt-modal-input {
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+  padding: 0.35rem 0.6rem;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.1s;
+}
+
+.apt-modal-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-inline-end: 2rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  cursor: pointer;
+}
+
+.apt-modal-select:focus,
+.apt-modal-input:focus {
+  border-color: var(--interactive-accent);
+}
+
+@media (max-width: 600px) {
+  .apt-image-card {
+    width: 100%;
+  }
+
+  .apt-entity-image {
+    max-height: 200px;
+    width: 100%;
+  }
+
+  .apt-modal-fields {
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+}
+
+body.is-mobile .apt-star {
+  font-size: 1.6rem;
+  padding: 0.2rem;
+}
+
+.apt-recipe-picker-input {
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.apt-recipe-picker-results {
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+/* No padding of its own any more: it sits inside .apt-dashboard-view, which
+   has it, and doubling it indented the grid past the greeting above it. */
+.apt-gallery-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 0.5rem;
+}
+
+.apt-gallery-empty {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.apt-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: 1rem;
+}
+
+.apt-gallery-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-l);
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.1s ease-in-out;
+}
+
+.apt-gallery-card:hover,
+.apt-gallery-card:focus-visible {
+  border-color: var(--interactive-accent);
+}
+
+.apt-gallery-card-image {
+  position: relative;
+  width: 100%;
+  height: 9rem;
+  background: var(--background-secondary);
+}
+
+.apt-gallery-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.apt-gallery-card-image--empty {
+  border-bottom: 1px dashed var(--background-modifier-border);
+}
+
+.apt-gallery-card-title-overlay {
+  position: absolute;
+  z-index: 1;
+  inset: auto 0 0 0;
+  padding: 1.25rem 0.6rem 0.4rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0));
+}
+
+.apt-gallery-card-title {
+  font-weight: 600;
+  color: #fff;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  line-height: 1.25;
+}
+
+.apt-gallery-card-menu-btn {
+  position: absolute;
+  z-index: 2;
+  top: 0.4rem;
+  inset-inline-end: 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.1s ease-in-out;
+}
+
+.apt-gallery-card:hover .apt-gallery-card-menu-btn,
+.apt-gallery-card:focus-within .apt-gallery-card-menu-btn {
+  opacity: 1;
+}
+
+@media (pointer: coarse) {
+  .apt-gallery-card-menu-btn {
+    opacity: 1;
+  }
+}
+
+.apt-gallery-card-menu-btn svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.apt-gallery-card-info {
+  padding: 0.6rem 0.75rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.apt-gallery-card-info .apt-star-rating {
+  margin: 0;
+}
+
+.apt-gallery-card-info .apt-star {
+  font-size: 0.9rem;
+}
+
+.apt-star-rating-readonly .apt-star {
+  pointer-events: none;
+}
+
+.apt-gallery-card-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  overflow: hidden;
+}
+
+.apt-gallery-card-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  white-space: nowrap;
+}
+
+.apt-gallery-card-meta-icon {
+  display: flex;
+  align-items: center;
+}
+
+.apt-gallery-card-meta-icon svg {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.apt-dashboard-view {
+  padding: 1rem;
+}
+
+.apt-dashboard-greeting {
+  padding: 1rem 0 2rem;
+}
+
+.apt-dashboard-greeting-text {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+.apt-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1rem;
+}
+
+.apt-dashboard-span-12 {
+  grid-column: span 12;
+}
+
+.apt-dashboard-card {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-l);
+  background: var(--background-primary);
+  padding: 0.9rem 1rem;
+}
+
+.apt-dashboard-card-label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 0.6rem;
+}
+
+.apt-dashboard-empty-text {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.apt-dashboard-stat-card--number {
+  cursor: pointer;
+}
+
+.apt-dashboard-stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.apt-dashboard-stats-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.apt-dashboard-stats-row .apt-dashboard-card {
+  flex: 1 1 200px;
+  cursor: pointer;
+}
+
+.apt-dashboard-trip-status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.apt-dashboard-trip-status-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+}
+
+.apt-dashboard-trip-status-count {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.apt-dashboard-quick-actions {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+/* The search on its own row under the buttons, so it keeps its width on a
+   narrow window instead of being squeezed by them. */
+.apt-dashboard-search-row {
+  display: flex;
+  margin-top: 0.6rem;
+}
+
+.apt-dashboard-search {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 1 1 16rem;
+  max-width: 22rem;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  background: var(--background-primary);
+}
+
+.apt-dashboard-search-icon {
+  display: inline-flex;
+  color: var(--text-faint);
+}
+
+.apt-dashboard-search-input {
+  flex: 1 1 auto;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.9rem;
+}
+
+.apt-dashboard-quick-action-buttons {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.apt-dashboard-quick-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.apt-dashboard-quick-action-icon {
+  display: inline-flex;
+}
+
+.apt-ribbon-hidden {
+  display: none;
+}
+
+.apt-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.apt-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 1.75rem;
+  padding: 0 0.5rem 0 0.65rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  color: var(--text-normal);
+}
+
+.apt-chip-remove {
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1;
+  padding: 0 0.15rem;
+}
+
+.apt-chip-remove:hover {
+  color: var(--text-error);
+}
+
+.apt-chip-add {
+  height: 1.75rem;
+  width: 1.75rem;
+  border-radius: 999px;
+  border: 1px dashed var(--background-modifier-border);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0;
+}
+
+.apt-chip-add:hover {
+  color: var(--text-normal);
+  border-color: var(--text-muted);
+}
+
+.apt-gallery-type-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.apt-gallery-type-filter-btn {
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--radius-s);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--background-modifier-border);
+}
+
+.apt-gallery-type-filter-btn:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.apt-gallery-type-filter-btn.is-active {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}
+
+.apt-gallery-facets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
+
+.apt-gallery-facet-select {
+  font-size: 0.8rem;
+  padding: 0.25rem 0.4rem;
+}
+
+.apt-place-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+}
+
+.apt-place-picker-row:hover,
+.apt-place-picker-row:focus-visible {
+  background: var(--background-modifier-hover);
+}
+
+.apt-place-picker-icon {
+  display: flex;
+  color: var(--text-muted);
+}
+
+.apt-place-picker-title {
+  font-size: 0.9rem;
+}
+
+.apt-place-picker-meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.apt-itinerary {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  padding: 0.75rem 0.9rem;
+}
+
+.apt-itinerary-persons {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 0.6rem;
+}
+
+.apt-itinerary-day {
+  font-weight: var(--font-semibold);
+  font-size: 0.85rem;
+  margin: 0.7rem 0 0.35rem;
+  color: var(--text-normal);
+}
+
+.apt-itinerary-day:first-child {
+  margin-top: 0;
+}
+
+.apt-itinerary-band-heading {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+  margin: 0.9rem 0 0.35rem;
+}
+
+.apt-itinerary-stop {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.25rem 0;
+}
+
+.apt-itinerary-time {
+  flex: 0 0 6.5rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.apt-itinerary-icon {
+  display: flex;
+  color: var(--text-muted);
+  padding-top: 0.1rem;
+}
+
+.apt-itinerary-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.apt-itinerary-link {
+  cursor: pointer;
+  color: var(--link-color);
+}
+
+.apt-itinerary-unresolved {
+  color: var(--text-error);
+}
+
+.apt-itinerary-rating {
+  margin-inline-start: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--text-accent);
+}
+
+.apt-itinerary-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  /* A note may be two paragraphs. HTML collapses a newline to a space, so
+     without this the blank line the note and the editor both have disappears
+     the moment it is rendered. */
+  white-space: pre-line;
+}
+
+/* A stop that is only a time and a sentence: the sentence is the row, so it
+   is set at body weight rather than in the muted style an aside gets. */
+.apt-itinerary-line {
+  font-size: 0.9rem;
+  white-space: pre-line;
+}
+
+/* The day's own paragraph, between its header and its stops.
+   A step ABOVE the timed lines under it, not below: the paragraph introduces
+   the day and the lines are its schedule. The size carries that on its own --
+   `--text-normal` rather than a mid grey of our own, because a hand-picked
+   tone between normal and muted is right in one theme and wrong in the rest. */
+.apt-itinerary-day-note {
+  font-size: 0.95rem;
+  color: var(--text-normal);
+  white-space: pre-line;
+  margin: 0.1rem 0 0.35rem 0;
+  max-width: 60ch;
+}
+
+.apt-itinerary-empty {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.apt-itinerary-actions {
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
+.apt-itinerary-duplicate,
+.apt-itinerary-edit,
+.apt-itinerary-export {
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.apt-related-trips {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  padding: 0.75rem 0.9rem;
+}
+
+.apt-related-trip {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.3rem 0;
+}
+
+.apt-related-trip-date {
+  flex: 0 0 9rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.apt-related-trip-icon {
+  display: flex;
+  color: var(--text-muted);
+  padding-top: 0.1rem;
+}
+
+.apt-related-trip-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.apt-related-trip-link {
+  cursor: pointer;
+  color: var(--link-color);
+}
+
+.apt-related-trip-status {
+  margin-inline-start: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--text-faint);
+}
+
+.apt-related-trip-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.apt-related-trip-rating {
+  font-size: 0.75rem;
+  color: var(--text-accent);
+}
+
+.apt-itinerary-day-row,
+.apt-itinerary-band-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.apt-itinerary-empty-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.apt-itinerary-add-btn {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+}
+
+.apt-itinerary-add-btn:hover {
+  color: var(--text-normal);
+  background: var(--background-modifier-hover);
+}
+
+.apt-itinerary-actions-inline {
+  display: flex;
+  gap: 0.15rem;
+  opacity: 0;
+  flex: 0 0 auto;
+}
+
+.apt-itinerary-stop:hover .apt-itinerary-actions-inline,
+.apt-itinerary-day-row:hover .apt-itinerary-actions-inline,
+.apt-itinerary-actions-inline:focus-within {
+  opacity: 1;
+}
+
+body.is-mobile .apt-itinerary-actions-inline {
+  opacity: 1;
+}
+
+.apt-itinerary-action-btn {
+  display: flex;
+  align-items: center;
+  padding: 0.15rem;
+  border-radius: var(--radius-s);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.apt-itinerary-action-btn:hover {
+  color: var(--text-normal);
+  background: var(--background-modifier-hover);
+}
+
+.apt-itinerary-action-btn.is-disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.apt-itinerary-action-btn.is-disabled:hover {
+  background: transparent;
+  color: var(--text-muted);
+}
+
+/* Photo spot block -- see docs/design/photo-spots.md §5. */
+
+.apt-photo-spot {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  padding: 0.75rem 0.9rem;
+}
+
+.apt-photo-spot-heading {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+  margin: 0.9rem 0 0.45rem;
+}
+
+.apt-photo-spot-heading:first-child {
+  margin-top: 0;
+}
+
+/* The one line the note is usually opened for, above the cards. */
+.apt-photo-spot-next-light {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.6rem;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  background: var(--background-secondary);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.apt-photo-spot-next-light-icon {
+  display: flex;
+  color: var(--color-orange);
+}
+
+.apt-photo-spot-motif {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  padding: 0.7rem 0.8rem;
+  margin-bottom: 0.6rem;
+}
+
+/* The main motif is what the page is named for, so it carries the accent
+   border. The secondaries stay quiet rather than competing with it. */
+.apt-photo-spot-motif--main {
+  border-color: var(--text-accent);
+}
+
+.apt-photo-spot-motif-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.apt-photo-spot-motif-icon {
+  display: flex;
+  color: var(--text-muted);
+  padding-top: 0.15rem;
+}
+
+.apt-photo-spot-motif--main .apt-photo-spot-motif-icon {
+  color: var(--text-accent);
+}
+
+.apt-photo-spot-motif-headbody {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.apt-photo-spot-motif-name {
+  font-weight: var(--font-semibold);
+}
+
+.apt-photo-spot-motif-name.is-unnamed {
+  color: var(--text-error);
+  font-weight: var(--font-normal);
+}
+
+.apt-photo-spot-motif-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  margin-top: 0.15rem;
+}
+
+.apt-photo-spot-role {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: var(--font-semibold);
+  padding: 0.05rem 0.35rem;
+  border-radius: var(--radius-s);
+  background: var(--background-modifier-border);
+  color: var(--text-muted);
+}
+
+.apt-photo-spot-role--main {
+  background: var(--text-accent);
+  color: var(--text-on-accent);
+}
+
+.apt-photo-spot-light,
+.apt-photo-spot-gear {
+  margin-top: 0.5rem;
+}
+
+.apt-chip-icon {
+  display: flex;
+  color: var(--text-muted);
+}
+
+/* Light chips read by colour before they read by word: blue for the blue
+   hours, warm for the golden ones and the two instants, neutral for the
+   three that are sky conditions rather than a slice of the horizon. */
+
+.apt-photo-spot-light-chip.is-blue {
+  border-color: var(--color-blue);
+}
+
+.apt-photo-spot-light-chip.is-gold {
+  border-color: var(--color-orange);
+}
+
+.apt-photo-spot-light-chip.is-neutral {
+  border-color: var(--background-modifier-border);
+}
+
+/* Tabular figures so a column of times does not shimmer as the date steps. */
+.apt-photo-spot-light-time {
+  margin-inline-start: 0.35rem;
+  color: var(--text-normal);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.apt-photo-spot-motif-note {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+}
+
+.apt-photo-spot-tip {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  margin-top: 0.55rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: var(--radius-s);
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+}
+
+.apt-photo-spot-tip-icon {
+  display: flex;
+  color: var(--text-accent);
+  padding-top: 0.1rem;
+}
+
+.apt-photo-spot-tip-text {
+  font-size: 0.82rem;
+  color: var(--text-normal);
+}
+
+.apt-photo-spot-samples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.6rem;
+}
+
+.apt-photo-spot-sample {
+  width: 11rem;
+}
+
+.apt-photo-spot-sample .apt-image-card {
+  border-radius: var(--radius-s);
+  overflow: hidden;
+}
+
+.apt-photo-spot-sample-caption {
+  margin-top: 0.25rem;
+}
+
+.apt-photo-spot-sample-light {
+  font-size: 0.72rem;
+  color: var(--text-faint);
+}
+
+.apt-photo-spot-sample-exposure {
+  font-size: 0.72rem;
+  font-family: var(--font-monospace);
+  color: var(--text-muted);
+}
+
+.apt-photo-spot-sample-credit {
+  font-size: 0.7rem;
+  color: var(--text-faint);
+}
+
+.apt-photo-spot-motif-foot {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-top: 0.6rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--background-modifier-border);
+  font-size: 0.78rem;
+}
+
+.apt-photo-spot-captured {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.apt-photo-spot-captured.is-captured {
+  color: var(--text-success);
+}
+
+.apt-photo-spot-captured.is-open {
+  color: var(--text-faint);
+}
+
+.apt-photo-spot-offset {
+  margin-inline-start: auto;
+  color: var(--text-faint);
+}
+
+.apt-photo-spot-logi {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.5rem 1rem;
+}
+
+.apt-photo-spot-logi-cell {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.apt-photo-spot-logi-icon {
+  display: flex;
+  color: var(--text-muted);
+  padding-top: 0.15rem;
+}
+
+.apt-photo-spot-logi-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+}
+
+.apt-photo-spot-logi-value {
+  font-size: 0.85rem;
+  color: var(--text-normal);
+}
+
+.apt-photo-spot-logi-value.is-muted {
+  color: var(--text-faint);
+}
+
+.apt-photo-spot-logi-value a {
+  color: var(--text-accent);
+}
+
+/* The capture count sits inside an uppercase section heading and is a
+   sentence rather than a label, so it opts out of the heading's casing. */
+.apt-photo-spot-progress {
+  margin-inline-start: 0.5rem;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--text-muted);
+}
+
+/* Photo spot sun panel -- see docs/design/photo-spots.md §4. */
+
+.apt-photo-spot-sun-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.apt-photo-spot-sun-nav {
+  display: inline-flex;
+  gap: 0.2rem;
+}
+
+.apt-photo-spot-sun-step {
+  background: transparent;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 0.05rem 0.4rem;
+  box-shadow: none;
+  height: auto;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.apt-photo-spot-sun-step:hover {
+  color: var(--text-normal);
+  border-color: var(--text-muted);
+}
+
+.apt-photo-spot-sun {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.4rem 0.8rem;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  padding: 0.6rem 0.7rem;
+}
+
+.apt-photo-spot-sun-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+}
+
+.apt-photo-spot-sun-value {
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-normal);
+}
+
+.apt-photo-spot-sun-polar {
+  grid-column: 1 / -1;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.apt-photo-spot-sunband {
+  height: 1.35rem;
+  border-radius: var(--radius-s);
+  margin-bottom: 0.35rem;
+}
+
+/* The ticks sit in their own strip under the band rather than inside it:
+   over a dark night segment a label would need its own contrast rules. */
+.apt-photo-spot-sun-ticks {
+  position: relative;
+  height: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.apt-photo-spot-sun-tick {
+  position: absolute;
+  inset-inline-start: var(--apt-tick-at);
+  transform: translateX(-50%);
+  font-size: 0.7rem;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.apt-photo-spot-sun-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  font-size: 0.72rem;
+  color: var(--text-faint);
+}
+
+.apt-photo-spot-sun-legend-entry {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.apt-photo-spot-sun-swatch {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 2px;
+}
+
+.apt-photo-spot-sun-swatch.is-night {
+  background: var(--background-modifier-border);
+}
+
+.apt-photo-spot-sun-swatch.is-blue {
+  background: var(--color-blue);
+  opacity: 0.55;
+}
+
+.apt-photo-spot-sun-swatch.is-golden {
+  background: var(--color-orange);
+}
+
+.apt-photo-spot-sun-swatch.is-day {
+  background: var(--color-yellow);
+  opacity: 0.35;
+}
+
+/* The zone these times are in, kept quiet but present: it is the difference
+   between a plausible number and a right one. */
+.apt-photo-spot-sun-where {
+  margin-inline-start: auto;
+  text-transform: none;
+  letter-spacing: normal;
+  font-variant-numeric: tabular-nums;
+}
+
+.apt-photo-spot-sun-caveat {
+  font-size: 0.72rem;
+  color: var(--text-faint);
+  margin-top: 0.35rem;
+}
+
+/* Front, side or back lit. Only back light gets a colour: it is the one
+   that changes what you bring, and colouring all three would turn a hint
+   into a traffic light. */
+.apt-photo-spot-relation {
+  display: inline-flex;
+  align-items: center;
+  height: 1.75rem;
+  padding: 0 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: var(--background-secondary);
+}
+
+.apt-photo-spot-relation.is-back {
+  color: var(--text-accent);
+}
+
+/* Photo spot editing affordances -- phase 4. */
+
+.apt-photo-spot-heading--action {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  /* The same trap the trip costs heading fell into: a heading with buttons
+     beside it has no room for them on a phone, and without this the last
+     one is simply off the edge of the screen rather than wrapped. */
+  flex-wrap: wrap;
+}
+
+/* The field sheet button: same shape as the add buttons beside it, with an
+   icon instead of a plus, because it exports rather than creates. */
+.apt-photo-spot-sheet-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* The first button takes the free space, so the group sits at the far end
+   together rather than each one claiming half of it. */
+.apt-photo-spot-heading--action .apt-photo-spot-add-btn:first-of-type {
+  margin-inline-start: auto;
+}
+
+.apt-photo-spot-add-btn {
+  background: transparent;
+  border: 1px dashed var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 0.1rem 0.5rem;
+  box-shadow: none;
+  height: auto;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.apt-photo-spot-add-btn:hover {
+  color: var(--text-normal);
+  border-color: var(--text-muted);
+}
+
+/* Hidden until the row is hovered or something inside it has focus, so a
+   spot reads as a page rather than as a form until you reach for it. */
+.apt-photo-spot-actions {
+  display: flex;
+  gap: 0.15rem;
+  margin-inline-start: auto;
+  opacity: 0;
+  transition: opacity 0.1s ease-in-out;
+}
+
+.apt-photo-spot-motif:hover .apt-photo-spot-actions,
+.apt-photo-spot-sample:hover .apt-photo-spot-actions,
+.apt-photo-spot-actions:focus-within {
+  opacity: 1;
+}
+
+.apt-photo-spot-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: var(--radius-s);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.apt-photo-spot-action-btn:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.apt-photo-spot-action-btn.is-disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.apt-photo-spot-action-btn.is-disabled:hover {
+  background: transparent;
+  color: var(--text-muted);
+}
+
+/* The capture state is a button now, but it should still read as a fact
+   first: no border until you point at it. */
+button.apt-photo-spot-captured {
+  background: transparent;
+  border: 1px solid transparent;
+  box-shadow: none;
+  cursor: pointer;
+  font-size: 0.78rem;
+  padding: 0.1rem 0.4rem;
+  height: auto;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+button.apt-photo-spot-captured:hover {
+  border-color: var(--background-modifier-border);
+  background: var(--background-modifier-hover);
+}
+
+.apt-photo-spot-sample {
+  position: relative;
+}
+
+.apt-photo-spot-sample .apt-photo-spot-actions {
+  position: absolute;
+  top: 0.25rem;
+  inset-inline-end: 0.25rem;
+  background: var(--background-primary);
+  border-radius: var(--radius-s);
+  padding: 0.1rem;
+}
+
+/* Toggle chips in the motif editor: a light window is on or off, and a
+   checkbox list of nine would be taller than the dialog. */
+/* A preset writes into the field above it rather than holding a state of
+   its own, so it is drawn as an action: dashed rather than solid. */
+.apt-season-presets {
+  margin-top: 0.35rem;
+}
+
+.apt-chip-preset {
+  border-style: dashed;
+  color: var(--text-muted);
+  cursor: pointer;
+  background: transparent;
+  box-shadow: none;
+}
+
+.apt-chip-preset:hover {
+  color: var(--text-normal);
+  border-style: solid;
+}
+
+.apt-chip-toggle {
+  cursor: pointer;
+  box-shadow: none;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.apt-chip-toggle.is-on {
+  background: var(--text-accent);
+  border-color: var(--text-accent);
+  color: var(--text-on-accent);
+}
+
+/* The day's light as a band. Drawn in two places -- behind an itinerary day
+   and above the photo spot sun panel -- so the colours live under one class
+   and only the height differs. See docs/design/photo-spots.md §6. */
+
+.apt-sunband {
+  display: flex;
+  height: 0.3rem;
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 0 0 0.5rem;
+}
+
+/* Each segment's share of the 24 hours arrives as a custom property from
+   the renderer; the rule that turns it into a width lives here so a theme
+   can see it. */
+.apt-sunband-seg {
+  flex: var(--apt-sunband-share) 0 0;
+}
+
+.apt-sunband-seg.is-night {
+  background: var(--background-modifier-border);
+}
+
+.apt-sunband-seg.is-blue {
+  background: var(--color-blue);
+  opacity: 0.55;
+}
+
+.apt-sunband-seg.is-golden {
+  background: var(--color-orange);
+}
+
+.apt-sunband-seg.is-day {
+  background: var(--color-yellow);
+  opacity: 0.35;
+}
+
+/* What a photo spot stop is for: motif, light, relation, lens. */
+.apt-itinerary-badges {
+  margin-top: 0.35rem;
+}
+
+/* The stop editor's "where these times came from" row. It explains the two
+   fields above it rather than offering a control of its own, so it drops
+   the separator that would file it as another setting. */
+.apt-stop-prefill-note {
+  border-top: none;
+  padding-top: 0;
+}
+
+.apt-itinerary-shotlist {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  padding: 0.35rem 0.6rem;
+}
+
+.apt-itinerary-shot {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  font-size: 0.85rem;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.apt-itinerary-shot:last-child {
+  border-bottom: 0;
+}
+
+/* A button now, because the shot list ticks a motif off. It keeps the
+   look of the mark it replaced: the affordance is the row, not a frame
+   around eleven pixels. */
+.apt-itinerary-shot-mark {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-s);
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-faint);
+  cursor: pointer;
+}
+
+.apt-itinerary-shot-mark:hover {
+  background: transparent;
+  color: var(--text-normal);
+}
+
+.apt-itinerary-shot-mark.is-captured {
+  color: var(--text-success);
+}
+
+.apt-itinerary-shot-name {
+  color: var(--text-normal);
+}
+
+.apt-itinerary-shot-spot {
+  margin-inline-start: auto;
+  color: var(--link-color);
+  cursor: pointer;
+  font-size: 0.78rem;
+}
+
+.apt-itinerary-shot-date {
+  color: var(--text-faint);
+  font-size: 0.78rem;
+}
+
+/* Conflict warning on an itinerary row -- see docs/design/photo-spots.md §6.3.
+   Advisory, so it sits in the warning colour rather than the error one: it
+   refuses nothing and may well be wrong about your car. */
+
+.apt-itinerary-conflict {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  margin: 0 0 0.4rem;
+  margin-inline-start: 7.1rem;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--background-modifier-border);
+  border-inline-start: 2px solid var(--text-warning);
+  border-radius: var(--radius-s);
+  background: var(--background-secondary);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.apt-itinerary-conflict-icon {
+  display: flex;
+  color: var(--text-warning);
+  padding-top: 0.05rem;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Trip costs: the summary strip, and the document under it.
+
+   The document's own class names are `culi-invoice-*` rather than `apt-`, and
+   that is not an oversight. `trail-core`'s renderer writes them, and it writes
+   them with that prefix because CULItrail's stylesheet already ships them and
+   renaming would change a file in every vault's plugin folder for no gain a
+   reader could see. Every rule below is scoped under `.apt-trip-costs`, so
+   this plugin styles that markup without claiming the names.
+   See docs/design/trip-budget-and-bookings.md §7.2.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.apt-trip-costs-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.3rem 0 0.6rem;
+}
+
+.apt-trip-costs-tile {
+  flex: 1 1 7rem;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  background: var(--background-secondary);
+}
+
+.apt-trip-costs-tile-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+}
+
+.apt-trip-costs-tile-value {
+  font-size: 1rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Under and over are the two states somebody actually looks for, so they are
+   the two the strip colours. */
+.apt-trip-costs-tile.is-under .apt-trip-costs-tile-value {
+  color: var(--text-success);
+}
+
+.apt-trip-costs-tile.is-over .apt-trip-costs-tile-value {
+  color: var(--text-warning);
+}
+
+/* One line per foreign currency, with the rate that converted it. This is what
+   makes the converted total readable rather than merely present. */
+.apt-trip-costs-currency,
+.apt-trip-costs-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.2rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.apt-trip-costs .culi-invoice {
+  max-width: 44rem;
+}
+
+.apt-trip-costs .culi-invoice-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.4rem 1rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid var(--background-modifier-border);
+}
+
+.apt-trip-costs .culi-invoice-doc {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+/* Uppercased here rather than in the translation table, so the German word is
+   still written as a word. */
+.apt-trip-costs .culi-invoice-doc-label,
+.apt-trip-costs .culi-label-caps {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+}
+
+.apt-trip-costs .culi-invoice-reference {
+  font-weight: 600;
+}
+
+.apt-trip-costs .culi-invoice-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1rem;
+  margin: 0.5rem 0;
+  font-size: 0.8rem;
+}
+
+.apt-trip-costs .culi-invoice-fact {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.apt-trip-costs .culi-invoice-fact-icon {
+  display: flex;
+  color: var(--text-faint);
+}
+
+.apt-trip-costs .culi-invoice-fact-value {
+  font-variant-numeric: tabular-nums;
+}
+
+/* The table scrolls inside itself rather than widening the note: a phone gets
+   the amounts, which is the column the table exists for. */
+.apt-trip-costs .culi-invoice-table-scroll {
+  overflow-x: auto;
+}
+
+.apt-trip-costs .culi-invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.apt-trip-costs .culi-invoice-table th {
+  text-align: left;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+  font-weight: 600;
+  padding: 0.3rem 0.4rem;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.apt-trip-costs .culi-invoice-table td {
+  padding: 0.3rem 0.4rem;
+  border-bottom: 1px solid var(--background-modifier-border);
+  vertical-align: top;
+}
+
+.apt-trip-costs .culi-invoice-col-num,
+.apt-trip-costs .culi-invoice-cell-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.apt-trip-costs .culi-invoice-link {
+  color: var(--link-color);
+  cursor: pointer;
+}
+
+.apt-trip-costs .culi-invoice-totals {
+  margin: 0.6rem 0 0 auto;
+  max-width: 26rem;
+}
+
+/* Three columns on every row, including the ones with nothing to remark, so
+   the amounts line up down the block. */
+.apt-trip-costs .culi-invoice-total-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 8rem;
+  gap: 0.4rem;
+  align-items: baseline;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.85rem;
+}
+
+.apt-trip-costs .culi-invoice-total-amount {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.apt-trip-costs .culi-invoice-total-note {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+.apt-trip-costs .culi-invoice-total-subtotal,
+.apt-trip-costs .culi-invoice-total-adjustment {
+  color: var(--text-muted);
+}
+
+/* The rule above it and the weight are what make this read as the bottom line. */
+.apt-trip-costs .culi-invoice-total-total {
+  margin-top: 0.2rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid var(--text-muted);
+  font-weight: 700;
+}
+
+/* The budget, beside the computed figure and never instead of it. */
+.apt-trip-costs .culi-invoice-total-stated {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.apt-trip-costs .culi-invoice-footer {
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.apt-trip-costs .culi-invoice-footer-heading {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+.apt-trip-costs .culi-invoice-group {
+  margin-bottom: 0.4rem;
+  font-size: 0.85rem;
+}
+
+.apt-trip-costs .culi-invoice-group-label {
+  font-size: 0.72rem;
+  color: var(--text-faint);
+}
+
+.apt-trip-costs .culi-invoice-group-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The four money actions on their own line under the heading, and wrapping
+   rather than running off the side: four buttons do not fit the width of a
+   phone, and on one the last of them was simply gone. */
+.apt-trip-costs-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-block-end: 0.7rem;
+}
+
+/* What an itinerary row cost, and the paperwork behind it. Per currency,
+   never converted: a chip has no room to explain a rate. */
+.apt-itinerary-costs {
+  margin-top: 0.3rem;
+}
+
+/* The item editors put three controls on one row (amount, currency, unit),
+   and Obsidian's default setting row gives the control column whatever it
+   asks for. That squeezed the name and description column down to roughly a
+   word per line. Letting the row wrap fixes it: the text keeps its full
+   width, and the controls drop to their own line when they have to. */
+.apt-item-editor .setting-item {
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+}
+
+.apt-item-editor .setting-item-info {
+  flex: 1 1 15rem;
+  /* Both of these are the guard against a horizontal scrollbar. A flex item
+     is allowed to grow to its content, and these descriptions are whole
+     sentences, so without a ceiling and a floor of zero the column sizes
+     itself to its longest line and scrolls the whole dialog sideways --
+     which is exactly what a `flex: 0 0 auto` here did on iPad. */
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  margin-inline-end: 0;
+}
+
+.apt-item-editor .setting-item-description {
+  overflow-wrap: break-word;
+}
+
+/* Grows rather than shrinking to its contents, so a control column that has
+   wrapped onto its own line still spans the full width and right-aligns
+   against the same edge as every row above it. A dialog where one row's
+   fields sit left and the rest sit right reads as a mistake, which is
+   exactly what it was. */
+.apt-item-editor .setting-item-control {
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  min-inline-size: 0;
+}
+
+/* An amount is four or five digits, so it does not need the width a text
+   field defaults to, and taking it keeps all three controls on one line. */
+.apt-cost-field .setting-item-control input[type='text'] {
+  inline-size: 7rem;
+}
+
+/* PHONES ONLY, and deliberately not `is-mobile`: an iPad carries that class
+   while still laying a setting row out as a row, so mobile rules written for
+   a stacked layout landed on the one device that did not need them.
+   A phone stacks the row into a COLUMN, where a flex-basis written for a row
+   stops being a width and becomes a height -- which is what left these
+   dialogs looking stretched out. A stacked row needs no basis at all: the
+   text already has the full width there. */
+body.is-phone .apt-item-editor .setting-item-info {
+  flex: 1 1 auto;
+}
+
+body.is-phone .apt-item-editor .setting-item-control {
+  inline-size: 100%;
+  justify-content: flex-end;
+}
+
+/* And the cost row keeps its three controls on one line rather than letting
+   a phone stack three full-width fields down the screen: the two dropdowns
+   are as wide as their own words, and the amount takes what is left. */
+body.is-phone .apt-cost-field .setting-item-control {
+  flex-wrap: nowrap;
+  gap: 0.4rem;
+}
+
+body.is-phone .apt-cost-field .setting-item-control input[type='text'] {
+  flex: 1 1 4rem;
+  inline-size: auto;
+  min-inline-size: 0;
+}
+
+body.is-phone .apt-cost-field .setting-item-control select {
+  flex: 0 1 auto;
+  min-inline-size: 0;
+}
+
+/* One tick box per participant, laid out along the row rather than as a
+   column of Setting rows: on a trip of two or three this is one line. */
+.apt-traveller-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.9rem;
+  margin-block-end: 0.75rem;
+}
+
+.apt-traveller-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+}
+
+/* A guess, dressed as a guess: dashed rather than solid, so a priced-but-
+   unbooked line never reads like money that has been spent. */
+.apt-itinerary-estimate {
+  border-style: dashed;
+  color: var(--text-muted);
+}
+
+.apt-itinerary-document.is-clickable {
+  cursor: pointer;
+  color: var(--link-color);
+}
+
+/* A document that does not resolve is shown as unresolved rather than
+   hidden: a moved PDF is a thing to fix, not a thing to forget. */
+.apt-itinerary-document.is-unresolved {
+  color: var(--text-faint);
+  text-decoration: line-through;
+}
+
+/* The gallery rows on the trip form: a path, a caption, and the two buttons.
+   The path is given the room because it is the long one. */
+/* A gallery row is the picture, its caption and its actions. The thumbnail
+   sizes the row, which is why it is the one fixed width here: a column of rows
+   that each measured themselves would step in and out as the pictures load. */
+.apt-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.apt-gallery-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+}
+
+/* The card inside is 200px everywhere else in the plugin, and a form row is
+   not a card; the override is on the wrapper so nothing else changes. */
+.apt-gallery-thumb {
+  flex: 0 0 auto;
+}
+
+.apt-gallery-thumb .apt-image-card {
+  width: 88px;
+}
+
+.apt-gallery-thumb .apt-entity-image,
+.apt-gallery-thumb .apt-image-placeholder {
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+}
+
+.apt-gallery-caption {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.apt-gallery-caption input {
+  width: 100%;
+}
+
+.apt-gallery-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  flex: 0 0 auto;
+}
+
+/* Same shape as the itinerary's row actions: a div carrying the icon, because
+   setIcon() aimed at a button is the iPad defect icon-slot.test.ts refuses. */
+.apt-gallery-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.apt-gallery-action:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.apt-gallery-action.is-disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* Tall enough for a brochure's worth of highlights without scrolling, since
+   ten is the number the reference document uses and roughly what a trip has. */
+.apt-trip-highlights {
+  width: 100%;
+  min-height: 9em;
+  font-family: var(--font-text);
+}
+
+/* Under the trip's name in the card overlay: what it is, below what it is
+   called. Smaller and lighter than the title, and clipped to one line so a
+   long one cannot push the title off its own card. */
+.apt-gallery-card-subtitle {
+  overflow: hidden;
+  color: var(--text-on-accent);
+  font-size: var(--font-ui-smaller);
+  opacity: 0.85;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Room for a paragraph or two without scrolling, since that is what a trip's
+   overview is. */
+.apt-trip-summary {
+  width: 100%;
+  min-height: 7em;
+  font-family: var(--font-text);
+}
+
+/* ------------------------------
+ * Sample vault preview
+ *
+ * A list of what a command would write, read once before clicking. Grouped by
+ * folder rather than shown as one flat list, because the question somebody has
+ * in front of this dialog is where these notes are going to land, and the
+ * folder is the answer.
+ * ------------------------------ */
+
+.apt-sample-heading {
+  font-size: var(--font-ui-small);
+  font-weight: 600;
+  color: var(--text-normal);
+  margin: 1rem 0 0.35rem;
+}
+
+.apt-sample-group {
+  margin-bottom: 0.5rem;
+}
+
+.apt-sample-folder {
+  font-size: var(--font-ui-smaller);
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.apt-sample-titles {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-faint);
+  line-height: 1.5;
+}
+
+/* The refusal, set apart from the lists under it: a coloured edge on the
+   reading side, because it is the one part of this dialog that has to be read
+   before the button below it makes sense. */
+.apt-sample-blocked {
+  border-inline-start: 3px solid var(--text-error);
+  padding-inline-start: 0.75rem;
+  margin-bottom: 0.75rem;
+}

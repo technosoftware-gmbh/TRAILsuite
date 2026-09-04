@@ -1,0 +1,10 @@
+{
+  "id": "culitrail",
+  "name": "CULItrail",
+  "version": "1.0.0",
+  "minAppVersion": "1.12.0",
+  "description": "Meals ordered ready-made, as plain Markdown: meal notes, per-person meal planning, and order tracking.",
+  "author": "Technosoftware GmbH",
+  "authorUrl": "https://technosoftware.com",
+  "isDesktopOnly": false
+}
