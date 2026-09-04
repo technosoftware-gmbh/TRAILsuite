@@ -1,0 +1,29 @@
+# Line endings.
+#
+# This repo shipped with three files in CRLF (models/create-entities.ts,
+# models/read-entities.ts, ui/modals/travel-place-picker-modal.ts) and every
+# other text file in LF. That mix stays invisible until it isn't: a two-line
+# edit to one of the three rewrote all 142 lines of the file, and the change
+# that mattered sat buried in a diff nobody would read. LF everywhere,
+# decided here once, rather than by whichever editor last saved the file.
+#
+# .prettierrc keeps endOfLine: "auto", which preserves whatever a file
+# already has. That stays the right setting now that this file exists: git
+# owns the decision and prettier does not argue with it.
+#
+# An existing checkout needs one pass to catch up:
+#   git add --renormalize .
+# Worth its own commit, so the whitespace churn never rides along with a
+# real change.
+* text=auto eol=lf
+
+# Generated, tracked, and never read by a human. Collapsed in diffs and kept
+# out of the repo's language statistics.
+package-lock.json -diff linguist-generated=true
+
+# Binary, marked explicitly rather than left to git's content heuristic: a
+# PDF or PNG that gets line-ending conversion applied to it is a corrupt PDF
+# or PNG.
+*.png binary
+*.pdf binary
+*.ico binary

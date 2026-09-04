@@ -1,0 +1,18 @@
+# Build output. `package.json` points `exports` into here, and `prepare` rebuilds it,
+# so it is derived rather than authored.
+node_modules/
+dist/
+main.js
+main.js.map
+*.log
+.DS_Store
+
+# Assembled by `scripts/claude-project-bundle.sh` from documents that are already
+# tracked, plus the two authored files under `docs/claude-project/`. Derived, so
+# it is rebuilt rather than committed.
+claude-project-bundle/
+
+# The sandbox that edits this repo cannot unlink files, so a deletion lands here
+# instead of happening. Nothing in it is source, and the eslint configs ignore it
+# for the same reason.
+_to_delete/

@@ -1,0 +1,33 @@
+{
+  "name": "trailsuite",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The trail suite: one shared core and the Obsidian plugins built on it.",
+  "author": "Technosoftware GmbH <support@technosoftware.com> (https://technosoftware.com)",
+  "homepage": "https://technosoftware.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/technosoftware-gmbh/TRAILsuite.git"
+  },
+  "bugs": {
+    "url": "https://github.com/technosoftware-gmbh/TRAILsuite/issues"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present && npm run test:suite",
+    "test:suite": "vitest run",
+    "core": "npm run build --workspace packages/core",
+    "build": "npm run core && npm run build --workspaces --if-present",
+    "check": "npm run core && npm run typecheck && npm run lint && npm run test"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.10"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "id": "nodatrail",
+  "name": "NODAtrail",
+  "version": "1.0.0",
+  "minAppVersion": "1.12.0",
+  "description": "Map your mind. A PARA life OS for Obsidian: areas, goals, projects and periodic plans, with the budgets, purchases and bills that belong to none of them.",
+  "author": "Technosoftware GmbH",
+  "authorUrl": "https://technosoftware.com",
+  "isDesktopOnly": false
+}
