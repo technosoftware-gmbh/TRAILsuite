@@ -39,6 +39,19 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { extname, join, relative } from "node:path";
+// TypeScript 5, declared at the repository root, and the version matters.
+//
+// This import used to be satisfied by luck. Nothing at the root asked for a
+// compiler; typescript-eslint drags in its own TypeScript 5 to satisfy its
+// peer range, npm hoists that copy here, and the bare specifier found it. A
+// dependency change that stopped hoisting it would have taken this sweep with
+// it, and the one thing a rule like this must not do is stop looking quietly.
+//
+// It cannot be TypeScript 7. The compiler API moved off the package root there
+// -- `exports["."]` is `lib/version.cjs`, the version and nothing else -- and
+// the scanner now lives behind `typescript/unstable/ast`. The root cannot hold
+// 7 anyway: typescript-eslint refuses to run against it, and the root copy is
+// the one it resolves. Each package keeps its own 7.0.2 for its own build.
 import ts from "typescript";
 
 const EM_DASH = "—";
