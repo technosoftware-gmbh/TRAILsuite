@@ -133,10 +133,15 @@ Security problems do not go in an issue. [`SECURITY.md`](SECURITY.md) says where
 they go, and describes an attack surface that is smaller than most: none of the
 three plugins makes a network request.
 
+Everyone taking part is covered by the
+[`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md).
+
 ## Ownership
 
 Copyright (c) 2026 Technosoftware GmbH, Switzerland
 (<https://technosoftware.com>). Each package carries its own licence beside its
-`package.json`; `NOTICE.md` says which and why. Bug reports go to
+`package.json`; [`LICENSE.md`](LICENSE.md) lists the four in one table and
+[`NOTICE.md`](NOTICE.md) says why they differ. The repository as a whole is not
+licensed. Bug reports go to
 <https://github.com/technosoftware-gmbh/TRAILsuite/issues>, and anything else to
 <support@technosoftware.com>.

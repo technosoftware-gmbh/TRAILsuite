@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/technosoftware-gmbh/TRAILsuite/security/advisories/new
+    about: Never in a public issue. This form is private between you and the maintainers.
+  - name: A question about using the plugins
+    url: https://github.com/technosoftware-gmbh/TRAILsuite/blob/main/docs/user-guide.md
+    about: The user guide covers the note formats and the everyday workflows. Read it before filing, and file if it does not answer you.
+  - name: Anything else
+    url: mailto:support@technosoftware.com
+    about: Licensing, the contributor agreement, commercial use of the PolyForm packages.

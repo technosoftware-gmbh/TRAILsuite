@@ -187,6 +187,12 @@ frontmatter of a note that shows the problem with anything private taken out.
 **A security issue is not an ordinary issue.** See
 [`SECURITY.md`](SECURITY.md).
 
+## Conduct
+
+Taking part here, in issues and in pull requests, means the
+[`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) applies to you and to us. It is
+Contributor Covenant 2.1 and reporting goes to <support@technosoftware.com>.
+
 ## Questions
 
 Anything the documents do not answer:
