@@ -38,20 +38,32 @@ happened and the check that allowed it.
 
 ## What a contribution grants
 
-**Technosoftware GmbH asks contributors to sign a contributor licence agreement
-before a code contribution can be merged.** It gives Technosoftware the right
-to license your contribution under terms that may differ from the package's
-current one, which is what keeps a commercial licence possible for the two
-PolyForm packages. You keep your copyright.
+Code contributions are covered by [`CLA.md`](CLA.md), Technosoftware GmbH's
+contributor agreement. In short, and the file itself governs: **you keep your
+copyright**, and you grant Technosoftware a licence broad enough to relicense
+your contribution, including under terms that differ from the package's current
+one. That is what keeps a commercial licence possible for the two PolyForm
+packages, and it is why the agreement exists rather than an inbound-equals-
+outbound rule. It also grants a patent licence, which terminates for anybody
+who sues over the contribution, and it is governed by Swiss law.
 
-Email <support@technosoftware.com> to receive the agreement. It is asked for
-once, not per pull request.
+**Signing is one comment.** Open your pull request; a bot will notice you have
+not signed and post the sentence to reply with:
 
-This applies to code, and to documentation that ships in the repository. It
-does not apply to filing an issue, or to a comment in a discussion.
+```
+I have read the CLA Document and I hereby sign the CLA
+```
 
-If that is not something you want to sign, an issue describing the bug and how
-to reproduce it is genuinely useful and asks nothing of you.
+Your signature is committed to `.github/cla/signatures.json` in this
+repository, so the record is in the open and you are asked once rather than per
+pull request. If the bot and that file ever disagree, comment `recheck`.
+
+This covers code, and documentation that ships in the repository. It does not
+cover filing an issue or commenting in a discussion, and a bug report that asks
+nothing of you is genuinely useful on its own.
+
+Questions about the agreement go to <support@technosoftware.com> before you
+write the code rather than after.
 
 ## What belongs in the core
 
