@@ -35,7 +35,7 @@ The short version:
 - Adding a marker, a setting or a section a note may now carry is a **minor**,
   and belongs under `### Added` with the vault consequence spelled out.
 - For the core, a note format is part of the public surface in the strict
-  sense, and `CRM_CONTRACT` is stricter still: changing one of its seven values
+  sense, and `CRM_CONTRACT` is stricter still: changing one of its nine values
   breaks two plugins at once and silently, because a type value that no longer
   matches produces an empty list rather than an error.
 

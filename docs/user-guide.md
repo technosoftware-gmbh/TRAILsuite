@@ -10,8 +10,11 @@ They can be used together or apart. Nothing one writes is unreadable without the
 others, and if you disable one, its notes stay plain Markdown with plain
 frontmatter.
 
-Written 19 August 2026, updated 22 August 2026 when NODAtrail arrived, for
-version 0.1.0 of all three. **NODAtrail has its own guide**, which is more
+Written 19 August 2026, updated 22 August 2026 when NODAtrail arrived, and
+audited 5 September 2026. All three are at 1.0.0. **CULItrail is installed from
+[its own repository](https://github.com/technosoftware-gmbh/CULItrail)** and the
+other two from this one; nothing about using them together changed when it
+moved. **NODAtrail has its own guide**, which is more
 detailed than a section here could be:
 [`packages/nodatrail/docs/usage.md`](../packages/nodatrail/docs/usage.md).
 

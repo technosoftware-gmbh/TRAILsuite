@@ -1,7 +1,7 @@
 /**
  * NODAtrail's half of the shared-CRM contract.
  *
- * Both plugins have to ship identical defaults for these seven fields, or a
+ * Both plugins have to ship identical defaults for these nine fields, or a
  * fresh vault ends up with one of them looking for `company` notes while the
  * other writes `Organisation` ones. The failure mode is an empty list, never
  * an error, so it is checked here rather than noticed later.

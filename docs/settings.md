@@ -145,7 +145,7 @@ Because it runs on a fresh install only, **a value configured in one plugin
 after another was already installed does not propagate**. That is the usual
 reason two plugins disagree about something in a long-lived vault.
 
-The seven CRM defaults the three must agree on are not adopted at all: they are
+The nine CRM defaults the three must agree on are not adopted at all: they are
 `trail-core`'s `CRM_CONTRACT`, a frozen constant imported into each plugin's
 defaults, with a `crm-contract` test in each that fails on drift. They had
 already drifted once, `Person` and `Organisation` on one side against `person`

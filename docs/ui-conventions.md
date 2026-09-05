@@ -1,9 +1,16 @@
 # The suite's user interface: what the three plugins agree on
 
 **Status: written 26 August 2026, section 5 revised the same day** once the
-three missing tests were moved. From conventions already proven in shipped code
-rather than proposed fresh. Where a rule is one plugin's practice and not yet
-the other two's, it says so.
+three missing tests were moved. Audited 5 September 2026 after CULItrail left
+for [its own repository](https://github.com/technosoftware-gmbh/CULItrail). From
+conventions already proven in shipped code rather than proposed fresh. Where a
+rule is one plugin's practice and not yet the other two's, it says so.
+
+**This document still covers three plugins**, because the specification is what
+they agree on and that did not change when one of them moved. What did change is
+that CULItrail's columns and counts below are a snapshot rather than something
+this repository can re-measure: check them against that repository before
+quoting one as current.
 
 This is the one document in the suite that cannot become a module. Everything
 else the three plugins share is in `trail-core` and imported. A user interface
@@ -13,11 +20,13 @@ cannot be, for two reasons that both hold independently:
   user-facing string and no settings object, and nothing in it may import
   `obsidian` or touch the DOM. A shared UI kit would break the one rule that
   lets the core run under vitest and in a future standalone application.
-- **The licence boundary forbids the sideways move.** CULItrail is
-  GPL-3.0-or-later because of its inherited Recipe Box code, and its UI kit is
-  part of that package. Copying a file out of it into either PolyForm package
-  would relicense that package, and `tests/package-boundary.test.ts` fails the
-  build on the attempt.
+- **The boundary forbids the sideways move.** Every package stays
+  independently buildable and shippable, so a UI kit in one of them cannot be
+  imported by another, and `tests/package-boundary.test.ts` fails the build on
+  the attempt. The rule also had a licence behind it while CULItrail shared this
+  repository: it is GPL-3.0-or-later because of its inherited Recipe Box code,
+  and a file copied out of its UI kit would have relicensed a PolyForm package.
+  Separate repositories settle that half now.
 
 So the suite gets a consistent interface the only way available to it: **one
 specification, implemented three times.** That costs three implementations of
@@ -218,8 +227,9 @@ APERtrail settings with no settings-page row that turned out to be a defensible
 line needing a stated reason rather than a control. None of that was visible
 while the rule was a preference.
 
-One row still reads no. `no-em-dash` is enforced in CULItrail and NODAtrail and
-absent from `core` and `apertrail`, which are kept clean by hand.
+That row now reads yes everywhere. `no-em-dash` was enforced in CULItrail and
+NODAtrail only when this was written; the check was consolidated into
+`tests/no-em-dash.test.ts` at the root, which reads every package from disk.
 
 ## 6. Where the three actually stand
 

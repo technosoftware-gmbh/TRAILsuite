@@ -82,8 +82,8 @@ describe('crmContractMismatches', () => {
   });
 
   it('reports every key a partial defaults object leaves out', () => {
-    // Holding three of the seven is not partial agreement, it is four keys a
-    // vault gets nothing for. All four are named, not passed over.
+    // Holding three of the nine is not partial agreement, it is six keys a
+    // vault gets nothing for. All six are named, not passed over.
     const three = {
       typePropertyName: 'type',
       personTypeValue: 'person',

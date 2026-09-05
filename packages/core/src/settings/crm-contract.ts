@@ -1,8 +1,8 @@
 /**
  * The CRM contract: the nine settings the three plugins have to agree on before
  * any of them can read another's Person and Company notes. It was seven until
- * the two roles properties joined, which is why several documents said seven for
- * a while.
+ * the two roles properties joined, and several documents went on saying seven
+ * afterwards; those were corrected in the September 2026 audit.
  *
  * Each plugin owns its own settings and each lets a vault rename any of these,
  * so this is not configuration. It is the set of DEFAULTS a fresh install of

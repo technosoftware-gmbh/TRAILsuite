@@ -16,8 +16,8 @@ out of the vault rather than from a sibling directory.
 | Package | Plugin id | What it covers | Licence | Version |
 |---|---|---|---|---|
 | `packages/core` (`@technosoftware/trail-core`) | not a plugin | The shared, Obsidian-free library | MIT | 1.1.0 |
-| `packages/apertrail` | `apertrail` | Trips, places, photo spots | PolyForm Noncommercial 1.0.0 | 0.1.0 |
-| `packages/nodatrail` | `nodatrail` | PARA, periodic notes, budgets, bills, ledger | PolyForm Noncommercial 1.0.0 | 0.1.0 |
+| `packages/apertrail` | `apertrail` | Trips, places, photo spots | PolyForm Noncommercial 1.0.0 | 1.0.0 |
+| `packages/nodatrail` | `nodatrail` | PARA, periodic notes, budgets, bills, ledger | PolyForm Noncommercial 1.0.0 | 1.0.0 |
 
 Both plugins declare `minAppVersion: 1.12.0` and neither is desktop-only.
 
@@ -295,7 +295,7 @@ is caught without anybody having to remember it.
 ### 5.1 The contract
 
 Person and Company notes are shared by all three plugins and owned by none of
-them. The seven defaults they must agree on live in the core as a frozen
+them. The nine defaults they must agree on live in the core as a frozen
 constant:
 
 | Key | Value |
@@ -848,8 +848,8 @@ file could enforce for itself:
 | `property-name-lock` (both plugins) | A property-name row that skips the lock |
 | `stylesheet` (both plugins) | A class in two rules, a dead rule, a class the source sets and the sheet does not style, a physical inline offset |
 | `vault-smoke` (nodatrail) | A reader that works against invented frontmatter and not against a real vault |
-| `ui-conventions` (all three plugins) | A view querying the document for DOM it built itself, `innerHTML`, console logging, inline style assignment, a bare async event listener |
-| `icon-slot` (all three plugins) | `setIcon()` aimed at a button element rather than at a slot inside one |
+| `ui-conventions` (both plugins) | A view querying the document for DOM it built itself, `innerHTML`, console logging, inline style assignment, a bare async event listener |
+| `icon-slot` (both plugins) | `setIcon()` aimed at a button element rather than at a slot inside one |
 | `no-em-dash` (suite) | An em dash in a TypeScript comment, a translation string, a stylesheet comment or document prose, in any package |
 | `settings-reference` (suite) | A setting with no row in its package's settings reference, or a row for a setting that no longer exists |
 | `display-locale` (suite) | A plugin drawing a number or a date in the machine's convention: a core formatter called with no locale, `Intl` left to its own default, or a plugin not shipping the shared default |
@@ -908,7 +908,7 @@ what to do by asking whether a sibling is enabled. The only occurrences of
 
 Section 1 says why that is not a matter of taste:
 `tests/package-boundary.test.ts` fails the build on an import across a package
-boundary, because CULItrail is GPL and the other two are not. What the plugins
+boundary, so that every package stays independently buildable. What the plugins
 do instead is the same three things every time, and the three together are the
 suite's cooperation model.
 
@@ -1011,37 +1011,30 @@ Stated here rather than left to be discovered:
    grows a purchasing side, at which point the two-consumer test applies to
    them. The order format is not the precedent to follow here: that is in the
    core as a note format, and a discount ladder is not one.
-4. **The root `npm run build` builds the packages in the wrong order.**
-   `npm run build --workspaces` visits them in the order npm resolves the
-   workspace graph, which on 29 August 2026 was **apertrail, trail-core,
-   culitrail, nodatrail**: one plugin ahead of the core. The order is npm's to
-   choose and is not stable, so naming a particular plugin here is a mistake the
-   documents have already made once.
-   The script only works because `npm install` has already built
-   `packages/core/dist/` through the core's `prepare`. On a tree whose `dist/` is
-   missing or stale, whichever plugin comes first fails its typecheck with
-   `Cannot find module '@technosoftware/trail-core'`. The workaround is
-   `npm run build --workspace packages/core` first; the fix is to order the root
-   script, and it has not been made.
-5. **`packages/apertrail` ships `sync-version.js` but no `version` script to
-   run it.** CULItrail's `package.json` wires the two together as
-   `"version": "node sync-version.js && git add manifest.json"`, so `npm version`
-   there keeps `manifest.json` in step with `package.json`. APERtrail carries the
-   same script file and no such wiring, so its `manifest.json` version has to be
-   bumped by hand.
+4. *(Closed 4 September 2026.)* **The root `npm run build` built the packages
+   in the wrong order.** `npm run build --workspaces` visits them in the order
+   npm resolves the workspace graph, which put a plugin ahead of the core, and
+   the script only worked because `npm install` had already built
+   `packages/core/dist/` through the core's `prepare`. On a tree whose `dist/`
+   was missing or stale, whichever plugin came first failed its typecheck with
+   `Cannot find module '@technosoftware/trail-core'`. Both `build` and `check`
+   now run `npm run core` first.
+5. *(Closed. Never true as written.)* **`packages/apertrail` was said to ship
+   `sync-version.js` with no `version` script to run it.** Both plugins carry
+   `"version": "node sync-version.js && git add manifest.json"` and both copies
+   of the script are identical, so `npm version` keeps `manifest.json` in step
+   with `package.json` in each. `docs/releasing.md` described it accurately
+   throughout; this entry did not.
 6. **NODAtrail's folder seeding prefers a folder the vault already has**, and
    the other two do not. Where a localised default is absent and the English one
    is present, NODAtrail seeds the English one. That rule exists because a
    German-language install into an English-foldered vault would otherwise find
    nothing while looking perfectly configured, and it belongs in the other two
    plugins as well. It has not been added to them.
-7. **Two of the four `CHANGELOG.md` files are now load bearing.** NODAtrail and
-   CULItrail were frozen at 0.1.0 on 29 August 2026 and tagged
-   `nodatrail-v0.1.0` and `culitrail-v0.1.0`, so from here their entries are
-   history rather than a draft and the vault promise at the top of each file is
-   a promise to somebody. `trail-core` and APERtrail still record only an
-   unreleased 0.1.0, which is correct: the core is not distributed on its own
-   and APERtrail is where the feature work moves next.
+7. *(Closed 5 September 2026.)* **Every `CHANGELOG.md` is load bearing now.**
+   All of them reached 1.0.0 on 4 September and the core is at 1.1.0, published
+   to npm as `@technosoftware/trail-core`, so it is distributed on its own after
+   all. Each file's vault promise is a promise to somebody.
 8. *(Closed 31 August 2026.)* **The no-em-dash rule was enforced in two
    packages of four.** `core` and `apertrail` had no copy and were kept clean by
    hand, which held until an em dash reached a German editor description and a

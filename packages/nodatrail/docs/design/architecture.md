@@ -83,7 +83,7 @@ existing behaviour.
 ### 1.2 Adoption from a sibling
 
 On a fresh install NODAtrail reads `<configDir>/plugins/apertrail/data.json` and
-then `culitrail/data.json`, first hit wins, and adopts the seven CRM contract
+then `culitrail/data.json`, first hit wins, and adopts the nine CRM contract
 fields plus the two stamp property names.
 
 Two boundaries, the same two CULItrail's version has. **It reads a file, not a
