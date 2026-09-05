@@ -20,6 +20,10 @@ what counts as a breaking change:
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-05
+
+The first version published to npm, and the first under the scoped name.
+
 ### Changed
 
 - **The package is now `@technosoftware/trail-core`.** Breaking for anybody

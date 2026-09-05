@@ -68,7 +68,32 @@ jobs:
             exit 1
           fi
 
+      # Whether this version is already on the registry.
+      #
+      # There is one case this exists for, and it is the first release. A
+      # trusted publisher is configured on a settings page that does not exist
+      # until the package does, so the first version goes up by hand before
+      # this workflow can authenticate at all. Its tag would otherwise arrive
+      # here and fail on a version that is already exactly right. It also makes
+      # re-running a run that died after publishing safe, which is the same
+      # situation approached from the other side.
+      #
+      # This does not soften the guard above. A tag disagreeing with the
+      # manifest is still refused, and that is the case where a version nobody
+      # meant could go out.
+      - name: Is this version already published
+        id: published
+        run: |
+          version=$(node -p "require('./packages/core/package.json').version")
+          if npm view "@technosoftware/trail-core@$version" version > /dev/null 2>&1; then
+            echo "already=true" >> "$GITHUB_OUTPUT"
+            echo "@technosoftware/trail-core@$version is on the registry already; nothing to do."
+          else
+            echo "already=false" >> "$GITHUB_OUTPUT"
+          fi
+
       # `prepare` builds `dist/`, which `exports` points at, so what goes up is
       # what a clean checkout produces rather than whatever was on disk.
       - run: npm publish
+        if: steps.published.outputs.already == 'false'
         working-directory: packages/core
