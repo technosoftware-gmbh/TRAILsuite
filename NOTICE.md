@@ -26,7 +26,7 @@ Two consequences follow, and both are enforced rather than remembered:
 library freely, and so may a PolyForm one. The reverse does not work in either
 direction, and copying a file from `culitrail` into either PolyForm package
 would make that package GPL without anybody meaning it to.
-`tests/licence-boundary.test.ts` fails if any file in one package resolves an
+`tests/package-boundary.test.ts` fails if any file in one package resolves an
 import outside its own package or names another package by dependency.
 
 **A file adopted into the core has to have its lineage established first.** The

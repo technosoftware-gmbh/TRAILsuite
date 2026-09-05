@@ -1,24 +1,37 @@
 /**
  * No package reaches into another package's source.
  *
- * This is the one rule a monorepo makes easy to break. The four packages ship
- * under three different licences: `core` is MIT, `culitrail` is
- * GPL-3.0-or-later because it carries inherited Recipe Box code, and
- * `apertrail` and `nodatrail` are PolyForm Noncommercial. In four separate
- * repositories that
- * boundary was enforced by the filesystem. In one repository it is one relative
- * path away, and an import that crosses it does not fail to compile, does not
- * fail a test, and does not look wrong in a diff.
+ * This was `package-boundary.test.ts`, and the licence was the whole argument:
+ * four packages under three licences, with a copy from GPL `culitrail` into
+ * either PolyForm package the failure worth preventing. That argument is being
+ * removed. CULItrail is moving to its own repository, which enforces the
+ * licence half by the filesystem, the way it was enforced before the monorepo.
+ *
+ * The rule stays, on a reason that was always underneath the licence one:
+ * **every package has to remain independently buildable and shippable.** Each
+ * carries its own manifest, tests, changelog and release, and each is installed
+ * into a vault on its own. A package that quietly reads a sibling's source is a
+ * package that no longer builds alone, and that is true whatever the licences
+ * say. In one repository the reach is one relative path away, and an import
+ * that crosses it does not fail to compile, does not fail a test, and does not
+ * look wrong in a diff.
  *
  * So the rule is checked rather than trusted: **a file may import its own
- * package, a published dependency, or `trail-core`, and nothing else.** The
- * direction that matters most is `culitrail` into either PolyForm package,
- * since that would pull GPL code into a package that must not carry it, but the
- * check is symmetric because a licence boundary that only holds in one
- * direction is not a boundary.
+ * package, a published dependency, or `trail-core`, and nothing else.**
+ * `trail-core` is the exception by design: it is the shared library, it flows
+ * into all of the others, and none of them flows back.
  *
- * `trail-core` is the exception by design: MIT flows into all three of the
- * others, and none of them flows back.
+ * **What this does not catch, and never did.** It reads imports and dependency
+ * names. A file copied wholesale into another package, using only that
+ * package's own modules, passes every assertion here. That gap is why the
+ * licence rationale could not rest on this test, and it is worth knowing before
+ * treating a green run as proof that nothing has moved.
+ *
+ * The last assertion is still about licences and is deliberately kept: each
+ * package states its own SPDX identifier and ships the text behind it. A
+ * licence named in a manifest with no file beside it is a claim, and the
+ * repository as a whole is not licensed, so the per-package statement is the
+ * only one there is.
  */
 import { describe, expect, it } from "vitest";
 import { readFileSync, readdirSync } from "node:fs";
@@ -72,7 +85,7 @@ function importSpecifiers(source: string): string[] {
   return specifiers;
 }
 
-describe("licence boundary", () => {
+describe("package boundary", () => {
   const files = sourceFiles();
 
   it("finds the packages and their source", () => {

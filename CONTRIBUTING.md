@@ -22,7 +22,7 @@ GPL-3.0-or-later as a whole. So:
 **Code may move from the core outwards. It may never move sideways.** Copying a
 file out of `culitrail` into either PolyForm package would relicense that
 package without anybody meaning it to, and the reverse fails for the same
-reason in the other direction. `tests/licence-boundary.test.ts` refuses any
+reason in the other direction. `tests/package-boundary.test.ts` refuses any
 file that resolves an import outside its own package, or that names another
 package as a dependency.
 

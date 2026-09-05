@@ -140,7 +140,7 @@ the sample vault is not beside the repo. `trail-core` adds 1,330 over 59 files
 and runs clean, APERtrail 493 over 42 with nothing skipped, and NODAtrail 579 of
 586 over 65, its own seven skipping for the same sample-vault reason. There are
 four packages now, so a green four-package gate is 3,328 passing cases, or 3,333
-with the suite's own `licence-boundary.test.ts`. Counted from a run on 29 August
+with the suite's own `package-boundary.test.ts`. Counted from a run on 29 August
 2026; re-read them off `npm test` rather than trusting the paragraph. Grouped below by what they
 are for rather than listed alphabetically, because the interesting question
 about a suite is which failure it exists to catch.

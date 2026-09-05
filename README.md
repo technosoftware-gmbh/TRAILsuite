@@ -113,7 +113,7 @@ that it can flow into all three.
 
 **Code may move from the core outwards. It may not move sideways.** In separate
 repositories the filesystem enforced that. Here it is one relative path away, so
-`tests/licence-boundary.test.ts` checks it instead: no file may resolve an
+`tests/package-boundary.test.ts` checks it instead: no file may resolve an
 import outside its own package or name another package, in either direction.
 NODAtrail follows CULItrail's settings-adoption mechanism and shares none of its
 code, and that distinction is what lets the two be licensed differently.

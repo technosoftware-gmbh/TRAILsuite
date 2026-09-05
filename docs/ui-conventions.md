@@ -16,7 +16,7 @@ cannot be, for two reasons that both hold independently:
 - **The licence boundary forbids the sideways move.** CULItrail is
   GPL-3.0-or-later because of its inherited Recipe Box code, and its UI kit is
   part of that package. Copying a file out of it into either PolyForm package
-  would relicense that package, and `tests/licence-boundary.test.ts` fails the
+  would relicense that package, and `tests/package-boundary.test.ts` fails the
   build on the attempt.
 
 So the suite gets a consistent interface the only way available to it: **one

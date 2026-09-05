@@ -7,7 +7,7 @@
  * That is why this exists.
  *
  * **Written for this package rather than shared.** NODAtrail and CULItrail both
- * have one, and `tests/licence-boundary.test.ts` fails the build on a file that
+ * have one, and `tests/package-boundary.test.ts` fails the build on a file that
  * crossed between packages -- the two PolyForm plugins are no more allowed to
  * borrow from each other than either is from the GPL one. The shape is the
  * same because the problem is; the code is not.

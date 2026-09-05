@@ -51,7 +51,7 @@ that one commit and one install.
 
 **What a monorepo makes easy is exactly what this suite must not do.** In
 separate repositories the licence boundary was enforced by the filesystem. Here
-it is one relative path away, so `tests/licence-boundary.test.ts` enforces it
+it is one relative path away, so `tests/package-boundary.test.ts` enforces it
 instead: no file may resolve an import outside its own package, no package may
 name another as a dependency, in either direction, and each package's stated
 licence must match a `LICENSE` file that exists. The core is the one exception,
@@ -837,7 +837,7 @@ file could enforce for itself:
 
 | Test | What it refuses to allow |
 |---|---|
-| `licence-boundary` (suite) | A package importing another package, in either direction |
+| `package-boundary` (suite) | A package importing another package, in either direction |
 | `obsidian-free` (core) | A core file importing Obsidian or touching the DOM |
 | `crm-contract` (all three plugins) | A plugin's CRM defaults drifting from the shared contract |
 | `translation-keys` (all three plugins) | A key present in one language table and not the other, or an orphan |
@@ -905,7 +905,7 @@ what to do by asking whether a sibling is enabled. The only occurrences of
 `getPlugin` anywhere in `src/` are three comments saying there is no such call.
 
 Section 1 says why that is not a matter of taste:
-`tests/licence-boundary.test.ts` fails the build on an import across a package
+`tests/package-boundary.test.ts` fails the build on an import across a package
 boundary, because CULItrail is GPL and the other two are not. What the plugins
 do instead is the same three things every time, and the three together are the
 suite's cooperation model.

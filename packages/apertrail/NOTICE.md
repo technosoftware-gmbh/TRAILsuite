@@ -11,7 +11,7 @@ Licensed under the PolyForm Noncommercial License 1.0.0. See `LICENSE`.
 and none from CULItrail, which is GPL-3.0-or-later and cannot flow into a
 PolyForm package. It must not be given any: a single file copied across would
 relicense this package as a whole without anybody meaning it to, which is what
-`tests/licence-boundary.test.ts` at the repository root exists to prevent.
+`tests/package-boundary.test.ts` at the repository root exists to prevent.
 
 The build and lint configuration, and the PolyForm licence text, are shared with
 NODAtrail, which is under the same licence and the same copyright.

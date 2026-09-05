@@ -2,7 +2,7 @@
 #
 # `npm run check` is typecheck, lint and 3,800-odd tests across four packages,
 # and two of those tests exist to catch mistakes nobody would see by reading a
-# diff: `tests/licence-boundary.test.ts`, which refuses an import that would
+# diff: `tests/package-boundary.test.ts`, which refuses an import that would
 # quietly relicense a PolyForm package with GPL code, and
 # `tests/no-em-dash.test.ts`. A house rule enforced only by habit lasts until
 # the first hurried afternoon.

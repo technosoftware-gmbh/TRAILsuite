@@ -18,7 +18,7 @@
  *
  * This is a reimplementation of a shape CULItrail arrived at first, not a copy:
  * that package is GPL and this one is PolyForm, and
- * `tests/licence-boundary.test.ts` fails the build on a file that crossed.
+ * `tests/package-boundary.test.ts` fails the build on a file that crossed.
  */
 import { TFile, type App } from 'obsidian';
 import { stripWikilink } from 'trail-core';

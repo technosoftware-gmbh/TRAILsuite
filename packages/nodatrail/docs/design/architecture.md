@@ -291,7 +291,7 @@ shape of the setting's name rather than by a list.
 
 | Suite | What it refuses to allow |
 |---|---|
-| `licence-boundary` (repository) | NODAtrail importing or naming another package |
+| `package-boundary` (repository) | NODAtrail importing or naming another package |
 | `crm-contract` | CRM defaults drifting from `trail-core`'s `CRM_CONTRACT` |
 | `translation-keys` | A key in one language table and not the other, or an orphan |
 | `property-name-lock` | A property-name row that skips the lock |
