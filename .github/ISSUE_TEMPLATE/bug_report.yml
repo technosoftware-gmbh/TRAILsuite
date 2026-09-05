@@ -1,0 +1,90 @@
+name: Bug report
+description: Something the plugin did that it should not have, or did not do that it should.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Two things before you start.
+
+        **If it wrote something wrong into your vault, say so and stop editing
+        those notes if you can spare them.** A wrong write is the failure this
+        project treats as most expensive, because nothing migrates a vault
+        automatically and the damage is usually noticed months later. A note
+        that still shows the problem is worth more than any description of it.
+
+        **A security problem is not a bug report.** See
+        [SECURITY.md](https://github.com/technosoftware-gmbh/TRAILsuite/blob/main/SECURITY.md).
+
+  - type: dropdown
+    id: plugin
+    attributes:
+      label: Which package
+      options:
+        - CULItrail (meals, plans, orders)
+        - APERtrail (trips, places, bookings)
+        - NODAtrail (PARA, budgets, bills, ledger)
+        - trail-core (the shared library)
+        - More than one, or not sure
+    validations:
+      required: true
+
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Plugin version
+      description: Settings, then the plugin's About section. The manifest version, not the release page.
+      placeholder: "1.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: obsidian
+    attributes:
+      label: Obsidian version and platform
+      description: Obsidian's Settings, About. Say desktop or mobile, and which operating system.
+      placeholder: "1.12.4, macOS desktop"
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened, and what you expected instead
+      description: The two halves matter equally. What a note should have looked like is often the whole report.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to get there
+      description: The shortest path you can find from a fresh vault or from the sample vault. If you cannot reproduce it, say that too and describe what you were doing.
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: frontmatter
+    attributes:
+      label: The note's frontmatter
+      description: The YAML between the two --- lines of a note that shows the problem. Take out anything private first; the property names and the shape of the values are what matter, not your data.
+      render: yaml
+
+  - type: textarea
+    id: console
+    attributes:
+      label: Anything in the developer console
+      description: "Ctrl+Shift+I on Windows and Linux, Cmd+Option+I on macOS, then the Console tab. These plugins log nothing of their own, so anything there is either an error or another plugin talking."
+      render: text
+
+  - type: checkboxes
+    id: wrote-to-vault
+    attributes:
+      label: Did it change a note?
+      options:
+        - label: Yes, a note in my vault was created or rewritten wrongly
+        - label: I have a copy of the note as it was before, or a backup I can restore from

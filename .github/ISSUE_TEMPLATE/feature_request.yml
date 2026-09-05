@@ -1,0 +1,50 @@
+name: Feature request
+description: Something the plugins should do and do not.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The most useful version of this is a description of what you were
+        trying to get done, not a description of the feature. What a plugin
+        should do is usually the second question.
+
+        **If it needs a new frontmatter property, a new `type:` value, or a
+        change to what an existing note carries, say so plainly.** That is the
+        expensive kind of change here: notes already in vaults are not migrated
+        and a reader that stops recognising them fails silently. It does not
+        make the request a bad one. It makes it a slower one.
+
+  - type: dropdown
+    id: plugin
+    attributes:
+      label: Which package
+      options:
+        - CULItrail (meals, plans, orders)
+        - APERtrail (trips, places, bookings)
+        - NODAtrail (PARA, budgets, bills, ledger)
+        - trail-core (the shared library)
+        - More than one, or not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do
+      description: The situation in your vault, and what makes it awkward today.
+    validations:
+      required: true
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: What you think would fix it
+      description: If you have a shape in mind, describe it. If not, leave this empty rather than inventing one.
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: What the notes would carry
+      description: If this needs anything new or changed in a note, write the frontmatter as you imagine it.
+      render: yaml
