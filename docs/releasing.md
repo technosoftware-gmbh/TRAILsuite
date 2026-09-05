@@ -1,9 +1,9 @@
 # Releasing
 
-Four packages ship from this repository on their own versions: `trail-core` to
-npm, and three plugins into Obsidian vaults. What follows is the whole process.
-It is short on purpose -- most of the judgement lives in the changelogs, and
-this file only says where to apply it.
+Four packages ship from this repository on their own versions:
+`@technosoftware/trail-core` to npm, and three plugins into Obsidian vaults.
+What follows is the whole process. It is short on purpose -- most of the
+judgement lives in the changelogs, and this file only says where to apply it.
 
 ## Before anything
 
@@ -34,7 +34,7 @@ The short version:
   an error -- it is silence, months later.
 - Adding a marker, a setting or a section a note may now carry is a **minor**,
   and belongs under `### Added` with the vault consequence spelled out.
-- For `trail-core`, a note format is part of the public surface in the strict
+- For the core, a note format is part of the public surface in the strict
   sense, and `CRM_CONTRACT` is stricter still: changing one of its seven values
   breaks two plugins at once and silently, because a type value that no longer
   matches produces an empty list rather than an error.
@@ -101,11 +101,34 @@ The short version:
    at the time, and that is the one thing nobody can check afterwards. The
    workflow also refuses a tag whose version and `manifest.json` disagree.
 
-   `core-v*` is not matched. The core has no manifest and no bundle.
+   `core-v*` is not matched by that workflow. The core has no manifest and no
+   bundle, and `publish-core.yml` handles it instead.
 
-6. **For `trail-core`**, `npm publish` from `packages/core`. Its `prepare`
-   script builds `dist/`, which `exports` points at, so a publish from a clean
-   checkout builds what it ships.
+6. **For the core**, push a `core-v<version>` tag and `publish-core.yml`
+   publishes it. No token is involved: the workflow authenticates to npm over
+   OIDC as this repository and that file, which is registered as a trusted
+   publisher on the package's npm settings page, and npm attaches a provenance
+   attestation on its own.
+
+   **The very first publish of a package cannot work that way**, because a
+   trusted publisher is configured on a settings page that does not exist until
+   the package does. So the first version goes up by hand, from a clean
+   checkout, by somebody logged in to an account with publish rights on the
+   `technosoftware` organization:
+
+   ```sh
+   npm login
+   npm publish --workspace packages/core
+   ```
+
+   `publishConfig.access` is `public` in the manifest, because a **scoped**
+   package is restricted by default and the failure otherwise is a package
+   published privately rather than an error.
+
+   Its `prepare` script builds `dist/`, which `exports` points at, so a publish
+   from a clean checkout ships what that checkout builds. Once 1.0.0 is up,
+   register the trusted publisher and never publish by hand again: an npm
+   version is immutable and a name, once taken, stays taken.
 
 ## Installing a build into a vault by hand
 

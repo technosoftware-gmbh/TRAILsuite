@@ -1,0 +1,74 @@
+# Publishing the core, by the thing that will be publishing it.
+#
+# `@technosoftware/trail-core` is the one package here that ships to a registry
+# rather than into a vault, and it is therefore the one release that cannot be
+# redone: an npm version is immutable and a name, once taken, stays taken. That
+# is why this is a workflow and not a step somebody runs at the end of a long
+# day.
+#
+# **No token.** Publishing authenticates over OIDC as this repository and this
+# workflow file, named as a trusted publisher on the package's npm settings
+# page. There is no npm credential in this repository to leak, rotate or
+# forget, and npm attaches a provenance attestation on its own because the
+# repository and the package are both public. `--provenance` is deliberately
+# not passed: it is implied here, and passing it would suggest it is what makes
+# it happen.
+#
+# **The first publish cannot come from here.** A trusted publisher is
+# configured on a package's settings page, and that page does not exist until
+# the package does. So 1.0.0 goes up by hand from a clean checkout, the trusted
+# publisher is configured against this file, and every version after it comes
+# from a tag. `docs/releasing.md` step 6 says the same thing in the same order.
+name: publish core
+
+on:
+  push:
+    tags:
+      - 'core-v*'
+
+permissions:
+  contents: read
+  # The OIDC token itself. Publishing fails with ENEEDAUTH without it, and the
+  # error does not mention this line.
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+          registry-url: 'https://registry.npmjs.org'
+
+      # Node 22 ships npm 10, and OIDC publishing needs 11.5.1 or later.
+      # Pinned to the major rather than `latest`, so a future npm cannot change
+      # what a tag publishes without somebody editing this line first.
+      - run: npm install -g npm@^11
+
+      - run: npm ci
+
+      # The whole suite rather than this package alone. The core is what the
+      # three plugins are built against, so a core that ships untested ships
+      # into all three of them.
+      - run: npm run check
+
+      # A tag disagreeing with the manifest would publish a version nobody
+      # asked for, and npm does not give it back. Same guard as `release.yml`
+      # applies to a plugin's `manifest.json`, for the same reason.
+      - name: Refuse a tag the manifest does not agree with
+        run: |
+          tagged="${GITHUB_REF_NAME#core-v}"
+          manifest=$(node -p "require('./packages/core/package.json').version")
+          if [ "$manifest" != "$tagged" ]; then
+            echo "tag says $tagged, package.json says $manifest"
+            exit 1
+          fi
+
+      # `prepare` builds `dist/`, which `exports` points at, so what goes up is
+      # what a clean checkout produces rather than whatever was on disk.
+      - run: npm publish
+        working-directory: packages/core
