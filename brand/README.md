@@ -15,9 +15,18 @@ logo and icon artwork drawn from them.
 | `CULItrail-Logo.png`, `CULItrail-Icon.png` | Shipped. The plugin's own copy is in the CULItrail repository |
 | `NODAtrail-Logo.png`, `NODAtrail-Icon.png` | Shipped. The plugin's own copies are under `packages/nodatrail/images/` |
 
-These are full-resolution masters, several megabytes each, and are deliberately
-not what a README embeds. A package that needs a logo keeps a sized copy under
-its own `images/`.
+**These are 1024px reference copies, not the masters.** They were the masters
+until September 2026, at 1536 and 2048 pixels and between 6 and 15 MB each: 55
+MB of a 24 MB repository, in a tree that is cloned by anybody who wants to read
+the code. The masters live with Technosoftware's other artwork now.
+
+Downscaled with Lanczos and re-encoded, so they are still worth drawing a
+smaller copy from, and still deliberately not what a README embeds: a package
+that needs a logo keeps its own sized copy under its `images/`.
+
+**The old files are still in the git history**, because taking them out of the
+tree does not take them out of a clone. That is the price of having committed
+them, and it was judged not worth rewriting the history to recover.
 
 ## The concepts
 
