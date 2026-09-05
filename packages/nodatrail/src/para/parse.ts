@@ -9,8 +9,13 @@
  *
  * Pure.
  */
-import { readIsoDate, readNumberLike, readString, readStringList } from 'trail-core';
-import { linkOrText, wikilinkTargets } from 'trail-core';
+import {
+  readIsoDate,
+  readNumberLike,
+  readString,
+  readStringList,
+} from '@technosoftware/trail-core';
+import { linkOrText, wikilinkTargets } from '@technosoftware/trail-core';
 import {
   type ParaCommon,
   type ParsedArea,

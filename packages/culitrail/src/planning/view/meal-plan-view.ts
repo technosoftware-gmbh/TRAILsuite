@@ -7,7 +7,7 @@
  * `meal-plan/actions.ts`, which write the note first.
  */
 import { ItemView, WorkspaceLeaf } from 'obsidian';
-import { currentWeekTitle } from 'trail-core';
+import { currentWeekTitle } from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import { toolbarButton } from '../../ui/toolbar';
 import { readPersons } from '../../crm/read-crm';

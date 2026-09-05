@@ -7,7 +7,7 @@
  * somebody has written prose in, or has two blocks in, must come back with the
  * prose and both blocks intact.
  */
-import { JOURNAL_LANGUAGE } from 'trail-core';
+import { JOURNAL_LANGUAGE } from '@technosoftware/trail-core';
 
 /** A journal note with nothing in it yet. */
 export function emptyJournalBody(heading: string): string {

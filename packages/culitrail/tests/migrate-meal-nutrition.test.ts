@@ -35,7 +35,7 @@
  * that kept it would be a copy of a vault that no longer exists.
  */
 import { describe, expect, it } from 'vitest';
-import { parseLegacyPer100gSections } from 'trail-core';
+import { parseLegacyPer100gSections } from '@technosoftware/trail-core';
 import { extractSection } from '../src/meals/parser/body-sections';
 import { readPer100g } from '../src/meals/parser/per100g';
 import { mergeSettings } from '../src/settings/validate';

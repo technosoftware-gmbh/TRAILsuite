@@ -85,7 +85,7 @@ import {
   splitFrontmatterBlock,
   startOfPeriod,
   type SampleNote,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import { mergeSettings } from '../src/settings/validate';
 import { FOREIGN_TITLES, sampleNotes } from '../src/sample/notes';

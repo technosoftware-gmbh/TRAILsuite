@@ -19,7 +19,11 @@
  */
 import { Notice, TFile } from 'obsidian';
 import type { App } from 'obsidian';
-import { type BillRecord, type PurchaseRecord, type RecurringRecord } from 'trail-core';
+import {
+  type BillRecord,
+  type PurchaseRecord,
+  type RecurringRecord,
+} from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import type { NODAtrailSettings } from '../../settings/types';
 import { writeBillEdits, writePurchaseEdits, writeRecurringEdits } from '../../finance/edit-money';

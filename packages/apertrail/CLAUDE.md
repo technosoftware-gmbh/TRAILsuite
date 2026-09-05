@@ -237,7 +237,7 @@ src/ui/           shared UI: components/, dashboard/, gallery/, settings/
   `findValue`, `readString`/`readNumberLike`/`readStringList`,
   `isUnderFolder`/`relativeFolderPath`/`joinFolder`/`sanitizeTitle`,
   `createdEntry`/`stampModified` and `frontmatterObject` are all imported
-  from `'trail-core'`. There is no re-export shim any more:
+  from `'@technosoftware/trail-core'`. There is no re-export shim any more:
   `shared/vault-scan.ts` was the one-stop import surface because the pure
   helpers had to sit in a separate file to stay `obsidian`-free, and the
   core is `obsidian`-free by construction, so pure and App-bound code alike
@@ -258,7 +258,7 @@ src/ui/           shared UI: components/, dashboard/, gallery/, settings/
   `src/shared/date-utils.ts` and `src/shared/date-distance.ts` are gone, and
   every day/week/month/quarter/year title, every `readDateLike()`-style
   frontmatter reader, `formatDateTimeStamp()` and `daysSince()` are imported
-  from `'trail-core'` instead. Do not re-add a local date helper: if a date
+  from `'@technosoftware/trail-core'` instead. Do not re-add a local date helper: if a date
   behaviour is missing, it belongs in the core, where it is tested against
   every timezone rather than only against the one this vault lives in.
   Three names differ from what this plugin used to spell them:

@@ -16,7 +16,7 @@
  * under the schedule heading is not required to look like ours.
  */
 import type { App, TFile } from 'obsidian';
-import { splitFrontmatterBlock } from 'trail-core';
+import { splitFrontmatterBlock } from '@technosoftware/trail-core';
 import { hostFor } from '../shared/vault-host';
 import type { NODAtrailSettings } from '../settings/types';
 

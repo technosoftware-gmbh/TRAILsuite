@@ -12,7 +12,7 @@ import {
   budgetYearOf,
   parseAccountBudget,
   type AccountBudgetProperties,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import { budgetProperties } from '../src/finance/properties';
 

@@ -9,7 +9,7 @@
  * shared, and each plugin answers its own question inside it without owning it.
  */
 import { Notice, Plugin, TFile, WorkspaceLeaf } from 'obsidian';
-import { companyHasRole, currentWeekTitle } from 'trail-core';
+import { companyHasRole, currentWeekTitle } from '@technosoftware/trail-core';
 import { I18nManager, t } from './lang/I18nManager';
 import { CULItrailSettings, type DashboardActivityRangeWeeks } from './settings/types';
 import { CULItrailSettingsStore } from './settings/store';

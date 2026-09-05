@@ -61,7 +61,7 @@
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { matchesType, readString } from 'trail-core';
+import { matchesType, readString } from '@technosoftware/trail-core';
 import { readGrams } from '../src/meals/parser/serving-size';
 import type { CULItrailSettings } from '../src/settings/types';
 import { mergeSettings } from '../src/settings/validate';

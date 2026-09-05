@@ -13,7 +13,7 @@
  *
  * App-free.
  */
-import { hasLeftoversTag, LEFTOVERS_TAG, stripLeftoversTag } from 'trail-core';
+import { hasLeftoversTag, LEFTOVERS_TAG, stripLeftoversTag } from '@technosoftware/trail-core';
 import { MEAL_SLOT_KEYS, parseMealSlotKey, type MealSlotKey } from '../../lang/vocabulary';
 import type { CULItrailSettings } from '../../settings/types';
 

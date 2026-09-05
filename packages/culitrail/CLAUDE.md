@@ -707,7 +707,7 @@ These are deliberate and worth not undoing by accident:
   `src/shared/`. `src/shared/date-utils.ts` is gone; `isoWeekOf`,
   `formatWeekTitle`, `parseWeekTitle`, `startOfIsoWeek`, `startOfWeekTitle`,
   `shiftWeekTitle`, `currentWeekTitle`, `localDateISO`, `localDateTimeISO` and
-  `quoteDateTime` all import from `'trail-core'` under the same names. Do not
+  `quoteDateTime` all import from `'@technosoftware/trail-core'` under the same names. Do not
   reimplement any of them here, and do not reach for moment: the `obsidian`
   package is types only, so a moment-based week calculation cannot be unit
   tested without stubbing a global.
@@ -718,11 +718,11 @@ These are deliberate and worth not undoing by accident:
   `findValue`, `splitFrontmatterBlock`, `createdEntry`, `stampModified`,
   `stripWikilink`, `wikilinkValue`, `formatWikilink`, `titlesMatch`,
   `isUnderFolder`, `isUnderAnyFolder`, `folderOfPath` and `joinFolder` all
-  import from `'trail-core'`.
+  import from `'@technosoftware/trail-core'`.
 - **The vault itself comes from `trail-core` too, through a shim rather than
   through every call site.** The core reads and writes over three ports
   (`VaultPort`, `MetadataPort`, `FrontmatterPort`, together a `VaultHost`), and
-  its Obsidian adapter is `obsidianHost(app)` from `'trail-core/obsidian'`.
+  its Obsidian adapter is `obsidianHost(app)` from `'@technosoftware/trail-core/obsidian'`.
   CULItrail does **not** thread a host down through its call sites: every module
   that used to take an `App` still takes one, and `src/shared/vault-host.ts`
   turns it into a host with `hostFor(app)`, memoised in a `WeakMap`. So
@@ -734,7 +734,7 @@ These are deliberate and worth not undoing by accident:
   and a new reader calls `frontmatterOf()`, not `getFileCache()`. What is
   genuinely still CULItrail's in `src/shared/` is the `{token}` path templating
   in `note-path.ts` and the small App-free helpers beside it.
-- **`trail-core/obsidian` is the only import that needs a runtime `obsidian`,
+- **`@technosoftware/trail-core/obsidian` is the only import that needs a runtime `obsidian`,
   and vitest stubs it.** The npm `obsidian` package is types only, so the
   adapter's `stringifyYaml` import cannot resolve under Node. `vitest.config.mts`
   aliases `obsidian` to `tests/obsidian-stub.ts`, which throws rather than

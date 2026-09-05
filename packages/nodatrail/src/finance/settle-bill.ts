@@ -12,7 +12,12 @@
  * for itself, because nothing else is going to.
  */
 import { App, TFile } from 'obsidian';
-import { billStatus, isOutstanding, type BillForMatching, type BillRecord } from 'trail-core';
+import {
+  billStatus,
+  isOutstanding,
+  type BillForMatching,
+  type BillRecord,
+} from '@technosoftware/trail-core';
 import type { NODAtrailSettings } from '../settings/types';
 import { setBillPaid } from './edit-finance';
 import { readBills } from './read-finance';

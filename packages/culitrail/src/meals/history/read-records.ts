@@ -7,7 +7,7 @@
  * round-trips exactly what was there.
  */
 import { App, TFile } from 'obsidian';
-import { readDateTimeLike, readNumberLike, readString } from 'trail-core';
+import { readDateTimeLike, readNumberLike, readString } from '@technosoftware/trail-core';
 import { frontmatterOf } from '../../shared/vault-scan';
 import type { CULItrailSettings } from '../../settings/types';
 import type { EatingRecord } from './types';

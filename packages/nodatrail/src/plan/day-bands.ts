@@ -13,7 +13,7 @@
  * unpadded hour is a thing somebody really can type, and normalising is not
  * defensive coding but the format doing what it said.
  */
-import { parseDayTitle } from 'trail-core';
+import { parseDayTitle } from '@technosoftware/trail-core';
 
 export type Band = 'morning' | 'lunch' | 'afternoon';
 

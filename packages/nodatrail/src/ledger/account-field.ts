@@ -5,7 +5,7 @@
  * invoice, a payment being marked paid -- and they must offer the same list in
  * the same order, or the same account is called two things in two dialogs.
  */
-import { accountLabel, type Account } from 'trail-core';
+import { accountLabel, type Account } from '@technosoftware/trail-core';
 import { t } from '../lang/I18nManager';
 
 /**

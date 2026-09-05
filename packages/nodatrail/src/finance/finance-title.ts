@@ -20,7 +20,7 @@
  *
  * Pure, so the rule can be tested without an Obsidian dialog around it.
  */
-import { financeNoteStem } from 'trail-core';
+import { financeNoteStem } from '@technosoftware/trail-core';
 import { dateOf } from './paths';
 
 /** The facts a money note's name is derived from. */

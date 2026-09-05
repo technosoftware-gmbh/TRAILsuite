@@ -17,7 +17,7 @@
  * figure, which is what this did too, and a price with no code is still a
  * price.
  */
-import { formatMoneyOrNull } from 'trail-core';
+import { formatMoneyOrNull } from '@technosoftware/trail-core';
 import { activeDisplayLocale } from '../../shared/display';
 
 /**

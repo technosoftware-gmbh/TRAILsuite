@@ -20,7 +20,7 @@
  * operation and second-guessing it is how links get broken.
  */
 import { TFile, type TFolder } from 'obsidian';
-import { joinFolder } from 'trail-core';
+import { joinFolder } from '@technosoftware/trail-core';
 import type { NODAtrailSettings } from '../settings/types';
 import { folderFor } from '../vault/entity-types';
 

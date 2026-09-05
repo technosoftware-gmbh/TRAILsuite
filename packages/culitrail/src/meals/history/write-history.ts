@@ -23,7 +23,7 @@
  * used to be counted from is empty.
  */
 import { App, TFile } from 'obsidian';
-import { stampModified } from 'trail-core';
+import { stampModified } from '@technosoftware/trail-core';
 import { readNoteOrEmpty } from '../../shared/vault-io';
 import { readEatingEventsFor } from '../../planning/meal-plan/eating-events';
 import { personTitleOf, recordEatingInPlan } from '../../planning/meal-plan/record-eating';

@@ -12,7 +12,12 @@
  * names in `CRM_CONTRACT`, which is the whole point of that contract.
  */
 import type { App, TFile } from 'obsidian';
-import { parseCrmNote, readNotesOfType, type CrmKind, type CrmPropertyNames } from 'trail-core';
+import {
+  parseCrmNote,
+  readNotesOfType,
+  type CrmKind,
+  type CrmPropertyNames,
+} from '@technosoftware/trail-core';
 import { hostFor } from '../shared/vault-host';
 import type { NODAtrailSettings } from '../settings/types';
 

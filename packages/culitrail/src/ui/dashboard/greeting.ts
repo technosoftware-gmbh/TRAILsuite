@@ -4,7 +4,7 @@
  * Above the grid rather than inside it, with room around it, so the view opens
  * with some air instead of straight into dense cards.
  */
-import { formatMediumDate } from 'trail-core';
+import { formatMediumDate } from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import { activeDisplayLocale } from '../../shared/display';
 

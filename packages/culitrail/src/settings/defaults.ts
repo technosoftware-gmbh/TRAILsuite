@@ -22,7 +22,7 @@ import {
   DISPLAY_CONTRACT,
   ORDER_CONTRACT,
   joinFolder as joinOneFolder,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { CULItrailSettings, CustomBadge, ReheatAppliance } from './types';
 import { I18nManager, t } from '../lang/I18nManager';
 
@@ -62,7 +62,7 @@ import {
   DEFAULT_APPLIANCES,
   DEFAULT_APPLIANCE_IDS,
   type DefaultApplianceId,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 
 export { APPLIANCE_LABELS_DE, APPLIANCE_LABELS_EN, DEFAULT_APPLIANCES, DEFAULT_APPLIANCE_IDS };
 export type { DefaultApplianceId };

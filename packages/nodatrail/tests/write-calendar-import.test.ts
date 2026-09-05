@@ -14,7 +14,7 @@
  */
 import { describe, expect, it, vi } from 'vitest';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
-import type { CalendarProposal } from 'trail-core';
+import type { CalendarProposal } from '@technosoftware/trail-core';
 import { TFile } from './obsidian-stub';
 
 vi.mock('obsidian', async () => {

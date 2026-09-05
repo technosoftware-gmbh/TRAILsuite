@@ -10,7 +10,7 @@
  * meal the note never held, which nothing repairs.
  */
 import { App } from 'obsidian';
-import { localDateISO } from 'trail-core';
+import { localDateISO } from '@technosoftware/trail-core';
 import type { CULItrailSettings, MealPlanEntry } from '../../settings/types';
 import { entriesInScope, type EntryScope } from './entries';
 import { newEntryId } from './sync';

@@ -16,7 +16,7 @@
  * as everywhere else.
  */
 import { App, TFile } from 'obsidian';
-import { GeoPoint, parseGeoPoint } from 'trail-core';
+import { GeoPoint, parseGeoPoint } from '@technosoftware/trail-core';
 import { APERtrailSettings } from '../../settings/types';
 import { ParsedPhotoSpot } from '../../places/photo-spot-note';
 import { readTravelBoard } from '../read-entities';

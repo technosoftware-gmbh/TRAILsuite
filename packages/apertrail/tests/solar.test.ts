@@ -12,7 +12,7 @@
  * here as a broken window.
  */
 import { describe, expect, it } from 'vitest';
-import { sunTimes } from 'trail-core';
+import { sunTimes } from '@technosoftware/trail-core';
 import { lightWindowRange } from '../src/places/solar';
 
 const BERN = { lat: 46.947999, lon: 7.448148 };

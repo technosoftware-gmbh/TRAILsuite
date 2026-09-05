@@ -16,7 +16,7 @@
  * written the useful sentence.
  */
 import { App, Notice } from 'obsidian';
-import { taskComment, type TaskStatus } from 'trail-core';
+import { taskComment, type TaskStatus } from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import type { NODAtrailSettings } from '../../settings/types';
 import { closeTaskWithComment } from '../../tasks/write-tasks';

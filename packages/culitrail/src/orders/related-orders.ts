@@ -10,7 +10,7 @@
  * App-free, so the matching is testable without a vault.
  */
 import type { OrderRecord, OrderSelection } from './types';
-import { selectionTitles } from 'trail-core';
+import { selectionTitles } from '@technosoftware/trail-core';
 
 /** Titles compare case-insensitively and trimmed, the way every other title match here does. */
 function sameTitle(a: string, b: string): boolean {

@@ -15,7 +15,7 @@
  * has. Two consumers -- the itinerary block and the trip document -- which is
  * why it is a module rather than a helper inside one of them.
  */
-import { parseDayTitle } from 'trail-core';
+import { parseDayTitle } from '@technosoftware/trail-core';
 import { t } from '../lang/I18nManager';
 import { clockTime, dayOffset, endpointDate, RelativeEndpoint } from './relative-days';
 import { formatMediumDate } from '../shared/display';

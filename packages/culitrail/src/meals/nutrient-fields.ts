@@ -13,7 +13,7 @@
  *
  * App-free.
  */
-import type { NutrientFieldNames } from 'trail-core';
+import type { NutrientFieldNames } from '@technosoftware/trail-core';
 import type { CULItrailSettings } from '../settings/types';
 
 export function nutrientFieldNames(settings: CULItrailSettings): NutrientFieldNames {

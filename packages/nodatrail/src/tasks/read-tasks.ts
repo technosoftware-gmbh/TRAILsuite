@@ -15,7 +15,7 @@
  * from.
  */
 import { App, TFile } from 'obsidian';
-import { isUnderAnyFolder, scanTasks, type LocatedTask } from 'trail-core';
+import { isUnderAnyFolder, scanTasks, type LocatedTask } from '@technosoftware/trail-core';
 import { hostFor } from '../shared/vault-host';
 import type { NODAtrailSettings } from '../settings/types';
 import { taskFolders } from '../vault/entity-types';

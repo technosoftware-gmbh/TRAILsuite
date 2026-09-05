@@ -26,7 +26,7 @@
  *    like a deletion.
  */
 
-import { readString } from 'trail-core';
+import { readString } from '@technosoftware/trail-core';
 import { APERtrailSettings } from '../settings/types';
 
 /**

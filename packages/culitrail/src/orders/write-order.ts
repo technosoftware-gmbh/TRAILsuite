@@ -6,7 +6,7 @@
  * the point: an order note is a record, and a record people annotate.
  */
 import { App, normalizePath, stringifyYaml, TFile } from 'obsidian';
-import { createdEntry, localDateISO, stampModified } from 'trail-core';
+import { createdEntry, localDateISO, stampModified } from '@technosoftware/trail-core';
 import { ensureParentFolders } from '../shared/vault-io';
 import type { CULItrailSettings } from '../settings/types';
 import {
@@ -14,7 +14,7 @@ import {
   legacySelectionProperty,
   orderFilenameStem,
   type OrderContent,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { orderProperties } from './read-orders';
 
 export interface NewOrder extends Omit<OrderContent, 'orderDate'> {

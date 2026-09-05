@@ -13,7 +13,7 @@ import {
   measureBudgetMonth,
   type AccountBudgetRecord,
   type BudgetMeasure,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import type { NODAtrailSettings } from '../settings/types';
 import { readBudgets, readLedger } from './read-ledger';
 

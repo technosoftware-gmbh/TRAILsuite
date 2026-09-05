@@ -17,7 +17,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { App } from 'obsidian';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
-import { replaceDescription } from 'trail-core';
+import { replaceDescription } from '@technosoftware/trail-core';
 import {
   freeMealPath,
   newMealFrontmatter,

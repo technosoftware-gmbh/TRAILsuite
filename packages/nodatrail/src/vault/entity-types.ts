@@ -11,7 +11,7 @@
  * what makes the archive work without a flag: an archived project is a project
  * note in a different folder, so the active read simply does not see it.
  */
-import type { NoteKindQuery } from 'trail-core';
+import type { NoteKindQuery } from '@technosoftware/trail-core';
 import { splitList } from '../settings/defaults';
 import type { NODAtrailSettings, StringSettingKey } from '../settings/types';
 

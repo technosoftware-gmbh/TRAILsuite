@@ -25,8 +25,8 @@
  * copied whole rather than rebuilt from `initialBody()`.
  */
 import { App, Notice, TFile, normalizePath } from 'obsidian';
-import { NoteExistsError, splitFrontmatterBlock } from 'trail-core';
-import { renderFrontmatterBlock } from 'trail-core/obsidian';
+import { NoteExistsError, splitFrontmatterBlock } from '@technosoftware/trail-core';
+import { renderFrontmatterBlock } from '@technosoftware/trail-core/obsidian';
 import { t } from '../../lang/I18nManager';
 import { APERtrailSettings } from '../../settings/types';
 import { TravelTrip } from '../../vault/types';
@@ -36,7 +36,7 @@ import { newTripFolder, ownedTripFolder } from '../trip-folder';
 import { tripToInput } from '../write-trip';
 import { buildTripFrontmatter } from '../trip-note';
 import { tripPropertyNames } from '../../vault/read-entities';
-import { formatDateTimeStamp } from 'trail-core';
+import { formatDateTimeStamp } from '@technosoftware/trail-core';
 
 /**
  * Copies the picture files the original keeps in its own folder.

@@ -13,11 +13,11 @@ import type {
   Posting,
   PurchaseRecord,
   RecurringRecord,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import type { NODAtrailSettings } from '../../settings/types';
 import type { AreaRecord, GoalRecord, ProjectRecord } from '../../para/board';
 import type { DayEntryRecord } from '../../plan/read-day';
-import type { PeriodLevel } from 'trail-core';
+import type { PeriodLevel } from '@technosoftware/trail-core';
 
 export interface ViewDeps {
   app: App;

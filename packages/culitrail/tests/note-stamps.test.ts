@@ -12,7 +12,7 @@
 import { describe, expect, it } from 'vitest';
 import type { App, TFile } from 'obsidian';
 import { mergeSettings } from '../src/settings/validate';
-import { splitFrontmatterBlock } from 'trail-core';
+import { splitFrontmatterBlock } from '@technosoftware/trail-core';
 import { writeNote } from '../src/shared/vault-io';
 import { writeMealDraft } from '../src/meals/editor/write-draft';
 import { emptyMealNutrition, type MealDraft } from '../src/meals/editor/types';

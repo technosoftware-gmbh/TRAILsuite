@@ -139,7 +139,7 @@ describe("package boundary", () => {
         readFileSync(join(PACKAGES_DIR, packageName, "package.json"), "utf8"),
       ) as { dependencies?: Record<string, string> };
       const dependencies = Object.keys(manifest.dependencies ?? {});
-      expect(dependencies).toContain("trail-core");
+      expect(dependencies).toContain("@technosoftware/trail-core");
       for (const sibling of ["culitrail", "apertrail", "nodatrail"]) {
         if (sibling === packageName) continue;
         expect(dependencies).not.toContain(sibling);

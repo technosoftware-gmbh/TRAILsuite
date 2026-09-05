@@ -17,7 +17,7 @@
  * and the disagreement would have shown up as somebody's only serving weight
  * going missing.
  */
-import { readNumberLike, readString } from 'trail-core';
+import { readNumberLike, readString } from '@technosoftware/trail-core';
 
 /** `440g`, `440 g` and `440` all mean the same weight. */
 export function readGrams(value: unknown): number | null {

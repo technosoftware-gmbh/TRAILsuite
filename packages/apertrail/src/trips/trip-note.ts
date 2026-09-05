@@ -35,7 +35,7 @@ import {
   toWikilink,
   wikilinkTarget,
   wikilinkTargets,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { CostUnit, FALLBACK_COST_UNIT, parseCostUnit } from './costs/line-cost';
 import { clockTime } from './relative-days';
 

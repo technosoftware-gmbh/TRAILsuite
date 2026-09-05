@@ -22,7 +22,7 @@ import { readOrders } from '../read-orders';
 import { ordersForCompany, ordersForPerson, orderTotal } from '../related-orders';
 import type { OrderRecord } from '../types';
 import { CUL_RELATED_ORDERS_BLOCK_LANG } from '../related-orders-block-lang';
-import { selectionTitles } from 'trail-core';
+import { selectionTitles } from '@technosoftware/trail-core';
 
 export { CUL_RELATED_ORDERS_BLOCK_LANG };
 

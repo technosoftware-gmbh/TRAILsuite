@@ -17,7 +17,11 @@
  * What each row means, and what a typed name resolves to, is in
  * `../nutrition-form.ts`, where it can be tested. This attaches inputs to it.
  */
-import { MACRONUTRIENT_IDS, MICRONUTRIENT_IDS, type NutrientEntry } from 'trail-core';
+import {
+  MACRONUTRIENT_IDS,
+  MICRONUTRIENT_IDS,
+  type NutrientEntry,
+} from '@technosoftware/trail-core';
 import { t } from '../../../lang/I18nManager';
 import { nutrientDisplayName } from '../../../lang/vocabulary';
 import { renderListEditor } from '../../../ui/list-editor';

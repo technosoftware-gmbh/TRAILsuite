@@ -7,7 +7,7 @@
  */
 import { t } from '../../lang/I18nManager';
 import { EntityCardMetaItem } from '../components/entity-card';
-import { dateTimeDatePart } from 'trail-core';
+import { dateTimeDatePart } from '@technosoftware/trail-core';
 import { shortUrl } from '../../shared/short-url';
 import { capturedMotifCount, primaryMotif } from '../../places/photo-spot-note';
 import { TravelCity, TravelCountry, TravelPlace, TravelState, TravelTrip } from '../../vault/types';

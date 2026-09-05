@@ -16,7 +16,7 @@ import { addFooterButtons, BaseModal } from '../../../ui/base-modal';
 import type { CULItrailSettings } from '../../../settings/types';
 import { readMealDraft } from '../read-draft';
 import type { CompanyTerms } from '../../../crm/company-terms';
-import { companyHasRole } from 'trail-core';
+import { companyHasRole } from '@technosoftware/trail-core';
 import { readCompanies } from '../../../crm/read-crm';
 import { SupplierLinesModal } from '../../../crm/supplier-lines-modal';
 import { currencyFor } from '../../view-model/currency';

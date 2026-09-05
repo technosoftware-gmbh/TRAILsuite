@@ -1,5 +1,5 @@
 {
-  "name": "trail-core",
+  "name": "@technosoftware/trail-core",
   "version": "1.0.0",
   "description": "The shared, Obsidian-free core behind APERtrail and CULItrail.",
   "type": "module",

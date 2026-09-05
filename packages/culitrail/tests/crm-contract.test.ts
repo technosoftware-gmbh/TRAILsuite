@@ -10,7 +10,11 @@
  * only that this plugin still agrees with them.
  */
 import { describe, expect, it } from 'vitest';
-import { CRM_CONTRACT, crmContractMismatches, describeCrmContractMismatches } from 'trail-core';
+import {
+  CRM_CONTRACT,
+  crmContractMismatches,
+  describeCrmContractMismatches,
+} from '@technosoftware/trail-core';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import { mergeSettings } from '../src/settings/validate';
 

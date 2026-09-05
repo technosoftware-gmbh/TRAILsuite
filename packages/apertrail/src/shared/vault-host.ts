@@ -16,7 +16,7 @@
  * nothing outlives the App it was built for.
  */
 import { App, TFile } from 'obsidian';
-import { obsidianHost, type ObsidianHost } from 'trail-core/obsidian';
+import { obsidianHost, type ObsidianHost } from '@technosoftware/trail-core/obsidian';
 
 const hosts = new WeakMap<App, ObsidianHost>();
 

@@ -9,11 +9,11 @@
  *
  * App-free.
  */
-export { emptyMealNutrition } from 'trail-core';
+export { emptyMealNutrition } from '@technosoftware/trail-core';
 export type {
   MealDraft,
   MealNutritionPer100g,
   MealNutritionPerServing,
   NutrientEntry,
   ServingTotals,
-} from 'trail-core';
+} from '@technosoftware/trail-core';

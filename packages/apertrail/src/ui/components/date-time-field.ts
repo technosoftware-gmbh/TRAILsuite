@@ -12,7 +12,7 @@
  * writes the same string shape.
  */
 import { Setting } from 'obsidian';
-import { dateTimeDatePart, dateTimeTimePart } from 'trail-core';
+import { dateTimeDatePart, dateTimeTimePart } from '@technosoftware/trail-core';
 
 export function renderDateTimeField(
   container: HTMLElement,

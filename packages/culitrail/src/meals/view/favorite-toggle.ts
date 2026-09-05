@@ -8,7 +8,7 @@
  */
 import { App, setIcon, TFile } from 'obsidian';
 import { t } from '../../lang/I18nManager';
-import { stampModified } from 'trail-core';
+import { stampModified } from '@technosoftware/trail-core';
 import type { CULItrailSettings } from '../../settings/types';
 
 async function persistFavorite(

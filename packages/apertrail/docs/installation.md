@@ -31,7 +31,7 @@ APERtrail is not distributed through the Obsidian community plugin directory. It
 
    This runs `tsc --project tsconfig.check.json` (typecheck) and then a production esbuild pass (`esbuild.config.mjs`). The output is `packages/apertrail/main.js`, alongside the `manifest.json` and `styles.css` that are already there.
 
-   A bare `npm run build` at the repository root builds every package instead, which is fine but slower. Note that it does not order them: `packages/core` is visited after `packages/culitrail`, so a tree whose `packages/core/dist/` is missing or stale fails the typecheck with `Cannot find module 'trail-core'`. Run `npm run build --workspace packages/core` first, or `npm install` again, and the core is rebuilt.
+   A bare `npm run build` at the repository root builds every package instead, which is fine but slower. Note that it does not order them: `packages/core` is visited after `packages/culitrail`, so a tree whose `packages/core/dist/` is missing or stale fails the typecheck with `Cannot find module '@technosoftware/trail-core'`. Run `npm run build --workspace packages/core` first, or `npm install` again, and the core is rebuilt.
 
 4. Copy the three built files into your vault. The suite ships a script that does it for both plugins at once:
 

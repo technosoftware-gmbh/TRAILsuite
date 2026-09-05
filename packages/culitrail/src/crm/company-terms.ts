@@ -22,7 +22,7 @@
  *
  * App-free.
  */
-import { readNumberLike, readString, readStringList } from 'trail-core';
+import { readNumberLike, readString, readStringList } from '@technosoftware/trail-core';
 
 /**
  * One rung of a quantity ladder: everything from `from` upward gets `percent`

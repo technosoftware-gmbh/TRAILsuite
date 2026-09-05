@@ -7,4 +7,4 @@
  *
  * App-free.
  */
-export { isUnknownSupplier, supplierOptionValues } from 'trail-core';
+export { isUnknownSupplier, supplierOptionValues } from '@technosoftware/trail-core';

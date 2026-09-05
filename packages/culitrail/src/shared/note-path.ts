@@ -11,7 +11,7 @@
  * `trail-core`'s date layer rather than moment, so this is directly testable.
  * The folder half of a resolved path is `trail-core`'s `folderOfPath`.
  */
-import { isoWeekOf, localDateISO } from 'trail-core';
+import { isoWeekOf, localDateISO } from '@technosoftware/trail-core';
 
 /**
  * A person's title as a plan note's filename spells them.
@@ -22,7 +22,7 @@ import { isoWeekOf, localDateISO } from 'trail-core';
  * here, since a second implementation that disagreed by one character would
  * file a week where the first could not find it.
  */
-import { personFileToken } from 'trail-core';
+import { personFileToken } from '@technosoftware/trail-core';
 
 // Re-exported separately rather than with `export ... from`, which would not
 // create the local binding the template filler below needs.

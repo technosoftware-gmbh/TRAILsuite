@@ -20,7 +20,7 @@ import {
   roundCents,
   type Account,
   type OrderForMatching,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { t } from '../lang/I18nManager';
 import { money } from '../ui/kit/format';
 import type { SplitLeg } from './import-write';

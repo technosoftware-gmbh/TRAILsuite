@@ -8,7 +8,7 @@
  * **Nothing here is written into a note.** A rollup written into a period note
  * is a rollup that is wrong the next morning.
  */
-import { isInPeriod, isOverdue, type ParsedTask } from 'trail-core';
+import { isInPeriod, isOverdue, type ParsedTask } from '@technosoftware/trail-core';
 import type { GoalRecord, ProjectRecord } from '../para/board';
 import { goalIsAchieved, projectIsCompleted } from '../para/types';
 

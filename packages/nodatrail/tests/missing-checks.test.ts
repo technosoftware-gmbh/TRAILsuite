@@ -10,7 +10,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
-import { parseTaskLine, type MissingLine } from 'trail-core';
+import { parseTaskLine, type MissingLine } from '@technosoftware/trail-core';
 import { TFile } from './obsidian-stub';
 
 vi.mock('obsidian', async () => {

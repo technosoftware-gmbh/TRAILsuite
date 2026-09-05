@@ -35,7 +35,7 @@ import {
   sampleWriteCount,
   addDays,
   type SampleNote,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import { mergeSettings } from '../src/settings/validate';
 import { sampleFrontmatter, sampleNotes } from '../src/sample/notes';
@@ -51,7 +51,7 @@ import { resolveReheating } from '../src/meals/reheating/resolve';
 import { parsePlanNote, planProperties } from '../src/planning/meal-plan/plan-note';
 import { orderProperties } from '../src/orders/read-orders';
 import { makeFakeVault } from './fake-vault';
-import { parseOrder } from 'trail-core';
+import { parseOrder } from '@technosoftware/trail-core';
 
 const settings = DEFAULT_SETTINGS;
 

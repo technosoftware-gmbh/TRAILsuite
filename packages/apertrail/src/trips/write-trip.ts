@@ -13,9 +13,9 @@
 import { App, normalizePath, TFile } from 'obsidian';
 import { APERtrailSettings } from '../settings/types';
 import { APT_TRIP_COSTS_BLOCK_LANG } from './costs/trip-costs-block-lang';
-import { renderFrontmatterBlock } from 'trail-core/obsidian';
+import { renderFrontmatterBlock } from '@technosoftware/trail-core/obsidian';
 import { createNote } from '../shared/note-creation';
-import { formatDateTimeStamp } from 'trail-core';
+import { formatDateTimeStamp } from '@technosoftware/trail-core';
 import { tripPropertyNames } from '../vault/read-entities';
 import { newTripFolder } from './trip-folder';
 import type { TripGalleryInput } from './trip-note';

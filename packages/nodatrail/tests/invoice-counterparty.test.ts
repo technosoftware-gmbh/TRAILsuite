@@ -43,7 +43,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { companyHasRole } from 'trail-core';
+import { companyHasRole } from '@technosoftware/trail-core';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 
 const form = readFileSync(

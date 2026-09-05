@@ -20,7 +20,7 @@
  * fixed: the form asks for the missing side before it will save.
  */
 import { Notice, Setting, TFile } from 'obsidian';
-import { formatPosting, readSplit, type Posting } from 'trail-core';
+import { formatPosting, readSplit, type Posting } from '@technosoftware/trail-core';
 import { t } from '../lang/I18nManager';
 import type { CreateDeps } from '../ui/modals/new-para-modals';
 import { deletePosting, rewritePosting, type PostingSite } from './edit-posting';

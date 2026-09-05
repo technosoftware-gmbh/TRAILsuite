@@ -20,7 +20,7 @@
  *
  * App-free.
  */
-import { computedOrderTotal, type ParsedOrder } from 'trail-core';
+import { computedOrderTotal, type ParsedOrder } from '@technosoftware/trail-core';
 
 export function orderTotal(order: ParsedOrder): number | null {
   return computedOrderTotal(order) ?? order.price;

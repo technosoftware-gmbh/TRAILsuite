@@ -15,7 +15,7 @@
  *
  * App-free.
  */
-import { splitFrontmatterBlock } from 'trail-core';
+import { splitFrontmatterBlock } from '@technosoftware/trail-core';
 
 /** A heading of any level, tolerating the closing hashes some editors add. */
 const HEADING_PATTERN = /^(#{1,6})\s+(.+?)(?:\s+#+)?$/;

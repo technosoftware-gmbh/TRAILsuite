@@ -7,7 +7,7 @@
  * thing `scan.ts` should need an `App` for is listing files and reading their
  * frontmatter.
  */
-import type { PeriodLevel } from 'trail-core';
+import type { PeriodLevel } from '@technosoftware/trail-core';
 import { templateFor, typeValueFor as periodTypeValueFor } from '../../plan/paths';
 import type { NODAtrailSettings } from '../../settings/types';
 import { archiveFolderFor, folderFor, typeValueFor, type NodaFolderType } from '../entity-types';

@@ -17,7 +17,7 @@
  *
  * App-free.
  */
-import { parseApplianceEntries, type ApplianceEntry } from 'trail-core';
+import { parseApplianceEntries, type ApplianceEntry } from '@technosoftware/trail-core';
 import type { CULItrailSettings } from '../../settings/types';
 import { splitIntoGroups } from '../parser/step-groups';
 import { reservedSectionHeadings } from '../parser/section-names';

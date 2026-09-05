@@ -6,7 +6,7 @@
  * cross-module by nature -- read-entities.ts builds every entity type in one
  * pass -- and it is only the derivation that belongs to Trips.
  */
-import { dateTimeDatePart, daysSince } from 'trail-core';
+import { dateTimeDatePart, daysSince } from '@technosoftware/trail-core';
 import { isTravelStatusValue, TRAVEL_STATUS_VALUES, TravelStatusValue } from './trip-note';
 import { TravelBoard, TravelTrip } from '../vault/types';
 import { BookingCategory } from './costs/booking-note';

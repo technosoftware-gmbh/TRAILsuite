@@ -9,7 +9,7 @@ import type {
   AccountBudgetProperties,
   PurchaseProperties,
   RecurringProperties,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import type { NODAtrailSettings } from '../settings/types';
 
 export function purchaseProperties(settings: NODAtrailSettings): PurchaseProperties {

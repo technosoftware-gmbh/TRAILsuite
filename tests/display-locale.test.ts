@@ -49,6 +49,31 @@ const BOUND = [
   "formatClock",
 ];
 
+/**
+ * The bindings each `@technosoftware/trail-core` import brings in, whether the
+ * statement fits on one line or wraps across several.
+ *
+ * Read per STATEMENT rather than per line, and that distinction is the whole
+ * point. Prettier wraps a long specifier list, which puts the names on lines of
+ * their own and the package on a closing `} from '...';` line. A line-based
+ * match reads one half or the other and never both, finds no names, and passes
+ * the file by. That is not hypothetical: this check was line-based and was
+ * silently skipping 70 of the 225 files that import the core. Scoping the
+ * core's package name pushed 19 more over the print width and would have taken
+ * it to 86.
+ *
+ * `import` is anchored to the start of a line and the match runs to the nearest
+ * `from '...';`, so a wrapped list is read whole and an import from another
+ * package immediately above cannot be swallowed into it.
+ */
+function coreImportClauses(source: string): string[] {
+  const clauses: string[] = [];
+  for (const match of source.matchAll(/^import\s+([\s\S]*?)\s+from\s+'([^']+)';/gm)) {
+    if (match[2] === "@technosoftware/trail-core") clauses.push(match[1] ?? "");
+  }
+  return clauses;
+}
+
 interface Finding {
   file: string;
   line: number;
@@ -134,6 +159,20 @@ const report = (findings: Finding[]): string[] =>
 describe("the display locale", () => {
   it("reads a meaningful number of plugin files", () => {
     expect(FILES.length).toBeGreaterThan(300);
+
+    // The check below picks the files it inspects by reading their core
+    // imports, so an extraction that quietly matches nothing would pass every
+    // assertion in this file by looking at no file at all. That already
+    // happened once: a line-based match saw only the imports Prettier had left
+    // on one line. Both shapes are asserted here, because covering the easy
+    // one alone is exactly how it went quiet the first time.
+    const clauses = FILES.map((path) => coreImportClauses(readFileSync(path, "utf8")));
+    const withCore = clauses.filter((found) => found.length > 0);
+    expect(withCore.length).toBeGreaterThan(180);
+    expect(
+      withCore.filter((found) => found.some((clause) => clause.includes("\n"))).length,
+    ).toBeGreaterThan(50);
+
     for (const suffix of DISPLAY_MODULES) {
       expect(
         FILES.some((path) => path.endsWith(suffix)),
@@ -158,10 +197,7 @@ describe("the display locale", () => {
 
     for (const path of FILES.filter((file) => !isDisplayModule(file))) {
       const source = readFileSync(path, "utf8");
-      const fromCore = source
-        .split("\n")
-        .filter((line) => /^import .*\bfrom 'trail-core'/.test(line))
-        .join(" ");
+      const fromCore = coreImportClauses(source).join(" ");
       const direct = BOUND.filter((name) =>
         new RegExp(`\\b${name}\\b`).test(fromCore),
       );

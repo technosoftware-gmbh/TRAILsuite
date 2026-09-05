@@ -22,7 +22,7 @@ import {
   type AccountBudgetRecord,
   type ExpenseLine,
   type PurchaseRecord,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import type { NODAtrailSettings } from '../../settings/types';
 import { readAccounts } from '../../ledger/read-ledger';

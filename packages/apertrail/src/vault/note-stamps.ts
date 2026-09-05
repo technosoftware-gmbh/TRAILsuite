@@ -12,7 +12,7 @@
  * stamping a file that already exists, in a pass of its own.
  */
 import { App, TFile } from 'obsidian';
-import { touchModified as touchModifiedInVault } from 'trail-core';
+import { touchModified as touchModifiedInVault } from '@technosoftware/trail-core';
 import { hostFor } from '../shared/vault-host';
 import { APERtrailSettings } from '../settings/types';
 

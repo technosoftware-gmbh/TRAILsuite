@@ -21,7 +21,7 @@
  * `tests/package-boundary.test.ts` fails the build on a file that crossed.
  */
 import { TFile, type App } from 'obsidian';
-import { stripWikilink } from 'trail-core';
+import { stripWikilink } from '@technosoftware/trail-core';
 
 /**
  * A value that is already a URL and names no file in the vault.

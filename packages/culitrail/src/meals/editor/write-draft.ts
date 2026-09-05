@@ -12,7 +12,7 @@
  * `kcal:` gets its calories written back into `kcal:`.
  */
 import { App, TFile } from 'obsidian';
-import { nutrientListValue, stampModified, wikilinkValue } from 'trail-core';
+import { nutrientListValue, stampModified, wikilinkValue } from '@technosoftware/trail-core';
 import type { CULItrailSettings } from '../../settings/types';
 import { nutrientFieldNames } from '../nutrient-fields';
 import { mealMetaAliases } from '../parser/meal-meta';

@@ -16,7 +16,11 @@
  * App-free, and returns text rather than DOM, so what the section says can be
  * asserted without rendering anything.
  */
-import { inNutrientOrder, type MealNutritionPer100g, type NutrientEntry } from 'trail-core';
+import {
+  inNutrientOrder,
+  type MealNutritionPer100g,
+  type NutrientEntry,
+} from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import { nutrientDisplayName } from '../../lang/vocabulary';
 import { ABSENT_FIGURE } from './nutrition-row';

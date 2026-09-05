@@ -12,8 +12,8 @@ import {
   frontmatterObject,
   splitFrontmatterBlock,
   type PeriodLevel,
-} from 'trail-core';
-import { renderFrontmatterBlock } from 'trail-core/obsidian';
+} from '@technosoftware/trail-core';
+import { renderFrontmatterBlock } from '@technosoftware/trail-core/obsidian';
 import { hostFor } from '../shared/vault-host';
 import { touchModified } from '../shared/note-stamps';
 import { ensureFolder } from '../shared/note-creation';

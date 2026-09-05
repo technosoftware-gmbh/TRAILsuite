@@ -7,7 +7,7 @@
  * and describes the opposite of what happened.
  */
 import { describe, expect, it } from 'vitest';
-import { parseJournal, type Posting } from 'trail-core';
+import { parseJournal, type Posting } from '@technosoftware/trail-core';
 import { linesFor } from '../src/ledger/import-write';
 
 function posting(overrides: Partial<Posting>): Posting {

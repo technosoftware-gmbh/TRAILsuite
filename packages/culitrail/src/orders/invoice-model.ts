@@ -21,8 +21,8 @@ import type {
   InvoiceLine,
   InvoiceModel,
   InvoiceTotal,
-} from 'trail-core';
-import { dishLines, selectionTitles, includedVat, type DishLine } from 'trail-core';
+} from '@technosoftware/trail-core';
+import { dishLines, selectionTitles, includedVat, type DishLine } from '@technosoftware/trail-core';
 import type { ParsedOrder } from './types';
 
 /**

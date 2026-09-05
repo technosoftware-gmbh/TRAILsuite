@@ -23,7 +23,7 @@ import {
   parseTagFilter,
   readNotesOfType,
   type CrmPropertyNames,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { hostFor } from '../shared/vault-host';
 import type { NODAtrailSettings } from '../settings/types';
 

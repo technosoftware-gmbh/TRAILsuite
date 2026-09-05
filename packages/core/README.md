@@ -39,7 +39,7 @@ A workspace of this repository, linked by npm rather than fetched from a
 registry:
 
 ```jsonc
-"dependencies": { "trail-core": "*" }
+"dependencies": { "@technosoftware/trail-core": "*" }
 ```
 
 npm runs `prepare` on install, so `dist/` is built by the root `npm install` and
@@ -52,7 +52,7 @@ bundled into `main.js` like any other. No build configuration changes.
 
 ## Consuming the Obsidian adapter
 
-`trail-core/obsidian` imports `obsidian` as a real value. That package ships
+`@technosoftware/trail-core/obsidian` imports `obsidian` as a real value. That package ships
 types only (`"main": ""`), so a consumer's test runner cannot resolve it from in
 here and needs an alias:
 
@@ -72,7 +72,7 @@ plausible-looking stand-in would not.
 ## Use
 
 ```ts
-import { CRM_CONTRACT, crmContractMismatches } from 'trail-core';
+import { CRM_CONTRACT, crmContractMismatches } from '@technosoftware/trail-core';
 
 // In a plugin's defaults:
 export const DEFAULT_SETTINGS = {

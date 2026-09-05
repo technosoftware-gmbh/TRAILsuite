@@ -23,7 +23,7 @@ import {
   sampleWriteCount,
   type PlannedSampleNote,
   type SampleVaultPlan,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import { APERtrailSettings } from '../../settings/types';
 import { addFooterButtons, BaseModal } from '../../ui/components/modal-shell';

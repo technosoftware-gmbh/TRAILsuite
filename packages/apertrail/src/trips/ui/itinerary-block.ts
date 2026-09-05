@@ -36,7 +36,7 @@ import {
   formatDayTitle,
   parseDayTitle,
   parseGeoPoint,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { readTravelBoard } from '../../vault/read-entities';
 import { DuplicateTripModal } from './duplicate-trip-modal';
 import { moveInList } from '../../shared/reorder';

@@ -6,7 +6,7 @@
  * resource URL, a TFile, or null.
  */
 import { App, TFile } from 'obsidian';
-import { stripWikilink } from 'trail-core';
+import { stripWikilink } from '@technosoftware/trail-core';
 import { makeLightboxable } from './lightbox';
 
 /** Schemes that are already displayable as-is. `app:` and `capacitor:` are Obsidian's own on desktop and mobile. */

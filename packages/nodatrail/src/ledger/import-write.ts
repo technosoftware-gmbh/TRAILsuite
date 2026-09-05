@@ -5,7 +5,7 @@
  * without a vault. The modal decides; this writes.
  */
 import { App, TFile } from 'obsidian';
-import { formatPosting, parseDayTitle, type Posting } from 'trail-core';
+import { formatPosting, parseDayTitle, type Posting } from '@technosoftware/trail-core';
 import type { NODAtrailSettings } from '../settings/types';
 import { insertPostingBlock } from './journal-text';
 import { journalNoteFor } from './write-ledger';

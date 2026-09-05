@@ -8,5 +8,5 @@
  *
  * App-free.
  */
-export { applianceLabel, inApplianceOrder, matchAppliance } from 'trail-core';
-export type { ApplianceMatch } from 'trail-core';
+export { applianceLabel, inApplianceOrder, matchAppliance } from '@technosoftware/trail-core';
+export type { ApplianceMatch } from '@technosoftware/trail-core';

@@ -16,7 +16,7 @@
  * money.
  */
 import { describe, expect, it } from 'vitest';
-import { roundCents } from 'trail-core';
+import { roundCents } from '@technosoftware/trail-core';
 import type { SplitLeg } from '../src/ledger/import-write';
 
 interface BillChoice {

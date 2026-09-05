@@ -17,7 +17,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import type { BadgeColor } from '../src/settings/types';
-import { INVOICE_TOTAL_KINDS } from 'trail-core';
+import { INVOICE_TOTAL_KINDS } from '@technosoftware/trail-core';
 import { STAT_STRIP_VARIANTS } from '../src/ui/stat-strip';
 
 const BADGE_COLORS: BadgeColor[] = ['default', 'green', 'blue', 'purple', 'yellow', 'red'];

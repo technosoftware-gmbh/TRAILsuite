@@ -12,7 +12,7 @@
  * whole units above. Precision follows what the input can support, which is
  * a coordinate pair somebody pasted off a map.
  */
-import { formatDistance } from 'trail-core';
+import { formatDistance } from '@technosoftware/trail-core';
 
 export type UnitSystem = 'metric' | 'imperial';
 

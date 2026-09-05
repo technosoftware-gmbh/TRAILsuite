@@ -15,7 +15,7 @@
  *
  * Pure.
  */
-import { joinFolder, pad2, parseDayTitle } from 'trail-core';
+import { joinFolder, pad2, parseDayTitle } from '@technosoftware/trail-core';
 import type { NODAtrailSettings } from '../settings/types';
 import { folderFor, type NodaFolderType } from '../vault/entity-types';
 

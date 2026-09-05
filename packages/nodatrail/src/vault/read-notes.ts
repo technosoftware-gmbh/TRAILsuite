@@ -6,7 +6,7 @@
  * can be.
  */
 import { App, TFile } from 'obsidian';
-import { indexByTitle, readNotesOfType, type VaultNote } from 'trail-core';
+import { indexByTitle, readNotesOfType, type VaultNote } from '@technosoftware/trail-core';
 import { hostFor } from '../shared/vault-host';
 import type { NODAtrailSettings } from '../settings/types';
 import { anyQueryFor, archivedQueryFor, queryFor, type NodaFolderType } from './entity-types';

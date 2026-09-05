@@ -15,7 +15,7 @@ import {
   parseOrder,
   parseOrderFilenameStem,
   type OrderProperties,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { ordersForMeal } from '../src/orders/read-orders';
 import type { OrderRecord, OrderSelection } from '../src/orders/types';
 

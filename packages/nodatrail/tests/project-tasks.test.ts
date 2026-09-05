@@ -15,7 +15,7 @@
  * loses them when it is renamed, exactly as Obsidian's own links do.
  */
 import { describe, expect, it } from 'vitest';
-import { parseTaskLine, type ParsedTask } from 'trail-core';
+import { parseTaskLine, type ParsedTask } from '@technosoftware/trail-core';
 import { openTaskCounts, tasksAbout } from '../src/para/project-tasks';
 
 const parse = (line: string): ParsedTask => parseTaskLine(line);

@@ -10,7 +10,7 @@
  * 2040 whether it is an asset would be asking them to repeat themselves.
  */
 import { Notice } from 'obsidian';
-import { kindForNumber, type AccountKind } from 'trail-core';
+import { kindForNumber, type AccountKind } from '@technosoftware/trail-core';
 import { eligiblePersonTitles } from '../crm/read-persons';
 import { t } from '../lang/I18nManager';
 import { FormModal } from '../ui/modals/form-modal';

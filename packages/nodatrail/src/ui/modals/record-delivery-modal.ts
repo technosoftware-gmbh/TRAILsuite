@@ -17,7 +17,7 @@
  */
 import { Notice, TFile } from 'obsidian';
 import { Setting } from 'obsidian';
-import { localDateISO, outstandingLines, type PurchaseRecord } from 'trail-core';
+import { localDateISO, outstandingLines, type PurchaseRecord } from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import { recordPurchaseDelivery } from '../../finance/edit-money';
 import { day, money } from '../kit/format';

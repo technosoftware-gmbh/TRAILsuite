@@ -10,7 +10,7 @@
  * suggest otherwise.
  */
 import type { TFile } from 'obsidian';
-import { byUrgency } from 'trail-core';
+import { byUrgency } from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import {
   byPriority,

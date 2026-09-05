@@ -18,7 +18,7 @@
  * this is the one field a person reaches for while looking at a meal.
  */
 import { App, FuzzySuggestModal, Notice, TFile } from 'obsidian';
-import { readStringList } from 'trail-core';
+import { readStringList } from '@technosoftware/trail-core';
 import { t } from '../lang/I18nManager';
 import { addFooterButtons, BaseModal } from '../ui/base-modal';
 import { renderListEditor } from '../ui/list-editor';

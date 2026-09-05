@@ -23,7 +23,7 @@
  *
  * App-free.
  */
-import { wikilinkTarget, wikilinkValue } from 'trail-core';
+import { wikilinkTarget, wikilinkValue } from '@technosoftware/trail-core';
 import { parseMealSlotKey, parseWeekdayKey, type MealSlotKey } from '../../lang/vocabulary';
 import type { WeekdayKey } from '../../lang/vocabulary';
 import type { CULItrailSettings } from '../../settings/types';

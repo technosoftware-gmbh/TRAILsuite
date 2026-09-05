@@ -16,7 +16,7 @@
  * can be missing.
  */
 import { describe, expect, it } from 'vitest';
-import { extractJournalBlocks, parseJournal, type Posting } from 'trail-core';
+import { extractJournalBlocks, parseJournal, type Posting } from '@technosoftware/trail-core';
 import { entryPostings } from '../src/ledger/edit-posting';
 import { postingBlockAt, replacePostingBlock } from '../src/ledger/journal-text';
 

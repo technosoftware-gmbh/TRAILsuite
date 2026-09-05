@@ -15,7 +15,7 @@ import {
   readNotesOfType as readNotesOfTypeCore,
   type NoteKindQuery,
   type VaultNote as CoreVaultNote,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { CULItrailSettings } from '../settings/types';
 import { hostFor } from '../shared/vault-host';
 import { CuliEntityType, foldersFor, typeValueFor } from './entity-types';
@@ -30,7 +30,7 @@ export type VaultNote = CoreVaultNote<TFile>;
  * `matchesType` decides what a type value means, and the two title functions
  * resolve wikilinks against an index a caller already holds.
  */
-export { indexByTitle, matchesType, resolveByTitle } from 'trail-core';
+export { indexByTitle, matchesType, resolveByTitle } from '@technosoftware/trail-core';
 
 /**
  * Where a kind lives and what marks it, as the core asks for it.

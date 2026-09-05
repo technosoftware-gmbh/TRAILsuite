@@ -21,7 +21,7 @@
  */
 import { TFile } from 'obsidian';
 import type { App } from 'obsidian';
-import { parseDayTitle } from 'trail-core';
+import { parseDayTitle } from '@technosoftware/trail-core';
 import type { NODAtrailSettings } from '../settings/types';
 import { headingsFor } from './add-to-day';
 import { notePathFor } from './paths';

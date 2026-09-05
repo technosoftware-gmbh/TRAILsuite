@@ -12,7 +12,7 @@ import {
   distanceKm,
   GeoPoint,
   parseGeoPoint,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { ParsedPhotoSpot, ParsedPhotoSpotMotif, ParsedPhotoSpotSample } from './photo-spot-note';
 
 export interface MotifOffset {

@@ -12,7 +12,7 @@
  *
  * Pure: no Obsidian import, no clock.
  */
-import { roundCents } from 'trail-core';
+import { roundCents } from '@technosoftware/trail-core';
 import { ParsedBooking } from './booking-note';
 import { lineCurrency } from './totals';
 

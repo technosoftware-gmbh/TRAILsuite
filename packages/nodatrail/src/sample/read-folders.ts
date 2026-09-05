@@ -18,7 +18,7 @@
  * on a fresh vault rather than an error.
  */
 import { App, TFile, TFolder } from 'obsidian';
-import { sampleFolders, type FolderContents, type SampleNote } from 'trail-core';
+import { sampleFolders, type FolderContents, type SampleNote } from '@technosoftware/trail-core';
 import { hostFor } from '../shared/vault-host';
 
 /**

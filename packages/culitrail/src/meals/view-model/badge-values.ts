@@ -13,7 +13,7 @@
  */
 import { t } from '../../lang/I18nManager';
 import { evaluateExpr } from '../../shared/expr-eval';
-import { findValue, stripWikilink } from 'trail-core';
+import { findValue, stripWikilink } from '@technosoftware/trail-core';
 import type { BadgeType, CULItrailSettings, CustomBadge } from '../../settings/types';
 import { readEatingHistoryProperty } from '../parser/eating-history';
 import type { EatingEntry } from '../types';

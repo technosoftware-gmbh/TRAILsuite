@@ -9,7 +9,7 @@
  * be wrong.
  */
 import { describe, expect, it } from 'vitest';
-import { normalizeCurrency } from 'trail-core';
+import { normalizeCurrency } from '@technosoftware/trail-core';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import { parseBooking } from '../src/trips/costs/booking-note';
 import { bookingProperties } from '../src/vault/read-entities';

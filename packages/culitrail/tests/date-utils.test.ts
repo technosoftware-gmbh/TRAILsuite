@@ -21,7 +21,7 @@
  * cannot pass while silently running in the zone the author happens to sit in.
  */
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { shiftWeekTitle } from 'trail-core';
+import { shiftWeekTitle } from '@technosoftware/trail-core';
 import { mealPlanNotePath } from '../src/planning/meal-plan/note-path';
 import { mergeSettings } from '../src/settings/validate';
 

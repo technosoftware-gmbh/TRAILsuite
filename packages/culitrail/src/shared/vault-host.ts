@@ -11,7 +11,7 @@
  * instance and still lets a test's throwaway app be collected.
  */
 import type { App } from 'obsidian';
-import { obsidianHost, type ObsidianHost } from 'trail-core/obsidian';
+import { obsidianHost, type ObsidianHost } from '@technosoftware/trail-core/obsidian';
 
 const hosts = new WeakMap<App, ObsidianHost>();
 

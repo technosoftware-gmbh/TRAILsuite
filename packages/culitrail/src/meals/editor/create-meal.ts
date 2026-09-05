@@ -15,7 +15,7 @@
  * any other meal does.
  */
 import { App, normalizePath, stringifyYaml, TFile } from 'obsidian';
-import { createdEntry } from 'trail-core';
+import { createdEntry } from '@technosoftware/trail-core';
 import type { CULItrailSettings } from '../../settings/types';
 import { ensureParentFolders } from '../../shared/vault-io';
 

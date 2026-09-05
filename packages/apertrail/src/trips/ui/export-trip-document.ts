@@ -15,7 +15,7 @@
  * folder of "Shongololo 2.html" would be worse than a stale copy replaced.
  */
 import { App, Notice, TFile, normalizePath } from 'obsidian';
-import { parseDayTitle, sanitizeTitle } from 'trail-core';
+import { parseDayTitle, sanitizeTitle } from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import { APERtrailSettings } from '../../settings/types';
 import { TravelTrip } from '../../vault/types';

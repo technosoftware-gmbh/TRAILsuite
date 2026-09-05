@@ -20,7 +20,7 @@
  * German nutrient name wraps rather than pushing the figures off the card.
  */
 import { setIcon } from 'obsidian';
-import type { MealNutritionPer100g } from 'trail-core';
+import type { MealNutritionPer100g } from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import { nutritionBreakdown } from '../view-model/nutrition-breakdown';
 

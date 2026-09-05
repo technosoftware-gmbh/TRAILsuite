@@ -35,7 +35,7 @@ import {
   roundCents,
   type Account,
   type Posting,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { rateFor } from '../shared/rates';
 import { readOrders } from '../finance/read-orders';
 import { t } from '../lang/I18nManager';

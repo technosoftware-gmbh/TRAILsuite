@@ -13,7 +13,7 @@
  * arithmetic lives in one place.
  */
 import { ItemView, WorkspaceLeaf } from 'obsidian';
-import { currentWeekTitle } from 'trail-core';
+import { currentWeekTitle } from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import { buildGalleryEntries } from '../../meals/gallery/build-entries';
 import type { GalleryEntry } from '../../meals/view-model/gallery-entry';

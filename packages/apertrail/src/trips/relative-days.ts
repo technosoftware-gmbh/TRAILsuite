@@ -27,7 +27,7 @@
  *
  * App-free, and free of the trip schema: it takes the two values it needs.
  */
-import { addDays, formatDayTitle, parseDayTitle } from 'trail-core';
+import { addDays, formatDayTitle, parseDayTitle } from '@technosoftware/trail-core';
 
 /** A bare `HH:mm`, which is what a relative item's `from` and `to` carry. */
 const CLOCK = /^(\d{1,2}):(\d{2})/;

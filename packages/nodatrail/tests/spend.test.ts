@@ -13,7 +13,7 @@ import {
   settledOccurrences,
   spendInPeriod,
 } from '../src/finance/spend';
-import type { BillRecord, PurchaseRecord, RecurringRecord } from 'trail-core';
+import type { BillRecord, PurchaseRecord, RecurringRecord } from '@technosoftware/trail-core';
 
 const TODAY = new Date(2026, 7, 22);
 const AUGUST = { from: '2026-08-01', to: '2026-08-31' };

@@ -9,7 +9,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { deliveryNote, type SettledOrder } from '../src/deliveries/delivery-note-model';
-import { parseDelivery, type DeliveryProperties } from 'trail-core';
+import { parseDelivery, type DeliveryProperties } from '@technosoftware/trail-core';
 import type { DeliveryItem, ParsedDelivery } from '../src/deliveries/types';
 
 const properties: DeliveryProperties = {

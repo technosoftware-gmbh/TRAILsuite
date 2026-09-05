@@ -18,7 +18,7 @@ import {
   type ParsedRecurring,
   type PurchaseDelivery,
   wikilinkValue,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { purchaseProperties } from './properties';
 import { hostFor } from '../shared/vault-host';
 import { touchModified } from '../shared/note-stamps';

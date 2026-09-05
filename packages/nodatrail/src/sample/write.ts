@@ -22,7 +22,11 @@
  * honest end of a run that went wrong in the middle.
  */
 import { App } from 'obsidian';
-import { sampleVaultWritable, type SampleNote, type SampleVaultPlan } from 'trail-core';
+import {
+  sampleVaultWritable,
+  type SampleNote,
+  type SampleVaultPlan,
+} from '@technosoftware/trail-core';
 import type { NODAtrailSettings } from '../settings/types';
 import { hostFor } from '../shared/vault-host';
 import { touchModified } from '../shared/note-stamps';

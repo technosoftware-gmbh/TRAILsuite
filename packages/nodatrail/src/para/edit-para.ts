@@ -18,7 +18,7 @@
  * what "no deadline" actually looks like.
  */
 import { App, TFile } from 'obsidian';
-import { wikilinkValue } from 'trail-core';
+import { wikilinkValue } from '@technosoftware/trail-core';
 import { hostFor } from '../shared/vault-host';
 import { touchModified } from '../shared/note-stamps';
 import type { NODAtrailSettings } from '../settings/types';

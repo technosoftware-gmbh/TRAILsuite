@@ -106,7 +106,7 @@ npm run build   # the three bundles, which are what actually ship
 ```
 
 `npm run build` does order the core, and `npm install` builds it, but if you
-see `Cannot find module 'trail-core'` after changing the core, run
+see `Cannot find module '@technosoftware/trail-core'` after changing the core, run
 `npm run core` first.
 
 One package at a time:

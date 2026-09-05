@@ -13,7 +13,7 @@ import {
   typeFindings,
 } from '../src/vault/health/findings';
 import type { GoalRecord, ProjectRecord } from '../src/para/board';
-import type { BillRecord, PurchaseRecord } from 'trail-core';
+import type { BillRecord, PurchaseRecord } from '@technosoftware/trail-core';
 
 const path = (record: { file: unknown }) => (record.file as { path: string }).path;
 

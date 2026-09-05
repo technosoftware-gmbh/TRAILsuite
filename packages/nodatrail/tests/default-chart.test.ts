@@ -15,7 +15,7 @@ import {
   strandedByNumber,
   type Account,
   type AccountProperties,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { CHART_TOKENS, DEFAULT_CHART, seedChart } from '../src/finance/default-chart';
 
 const P: AccountProperties = {

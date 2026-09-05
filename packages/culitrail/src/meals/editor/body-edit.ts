@@ -8,4 +8,4 @@
  *
  * App-free.
  */
-export { removeSection, replaceDescription } from 'trail-core';
+export { removeSection, replaceDescription } from '@technosoftware/trail-core';

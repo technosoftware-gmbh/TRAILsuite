@@ -27,7 +27,7 @@ import {
   type BillRecord,
   type PurchaseRecord,
   type RecurringRecord,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import type { ParaBoard } from '../../para/board';
 import { goalIsAchieved, projectIsCompleted } from '../../para/types';

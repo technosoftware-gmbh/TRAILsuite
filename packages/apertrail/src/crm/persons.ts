@@ -12,7 +12,7 @@
  */
 import { App } from 'obsidian';
 import { APERtrailSettings } from '../settings/types';
-import { filterByTags, parseTagFilter } from 'trail-core';
+import { filterByTags, parseTagFilter } from '@technosoftware/trail-core';
 import { readCrmBoard } from './read-crm';
 
 /** Every Person note under the configured folder, title-sorted. */

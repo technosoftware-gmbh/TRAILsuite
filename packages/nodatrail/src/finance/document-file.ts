@@ -17,7 +17,7 @@
  *
  * The path arithmetic is here and pure; the vault work is in `write-finance`.
  */
-import { joinFolder } from 'trail-core';
+import { joinFolder } from '@technosoftware/trail-core';
 import type { NODAtrailSettings } from '../settings/types';
 import { noteFolderFor } from './paths';
 import type { NodaFolderType } from '../vault/entity-types';

@@ -17,7 +17,7 @@
  * the number of readers. What is left here is the half that needs an `App`.
  */
 import { App, TFile } from 'obsidian';
-import { readSummary, splitFrontmatterBlock, withSummary } from 'trail-core';
+import { readSummary, splitFrontmatterBlock, withSummary } from '@technosoftware/trail-core';
 
 /** The summary on a note, or '' when it has none. */
 export async function loadTripSummary(app: App, file: TFile): Promise<string> {

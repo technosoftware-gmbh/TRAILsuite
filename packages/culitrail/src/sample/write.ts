@@ -27,7 +27,7 @@ import {
   type PlannedSampleNote,
   type SampleNote,
   type SampleVaultPlan,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import type { CULItrailSettings } from '../settings/types';
 import { hostFor } from '../shared/vault-host';
 import { ensureParentFolders } from '../shared/vault-io';

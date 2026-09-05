@@ -64,7 +64,7 @@ import {
   nutrientListValue,
   removeSection,
   type MealNutritionPer100g,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { nutrientFieldNames } from '../src/meals/nutrient-fields';
 import { readPer100g } from '../src/meals/parser/per100g';
 import type { CULItrailSettings } from '../src/settings/types';

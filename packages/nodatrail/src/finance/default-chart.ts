@@ -16,7 +16,7 @@
  * seeded. A default chart naming somebody else's household would be a chart
  * everybody renames.
  */
-import type { AccountKind } from 'trail-core';
+import type { AccountKind } from '@technosoftware/trail-core';
 
 /** One account as the seed describes it, before the names are filled in. */
 export interface ChartEntry {

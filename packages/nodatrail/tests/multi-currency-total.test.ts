@@ -16,7 +16,7 @@ import {
   parseJournal,
   type Account,
   type AccountProperties,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import { toHome } from '../src/shared/rates';
 import type { NODAtrailSettings } from '../src/settings/types';

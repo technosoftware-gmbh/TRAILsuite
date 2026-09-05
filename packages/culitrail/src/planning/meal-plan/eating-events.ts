@@ -17,7 +17,7 @@
  * the answer by meal is the difference between that and 126 passes.
  */
 import { App } from 'obsidian';
-import { datesOfWeek } from 'trail-core';
+import { datesOfWeek } from '@technosoftware/trail-core';
 import { WEEKDAY_KEYS } from '../../lang/vocabulary';
 import type { CULItrailSettings } from '../../settings/types';
 import type { EatingEntry } from '../../meals/types';

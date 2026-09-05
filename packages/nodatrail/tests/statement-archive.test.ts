@@ -10,7 +10,7 @@ import {
   acceptedRows,
   parseStatement,
   type BankStatementRow,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import {
   profileFor,
   readStatementFileName,

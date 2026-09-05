@@ -7,9 +7,9 @@
 import { App } from 'obsidian';
 import type { CULItrailSettings } from '../settings/types';
 import { readNotesOfType } from '../vault/read-notes';
-import { parseOrder, type OrderProperties } from 'trail-core';
+import { parseOrder, type OrderProperties } from '@technosoftware/trail-core';
 import type { OrderRecord } from './types';
-import { selectionTitles } from 'trail-core';
+import { selectionTitles } from '@technosoftware/trail-core';
 
 /** The property names an order note is written and read with, gathered from settings. */
 export function orderProperties(settings: CULItrailSettings): OrderProperties {

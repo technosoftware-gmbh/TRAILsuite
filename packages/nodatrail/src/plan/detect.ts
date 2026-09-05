@@ -28,7 +28,7 @@
  * the navigation block that once wrote `[[2026-07|Monthly]]` is stripped rather
  * than rebuilt -- but a vault migrated from that scheme still carries them.
  */
-import { detectPeriodLevel, parsePeriodTitle, type PeriodLevel } from 'trail-core';
+import { detectPeriodLevel, parsePeriodTitle, type PeriodLevel } from '@technosoftware/trail-core';
 import type { NODAtrailSettings } from '../settings/types';
 import { noteTitleFor } from './paths';
 

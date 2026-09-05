@@ -12,7 +12,7 @@ directory. It is built from source and installed by hand.
 - Node.js for building from source, any version compatible with the pinned
   `devDependencies` in `package.json` (TypeScript 5.9, esbuild 0.28,
   Vitest 4)
-- `trail-core`, which `package.json` depends on as `"trail-core": "*"` and npm
+- `@technosoftware/trail-core`, which `package.json` depends on as `"@technosoftware/trail-core": "*"` and npm
   workspaces resolves to `packages/core` in this repository. It is the shared
   layer CULItrail and APERtrail both read dates, frontmatter, wikilinks, plan
   lines and the reheating merge out of, and it is installed with the rest of
@@ -49,7 +49,7 @@ directory. It is built from source and installed by hand.
    instead, which is fine but slower. It visits the packages in whatever order
    npm resolves the workspace graph, and that order puts a plugin ahead of
    `core`, so if `packages/core/dist/` is missing or stale the typecheck fails
-   with `Cannot find module 'trail-core'`. Run
+   with `Cannot find module '@technosoftware/trail-core'`. Run
    `npm run build --workspace packages/core` first, or `npm install` again, and
    the core is rebuilt.
 

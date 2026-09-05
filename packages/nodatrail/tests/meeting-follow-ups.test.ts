@@ -20,7 +20,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { parseTaskLine } from 'trail-core';
+import { parseTaskLine } from '@technosoftware/trail-core';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import { emptyDraft, emptyFollowUp, entryLines } from '../src/plan/add-to-day';
 

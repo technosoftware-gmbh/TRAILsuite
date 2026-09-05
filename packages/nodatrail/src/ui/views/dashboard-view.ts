@@ -34,7 +34,7 @@ import {
   periodTitle,
   sumByCurrency,
   type PeriodLevel,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import type { TFile } from 'obsidian';
 import { t } from '../../lang/I18nManager';
 import { type ParaBoard } from '../../para/board';

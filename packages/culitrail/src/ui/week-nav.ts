@@ -7,7 +7,7 @@
  * to reach into shared state from here.
  */
 import { Platform, setIcon } from 'obsidian';
-import { currentWeekTitle, shiftWeekTitle, startOfWeekTitle } from 'trail-core';
+import { currentWeekTitle, shiftWeekTitle, startOfWeekTitle } from '@technosoftware/trail-core';
 import { t } from '../lang/I18nManager';
 import { activeDisplayLocale } from '../shared/display';
 

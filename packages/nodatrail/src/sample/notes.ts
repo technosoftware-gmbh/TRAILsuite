@@ -59,7 +59,7 @@ import {
   summaryBody,
   type Posting,
   type SampleNote,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import type { NODAtrailSettings } from '../settings/types';
 import { folderFor } from '../vault/entity-types';
 import { newProjectFolder } from '../para/project-folder';
@@ -82,7 +82,7 @@ import {
   buildAccountBudgetFrontmatter,
   buildPurchaseFrontmatter,
   buildRecurringFrontmatter,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import {
   billProperties,
   budgetProperties,

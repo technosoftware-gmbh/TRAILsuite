@@ -39,7 +39,7 @@
  * on their account; a folder named after one of these sample trips that holds
  * somebody else's note is.
  */
-import { summaryBody, type SampleNote } from 'trail-core';
+import { summaryBody, type SampleNote } from '@technosoftware/trail-core';
 import { APERtrailSettings } from '../settings/types';
 import { TravelEntityType } from '../vault/entity-types';
 import { buildTripFrontmatter } from '../trips/trip-note';

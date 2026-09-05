@@ -17,7 +17,7 @@
  * missing line somebody can see.
  */
 import { App, TFile } from 'obsidian';
-import { parseDayTitle, type Posting } from 'trail-core';
+import { parseDayTitle, type Posting } from '@technosoftware/trail-core';
 import type { NODAtrailSettings } from '../settings/types';
 import { insertPostingBlock, removePostingBlock, replacePostingBlock } from './journal-text';
 import { linesFor, type PendingPosting } from './import-write';

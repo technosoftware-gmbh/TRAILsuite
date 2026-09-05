@@ -5,7 +5,7 @@
  * They are now what the plan view puts over the period on screen, which is the
  * only place a period's name has to be readable rather than a note title.
  */
-import { formatMonthName, isoWeekOf, type PeriodLevel } from 'trail-core';
+import { formatMonthName, isoWeekOf, type PeriodLevel } from '@technosoftware/trail-core';
 import { activeDisplayLocale } from '../ui/kit/format';
 import { t } from '../lang/I18nManager';
 

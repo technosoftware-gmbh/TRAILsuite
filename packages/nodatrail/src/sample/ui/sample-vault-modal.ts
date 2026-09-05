@@ -28,7 +28,7 @@ import {
   sampleWriteCount,
   type PlannedSampleNote,
   type SampleVaultPlan,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import type { NODAtrailSettings } from '../../settings/types';
 import { emptyState } from '../../ui/kit/elements';

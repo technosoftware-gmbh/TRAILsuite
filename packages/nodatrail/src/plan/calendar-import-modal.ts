@@ -41,7 +41,7 @@ import {
   type ExistingEntry,
   type MissingLine,
   type IcsEvent,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { t } from '../lang/I18nManager';
 import type { NODAtrailSettings } from '../settings/types';
 import { archiveCalendar, priorImportsOf } from './calendar-archive';

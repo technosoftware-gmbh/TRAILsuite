@@ -7,7 +7,13 @@
  * than through the note creator.
  */
 import { App, TFile, normalizePath } from 'obsidian';
-import { formatPosting, looksLikeIban, pad2, parseDayTitle, type Posting } from 'trail-core';
+import {
+  formatPosting,
+  looksLikeIban,
+  pad2,
+  parseDayTitle,
+  type Posting,
+} from '@technosoftware/trail-core';
 import type { NODAtrailSettings } from '../settings/types';
 import { createTypedNote } from '../vault/create-note';
 import { noteFolderFor } from '../finance/paths';

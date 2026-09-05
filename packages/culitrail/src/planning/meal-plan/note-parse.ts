@@ -8,7 +8,7 @@
  *
  * App-free.
  */
-import { isQueueHeading as isCoreQueueHeading, QUEUE_HEADING } from 'trail-core';
+import { isQueueHeading as isCoreQueueHeading, QUEUE_HEADING } from '@technosoftware/trail-core';
 import { parseWeekdayKey, type WeekdayKey } from '../../lang/vocabulary';
 import type { CULItrailSettings } from '../../settings/types';
 import { readLineSuffix } from './meal-suffix';

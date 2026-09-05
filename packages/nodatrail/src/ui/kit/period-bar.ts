@@ -11,7 +11,12 @@
  * Held by the view rather than passed around, because the chosen period is
  * state a view keeps between renders.
  */
-import { parsePeriodTitle, periodRange, periodTitle, shiftPeriod } from 'trail-core';
+import {
+  parsePeriodTitle,
+  periodRange,
+  periodTitle,
+  shiftPeriod,
+} from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 
 /**

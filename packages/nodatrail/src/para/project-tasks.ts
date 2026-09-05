@@ -15,7 +15,7 @@
  * anchor already stripped by the parser. A link is a note title, and a title is
  * how everything else in this suite identifies a note.
  */
-import { isOpen, type ParsedTask } from 'trail-core';
+import { isOpen, type ParsedTask } from '@technosoftware/trail-core';
 
 /** Open tasks naming this title. */
 export function tasksAbout<T extends ParsedTask>(tasks: readonly T[], title: string): T[] {

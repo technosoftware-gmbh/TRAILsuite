@@ -16,7 +16,7 @@
  * it. Nothing here moves a file on a schedule or in bulk.
  */
 import { App, TFile } from 'obsidian';
-import { formatDayTitle, joinFolder } from 'trail-core';
+import { formatDayTitle, joinFolder } from '@technosoftware/trail-core';
 import { ensureFolder } from '../shared/note-creation';
 import { hostFor } from '../shared/vault-host';
 import type { NODAtrailSettings } from '../settings/types';

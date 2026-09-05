@@ -21,7 +21,7 @@
  * stable and English and the label is translated, but the vocabulary is open,
  * because a label can declare something no table here anticipated.
  */
-import { isKnownNutrientId } from 'trail-core';
+import { isKnownNutrientId } from '@technosoftware/trail-core';
 import { t } from './I18nManager';
 
 /**

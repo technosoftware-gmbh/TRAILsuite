@@ -16,7 +16,7 @@ import {
   ORDER_CONTRACT,
   orderContractMismatches,
   describeOrderContractMismatches,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import { mergeSettings } from '../src/settings/validate';
 

@@ -6,7 +6,12 @@
  * and the locale-aware money formatter; the vocabulary a product lays over it
  * stays with the product.
  */
-import { displayLocale, formatMediumDate, formatMoneyOrNull, parseDayTitle } from 'trail-core';
+import {
+  displayLocale,
+  formatMediumDate,
+  formatMoneyOrNull,
+  parseDayTitle,
+} from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 
 /**

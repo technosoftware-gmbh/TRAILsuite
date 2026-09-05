@@ -12,7 +12,7 @@
  * docs/design/architecture.md.
  */
 import { Notice, Plugin, TFile } from 'obsidian';
-import { PERIOD_LEVELS, type PeriodLevel } from 'trail-core';
+import { PERIOD_LEVELS, type PeriodLevel } from '@technosoftware/trail-core';
 import { I18nManager, t } from './lang/I18nManager';
 import { NODAtrailSettings } from './settings/types';
 import { NODAtrailSettingsStore } from './settings/store';
@@ -47,7 +47,7 @@ import { NewAccountModal } from './ledger/new-account-modal';
 import { NewPostingModal } from './ledger/new-posting-modal';
 import { EditPostingModal } from './ledger/edit-posting-modal';
 import { NewCompanyModal } from './crm/new-company-modal';
-import { isNoteOfType } from 'trail-core';
+import { isNoteOfType } from '@technosoftware/trail-core';
 import { hostFor } from './shared/vault-host';
 import { NewPersonModal } from './crm/new-person-modal';
 import { EditCompanyModal, EditPersonModal, type CrmNote } from './crm/edit-crm-modals';

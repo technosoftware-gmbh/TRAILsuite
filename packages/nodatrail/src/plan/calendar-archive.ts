@@ -33,8 +33,8 @@ import {
   priorLinesOf,
   type PriorImport,
   type PriorLine,
-} from 'trail-core';
-import { joinFolder } from 'trail-core';
+} from '@technosoftware/trail-core';
+import { joinFolder } from '@technosoftware/trail-core';
 import { noteFolderFor } from './paths';
 import { vaultZone } from './vault-zone';
 import type { NODAtrailSettings } from '../settings/types';

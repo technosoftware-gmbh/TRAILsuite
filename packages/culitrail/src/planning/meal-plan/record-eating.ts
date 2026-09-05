@@ -22,7 +22,7 @@
  * which is the order every other writer here uses.
  */
 import { App } from 'obsidian';
-import { formatWeekTitle, parseDayTitle } from 'trail-core';
+import { formatWeekTitle, parseDayTitle } from '@technosoftware/trail-core';
 import { WEEKDAY_KEYS, type WeekdayKey } from '../../lang/vocabulary';
 import type { CULItrailSettings } from '../../settings/types';
 import { mealPlanNotePath } from './note-path';

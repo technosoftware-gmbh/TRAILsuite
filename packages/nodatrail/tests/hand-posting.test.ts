@@ -13,7 +13,7 @@ import {
   parseJournal,
   type Account,
   type AccountProperties,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { linesFor } from '../src/ledger/import-write';
 
 const P: AccountProperties = {

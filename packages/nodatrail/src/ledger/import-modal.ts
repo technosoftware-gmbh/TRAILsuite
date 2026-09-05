@@ -32,7 +32,7 @@ import {
   type ImportProposal,
   type Posting,
   type StatementProfile,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { t } from '../lang/I18nManager';
 import { money } from '../ui/kit/format';
 import type { NODAtrailSettings } from '../settings/types';

@@ -19,7 +19,7 @@ import {
   taskPriorityLevel,
   type PriorityLevel,
   type TaskPriority,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 
 function levelChoices(extra?: [string, string]): [string, string][] {

@@ -15,8 +15,8 @@
  * note in it acquires a new modification date.
  */
 import { App, TFile } from 'obsidian';
-import { readStamp, touchModified as touchModifiedInVault } from 'trail-core';
-import type { NoteStampProperties } from 'trail-core';
+import { readStamp, touchModified as touchModifiedInVault } from '@technosoftware/trail-core';
+import type { NoteStampProperties } from '@technosoftware/trail-core';
 import { hostFor } from './vault-host';
 
 export function touchModified(

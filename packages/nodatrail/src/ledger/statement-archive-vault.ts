@@ -5,8 +5,13 @@
  * `statement-archive.ts`. This is the part that needs an `App`.
  */
 import { TFile, normalizePath, type App } from 'obsidian';
-import { acceptedRows, parseDayTitle, parseStatement, planImport } from 'trail-core';
-import type { Account, BankStatementRow, Posting } from 'trail-core';
+import {
+  acceptedRows,
+  parseDayTitle,
+  parseStatement,
+  planImport,
+} from '@technosoftware/trail-core';
+import type { Account, BankStatementRow, Posting } from '@technosoftware/trail-core';
 import { documentFolderFor } from '../finance/document-file';
 import type { NODAtrailSettings } from '../settings/types';
 import {

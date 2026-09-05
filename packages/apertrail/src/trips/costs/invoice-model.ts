@@ -17,7 +17,7 @@ import type {
   InvoiceLine,
   InvoiceModel,
   InvoiceTotal,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import { BookingCategory, ParsedBooking } from './booking-note';
 import { Settlement } from './split';

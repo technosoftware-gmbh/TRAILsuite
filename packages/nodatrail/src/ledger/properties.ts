@@ -1,5 +1,5 @@
 /** The settings that name an account note's properties, in the shape `trail-core` wants. */
-import type { AccountProperties } from 'trail-core';
+import type { AccountProperties } from '@technosoftware/trail-core';
 import type { NODAtrailSettings } from '../settings/types';
 
 export function accountProperties(settings: NODAtrailSettings): AccountProperties {

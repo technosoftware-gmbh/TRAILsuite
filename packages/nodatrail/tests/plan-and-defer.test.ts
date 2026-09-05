@@ -16,7 +16,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { endOfPeriod, parseTaskLine, setTaskDate, placingField } from 'trail-core';
+import { endOfPeriod, parseTaskLine, setTaskDate, placingField } from '@technosoftware/trail-core';
 
 const source = readFileSync(join(__dirname, '..', 'src', 'tasks', 'write-tasks.ts'), 'utf8');
 const parse = (line: string) => parseTaskLine(line);

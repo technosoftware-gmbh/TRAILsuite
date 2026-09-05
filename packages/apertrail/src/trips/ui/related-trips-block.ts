@@ -20,7 +20,7 @@
 import { App, MarkdownPostProcessorContext, setIcon } from 'obsidian';
 import { t } from '../../lang/I18nManager';
 import { APERtrailSettings } from '../../settings/types';
-import { dateTimeDatePart, dateTimeTimePart, parseDayTitle } from 'trail-core';
+import { dateTimeDatePart, dateTimeTimePart, parseDayTitle } from '@technosoftware/trail-core';
 import { readTravelBoard } from '../../vault/read-entities';
 import { readCrmBoard } from '../../crm/read-crm';
 import { relatedTrips, tripsWithPerson } from '../related-trips';

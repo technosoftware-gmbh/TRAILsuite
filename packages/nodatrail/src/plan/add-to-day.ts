@@ -14,7 +14,7 @@
  * other three are this plugin's own body convention and carry a marker from
  * settings.
  */
-import { composeTaskLine, priorityTask, type PriorityLevel } from 'trail-core';
+import { composeTaskLine, priorityTask, type PriorityLevel } from '@technosoftware/trail-core';
 import { tAll } from '../lang/I18nManager';
 import type { NODAtrailSettings } from '../settings/types';
 import type { Attendance } from './read-schedule';

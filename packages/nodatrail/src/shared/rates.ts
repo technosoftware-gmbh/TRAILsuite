@@ -10,7 +10,7 @@
  * the total instead, which is the honest way to say "this is held, and it is
  * not in this figure".
  */
-import { roundCents } from 'trail-core';
+import { roundCents } from '@technosoftware/trail-core';
 import type { ExchangeRateSetting, NODAtrailSettings } from '../settings/types';
 
 /** The rates by upper-cased code, last one winning so a corrected row replaces its predecessor. */

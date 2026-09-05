@@ -9,9 +9,9 @@
  * order note without lying about the other.
  */
 import type { TFile } from 'obsidian';
-import type { DeliveryRecord as CoreDeliveryRecord } from 'trail-core';
+import type { DeliveryRecord as CoreDeliveryRecord } from '@technosoftware/trail-core';
 
-export type { DeliveryItem, ParsedDelivery } from 'trail-core';
+export type { DeliveryItem, ParsedDelivery } from '@technosoftware/trail-core';
 
 /** One delivery, as read back out of its note, paired with the note it came from. */
 export type DeliveryRecord = CoreDeliveryRecord<TFile>;

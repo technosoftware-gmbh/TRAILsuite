@@ -9,4 +9,4 @@
  *
  * App-free.
  */
-export type { ApplianceEntry, ReheatInstruction, ReheatSource } from 'trail-core';
+export type { ApplianceEntry, ReheatInstruction, ReheatSource } from '@technosoftware/trail-core';

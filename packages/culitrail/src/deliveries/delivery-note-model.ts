@@ -24,7 +24,7 @@ import type {
   InvoiceLine,
   InvoiceModel,
   InvoiceTotal,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import type { DeliveryItem, ParsedDelivery } from './types';
 
 /**

@@ -75,7 +75,7 @@ files directly, because a lint rule is only run when somebody runs lint and can
 be silenced by the same edit that breaks it.
 
 The single exemption is `src/obsidian/`, reachable only through the
-`trail-core/obsidian` subpath export. It is the only place in the package that
+`@technosoftware/trail-core/obsidian` subpath export. It is the only place in the package that
 imports Obsidian, and it is deliberately thin: there is no logic in it to get
 wrong.
 
@@ -188,7 +188,7 @@ bundle it into `main.js` with esbuild, externalising only `obsidian`,
 **The root `npm run build` does not order the packages.** `npm run build
 --workspaces` visits them in workspace order, which puts `culitrail` before
 `core`, so a tree whose `dist/` is missing or stale fails the plugin typecheck
-with `Cannot find module 'trail-core'` rather than rebuilding the core first.
+with `Cannot find module '@technosoftware/trail-core'` rather than rebuilding the core first.
 After a change to the core, run `npm run build --workspace packages/core` first,
 or `npm install` again. This is a rough edge in the root script rather than a
 design decision, and it is listed in section 12.
@@ -1018,7 +1018,7 @@ Stated here rather than left to be discovered:
    The script only works because `npm install` has already built
    `packages/core/dist/` through the core's `prepare`. On a tree whose `dist/` is
    missing or stale, whichever plugin comes first fails its typecheck with
-   `Cannot find module 'trail-core'`. The workaround is
+   `Cannot find module '@technosoftware/trail-core'`. The workaround is
    `npm run build --workspace packages/core` first; the fix is to order the root
    script, and it has not been made.
 5. **`packages/apertrail` ships `sync-version.js` but no `version` script to

@@ -8,7 +8,7 @@
  * block's private helpers until the second caller appeared, and two copies
  * would have drifted in wording before they drifted in colour.
  */
-import { GeoPoint, lightRelation, sunPosition } from 'trail-core';
+import { GeoPoint, lightRelation, sunPosition } from '@technosoftware/trail-core';
 import { formatClockIn } from '../../shared/clock';
 import { t } from '../../lang/I18nManager';
 import { ParsedPhotoSpotMotif, PhotoSpotLightWindow } from '../photo-spot-note';

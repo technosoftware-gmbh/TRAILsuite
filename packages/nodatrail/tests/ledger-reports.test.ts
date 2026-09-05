@@ -17,7 +17,7 @@ import {
   statement,
   type Account,
   type AccountProperties,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 
 const P: AccountProperties = {
   numberProperty: 'number',

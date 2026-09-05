@@ -22,7 +22,7 @@ import {
   SUN_ELEVATIONS,
   sunPosition,
   sunTimes,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import { APERtrailSettings } from '../../settings/types';
 import { TravelPlace } from '../../vault/types';

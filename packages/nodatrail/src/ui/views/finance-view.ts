@@ -15,8 +15,8 @@ import {
   occurrencesBetween,
   purchaseStatusOf,
   sumByCurrency,
-} from 'trail-core';
-import type { BillRecord, BillStatus } from 'trail-core';
+} from '@technosoftware/trail-core';
+import type { BillRecord, BillStatus } from '@technosoftware/trail-core';
 import type { TFile } from 'obsidian';
 import { t } from '../../lang/I18nManager';
 import { readFinanceBoard, type FinanceBoard } from '../../finance/read-finance';

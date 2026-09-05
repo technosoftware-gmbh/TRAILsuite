@@ -11,7 +11,7 @@
 import { describe, expect, it } from 'vitest';
 import { mergeSettings } from '../src/settings/validate';
 import { orderInvoice } from '../src/orders/invoice-model';
-import { parseOrder, type OrderProperties } from 'trail-core';
+import { parseOrder, type OrderProperties } from '@technosoftware/trail-core';
 import type { OrderItem, OrderSelection, ParsedOrder } from '../src/orders/types';
 
 const settings = mergeSettings({});

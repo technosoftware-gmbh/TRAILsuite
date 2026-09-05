@@ -15,8 +15,8 @@ import {
   type BillRecord,
   type AccountBudgetRecord,
   type PurchaseRecord,
-} from 'trail-core';
-import { purchaseTotalsDisagree } from 'trail-core';
+} from '@technosoftware/trail-core';
+import { purchaseTotalsDisagree } from '@technosoftware/trail-core';
 import type { GoalRecord, ProjectRecord, ParaRecord } from '../../para/board';
 
 export const FINDING_KINDS = [

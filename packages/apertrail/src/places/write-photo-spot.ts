@@ -12,7 +12,7 @@
  */
 import { App, TFile } from 'obsidian';
 import { APERtrailSettings } from '../settings/types';
-import { formatDateTimeStamp } from 'trail-core';
+import { formatDateTimeStamp } from '@technosoftware/trail-core';
 import { touchModified } from '../vault/note-stamps';
 import { APT_PHOTO_SPOT_BLOCK_LANG } from './photo-spot-block-lang';
 import { TravelPlace } from '../vault/types';

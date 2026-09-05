@@ -17,7 +17,7 @@ import {
   readString,
   wikilinkTarget,
   wikilinkTargets,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 
 /**
  * What kind of spending this is.

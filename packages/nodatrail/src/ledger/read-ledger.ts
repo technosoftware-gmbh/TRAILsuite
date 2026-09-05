@@ -26,7 +26,7 @@ import {
   type JournalProblem,
   type OrderMatch,
   type Posting,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import type { NODAtrailSettings } from '../settings/types';
 import { readNotes } from '../vault/read-notes';
 import { accountProperties } from './properties';

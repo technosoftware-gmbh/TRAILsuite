@@ -28,9 +28,9 @@ import {
   linkOrText,
   normalizeCurrency,
   type OrderForMatching,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { hostFor } from '../shared/vault-host';
-import { readNotesOfType } from 'trail-core';
+import { readNotesOfType } from '@technosoftware/trail-core';
 import type { NODAtrailSettings } from '../settings/types';
 
 /** An order note read, with the file it came from. */

@@ -13,7 +13,7 @@
  *
  * App-free.
  */
-import { formatWeekTitle, parseDayTitle, shiftWeekTitle } from 'trail-core';
+import { formatWeekTitle, parseDayTitle, shiftWeekTitle } from '@technosoftware/trail-core';
 
 /**
  * The week a `YYYY-MM-DD` day falls in, or null when it does not parse.

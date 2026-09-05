@@ -21,7 +21,7 @@ import {
   sumByCurrency,
   titlesMatch,
   type PeriodLevel,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import { readFinanceBoard } from '../../finance/read-finance';
 import { purchaseAmount } from '../../finance/spend';

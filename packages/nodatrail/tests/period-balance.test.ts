@@ -19,7 +19,7 @@ import {
   type Account,
   type AccountProperties,
   type Posting,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 
 const P: AccountProperties = {
   numberProperty: 'number',

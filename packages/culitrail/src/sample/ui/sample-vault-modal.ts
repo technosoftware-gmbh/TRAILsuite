@@ -19,7 +19,7 @@ import {
   sampleVaultWritable,
   sampleWriteCount,
   type SampleVaultPlan,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import type { CULItrailSettings } from '../../settings/types';
 import { addFooterButtons, BaseModal } from '../../ui/base-modal';

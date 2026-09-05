@@ -32,7 +32,13 @@
 import { App, TFile } from 'obsidian';
 import { APERtrailSettings } from '../../settings/types';
 import { isInTripBookingsFolder } from '../../trips/trip-folder';
-import { isUnderFolder, matchesType, readString, stampModified, stripWikilink } from 'trail-core';
+import {
+  isUnderFolder,
+  matchesType,
+  readString,
+  stampModified,
+  stripWikilink,
+} from '@technosoftware/trail-core';
 import { frontmatterOf } from '../../shared/vault-host';
 
 export type EntityFolderLocation =

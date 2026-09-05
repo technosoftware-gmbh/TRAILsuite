@@ -11,7 +11,7 @@
  * fed by all of their plans at once, and state has to hold all of them.
  */
 import { App } from 'obsidian';
-import { localDateISO } from 'trail-core';
+import { localDateISO } from '@technosoftware/trail-core';
 import { readPersons } from '../../crm/read-crm';
 import type { CULItrailSettings, MealPlanEntry } from '../../settings/types';
 import { entryInScope, type EntryScope } from './entries';

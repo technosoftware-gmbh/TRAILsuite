@@ -7,7 +7,7 @@
  * edit restamp it would quietly rewrite history and rename the file.
  */
 import { App, Setting, TFile } from 'obsidian';
-import { findValue, localDateISO, readNumberLike } from 'trail-core';
+import { findValue, localDateISO, readNumberLike } from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import type { CompanyTerms } from '../../crm/company-terms';
 import { readCompanies, readPersons } from '../../crm/read-crm';
@@ -23,7 +23,7 @@ import {
   dishLines,
   orderSubtotal,
   selectionTitles,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { mealMetaAliases } from '../../meals/parser/meal-meta';
 
 /** The fields the company's terms can fill in, and that a person can override. */

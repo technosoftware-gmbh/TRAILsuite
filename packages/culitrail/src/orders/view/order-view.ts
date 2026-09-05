@@ -35,7 +35,7 @@ import { TOOLBAR_SEARCH_SELECTOR } from '../../ui/toolbar';
 import { deliveredOrderTitles, filterOrders } from '../view-model/orders-filter';
 import { sortOrders } from '../view-model/orders-sort';
 import type { OrderViewDeps } from './deps';
-import { selectionTitles } from 'trail-core';
+import { selectionTitles } from '@technosoftware/trail-core';
 
 export class OrdersView extends ItemView {
   private unsubscribe: (() => void) | null = null;

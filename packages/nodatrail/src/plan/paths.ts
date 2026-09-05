@@ -9,7 +9,7 @@ import {
   periodFolder,
   periodTitleFromTemplate,
   type PeriodLevel,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import type { NODAtrailSettings } from '../settings/types';
 
 export function templateFor(settings: NODAtrailSettings, level: PeriodLevel): string {

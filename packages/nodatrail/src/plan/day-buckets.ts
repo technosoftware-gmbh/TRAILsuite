@@ -10,7 +10,7 @@
  * Days are ISO strings throughout rather than Dates. A bucket key has to
  * compare by value, and two Dates for the same midnight are not equal.
  */
-import { addDays, formatDayTitle, parseDayTitle, startOfIsoWeek } from 'trail-core';
+import { addDays, formatDayTitle, parseDayTitle, startOfIsoWeek } from '@technosoftware/trail-core';
 
 /** One cell of a month grid: the day, and whether it belongs to the month being shown. */
 export interface GridDay {

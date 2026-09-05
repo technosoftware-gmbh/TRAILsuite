@@ -9,7 +9,7 @@
  * range with different prices.
  */
 import { describe, expect, it } from 'vitest';
-import { companyHasRole } from 'trail-core';
+import { companyHasRole } from '@technosoftware/trail-core';
 import {
   joinValues,
   splitValues,

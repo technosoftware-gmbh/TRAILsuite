@@ -16,8 +16,8 @@
  * See docs/design/trip-budget-and-bookings.md §7.2.
  */
 import { App, MarkdownPostProcessorContext, MarkdownRenderChild, Notice, setIcon } from 'obsidian';
-import { renderInvoice } from 'trail-core/obsidian';
-import { parseDayTitle } from 'trail-core';
+import { renderInvoice } from '@technosoftware/trail-core/obsidian';
+import { parseDayTitle } from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import { APERtrailSettings } from '../../settings/types';
 import { readTravelBoard } from '../../vault/read-entities';

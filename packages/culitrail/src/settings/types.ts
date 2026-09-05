@@ -18,7 +18,7 @@
  * the plugin already says `from '../../settings/types'` and where a type is
  * declared is not what those files are about.
  */
-import { type ReheatAppliance } from 'trail-core';
+import { type ReheatAppliance } from '@technosoftware/trail-core';
 
 export type { ReheatAppliance };
 

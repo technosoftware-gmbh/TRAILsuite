@@ -13,7 +13,12 @@
  * where half the accounts opened on different days has no balance sheet at all.
  */
 import { App, Modal, Notice, Setting, TFile } from 'obsidian';
-import { accountLabel, formatDayTitle, looksLikeIban, type Account } from 'trail-core';
+import {
+  accountLabel,
+  formatDayTitle,
+  looksLikeIban,
+  type Account,
+} from '@technosoftware/trail-core';
 import { t } from '../lang/I18nManager';
 import type { NODAtrailSettings } from '../settings/types';
 import { readAccounts } from './read-ledger';

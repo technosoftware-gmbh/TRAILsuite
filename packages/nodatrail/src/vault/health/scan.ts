@@ -8,7 +8,7 @@
  * can reach, so the less of it there is, the less goes unchecked.
  */
 import { App, TFile } from 'obsidian';
-import { stripWikilink } from 'trail-core';
+import { stripWikilink } from '@technosoftware/trail-core';
 import { hostFor } from '../../shared/vault-host';
 import { readParaBoard } from '../../para/read-para';
 import { readFinanceBoard } from '../../finance/read-finance';

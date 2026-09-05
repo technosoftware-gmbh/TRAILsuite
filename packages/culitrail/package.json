@@ -48,6 +48,6 @@
     "vitest": "^4.1.10"
   },
   "dependencies": {
-    "trail-core": "*"
+    "@technosoftware/trail-core": "*"
   }
 }

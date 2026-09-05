@@ -6,7 +6,7 @@
  * here or from anywhere else.
  */
 import { App, Platform, TFile } from 'obsidian';
-import { localDateTimeISO } from 'trail-core';
+import { localDateTimeISO } from '@technosoftware/trail-core';
 import { t } from '../../../lang/I18nManager';
 import { eligiblePersonTitles } from '../../../crm/persons';
 import { addFooterButtons, BaseModal } from '../../../ui/base-modal';

@@ -11,7 +11,7 @@
  * given elevation is a fact about the sun. What counts as "golden" between
  * two of those crossings is product logic and is here.
  */
-import { GeoPoint, SUN_ELEVATIONS, sunPosition, sunTimes } from 'trail-core';
+import { GeoPoint, SUN_ELEVATIONS, sunPosition, sunTimes } from '@technosoftware/trail-core';
 
 /** The bands of a day's light, in order, as fractions of the 24 hours. */
 export type SunBandKind = 'night' | 'blue' | 'golden' | 'day';

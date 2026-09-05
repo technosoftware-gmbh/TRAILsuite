@@ -25,7 +25,7 @@
  */
 import { Notice, TFile } from 'obsidian';
 import type { App } from 'obsidian';
-import { formatDayTitle } from 'trail-core';
+import { formatDayTitle } from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import { fileImageChoice } from '../../para/image-file';
 import type { NODAtrailSettings } from '../../settings/types';

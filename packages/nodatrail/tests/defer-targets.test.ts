@@ -16,7 +16,7 @@
  * a Monday and a Sunday cannot disagree about what "next week" meant.
  */
 import { describe, expect, it } from 'vitest';
-import { formatDayTitle } from 'trail-core';
+import { formatDayTitle } from '@technosoftware/trail-core';
 import { deferTargets } from '../src/plan/defer-menu';
 
 /** Friday 28 August 2026. */

@@ -16,7 +16,7 @@
  * on a fresh vault rather than a failure.
  */
 import { App, TFile, TFolder } from 'obsidian';
-import { sampleFolders, type FolderContents, type SampleNote } from 'trail-core';
+import { sampleFolders, type FolderContents, type SampleNote } from '@technosoftware/trail-core';
 
 /**
  * True when a note's text already carries a fence of this language.

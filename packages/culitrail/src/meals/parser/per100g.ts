@@ -39,7 +39,7 @@ import {
   readNumberLike,
   readNutrientList,
   type MealNutritionPer100g,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import type { CULItrailSettings } from '../../settings/types';
 import { nutrientFieldNames } from '../nutrient-fields';
 import { extractSection } from './body-sections';

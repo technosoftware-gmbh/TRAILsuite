@@ -29,8 +29,8 @@ import {
   sanitizeTitle,
   type SampleNote,
   type SampleVaultPlan,
-} from 'trail-core';
-import { renderFrontmatterBlock } from 'trail-core/obsidian';
+} from '@technosoftware/trail-core';
+import { renderFrontmatterBlock } from '@technosoftware/trail-core/obsidian';
 import { APERtrailSettings } from '../settings/types';
 import { createNote } from '../shared/note-creation';
 import { touchModified } from '../vault/note-stamps';

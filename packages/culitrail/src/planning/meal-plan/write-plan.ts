@@ -14,7 +14,7 @@
  * leave a vault where saving an old week silently dropped it.
  */
 import { App, TFile } from 'obsidian';
-import { splitFrontmatterBlock, stampModified } from 'trail-core';
+import { splitFrontmatterBlock, stampModified } from '@technosoftware/trail-core';
 import { getOrCreateNote, readNoteOrEmpty } from '../../shared/vault-io';
 import type { CULItrailSettings } from '../../settings/types';
 import { bodyWithoutPlan, planEntriesFromBody } from './legacy-body';

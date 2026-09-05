@@ -5,7 +5,7 @@
  * note, rebuilt on every read, which is why they live with the area rather
  * than in `settings/types.ts` alongside the things `data.json` holds.
  */
-import type { MealNutritionPer100g } from 'trail-core';
+import type { MealNutritionPer100g } from '@technosoftware/trail-core';
 import type { EatingEntry } from './parser/eating-history';
 
 export type { EatingEntry };

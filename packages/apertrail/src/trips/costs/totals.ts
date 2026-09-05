@@ -21,7 +21,7 @@
  * Pure: no Obsidian import, no clock. See
  * docs/design/trip-budget-and-bookings.md §5.
  */
-import { roundCents } from 'trail-core';
+import { roundCents } from '@technosoftware/trail-core';
 import { BOOKING_CATEGORIES, BookingCategory, ParsedBooking } from './booking-note';
 
 /** A booking with its currency already resolved through the note, the trip and the setting. */

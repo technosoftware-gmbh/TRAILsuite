@@ -11,7 +11,7 @@
  * two. It is here rather than skipped so that a vault sets the convention once
  * and all three obey it, which is the whole point of the shared contract.
  */
-import { displayLocale } from 'trail-core';
+import { displayLocale } from '@technosoftware/trail-core';
 
 let active: string | undefined;
 

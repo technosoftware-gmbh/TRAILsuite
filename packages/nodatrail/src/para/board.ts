@@ -13,7 +13,7 @@
  * is the rule the whole suite follows for a value that can be both stated and
  * derived.
  */
-import { titlesMatch } from 'trail-core';
+import { titlesMatch } from '@technosoftware/trail-core';
 import type { ParsedArea, ParsedGoal, ParsedProject, ParsedResource } from './types';
 
 /** A parsed note paired with the file it came from. */

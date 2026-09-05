@@ -14,7 +14,7 @@ import {
   ordersForMeal,
 } from '../src/orders/related-orders';
 import type { OrderRecord, OrderSelection } from '../src/orders/types';
-import { selectionTitles } from 'trail-core';
+import { selectionTitles } from '@technosoftware/trail-core';
 
 function order(
   orderNumber: string,

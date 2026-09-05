@@ -3,7 +3,7 @@
  *
  * The npm `obsidian` package ships type definitions and no code, so a module
  * importing a *value* from it cannot be loaded under Node. Nothing in `src/`
- * does. `trail-core/obsidian` does: its adapter is the one file in the core
+ * does. `@technosoftware/trail-core/obsidian` does: its adapter is the one file in the core
  * allowed to touch Obsidian, and `src/shared/vault-host.ts` imports it to build
  * a vault host. Aliasing the package to this file is what lets a test drive a
  * real write through that host.

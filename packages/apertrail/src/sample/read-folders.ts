@@ -16,7 +16,7 @@
  * on a fresh vault rather than an error.
  */
 import { App, normalizePath, TFile } from 'obsidian';
-import { sampleFolders, type FolderContents, type SampleNote } from 'trail-core';
+import { sampleFolders, type FolderContents, type SampleNote } from '@technosoftware/trail-core';
 
 /** The markdown notes directly in a folder, ignoring subfolders and anything that is not a note. */
 function markdownChildren(app: App, folder: string): TFile[] {

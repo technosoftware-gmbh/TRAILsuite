@@ -19,7 +19,7 @@
  * number of readers. What is left here is the half that needs an `App`.
  */
 import { App, TFile } from 'obsidian';
-import { readSummary, splitFrontmatterBlock, withSummary } from 'trail-core';
+import { readSummary, splitFrontmatterBlock, withSummary } from '@technosoftware/trail-core';
 import { hostFor } from '../shared/vault-host';
 
 /** The summary on a note, or '' when it has none. */

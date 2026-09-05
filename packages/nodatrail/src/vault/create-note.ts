@@ -11,8 +11,8 @@
  * does not.
  */
 import { App, TFile } from 'obsidian';
-import { createdEntry, frontmatterObject } from 'trail-core';
-import { renderFrontmatterBlock } from 'trail-core/obsidian';
+import { createdEntry, frontmatterObject } from '@technosoftware/trail-core';
+import { renderFrontmatterBlock } from '@technosoftware/trail-core/obsidian';
 import { createNote } from '../shared/note-creation';
 import type { NODAtrailSettings } from '../settings/types';
 

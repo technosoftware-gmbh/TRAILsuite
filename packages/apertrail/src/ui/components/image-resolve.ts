@@ -3,7 +3,7 @@
  * displayable resource URL and renders it inside a card element.
  */
 import { App, TFile } from 'obsidian';
-import { stripWikilink } from 'trail-core';
+import { stripWikilink } from '@technosoftware/trail-core';
 import { makeLightboxable } from './lightbox';
 
 export const ABSOLUTE_URL_RE = /^(?:https?|data|app|capacitor):\/\//i;

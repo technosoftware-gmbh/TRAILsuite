@@ -18,7 +18,7 @@ import {
   parseCrmNote,
   type CrmKind,
   type CrmPropertyNames as CoreCrmPropertyNames,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import type { CULItrailSettings } from '../settings/types';
 import {
   emptyCompanyTerms,

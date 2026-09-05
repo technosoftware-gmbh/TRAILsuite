@@ -8,7 +8,7 @@
  * made a second one, and two copies of "8.9 km SSW of the anchor" would
  * have drifted in wording before they drifted in arithmetic.
  */
-import { compassPoint, parseDayTitle, SunTimes } from 'trail-core';
+import { compassPoint, parseDayTitle, SunTimes } from '@technosoftware/trail-core';
 import { t } from '../lang/I18nManager';
 import { formatDistanceIn, UnitSystem } from '../shared/units';
 import { shortUrl } from '../shared/short-url';

@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to `trail-core` are recorded here. The format follows
+All notable changes to `@technosoftware/trail-core` are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this package uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
@@ -11,11 +11,33 @@ what counts as a breaking change:
   `plan`, `order`, `delivery`, `meal` or `reheating` will read out of a note
   already in a vault is a breaking change even when no exported signature moves,
   because the notes go on existing after the release that stopped reading them.
-- **`CRM_CONTRACT` is the strictest of the lot.** Changing one of its seven
-  values breaks both plugins at once and silently: the failure mode of a type
-  value that no longer matches is an empty list rather than an error.
+- **The settings contracts are the strictest of the lot.** Changing one of
+  `CRM_CONTRACT`'s nine values breaks all three plugins at once and silently:
+  the failure mode of a type value that no longer matches is an empty list
+  rather than an error. `ORDER_CONTRACT` is the same promise for the six
+  settings NODAtrail uses to read an order note CULItrail wrote, where the
+  failure mode is quieter still: an order read without its price.
 
 ## [Unreleased]
+
+### Changed
+
+- **The package is now `@technosoftware/trail-core`.** Breaking for anybody
+  depending on it by name, which today is the three plugins in this repository
+  and nothing else. Scoped rather than unscoped so that ownership is stated in
+  the name: this is published from an organization account, and a short generic
+  name on a public registry says nothing about who stands behind it.
+
+### Added
+
+- **`settings/order-contract.ts`**: the six settings NODAtrail uses to find and
+  read the order notes CULItrail writes -- the folder, the type value, and the
+  company, date, price and currency property names. They were spelled out in
+  both plugins' defaults with nothing comparing them, so renaming one on either
+  side left both suites green and reached a person as a ledger reading every
+  order as unpriced. Modelled on `CRM_CONTRACT`, and asymmetric where that one
+  is not: orders have one author, so these are CULItrail's answers and the
+  other side copies them.
 
 ## [1.0.0] - 2026-09-04
 

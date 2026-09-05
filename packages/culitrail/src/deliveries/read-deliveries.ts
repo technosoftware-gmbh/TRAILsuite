@@ -11,7 +11,7 @@
 import type { App } from 'obsidian';
 import type { CULItrailSettings } from '../settings/types';
 import { readNotesOfType } from '../vault/read-notes';
-import { parseDelivery, type DeliveryProperties } from 'trail-core';
+import { parseDelivery, type DeliveryProperties } from '@technosoftware/trail-core';
 import type { DeliveryRecord } from './types';
 
 export function deliveryProperties(settings: CULItrailSettings): DeliveryProperties {

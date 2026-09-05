@@ -27,7 +27,7 @@ import {
   type PurchaseRecord,
   type RecurringRecord,
   type SpendItem,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 
 /** A spend item with the note it came from, so a row can be clicked through. */
 interface SourcedBase<F> extends SpendItem {

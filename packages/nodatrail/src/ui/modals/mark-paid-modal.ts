@@ -27,7 +27,7 @@ import {
   type BillRecord,
   type NearMiss,
   type Posting,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import { day } from '../kit/format';
 import { likelyPaidDate, setBillPaid } from '../../finance/edit-finance';

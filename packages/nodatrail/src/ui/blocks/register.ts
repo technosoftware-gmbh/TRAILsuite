@@ -10,7 +10,7 @@
  * post-processor is a rejection nobody sees.
  */
 import { Plugin } from 'obsidian';
-import { JOURNAL_LANGUAGE } from 'trail-core';
+import { JOURNAL_LANGUAGE } from '@technosoftware/trail-core';
 import { NOD_SPENDING_BLOCK_LANG } from '../../crm/spending-block-lang';
 import { renderProjectsBlock } from './para-blocks';
 import { renderBillsBlock, renderBudgetBlock, renderSpendingBlock } from './finance-blocks';

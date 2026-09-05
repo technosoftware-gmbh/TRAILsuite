@@ -15,8 +15,8 @@
  * and a property NODAtrail has no setting for would quietly disappear.
  */
 import { App, TFile } from 'obsidian';
-import type { AccountBudgetLine, ExpenseLine } from 'trail-core';
-import { formatDayTitle } from 'trail-core';
+import type { AccountBudgetLine, ExpenseLine } from '@technosoftware/trail-core';
+import { formatDayTitle } from '@technosoftware/trail-core';
 import { hostFor } from '../shared/vault-host';
 import { touchModified } from '../shared/note-stamps';
 import type { NODAtrailSettings } from '../settings/types';

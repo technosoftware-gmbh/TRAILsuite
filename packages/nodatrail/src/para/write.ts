@@ -13,7 +13,7 @@
  *
  * Pure.
  */
-import { wikilinkValue } from 'trail-core';
+import { wikilinkValue } from '@technosoftware/trail-core';
 import type {
   GoalProperties,
   ParaCommonProperties,

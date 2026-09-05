@@ -24,8 +24,8 @@
 import { App, TFile } from 'obsidian';
 import { t } from '../lang/I18nManager';
 import { APERtrailSettings } from '../settings/types';
-import { createdEntry, frontmatterObject } from 'trail-core';
-import { renderFrontmatterBlock } from 'trail-core/obsidian';
+import { createdEntry, frontmatterObject } from '@technosoftware/trail-core';
+import { renderFrontmatterBlock } from '@technosoftware/trail-core/obsidian';
 import { createNote } from '../shared/note-creation';
 import { TRAVEL_RELATED_TRIPS_BLOCK_LANG } from '../trips/related-trips-block-lang';
 import { CrmEntityType, CRM_FOLDER_SETTING } from './entity-types';

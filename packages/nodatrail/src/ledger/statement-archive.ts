@@ -26,8 +26,8 @@ import {
   SWISS_EBANKING_PROFILE,
   acceptedRows,
   parseStatement,
-} from 'trail-core';
-import type { BankStatementRow, StatementProfile } from 'trail-core';
+} from '@technosoftware/trail-core';
+import type { BankStatementRow, StatementProfile } from '@technosoftware/trail-core';
 
 /** The formats this plugin can read, in the order a guess should try them. */
 export const KNOWN_PROFILES: readonly StatementProfile[] = [

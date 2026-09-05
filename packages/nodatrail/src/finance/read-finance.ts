@@ -13,7 +13,7 @@ import {
   type BillRecord,
   type PurchaseRecord,
   type RecurringRecord,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import type { NODAtrailSettings } from '../settings/types';
 import { readNotes } from '../vault/read-notes';
 import { billProperties, purchaseProperties, recurringProperties } from './properties';

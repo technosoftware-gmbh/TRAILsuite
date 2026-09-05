@@ -38,7 +38,7 @@ import {
 import { readAreas, readGoals } from '../../para/read-para';
 import { t } from '../../lang/I18nManager';
 import type { NODAtrailSettings } from '../../settings/types';
-import { formatDayTitle, summaryBody } from 'trail-core';
+import { formatDayTitle, summaryBody } from '@technosoftware/trail-core';
 import { PARA_STATUSES, type ParaStatus } from '../../para/types';
 import { datesAfterStatus } from '../../para/status-dates';
 import { FormModal } from './form-modal';

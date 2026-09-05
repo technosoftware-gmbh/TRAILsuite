@@ -8,7 +8,12 @@
  *
  * App-free.
  */
-import { readIsoDate, readDateTimeLike, readNumberLike, readString } from 'trail-core';
+import {
+  readIsoDate,
+  readDateTimeLike,
+  readNumberLike,
+  readString,
+} from '@technosoftware/trail-core';
 
 export interface EatingEntry {
   /** `YYYY-MM-DD`. An entry with no readable date is dropped rather than shown undated. */

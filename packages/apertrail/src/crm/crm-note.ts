@@ -16,7 +16,7 @@ import {
   parseCrmNote,
   type CrmNoteFields,
   type CrmPropertyNames,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { CrmEntityType } from './entity-types';
 import type { APERtrailSettings } from '../settings/types';
 

@@ -14,7 +14,7 @@ import {
   parseDelivery,
   parseDeliveryFilenameStem,
   type DeliveryProperties,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { lastDeliveredTitles, newestDelivery } from '../src/deliveries/read-deliveries';
 import type { DeliveryRecord } from '../src/deliveries/types';
 

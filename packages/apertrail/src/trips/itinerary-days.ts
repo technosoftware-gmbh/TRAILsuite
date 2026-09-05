@@ -5,7 +5,7 @@
  * directly -- that is the only reason it lives here rather than inside
  * trips/ui/itinerary-block.ts, which is the sole caller.
  */
-import { dateTimeDatePart } from 'trail-core';
+import { dateTimeDatePart } from '@technosoftware/trail-core';
 import { ParsedTripDay } from './trip-note';
 import { TravelTripStop } from '../vault/types';
 import { dateOfDay, dayKey, dayOfDate, endpointDate } from './relative-days';

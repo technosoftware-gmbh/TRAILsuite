@@ -8,7 +8,13 @@
  * into the metadata the rest comes from.
  */
 import { App, TFile } from 'obsidian';
-import { findValue, linkOrText, readNumberLike, readString, readStringList } from 'trail-core';
+import {
+  findValue,
+  linkOrText,
+  readNumberLike,
+  readString,
+  readStringList,
+} from '@technosoftware/trail-core';
 import { frontmatterOf } from '../../shared/vault-scan';
 import type { CULItrailSettings } from '../../settings/types';
 import { extractLeadingText, stripFrontmatter } from '../parser/body-sections';

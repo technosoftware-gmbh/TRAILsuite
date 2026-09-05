@@ -23,7 +23,7 @@
  */
 import { afterEach, describe, expect, it } from 'vitest';
 import { parse as parseYaml } from 'yaml';
-import { nutrientListValue, parseLegacyPer100gSections } from 'trail-core';
+import { nutrientListValue, parseLegacyPer100gSections } from '@technosoftware/trail-core';
 import { I18nManager } from '../src/lang/I18nManager';
 import { mergeSettings } from '../src/settings/validate';
 import { nutrientFieldNames } from '../src/meals/nutrient-fields';

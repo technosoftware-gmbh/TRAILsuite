@@ -12,7 +12,7 @@ import {
   ensureParentFolders as ensureParentFoldersCore,
   readNoteOrEmpty as readNoteOrEmptyCore,
   writeNote as writeNoteCore,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { hostFor } from './vault-host';
 import type { NoteStampSettings } from './note-stamps';
 

@@ -15,7 +15,7 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { parse as parseYaml } from 'yaml';
-import { detectPeriodLevel, readStamp, scanTasks } from 'trail-core';
+import { detectPeriodLevel, readStamp, scanTasks } from '@technosoftware/trail-core';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import { mergeSettings } from '../src/settings/validate';
 import type { NODAtrailSettings } from '../src/settings/types';

@@ -20,7 +20,7 @@ import {
   type ParsedAccountBudget,
   type ParsedPurchase,
   type ParsedRecurring,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import type { NODAtrailSettings } from '../settings/types';
 import { createTypedNote } from '../vault/create-note';
 import { budgetDateOf, dateOf, noteFolderFor } from './paths';

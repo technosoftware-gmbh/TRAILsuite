@@ -8,7 +8,7 @@
  */
 import type { App } from 'obsidian';
 import type { CULItrailSettings } from '../../settings/types';
-import { readTags } from 'trail-core';
+import { readTags } from '@technosoftware/trail-core';
 import { readNotesOfType } from '../../vault/read-notes';
 import { internalPropertyNames, summarizeFields, type RawFieldObservations } from './field-summary';
 import type { FieldDiscovery } from './types';

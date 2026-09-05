@@ -168,8 +168,8 @@ document claiming something the note does not say.
 
 Two steps, now that the model is in core:
 
-1. **Import it.** `import type { InvoiceModel } from 'trail-core'` and
-   `import { renderInvoice } from 'trail-core/obsidian'`. The `culi-invoice-*`
+1. **Import it.** `import type { InvoiceModel } from '@technosoftware/trail-core'` and
+   `import { renderInvoice } from '@technosoftware/trail-core/obsidian'`. The `culi-invoice-*`
    rules have to be in that plugin's own `styles.css`, since the renderer writes
    the class names and each plugin ships its own stylesheet.
 2. **Write an adapter.** One function, from that plugin's record to an

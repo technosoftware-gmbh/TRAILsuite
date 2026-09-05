@@ -20,8 +20,8 @@ import {
   readNumberLike,
   readString,
   readStringList,
-} from 'trail-core';
-import { readTags } from 'trail-core';
+} from '@technosoftware/trail-core';
+import { readTags } from '@technosoftware/trail-core';
 import type { CULItrailSettings } from '../../settings/types';
 import { MealMeta, MealNutrition } from '../types';
 import { lastEatingDate, readEatingHistoryProperty } from './eating-history';

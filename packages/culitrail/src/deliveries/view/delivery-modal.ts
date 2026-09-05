@@ -12,15 +12,15 @@
  * one that leaves a row to delete.
  */
 import { App, Setting, setIcon } from 'obsidian';
-import { localDateISO } from 'trail-core';
+import { localDateISO } from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import { formatIsoDate } from '../../meals/view-model/format-date';
 import type { OrderRecord } from '../../orders/types';
 import type { CULItrailSettings } from '../../settings/types';
 import { addFooterButtons, BaseModal } from '../../ui/base-modal';
 import { readNotesOfType } from '../../vault/read-notes';
-import type { DeliveryContent } from 'trail-core';
-import { outstandingItems } from 'trail-core';
+import type { DeliveryContent } from '@technosoftware/trail-core';
+import { outstandingItems } from '@technosoftware/trail-core';
 import type { DeliveryItem, DeliveryRecord } from '../types';
 
 /** How many recent orders the dialog offers to link. */

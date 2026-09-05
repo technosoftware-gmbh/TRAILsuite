@@ -32,7 +32,7 @@ import { goalIsActive, projectIsActive } from '../../para/types';
 import { resolveImagePath } from '../kit/images';
 import type { DefaultImages } from '../../para/default-image-file';
 import { day } from '../kit/format';
-import { priorityLevelOf } from 'trail-core';
+import { priorityLevelOf } from '@technosoftware/trail-core';
 import { cardHeader, cardStrip, dashboardCard, headerButton, heroCard } from './cards';
 import { emptyState } from '../kit/elements';
 

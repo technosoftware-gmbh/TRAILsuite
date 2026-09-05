@@ -39,7 +39,7 @@
  */
 import { TFile } from 'obsidian';
 import type { App } from 'obsidian';
-import { parseDayTitle, splitFrontmatterBlock, type MissingLine } from 'trail-core';
+import { parseDayTitle, splitFrontmatterBlock, type MissingLine } from '@technosoftware/trail-core';
 import { t } from '../lang/I18nManager';
 import type { NODAtrailSettings } from '../settings/types';
 import { hostFor } from '../shared/vault-host';

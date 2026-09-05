@@ -27,7 +27,7 @@ import {
   orderFilenameStem,
   wikilinkValue,
   type SampleNote,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { CUL_RELATED_ORDERS_BLOCK_LANG } from '../orders/related-orders-block-lang';
 import { mealPlanNotePath } from '../planning/meal-plan/note-path';
 import type { CULItrailSettings } from '../settings/types';

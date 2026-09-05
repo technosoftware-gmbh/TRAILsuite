@@ -13,7 +13,7 @@
  * rule says so, and this file is where that line falls: the boundaries are
  * there, the names for the spans between them are here.
  */
-import { sunTimes } from 'trail-core';
+import { sunTimes } from '@technosoftware/trail-core';
 import { PhotoSpotLightWindow } from './photo-spot-note';
 
 export interface LightWindowRange {

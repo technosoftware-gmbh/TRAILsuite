@@ -7,7 +7,10 @@
  * date reads as a fact. What is here is the `App`-shaped face of them.
  */
 import type { App, TFile } from 'obsidian';
-import { touchCreated as touchCreatedCore, touchModified as touchModifiedCore } from 'trail-core';
+import {
+  touchCreated as touchCreatedCore,
+  touchModified as touchModifiedCore,
+} from '@technosoftware/trail-core';
 import { hostFor } from './vault-host';
 import type { CULItrailSettings } from '../settings/types';
 

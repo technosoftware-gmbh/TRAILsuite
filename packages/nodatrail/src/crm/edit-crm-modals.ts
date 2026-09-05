@@ -21,7 +21,7 @@
  * the first time they set it on the wrong company.
  */
 import { App, Notice, TFile } from 'obsidian';
-import { readString, readStringList } from 'trail-core';
+import { readString, readStringList } from '@technosoftware/trail-core';
 import { t } from '../lang/I18nManager';
 import { hostFor } from '../shared/vault-host';
 import type { NODAtrailSettings } from '../settings/types';

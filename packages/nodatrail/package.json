@@ -49,6 +49,6 @@
     "yaml": "^2.6.0"
   },
   "dependencies": {
-    "trail-core": "*"
+    "@technosoftware/trail-core": "*"
   }
 }

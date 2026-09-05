@@ -22,7 +22,7 @@
  */
 import type { App } from 'obsidian';
 import type { CULItrailSettings } from '../../settings/types';
-import { readTags } from 'trail-core';
+import { readTags } from '@technosoftware/trail-core';
 import { readNoteOrEmpty } from '../../shared/vault-io';
 import { readNotesOfType } from '../../vault/read-notes';
 import { stripFrontmatter } from '../parser/body-sections';

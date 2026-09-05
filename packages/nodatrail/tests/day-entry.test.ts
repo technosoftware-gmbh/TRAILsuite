@@ -20,7 +20,7 @@
  * work out which meeting a note belonged under.
  */
 import { describe, expect, it } from 'vitest';
-import { parseTaskLine } from 'trail-core';
+import { parseTaskLine } from '@technosoftware/trail-core';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import { emptyDraft, entryLines, headingsFor } from '../src/plan/add-to-day';
 import type { NODAtrailSettings } from '../src/settings/types';

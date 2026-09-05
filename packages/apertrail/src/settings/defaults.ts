@@ -19,7 +19,7 @@
  * every path here is built with trail-core's `joinFolder()`, which drops a
  * blank segment instead of producing a leading slash.
  */
-import { CRM_CONTRACT, DISPLAY_CONTRACT, joinFolder } from 'trail-core';
+import { CRM_CONTRACT, DISPLAY_CONTRACT, joinFolder } from '@technosoftware/trail-core';
 import { APERtrailSettings } from './types';
 import { I18nManager, t } from '../lang/I18nManager';
 

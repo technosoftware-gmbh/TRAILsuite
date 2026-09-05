@@ -16,7 +16,7 @@ import {
   type MealNutritionPer100g,
   type NutrientEntry,
   type ServingTotals,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 
 /** A row naming a nutrient with no figure yet, which is a real thing to say. */
 export function blankEntry(id: string): NutrientEntry {

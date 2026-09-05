@@ -17,7 +17,7 @@ import {
   type Account,
   type JournalProblem,
   type Posting,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import { money } from '../kit/format';
 import { readAccounts } from '../../ledger/read-ledger';

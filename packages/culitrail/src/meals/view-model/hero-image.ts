@@ -10,7 +10,7 @@
  *
  * App-free.
  */
-import { findValue } from 'trail-core';
+import { findValue } from '@technosoftware/trail-core';
 import type { CULItrailSettings } from '../../settings/types';
 import { findFirstImageInBody } from '../parser/body-images';
 import { mealMetaAliases } from '../parser/meal-meta';

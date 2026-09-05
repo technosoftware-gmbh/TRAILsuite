@@ -10,14 +10,14 @@
  * The `---` fence is no longer here either: `renderFrontmatterBlock()` is
  * the Obsidian adapter's, because the host owns serialisation in both
  * directions and `processFrontMatter()` re-serialises with that same
- * writer. Import it from `trail-core/obsidian`.
+ * writer. Import it from `@technosoftware/trail-core/obsidian`.
  */
 import { App, TFile } from 'obsidian';
 import {
   createNote as createNoteInVault,
   ensureFolder as ensureFolderInVault,
   ensureParentFolders as ensureParentFoldersInVault,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { hostFor } from './vault-host';
 
 export function ensureFolder(app: App, path: string): Promise<void> {

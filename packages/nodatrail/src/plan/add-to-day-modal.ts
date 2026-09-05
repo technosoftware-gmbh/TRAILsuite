@@ -22,7 +22,7 @@ import {
   parseDayTitle,
   splitFrontmatterBlock,
   type PeriodLevel,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { t } from '../lang/I18nManager';
 import { FormModal } from '../ui/modals/form-modal';
 import { NewProjectModal } from '../ui/modals/new-para-modals';

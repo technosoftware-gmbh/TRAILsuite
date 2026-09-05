@@ -16,12 +16,12 @@ import { eligiblePersonTitles } from '../../crm/persons';
 import { ordersForMeal } from '../../orders/related-orders';
 import { readOrders } from '../../orders/read-orders';
 import type { CULItrailSettings } from '../../settings/types';
-import { linkOrText } from 'trail-core';
+import { linkOrText } from '@technosoftware/trail-core';
 import { readNoteOrEmpty } from '../../shared/vault-io';
 import { stripFrontmatter } from '../parser/body-sections';
 import { parseReheatSection } from './parse-section';
 import type { ApplianceEntry } from './types';
-import { selectionTitles } from 'trail-core';
+import { selectionTitles } from '@technosoftware/trail-core';
 
 /** How a supplier was arrived at, so a reader can be told which and why. */
 export type SupplierSource = 'property' | 'order' | 'none';

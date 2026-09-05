@@ -21,7 +21,7 @@ import {
   type PeriodLevel,
   type TaskStatus,
   withTaskComment,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { hostFor } from '../shared/vault-host';
 import { touchModified } from '../shared/note-stamps';
 import type { NODAtrailSettings } from '../settings/types';

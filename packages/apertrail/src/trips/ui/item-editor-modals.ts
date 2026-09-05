@@ -42,7 +42,7 @@ import { TravelPlacePickerModal } from '../../places/ui/place-picker-modal';
 import { readTravelBoard } from '../../vault/read-entities';
 import { TravelPlace } from '../../vault/types';
 import { goldenHourPrefill, StopTimeSuggestion } from '../trip-light';
-import { formatDateTimeStamp, parseDayTitle } from 'trail-core';
+import { formatDateTimeStamp, parseDayTitle } from '@technosoftware/trail-core';
 import { formatMediumDate } from '../../shared/display';
 
 /**

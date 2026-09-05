@@ -20,7 +20,12 @@
  * into `1 Areas/6 Finanzen` would be writing into somebody's filing rather than
  * beside it. A bill note links to its document wherever that document lives.
  */
-import { CRM_CONTRACT, DISPLAY_CONTRACT, ORDER_CONTRACT, joinFolder } from 'trail-core';
+import {
+  CRM_CONTRACT,
+  DISPLAY_CONTRACT,
+  ORDER_CONTRACT,
+  joinFolder,
+} from '@technosoftware/trail-core';
 import { NODAtrailSettings } from './types';
 import { I18nManager, t } from '../lang/I18nManager';
 

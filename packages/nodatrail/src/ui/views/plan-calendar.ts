@@ -23,7 +23,7 @@
  * The pure half -- which days, which cells, what falls on each -- is
  * plan/day-buckets.ts. This file only draws.
  */
-import { formatDayTitle, isoWeekOf, parseDayTitle, placingDay } from 'trail-core';
+import { formatDayTitle, isoWeekOf, parseDayTitle, placingDay } from '@technosoftware/trail-core';
 import type { TFile } from 'obsidian';
 import { t } from '../../lang/I18nManager';
 import { eachDay, monthGrid, weekRows, type GridDay } from '../../plan/day-buckets';

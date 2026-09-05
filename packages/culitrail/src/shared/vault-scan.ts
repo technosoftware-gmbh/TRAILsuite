@@ -7,7 +7,7 @@
  * sit beside it are `trail-core`'s now.
  */
 import { App, TFile } from 'obsidian';
-import { isUnderAnyFolder } from 'trail-core';
+import { isUnderAnyFolder } from '@technosoftware/trail-core';
 import { hostFor } from './vault-host';
 
 /**

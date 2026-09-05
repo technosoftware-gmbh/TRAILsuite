@@ -8,7 +8,7 @@
  *
  * App-free.
  */
-import { startOfWeekTitle } from 'trail-core';
+import { startOfWeekTitle } from '@technosoftware/trail-core';
 import { resolveNotePath, templateNeedsPerson } from '../../shared/note-path';
 import type { CULItrailSettings, MealPlanEntry } from '../../settings/types';
 

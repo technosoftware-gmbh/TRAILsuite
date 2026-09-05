@@ -25,7 +25,7 @@ import {
   wikilinkTarget,
   wikilinkTargets,
   type VaultNote,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import {
   TRAVEL_PLACE_FOLDER_SETTING,
   TRAVEL_PLACE_TYPES,

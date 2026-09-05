@@ -13,7 +13,7 @@
  */
 import { App, TFile } from 'obsidian';
 import { APERtrailSettings } from '../settings/types';
-import { readNotesOfType, type VaultNote } from 'trail-core';
+import { readNotesOfType, type VaultNote } from '@technosoftware/trail-core';
 import { hostFor } from '../shared/vault-host';
 import { CrmEntityType, CRM_FOLDER_SETTING } from './entity-types';
 import {

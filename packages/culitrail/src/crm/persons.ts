@@ -13,7 +13,7 @@
  */
 import { App } from 'obsidian';
 import { CULItrailSettings } from '../settings/types';
-import { filterByTags, parseTagFilter } from 'trail-core';
+import { filterByTags, parseTagFilter } from '@technosoftware/trail-core';
 import { readPersons } from './read-crm';
 import { CrmPerson } from './types';
 

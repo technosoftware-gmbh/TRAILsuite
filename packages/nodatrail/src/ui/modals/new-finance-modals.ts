@@ -29,7 +29,7 @@ import {
   type CompanyDefaults,
   type RecurringRecord,
   type RecurringStatus,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import { configuredCategories, categoryLabel } from '../../shared/categories';
 import { splitList } from '../../settings/defaults';
@@ -46,7 +46,7 @@ import { documentFields, type DocumentChoice } from './document-field';
 import { dateOf } from '../../finance/paths';
 import { noteTitle } from '../../finance/finance-title';
 import { accountChoices, accountValue } from '../../ledger/account-field';
-import { BILL_DIRECTIONS, type BillDirection } from 'trail-core';
+import { BILL_DIRECTIONS, type BillDirection } from '@technosoftware/trail-core';
 import { readAccounts } from '../../ledger/read-ledger';
 import { readRecurring } from '../../finance/read-finance';
 import { readOrders } from '../../finance/read-orders';

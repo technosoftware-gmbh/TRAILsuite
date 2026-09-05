@@ -27,7 +27,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { MACRONUTRIENT_IDS, MICRONUTRIENT_IDS } from 'trail-core';
+import { MACRONUTRIENT_IDS, MICRONUTRIENT_IDS } from '@technosoftware/trail-core';
 import { enTranslations } from '../src/lang/translations/en';
 import { deTranslations } from '../src/lang/translations/de';
 import { DEFAULT_APPLIANCE_IDS, DEFAULT_SETTINGS } from '../src/settings/defaults';

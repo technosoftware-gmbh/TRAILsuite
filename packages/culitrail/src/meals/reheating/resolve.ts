@@ -13,10 +13,10 @@ import {
   resolveReheating as resolve,
   type ApplianceEntry,
   type ReheatInstruction,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import type { CULItrailSettings } from '../../settings/types';
 
-export { resolveAppliance } from 'trail-core';
+export { resolveAppliance } from '@technosoftware/trail-core';
 
 export function resolveReheating(
   dishEntries: ApplianceEntry[],

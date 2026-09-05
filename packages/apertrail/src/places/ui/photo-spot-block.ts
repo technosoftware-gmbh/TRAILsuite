@@ -31,7 +31,7 @@ import {
   sunPosition,
   sunTimes,
   SunTimes,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { renderChip } from '../../ui/components/chip';
 import { exportPhotoSpotSheet } from './export-photo-spot';
 import {

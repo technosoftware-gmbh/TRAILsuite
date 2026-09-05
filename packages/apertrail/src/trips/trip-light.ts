@@ -10,7 +10,7 @@
  *
  * See docs/design/photo-spots.md §6.
  */
-import { distanceKm, GeoPoint, parseGeoPoint } from 'trail-core';
+import { distanceKm, GeoPoint, parseGeoPoint } from '@technosoftware/trail-core';
 import { lightWindowRange } from '../places/solar';
 import {
   ParsedPhotoSpot,

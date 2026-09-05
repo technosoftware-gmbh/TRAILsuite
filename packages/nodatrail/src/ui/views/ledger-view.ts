@@ -27,7 +27,7 @@ import {
   type Account,
   type BudgetMeasureRow,
   type ReportGroup,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import { readBudgets, readLedger, type Ledger } from '../../ledger/read-ledger';
 import {

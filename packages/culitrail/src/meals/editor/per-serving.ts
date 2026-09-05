@@ -8,4 +8,4 @@
  *
  * App-free.
  */
-export { deriveServingNutrition, per100g, perServing, round2 } from 'trail-core';
+export { deriveServingNutrition, per100g, perServing, round2 } from '@technosoftware/trail-core';

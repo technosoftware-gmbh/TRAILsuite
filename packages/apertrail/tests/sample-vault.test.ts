@@ -103,7 +103,7 @@ import {
   sampleVaultWritable,
   splitFrontmatterBlock,
   type SampleNote,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import { sampleNotes } from '../src/sample/notes';
 import { sampleFolderContents } from '../src/sample/read-folders';

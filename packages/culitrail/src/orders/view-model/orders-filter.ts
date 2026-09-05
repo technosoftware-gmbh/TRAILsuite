@@ -11,7 +11,7 @@
  * rather than in the view because it is a rule about what an order means, not
  * about how one is drawn.
  */
-import { selectionTitles } from 'trail-core';
+import { selectionTitles } from '@technosoftware/trail-core';
 import type { OrdersSavedState } from '../../settings/types';
 import type { OrderRecord } from '../types';
 

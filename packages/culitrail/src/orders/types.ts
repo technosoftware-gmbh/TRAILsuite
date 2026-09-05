@@ -9,9 +9,9 @@
  * ever naming Obsidian.
  */
 import type { TFile } from 'obsidian';
-import type { OrderRecord as CoreOrderRecord } from 'trail-core';
+import type { OrderRecord as CoreOrderRecord } from '@technosoftware/trail-core';
 
-export type { OrderItem, OrderSelection, ParsedOrder } from 'trail-core';
+export type { OrderItem, OrderSelection, ParsedOrder } from '@technosoftware/trail-core';
 
 /** One order, as read back out of its note, paired with the note it came from. */
 export type OrderRecord = CoreOrderRecord<TFile>;

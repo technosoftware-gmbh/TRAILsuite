@@ -10,7 +10,7 @@
  * is what earned this file its move here: two consumers make a contract.
  *
  * App-free, and types only. The renderer that draws it needs a DOM and lives
- * in `trail-core/obsidian`.
+ * in `@technosoftware/trail-core/obsidian`.
  */
 
 /** One label and value in the row of facts above the table. `icon` is a lucide id. */

@@ -23,7 +23,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import type { App, TFile } from 'obsidian';
-import { splitFrontmatterBlock } from 'trail-core';
+import { splitFrontmatterBlock } from '@technosoftware/trail-core';
 import { mergeSettings } from '../src/settings/validate';
 import { readMealDraft } from '../src/meals/editor/read-draft';
 import { writeMealDraft } from '../src/meals/editor/write-draft';

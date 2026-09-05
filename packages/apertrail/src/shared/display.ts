@@ -27,7 +27,7 @@ import {
   formatMoney as coreMoney,
   formatMoneyOrNull as coreMoneyOrNull,
   formatShortDate as coreShortDate,
-} from 'trail-core';
+} from '@technosoftware/trail-core';
 
 let active: string | undefined;
 

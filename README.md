@@ -57,7 +57,7 @@ That copies `main.js`, `styles.css` and `manifest.json` for all three plugins
 into `<vault>/.obsidian/plugins/<id>/`. It deliberately does not build first, so
 what lands in a vault is whatever was last verified.
 
-`npm install` links `packages/core` into each plugin as `trail-core`, so a
+`npm install` links `packages/core` into each plugin as `@technosoftware/trail-core`, so a
 change to the core is visible to a plugin as soon as the core is rebuilt.
 **The core has to be built before a plugin will typecheck against it**, because
 `dist/` is generated and the package's entry points point into it.
@@ -65,7 +65,7 @@ change to the core is visible to a plugin as soon as the core is rebuilt.
 npm will not do that ordering on its own. `--workspaces` visits packages in
 workspace order, which puts `culitrail` before `core`, so a tree whose
 `packages/core/dist/` is missing or stale fails the plugin typecheck with
-`Cannot find module 'trail-core'` rather than rebuilding the core first. That is
+`Cannot find module '@technosoftware/trail-core'` rather than rebuilding the core first. That is
 not a hypothetical: it cost an afternoon, because the error names a module
 rather than a build step and reads like a broken install.
 

@@ -7,10 +7,14 @@
  * alone.
  */
 import { App, normalizePath, stringifyYaml, TFile } from 'obsidian';
-import { createdEntry, stampModified } from 'trail-core';
+import { createdEntry, stampModified } from '@technosoftware/trail-core';
 import type { CULItrailSettings } from '../settings/types';
 import { ensureParentFolders } from '../shared/vault-io';
-import { buildDeliveryFrontmatter, deliveryFilenameStem, type DeliveryContent } from 'trail-core';
+import {
+  buildDeliveryFrontmatter,
+  deliveryFilenameStem,
+  type DeliveryContent,
+} from '@technosoftware/trail-core';
 import { deliveryProperties } from './read-deliveries';
 
 /** The folder deliveries are written to, or null when the setting is blank. */
