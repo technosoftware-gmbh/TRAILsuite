@@ -2,39 +2,44 @@
 
 Thank you for wanting to. Two things are worth reading before you write code,
 because both of them can make a pull request unmergeable no matter how good it
-is: the licence boundary, and what a contribution grants Technosoftware GmbH.
+is: the licences, and what a contribution grants Technosoftware GmbH.
 
-## The licence boundary comes first
+## The licences
 
-Four packages, three licences:
+Three packages, two licences:
 
 ```
-packages/core        trail-core, the shared Obsidian-free library      MIT
-packages/culitrail   meals, meal plans, orders, deliveries             GPL-3.0-or-later
-packages/apertrail   trips, places, photo spots, bookings              PolyForm Noncommercial 1.0.0
-packages/nodatrail   PARA, periodic notes, budgets, bills, ledger      PolyForm Noncommercial 1.0.0
+packages/core        @technosoftware/trail-core, the shared library   MIT
+packages/apertrail   trips, places, photo spots, bookings             PolyForm Noncommercial 1.0.0
+packages/nodatrail   PARA, periodic notes, budgets, bills, ledger     PolyForm Noncommercial 1.0.0
 ```
 
-CULItrail carries code inherited from
-[Recipe Box](https://github.com/AdamArcane/obsidian-recipebox) and is
-GPL-3.0-or-later as a whole. So:
+The plugins are **free for personal use**, and **any use in or for a business
+needs a commercial licence from Technosoftware GmbH**. That is the business
+this repository is part of, and it is why the next section matters more here
+than it would on a permissively licensed project.
 
-**Code may move from the core outwards. It may never move sideways.** Copying a
-file out of `culitrail` into either PolyForm package would relicense that
-package without anybody meaning it to, and the reverse fails for the same
-reason in the other direction. `tests/package-boundary.test.ts` refuses any
-file that resolves an import outside its own package, or that names another
-package as a dependency.
+**Code may move from the core outwards. It may not move sideways.** Both plugins
+consume the core; neither flows back into it and neither may take a file from
+the other. `tests/package-boundary.test.ts` refuses any file that resolves an
+import outside its own package, or that names another package as a dependency.
 
-Cross-plugin cooperation is done by reading the other plugin's `data.json` off
-disk and by reading the notes in the vault. Never through
-`app.plugins.getPlugin()`, and never through a shared type.
+The reason is architectural: every package stays independently buildable and
+shippable, each with its own manifest, tests, changelog and release, and each
+installed into a vault alone. A package that quietly reads a sibling's source is
+a package that no longer builds alone.
 
-**Before proposing that a file be adopted into `packages/core`, its lineage has
-to be established.** The core is MIT, and relicensing somebody else's GPL code
-is not Technosoftware's to do. A file whose lineage cannot be established stays
-where it is. `packages/core/NOTICE.md` records the one adoption that has
-happened and the check that allowed it.
+That rule also carried a licence argument until September 2026, when
+[CULItrail](https://github.com/technosoftware-gmbh/CULItrail) moved to its own
+repository. It carries inherited
+[Recipe Box](https://github.com/AdamArcane/obsidian-recipebox) code and is
+GPL-3.0-or-later as a whole; a file copied out of it into either package here
+would have relicensed that package without anybody meaning to. Separate
+repositories settle that better than a test could.
+
+Cross-plugin cooperation, including with CULItrail, is done by reading the other
+plugin's `data.json` off disk and by reading the notes in the vault. Never
+through `app.plugins.getPlugin()`, and never through a shared type.
 
 ## What a contribution grants
 
@@ -42,10 +47,23 @@ Code contributions are covered by [`CLA.md`](CLA.md), Technosoftware GmbH's
 contributor agreement. In short, and the file itself governs: **you keep your
 copyright**, and you grant Technosoftware a licence broad enough to relicense
 your contribution, including under terms that differ from the package's current
-one. That is what keeps a commercial licence possible for the two PolyForm
-packages, and it is why the agreement exists rather than an inbound-equals-
-outbound rule. It also grants a patent licence, which terminates for anybody
-who sues over the contribution, and it is governed by Swiss law.
+one.
+
+**Said plainly, because you should not have to work it out from a legal text:
+that includes selling it.** APERtrail and NODAtrail are free for personal use
+and licensed commercially to businesses, and that only stays possible while
+Technosoftware holds the rights to every line. Section 4 of the agreement is the
+operative one: contributions may be distributed under any licence approved by
+the Open Source Initiative **or any licence approved by Technosoftware**. The
+second half is doing real work, because PolyForm Noncommercial is not
+OSI-approved.
+
+If that is not something you want for your code, say so before you write it
+rather than after, and we will find something else worth doing. Questions go to
+<support@technosoftware.com>.
+
+The agreement also grants a patent licence, which terminates for anybody who
+sues over the contribution, and it is governed by Swiss law.
 
 **Signing is one comment.** Open your pull request; a bot will notice you have
 not signed and post the sentence to reply with:
@@ -61,9 +79,6 @@ pull request. If the bot and that file ever disagree, comment `recheck`.
 This covers code, and documentation that ships in the repository. It does not
 cover filing an issue or commenting in a discussion, and a bug report that asks
 nothing of you is genuinely useful on its own.
-
-Questions about the agreement go to <support@technosoftware.com> before you
-write the code rather than after.
 
 ## What belongs in the core
 
@@ -84,6 +99,16 @@ translate. When it needs the vault it takes a port, and the Obsidian
 implementations live in `src/obsidian/`, the one exempt directory.
 `tests/obsidian-free.test.ts` reads the source rather than trusting the lint
 run, because a lint rule can be silenced by the same edit that breaks it.
+
+**A file proposed for the core has to have its lineage established first.** The
+core is MIT and relicensing somebody else's code is not Technosoftware's to do,
+so a file whose lineage cannot be established stays where it is.
+`packages/core/NOTICE.md` records the one adoption that has happened and the
+check that allowed it. This applies with particular force to anything arriving
+from CULItrail, which is GPL and carries inherited code, and which now has to
+travel between two repositories to get here: the core gains it and releases,
+and the plugin then depends on the new version. That is slower on purpose. A
+shared contract is a thing you should have to mean.
 
 ## The change that costs the most
 
@@ -174,7 +199,7 @@ what changed and, in the body, why.
 `## [Unreleased]` in the package you changed, under `### Added`, `### Changed`
 or `### Fixed`, and write the vault consequence rather than the diff. They are
 release notes a user reads inside Obsidian, not repository bookkeeping: all
-three plugins compile their own `CHANGELOG.md` into the What's New panel.
+two plugins compile their own `CHANGELOG.md` into the What's New panel.
 
 ## Reporting a bug
 

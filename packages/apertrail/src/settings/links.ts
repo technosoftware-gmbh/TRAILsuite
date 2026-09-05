@@ -14,6 +14,8 @@ export const LINKS = {
   issues: `${REPOSITORY_URL}/issues`,
   vendor: 'https://technosoftware.com',
   support: 'mailto:support@technosoftware.com',
+  /** Where somebody who needs a commercial licence goes. */
+  licensing: 'https://technosoftware.com/license-agreement',
   /**
    * The two donation targets. Both are Technosoftware's; change them here and
    * the buttons follow.

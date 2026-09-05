@@ -21,7 +21,6 @@ body:
     attributes:
       label: Which package
       options:
-        - CULItrail (meals, plans, orders)
         - APERtrail (trips, places, bookings)
         - NODAtrail (PARA, budgets, bills, ledger)
         - trail-core (the shared library)

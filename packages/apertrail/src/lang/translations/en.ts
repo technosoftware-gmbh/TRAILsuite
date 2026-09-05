@@ -1179,11 +1179,13 @@ export const enTranslations = {
       links: {
         github: 'APERtrail on GitHub',
         vendor: 'Technosoftware GmbH',
+        licensing: 'Commercial licence',
       },
       pluginInfo: {
         version: 'Version: {version}',
         author: 'Author: {author}',
         licence: 'Licence: {licence}',
+        usage: 'Free for personal use. Any use in or for a business needs a commercial licence.',
       },
     },
   },

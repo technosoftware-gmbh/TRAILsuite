@@ -805,6 +805,8 @@ export const enTranslations = {
     about: 'About',
     aboutBody:
       'NODAtrail is part of TRAILsuite, beside APERtrail for travel and CULItrail for the kitchen. All three share one library and one folder of Person and Company notes.',
+    aboutUsage: 'Free for personal use. Any use in or for a business needs a commercial licence.',
+    aboutLicensingLink: 'Commercial licence',
 
     vault: {
       heading: 'Vault setup',

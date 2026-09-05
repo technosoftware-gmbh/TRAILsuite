@@ -6,17 +6,20 @@ what any older design document proposed. Where a package's own docs disagree
 with its source, the source is what is written here and the disagreement is
 called out.
 
-One repository, four packages: a shared library and the three Obsidian plugins
-built on it.
+One repository, three packages: a shared library and the two Obsidian plugins
+built on it. **CULItrail moved to
+[its own repository](https://github.com/technosoftware-gmbh/CULItrail) in
+September 2026**; where this document says a thing is shared by three plugins,
+that is still true and one of the three now reads the shared pieces off npm and
+out of the vault rather than from a sibling directory.
 
 | Package | Plugin id | What it covers | Licence | Version |
 |---|---|---|---|---|
-| `packages/core` (`trail-core`) | not a plugin | The shared, Obsidian-free library | MIT | 0.1.0 |
-| `packages/culitrail` | `culitrail` | Meals, meal plans, orders, deliveries | GPL-3.0-or-later | 0.1.0 |
+| `packages/core` (`@technosoftware/trail-core`) | not a plugin | The shared, Obsidian-free library | MIT | 1.1.0 |
 | `packages/apertrail` | `apertrail` | Trips, places, photo spots | PolyForm Noncommercial 1.0.0 | 0.1.0 |
 | `packages/nodatrail` | `nodatrail` | PARA, periodic notes, budgets, bills, ledger | PolyForm Noncommercial 1.0.0 | 0.1.0 |
 
-All three plugins declare `minAppVersion: 1.12.0` and none is desktop-only.
+Both plugins declare `minAppVersion: 1.12.0` and neither is desktop-only.
 
 **NODAtrail is documented in its own tree** rather than repeated here:
 [`packages/nodatrail/docs/design/architecture.md`](../packages/nodatrail/docs/design/architecture.md)
@@ -487,7 +490,7 @@ configures one convention rather than two.
 wrote both from the same weight, so it could never state anything the row above
 it did not, and nothing ever read it back: a second name for one number is a
 second place for a reader to look and a second thing for a hand edit to
-contradict. `packages/culitrail/scripts/strip-default-serving-size.ts` takes it
+contradict. CULItrail's `scripts/strip-default-serving-size.ts` takes it
 off a vault that still carries it.
 
 `lastEaten` and `eatenCount` are **the one deliberate write-back across notes**:
@@ -839,12 +842,11 @@ file could enforce for itself:
 |---|---|
 | `package-boundary` (suite) | A package importing another package, in either direction |
 | `obsidian-free` (core) | A core file importing Obsidian or touching the DOM |
-| `crm-contract` (all three plugins) | A plugin's CRM defaults drifting from the shared contract |
-| `translation-keys` (all three plugins) | A key present in one language table and not the other, or an orphan |
-| `settings-coverage` (all three plugins) | A setting with no control on the settings page, or without a stated reason for having none |
-| `property-name-lock` (all three plugins) | A property-name row that skips the lock |
-| `stylesheet` (all three plugins) | A class in two rules, a dead rule, a class the source sets and the sheet does not style, a physical inline offset |
-| `legacy-id-markers` (culitrail) | Dropping support for an old id marker |
+| `crm-contract` (both plugins, and the core) | A plugin's CRM defaults drifting from the shared contract |
+| `translation-keys` (both plugins) | A key present in one language table and not the other, or an orphan |
+| `settings-coverage` (both plugins) | A setting with no control on the settings page, or without a stated reason for having none |
+| `property-name-lock` (both plugins) | A property-name row that skips the lock |
+| `stylesheet` (both plugins) | A class in two rules, a dead rule, a class the source sets and the sheet does not style, a physical inline offset |
 | `vault-smoke` (nodatrail) | A reader that works against invented frontmatter and not against a real vault |
 | `ui-conventions` (all three plugins) | A view querying the document for DOM it built itself, `innerHTML`, console logging, inline style assignment, a bare async event listener |
 | `icon-slot` (all three plugins) | `setIcon()` aimed at a button element rather than at a slot inside one |
@@ -892,7 +894,7 @@ Two environment notes that have cost real time:
 ```
                         packages/core (MIT)
               /                   |                   \
-  packages/culitrail    packages/apertrail    packages/nodatrail
+  packages/apertrail    packages/nodatrail
         (GPL)                (PolyForm)            (PolyForm)
               \                   |                   /
                      the shared CRM notes

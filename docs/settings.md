@@ -181,7 +181,7 @@ with no control *and a stated reason*, which is the shape APERtrail would need.
 
 | Plugin | Reference |
 |---|---|
-| CULItrail | `packages/culitrail/docs/design/settings-reference.md` |
+| CULItrail | [its own repository](https://github.com/technosoftware-gmbh/CULItrail/blob/main/docs/design/settings-reference.md) |
 | APERtrail | `packages/apertrail/docs/design/settings-reference.md` |
 | NODAtrail | `packages/nodatrail/docs/design/settings-reference.md` |
 

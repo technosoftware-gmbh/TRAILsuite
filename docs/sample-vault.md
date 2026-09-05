@@ -10,7 +10,7 @@ This page is about the second case. What each plugin seeds on its own is
 described in its own docs, and those pages are the ones to read for the content:
 
 - [APERtrail](../packages/apertrail/docs/design/sample-vault.md), 16 notes
-- [CULItrail](../packages/culitrail/docs/design/sample-vault.md), 15 notes
+- [CULItrail](https://github.com/technosoftware-gmbh/CULItrail/blob/main/docs/design/sample-vault.md), 15 notes
 - [NODAtrail](../packages/nodatrail/docs/design/sample-vault.md), 23 notes
 
 Everything seeded is in English, whatever the vault's language. Folder names and

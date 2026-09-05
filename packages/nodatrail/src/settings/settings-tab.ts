@@ -272,9 +272,13 @@ export class NODAtrailSettingTab extends PluginSettingTab {
 
     const about = sectionCard(this.containerEl, t('settings.about'));
     about.createEl('p', { cls: 'nod-settings-note', text: t('settings.aboutBody') });
+    // The licence text says what is permitted; this says it in the words
+    // somebody deciding whether they may use it at work would use.
+    about.createEl('p', { cls: 'nod-settings-note', text: t('settings.aboutUsage') });
     linkRow(about, { name: t('plugin.name') }, [
       { label: 'technosoftware.com', href: LINKS.homepage, icon: 'globe' },
       { label: 'GitHub', href: LINKS.repository, icon: 'github' },
+      { label: t('settings.aboutLicensingLink'), href: LINKS.licensing, icon: 'scale' },
     ]);
   }
 }

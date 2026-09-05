@@ -1209,11 +1209,14 @@ export const deTranslations: Translations = {
       links: {
         github: 'APERtrail auf GitHub',
         vendor: 'Technosoftware GmbH',
+        licensing: 'Kommerzielle Lizenz',
       },
       pluginInfo: {
         version: 'Version: {version}',
         author: 'Autor: {author}',
         licence: 'Lizenz: {licence}',
+        usage:
+          'Für die private Nutzung kostenlos. Jede geschäftliche Nutzung erfordert eine kommerzielle Lizenz.',
       },
     },
   },

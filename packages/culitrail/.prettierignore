@@ -1,7 +1,0 @@
-# Third-party code, kept verbatim so it can be re-synced against upstream.
-# See src/recipes/importer/vendor/recipe-scrapers/README.md.
-src/recipes/importer/vendor/
-
-# Build output and lockfiles.
-main.js
-package-lock.json

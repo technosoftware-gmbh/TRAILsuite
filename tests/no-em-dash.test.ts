@@ -76,9 +76,16 @@ const SKIP_DIRS = new Set([
 ]);
 
 /**
- * The one file that must contain the character, because it is where the rule is
- * written down. Excluded by shape -- any CLAUDE.md, anywhere -- rather than by
- * path, so a new package's copy needs no edit here.
+ * The instruction files, which used to be exempt.
+ *
+ * They were excluded because one of them stated the rule by showing the
+ * character. That copy left with CULItrail in September 2026, and the three
+ * that remain state it in words, so the exemption had nothing left to protect
+ * and this file said what to do about that: widen the sweep. They are checked
+ * like every other document now.
+ *
+ * If one of them ever has to show an em dash again, this is where the
+ * exemption goes back, and the test below is what will tell you.
  */
 const RULE_FILE = "CLAUDE.md";
 
@@ -112,16 +119,11 @@ function packageDirs(): string[] {
     .map((entry) => join(PACKAGES, entry.name));
 }
 
-/** Every `.md` at the top level of one directory, minus the file that states the rule. */
+/** Every `.md` at the top level of one directory. */
 function topLevelDocs(dir: string): string[] {
   if (!existsSync(dir)) return [];
   return readdirSync(dir, { withFileTypes: true })
-    .filter(
-      (entry) =>
-        entry.isFile() &&
-        extname(entry.name) === ".md" &&
-        entry.name !== RULE_FILE,
-    )
+    .filter((entry) => entry.isFile() && extname(entry.name) === ".md")
     .map((entry) => join(dir, entry.name));
 }
 
@@ -258,7 +260,7 @@ describe("the em-dash rule", () => {
     // findings, which looks exactly like a repository in good order.
     expect(TS_FILES.length).toBeGreaterThan(300);
     expect(TRANSLATION_FILES.length).toBeGreaterThanOrEqual(6);
-    expect(CSS_FILES.length).toBeGreaterThanOrEqual(3);
+    expect(CSS_FILES.length).toBeGreaterThanOrEqual(2);
     expect(MARKDOWN_FILES.length).toBeGreaterThan(30);
   });
 
@@ -286,21 +288,23 @@ describe("the em-dash rule", () => {
     expect(report(MARKDOWN_FILES.flatMap(markdownFindings))).toEqual([]);
   });
 
-  it("leaves the file that states the rule alone, and that file still states it", () => {
-    // Asserted rather than skipped, so the exemption stays a stated fact about
-    // unshipped instruction files instead of quietly becoming a habit. If this
-    // ever comes back empty, the sweep above should be widened to cover them.
-    const ruleFiles = [ROOT, ...packageDirs()]
+  it("sweeps the files that state the rule, because none of them shows it", () => {
+    // These were exempt while one of them wrote the character out to state the
+    // rule. That copy left with CULItrail; the three that remain say it in
+    // words. So the exemption is gone and this asserts the two halves of why:
+    // they are swept, and none of them needs to be.
+    const ruleFiles = packageDirs()
       .map((dir) => join(dir, RULE_FILE))
       .filter((path) => existsSync(path));
 
     expect(ruleFiles.length).toBeGreaterThan(0);
-    expect(MARKDOWN_FILES.filter((path) => path.endsWith(RULE_FILE))).toEqual(
-      [],
-    );
     expect(
-      ruleFiles.some((path) => readFileSync(path, "utf8").includes(EM_DASH)),
+      ruleFiles.every((path) => MARKDOWN_FILES.includes(path)),
+      "a CLAUDE.md the sweep does not reach",
     ).toBe(true);
+    expect(
+      ruleFiles.filter((path) => readFileSync(path, "utf8").includes(EM_DASH)),
+    ).toEqual([]);
   });
 });
 

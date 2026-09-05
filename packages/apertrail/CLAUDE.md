@@ -270,7 +270,7 @@ src/ui/           shared UI: components/, dashboard/, gallery/, settings/
   reads local getters and returns Dates at LOCAL midnight, never
   `toISOString()`.
 - **APERtrail is not the only reader of `CRM/`.** **CULItrail**
-  (`packages/culitrail`) reads the same two folders to answer what a person
+  (in its own repository) reads the same two folders to answer what a person
   ordered. The agreement is now code: the folder names, the `person`
   and `company` type values and the two tag properties come from `CRM_CONTRACT`
   in **trail-core** (`packages/core`), which both

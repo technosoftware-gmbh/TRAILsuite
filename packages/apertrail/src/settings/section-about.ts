@@ -28,6 +28,11 @@ export function renderSectionAbout(host: Plugin, containerEl: HTMLElement): void
     text: t('settings.about.links.github'),
     attr: { href: LINKS.plugin, target: '_blank', rel: 'noopener' },
   });
+  const licensing = links.createEl('li');
+  licensing.createEl('a', {
+    text: t('settings.about.links.licensing'),
+    attr: { href: LINKS.licensing, target: '_blank', rel: 'noopener' },
+  });
   const vendor = links.createEl('li');
   vendor.createEl('a', {
     text: t('settings.about.links.vendor'),
@@ -40,4 +45,7 @@ export function renderSectionAbout(host: Plugin, containerEl: HTMLElement): void
   });
   info.createDiv({ text: t('settings.about.pluginInfo.author', { author: host.manifest.author }) });
   info.createDiv({ text: t('settings.about.pluginInfo.licence', { licence: LICENCE }) });
+  // The licence text says what is permitted; this says it in the words somebody
+  // deciding whether they may use it at work would use.
+  info.createDiv({ text: t('settings.about.pluginInfo.usage') });
 }

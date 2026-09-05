@@ -34,7 +34,6 @@ const SKIP_DIRS = new Set(["node_modules", "dist", ".git", "vendor"]);
 /** Each plugin's display module: the one file allowed to bind the formatters. */
 const DISPLAY_MODULES = [
   join("apertrail", "src", "shared", "display.ts"),
-  join("culitrail", "src", "shared", "display.ts"),
   join("nodatrail", "src", "ui", "kit", "format.ts"),
 ];
 
@@ -158,7 +157,8 @@ const report = (findings: Finding[]): string[] =>
 
 describe("the display locale", () => {
   it("reads a meaningful number of plugin files", () => {
-    expect(FILES.length).toBeGreaterThan(300);
+    // Two plugins now rather than three; CULItrail left in September 2026.
+    expect(FILES.length).toBeGreaterThan(250);
 
     // The check below picks the files it inspects by reading their core
     // imports, so an extraction that quietly matches nothing would pass every
@@ -168,10 +168,10 @@ describe("the display locale", () => {
     // one alone is exactly how it went quiet the first time.
     const clauses = FILES.map((path) => coreImportClauses(readFileSync(path, "utf8")));
     const withCore = clauses.filter((found) => found.length > 0);
-    expect(withCore.length).toBeGreaterThan(180);
+    expect(withCore.length).toBeGreaterThan(120);
     expect(
       withCore.filter((found) => found.some((clause) => clause.includes("\n"))).length,
-    ).toBeGreaterThan(50);
+    ).toBeGreaterThan(40);
 
     for (const suffix of DISPLAY_MODULES) {
       expect(
@@ -230,8 +230,8 @@ describe("the display locale", () => {
     expect(report(findings)).toEqual([]);
   });
 
-  it("gives all three plugins the same setting, from the shared contract", () => {
-    for (const plugin of ["apertrail", "culitrail", "nodatrail"]) {
+  it("gives both plugins the same setting, from the shared contract", () => {
+    for (const plugin of ["apertrail", "nodatrail"]) {
       const defaults = readFileSync(
         join(PACKAGES, plugin, "src/settings/defaults.ts"),
         "utf8",

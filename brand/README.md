@@ -12,7 +12,7 @@ logo and icon artwork drawn from them.
 | File | For |
 |---|---|
 | `APERtrail-Logo.png`, `APERtrail-Icon.png` | Shipped. The plugin's own copy of the logo is `packages/apertrail/images/APERtrail-Logo.png` |
-| `CULItrail-Logo.png`, `CULItrail-Icon.png` | Shipped. The plugin's own copy is `packages/culitrail/images/CULItrail-Logo.png` |
+| `CULItrail-Logo.png`, `CULItrail-Icon.png` | Shipped. The plugin's own copy is in the CULItrail repository |
 | `NODAtrail-Logo.png`, `NODAtrail-Icon.png` | Shipped. The plugin's own copies are under `packages/nodatrail/images/` |
 
 These are full-resolution masters, several megabytes each, and are deliberately
@@ -62,6 +62,6 @@ If you place these three icons on your website or in your Obsidian vault, here i
 Copyright (c) 2026 Technosoftware GmbH, Switzerland
 (<https://technosoftware.com>). TRAILsuite, APERtrail, CULItrail, NODAtrail and
 TRAILcore are product names of Technosoftware GmbH. The artwork in this folder
-is not covered by any of the three package licences: those licence the code in
+is not covered by any of the package licences: those licence the code in
 `packages/`, and a licence to use a package is not a licence to use the marks.
 See the repository's [`NOTICE.md`](../NOTICE.md).

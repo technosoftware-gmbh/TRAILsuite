@@ -11,18 +11,18 @@
  * to be worth anything.
  *
  * Why it is a constant rather than two lists of literals: it was two lists of
- * literals. `packages/culitrail/src/settings/defaults.ts` and
- * `packages/nodatrail/src/settings/defaults.ts` each spelled all six, and
- * nothing compared them. Renaming one on either side left both suites green,
+ * literals: each plugin's own `settings/defaults.ts` spelled all six, and nothing
+ * compared them. Renaming one on either side left both suites green,
  * because each plugin tests its own reader against a fixture it writes itself.
  * The failure reaches a person as a ledger that reads every order as unpriced,
  * months later, which is the expensive shape in this repository.
  *
- * The reason it is fixed now rather than when somebody notices: CULItrail is
- * moving to its own repository. In one tree this is a duplication a reader can
- * find. Across two trees under two licences it is a contract with no shared
- * type, no shared test, and no reason for either side to look at the other
- * before renaming something.
+ * It was fixed just before CULItrail moved to its own repository, which is what
+ * made it urgent. In one tree it was a duplication a reader could find. Across
+ * two repositories under two licences it would have been a contract with no
+ * shared type, no shared test, and no reason for either side to look at the
+ * other before renaming something. That is now the situation, and this is what
+ * holds it together.
  *
  * As with the CRM contract, this is about DEFAULTS and not about configuration.
  * A vault renames any of these freely; what has to agree is what a fresh

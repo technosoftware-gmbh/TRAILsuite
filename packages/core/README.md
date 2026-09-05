@@ -6,7 +6,7 @@ A [Technosoftware GmbH](https://technosoftware.com) product, part of
 The shared, Obsidian-free core behind two Obsidian plugins:
 
 - **APERtrail** (`packages/apertrail`) - travel planning for photography
-- **CULItrail** (`packages/culitrail`) - ordered meals, meal plans, orders
+- **CULItrail** ([its own repository](https://github.com/technosoftware-gmbh/CULItrail)) - ordered meals, meal plans, orders
 
 Everything exported from this package is pure: no Obsidian, no DOM, no
 filesystem, no clock that cannot be injected. That is not tidiness. It is what

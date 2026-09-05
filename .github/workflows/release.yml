@@ -8,7 +8,7 @@
 # Here they are built from the tag, by `npm ci` and `npm run build`, and the
 # release is drafted from the same run.
 #
-# Tags name their package, because four packages share this repository:
+# Tags name their package, because three packages share this repository:
 # `nodatrail-v1.0.0`, not `v1.0.0`. `core-v*` is deliberately not matched here
 # -- the core has no manifest and no bundle, and it ships to npm from
 # `publish-core.yml` instead.
@@ -18,7 +18,6 @@ on:
   push:
     tags:
       - 'apertrail-v*'
-      - 'culitrail-v*'
       - 'nodatrail-v*'
 
 permissions:

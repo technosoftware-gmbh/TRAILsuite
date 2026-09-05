@@ -166,7 +166,6 @@ describe("the settings reference", () => {
     // without reading a single file.
     expect(PACKAGE_DOCS.map((p) => p.name).sort()).toEqual([
       "apertrail",
-      "culitrail",
       "nodatrail",
     ]);
     for (const doc of PACKAGE_DOCS) expect(doc.keys.length).toBeGreaterThan(20);

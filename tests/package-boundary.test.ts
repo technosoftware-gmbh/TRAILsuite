@@ -90,12 +90,7 @@ describe("package boundary", () => {
 
   it("finds the packages and their source", () => {
     // A guard on the guard: an empty walk would pass every assertion below.
-    expect(PACKAGE_NAMES.sort()).toEqual([
-      "apertrail",
-      "core",
-      "culitrail",
-      "nodatrail",
-    ]);
+    expect(PACKAGE_NAMES.sort()).toEqual(["apertrail", "core", "nodatrail"]);
     expect(files.length).toBeGreaterThan(250);
   });
 
@@ -134,13 +129,13 @@ describe("package boundary", () => {
   });
 
   it("lets every plugin depend on the core and none depend on another", () => {
-    for (const packageName of ["culitrail", "apertrail", "nodatrail"]) {
+    for (const packageName of ["apertrail", "nodatrail"]) {
       const manifest = JSON.parse(
         readFileSync(join(PACKAGES_DIR, packageName, "package.json"), "utf8"),
       ) as { dependencies?: Record<string, string> };
       const dependencies = Object.keys(manifest.dependencies ?? {});
       expect(dependencies).toContain("@technosoftware/trail-core");
-      for (const sibling of ["culitrail", "apertrail", "nodatrail"]) {
+      for (const sibling of ["apertrail", "nodatrail"]) {
         if (sibling === packageName) continue;
         expect(dependencies).not.toContain(sibling);
       }
@@ -150,7 +145,6 @@ describe("package boundary", () => {
   it("keeps each package licence stated in its own manifest and file", () => {
     const expected: Record<string, string> = {
       core: "MIT",
-      culitrail: "GPL-3.0-or-later",
       // SPDX identifiers, which is what the `license` field is read as. The
       // human spelling of this one lives in the About section of the settings
       // page, where a person reads it.

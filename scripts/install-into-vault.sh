@@ -11,7 +11,7 @@ set -euo pipefail
 VAULT="${1:?usage: install-into-vault.sh /path/to/Vault}"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-for plugin in culitrail apertrail nodatrail; do
+for plugin in apertrail nodatrail; do
   src="$ROOT/packages/$plugin"
   dest="$VAULT/.obsidian/plugins/$plugin"
   if [ ! -f "$src/main.js" ]; then

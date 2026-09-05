@@ -9,7 +9,7 @@ Use GitHub's private reporting form, which is enabled on this repository:
 It is private between you and the maintainers until an advisory is published.
 
 If you would rather use email, <support@technosoftware.com> reaches the same
-people. Say TRAILsuite in the subject.
+people. Say TRAILsuite in the subject. CULItrail has [its own repository](https://github.com/technosoftware-gmbh/CULItrail) and its own policy.
 
 What helps: which plugin and version, what an attacker can do that they should
 not be able to, and the smallest reproduction you can manage. A note or a
@@ -24,13 +24,11 @@ rather not be named.
 ## Supported versions
 
 The newest release of each package is the supported one. There is no long-term
-support branch: these are four packages at 1.0.0 and everything before that was
-private.
+support branch.
 
 | Package | Supported |
 |---|---|
-| `trail-core` | newest release |
-| `culitrail` | newest release |
+| `@technosoftware/trail-core` | newest release |
 | `apertrail` | newest release |
 | `nodatrail` | newest release |
 
@@ -38,7 +36,7 @@ private.
 
 Worth knowing before you look, because it is smaller than most:
 
-**None of the three plugins makes a network request.** There is no `fetch`, no
+**Neither plugin makes a network request.** There is no `fetch`, no
 `requestUrl`, no XMLHttpRequest and no WebSocket anywhere in the shipped
 source; the only URLs in the code are links a user clicks, which open in their
 browser. Release notes are compiled into the bundle at build time rather than
@@ -55,8 +53,8 @@ So the surface is local, and it is these three things:
    destroys content it was meant to leave alone, is a vulnerability in the
    sense that matters most for this project: a vault is somebody's records.
 3. **What they render.** Rendered vault content that could execute rather than
-   display. The `ui-conventions` test forbids `innerHTML` in all three plugins,
-   which is part of why.
+   display. The `ui-conventions` test forbids `innerHTML` in both plugins, which
+   is part of why.
 
 Out of scope: Obsidian itself, other plugins installed alongside these, and
 anything that requires an attacker to already have write access to the vault

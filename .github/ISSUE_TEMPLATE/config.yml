@@ -6,6 +6,9 @@ contact_links:
   - name: A question about using the plugins
     url: https://github.com/technosoftware-gmbh/TRAILsuite/blob/main/docs/user-guide.md
     about: The user guide covers the note formats and the everyday workflows. Read it before filing, and file if it does not answer you.
+  - name: CULItrail
+    url: https://github.com/technosoftware-gmbh/CULItrail
+    about: Meals, meal plans, orders and deliveries moved to their own repository in September 2026. File CULItrail issues there.
   - name: Anything else
     url: mailto:support@technosoftware.com
     about: Licensing, the contributor agreement, commercial use of the PolyForm packages.
