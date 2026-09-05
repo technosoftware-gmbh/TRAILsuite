@@ -122,6 +122,17 @@ Before adopting a file into `packages/core`, confirm it has no Recipe Box
 lineage. A file whose lineage cannot be established stays where it is. See
 `packages/core/NOTICE.md`.
 
+## Contributing
+
+[`CONTRIBUTING.md`](CONTRIBUTING.md) has the setup commands, the conventions the
+tests enforce, and the two things that can make a pull request unmergeable
+whatever else is right about it: the licence boundary above, and the contributor
+licence agreement Technosoftware asks for before merging code.
+
+Security problems do not go in an issue. [`SECURITY.md`](SECURITY.md) says where
+they go, and describes an attack surface that is smaller than most: none of the
+three plugins makes a network request.
+
 ## Ownership
 
 Copyright (c) 2026 Technosoftware GmbH, Switzerland
