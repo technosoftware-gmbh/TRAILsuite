@@ -17,7 +17,12 @@
  * two-folder tree above; set it to e.g. `4 Resources/Eating` and the whole
  * tree moves underneath that in one step.
  */
-import { CRM_CONTRACT, DISPLAY_CONTRACT, joinFolder as joinOneFolder } from 'trail-core';
+import {
+  CRM_CONTRACT,
+  DISPLAY_CONTRACT,
+  ORDER_CONTRACT,
+  joinFolder as joinOneFolder,
+} from 'trail-core';
 import { CULItrailSettings, CustomBadge, ReheatAppliance } from './types';
 import { I18nManager, t } from '../lang/I18nManager';
 
@@ -193,7 +198,11 @@ export const DEFAULT_SETTINGS: CULItrailSettings = {
   mealsFolder: 'Eating/Meals',
   additionalMealFolders: [],
   mealPlansFolder: 'Eating/Meal Plans',
-  ordersFolder: 'Eating/Orders',
+  // From trail-core's ORDER_CONTRACT: NODAtrail reads order notes out of this
+  // folder to price a card statement, so where they are is an agreement rather
+  // than this plugin's choice alone. tests/order-contract.test.ts fails if it
+  // stops matching.
+  ordersFolder: ORDER_CONTRACT.ordersFolder,
   deliveriesFolder: 'Eating/Deliveries',
 
   crmFolder: 'CRM',
@@ -205,7 +214,7 @@ export const DEFAULT_SETTINGS: CULItrailSettings = {
 
   typePropertyName: CRM_CONTRACT.typePropertyName,
   mealTypeValue: 'meal',
-  orderTypeValue: 'order',
+  orderTypeValue: ORDER_CONTRACT.orderTypeValue,
   deliveryTypeValue: 'delivery',
   // From trail-core's CRM_CONTRACT, not spelled here: APERtrail has to ship the
   // identical values for both plugins to find each other's Person and Company
@@ -352,13 +361,16 @@ export const DEFAULT_SETTINGS: CULItrailSettings = {
   mealLineOptions: [],
   mealSupplierRole: '',
 
-  orderCompanyProperty: 'company',
-  orderDateProperty: 'orderDate',
+  // Company, date, price and currency are the four facts NODAtrail reads off an
+  // order. They are contract values for that reason; the properties around them
+  // that nothing else reads are this plugin's own.
+  orderCompanyProperty: ORDER_CONTRACT.orderCompanyProperty,
+  orderDateProperty: ORDER_CONTRACT.orderDateProperty,
   orderDeliveryDateProperty: 'deliveryDate',
-  orderPriceProperty: 'price',
+  orderPriceProperty: ORDER_CONTRACT.orderPriceProperty,
   orderDiscountProperty: 'discount',
   orderShippingProperty: 'shipping',
-  orderPriceCurrencyProperty: 'priceCurrency',
+  orderPriceCurrencyProperty: ORDER_CONTRACT.orderPriceCurrencyProperty,
   displayLocale: DISPLAY_CONTRACT.displayLocale,
   orderDefaultCurrency: 'CHF',
   orderSelectionsProperty: 'selections',

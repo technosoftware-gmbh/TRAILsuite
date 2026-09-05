@@ -20,7 +20,7 @@
  * into `1 Areas/6 Finanzen` would be writing into somebody's filing rather than
  * beside it. A bill note links to its document wherever that document lives.
  */
-import { CRM_CONTRACT, DISPLAY_CONTRACT, joinFolder } from 'trail-core';
+import { CRM_CONTRACT, DISPLAY_CONTRACT, ORDER_CONTRACT, joinFolder } from 'trail-core';
 import { NODAtrailSettings } from './types';
 import { I18nManager, t } from '../lang/I18nManager';
 
@@ -239,14 +239,17 @@ export const DEFAULT_SETTINGS: NODAtrailSettings = {
   companyCategoryProperty: 'category',
   companyPaymentProviderProperty: 'paymentProvider',
 
-  // CULItrail's own defaults. Adopted from its settings when it is installed,
-  // and a reasonable guess when it is not.
-  ordersFolder: 'Eating/Orders',
-  orderTypeValue: 'order',
-  orderCompanyProperty: 'company',
-  orderDateProperty: 'orderDate',
-  orderPriceProperty: 'price',
-  orderPriceCurrencyProperty: 'priceCurrency',
+  // CULItrail's own defaults, held in trail-core's ORDER_CONTRACT so both sides
+  // ship one set of values rather than two lists of literals that nothing
+  // compares. Adopted from the sibling's settings when it is installed; when it
+  // is not, these are what an order note written by a fresh CULItrail looks
+  // like. tests/order-contract.test.ts fails if this stops matching.
+  ordersFolder: ORDER_CONTRACT.ordersFolder,
+  orderTypeValue: ORDER_CONTRACT.orderTypeValue,
+  orderCompanyProperty: ORDER_CONTRACT.orderCompanyProperty,
+  orderDateProperty: ORDER_CONTRACT.orderDateProperty,
+  orderPriceProperty: ORDER_CONTRACT.orderPriceProperty,
+  orderPriceCurrencyProperty: ORDER_CONTRACT.orderPriceCurrencyProperty,
 
   budgetPeriodProperty: 'period',
   budgetCurrencyProperty: 'currency',
