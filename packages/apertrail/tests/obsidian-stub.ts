@@ -17,6 +17,7 @@ function unmocked(name: string): never {
   throw new Error(`obsidian.${name}() called without vi.mock('obsidian') in the suite.`);
 }
 
+export const getLanguage = (): never => unmocked('getLanguage');
 export const stringifyYaml = (): never => unmocked('stringifyYaml');
 export const normalizePath = (): never => unmocked('normalizePath');
 

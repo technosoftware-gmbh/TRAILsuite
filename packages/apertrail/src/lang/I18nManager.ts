@@ -15,7 +15,7 @@
  * transit modes and the type literals stay English identifiers in the
  * frontmatter and are only translated on their way to the screen.
  */
-import { App, Plugin } from 'obsidian';
+import { App, Plugin, getLanguage } from 'obsidian';
 import { FALLBACK_LOCALE, LOCALES, localeEntry } from './translations';
 import { LocaleData, LocaleEntry, SupportedLocale } from './types';
 import { isPluralForms, selectPluralForm } from './plural';
@@ -97,6 +97,7 @@ export class I18nManager {
   private detectUserLocale(): string {
     try {
       const candidates = [
+        this.getObsidianLanguage(),
         this.getMomentLocale(),
         activeDocument?.documentElement?.lang,
         (this.app as ObsidianAppWithConfig).vault?.config?.userInterfaceMode,
@@ -117,6 +118,34 @@ export class I18nManager {
     }
 
     return FALLBACK_LOCALE;
+  }
+
+  /**
+   * Obsidian's own language first, then the ambient signals.
+   *
+   * `getLanguage()` is the only one of these that reports what the vault
+   * owner told **Obsidian** they read. Everything below it reports what they
+   * told their operating system, and the two disagree constantly: a Swiss Mac
+   * running Obsidian in English answers `de-CH` to moment and to
+   * `navigator.language`, and this file's own header promises to follow
+   * Obsidian rather than a setting of its own.
+   *
+   * That mattered more than a mistranslated label. The folder defaults are
+   * localized, so a vault set up in English on a German-configured machine had
+   * German folders invented for it, beside the English ones it already had,
+   * and `preferExisting` then kept both. Folder names are written into
+   * somebody's vault and nothing renames them afterwards.
+   *
+   * Available since Obsidian 1.8.7 and the manifest floor is 1.12.0, so it is
+   * always there. Called through a guard anyway, because the cost is one
+   * `typeof` and the failure it prevents is a crash on load.
+   */
+  private getObsidianLanguage(): string | null {
+    try {
+      return typeof getLanguage === 'function' ? getLanguage() : null;
+    } catch {
+      return null;
+    }
   }
 
   private getMomentLocale(): string | null {

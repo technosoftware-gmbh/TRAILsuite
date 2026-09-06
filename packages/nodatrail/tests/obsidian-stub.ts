@@ -32,5 +32,6 @@ export class TFile {
   extension = 'md';
 }
 
+export const getLanguage = (): never => unmocked('getLanguage');
 export const stringifyYaml = (): never => unmocked('stringifyYaml');
 export const normalizePath = (): never => unmocked('normalizePath');
