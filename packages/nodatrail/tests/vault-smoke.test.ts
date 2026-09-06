@@ -142,7 +142,22 @@ describe.skipIf(!available)('the real vault', () => {
     for (const note of areas) {
       const area = parseArea(note.frontmatter, commonProperties(S));
       expect(note.frontmatter[S.typePropertyName]).toBe(S.areaTypeValue);
-      expect(area.priority, note.title).not.toBeNull();
+
+      // A priority is optional and a null one is a stated state, not a gap:
+      // `write.ts` omits the property when there is none, `types.ts` says null
+      // sorts after every stated one, `byPriority` implements that, and the
+      // strip renderer guards on it. This asserted `not.toBeNull()` until
+      // September 2026 and passed only because the vault it was written
+      // against happened to have a priority on every area. The first vault
+      // without one failed it, and nothing was wrong.
+      //
+      // What is worth checking is the reader rather than the data: a note that
+      // states a priority must come back with one. A stated value silently
+      // read as null is the real defect, and it is the one this could not see.
+      const stated = note.frontmatter[commonProperties(S).priorityProperty];
+      if (stated !== undefined && stated !== null && stated !== '') {
+        expect(area.priority, note.title).not.toBeNull();
+      }
     }
   });
 
