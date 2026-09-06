@@ -16,3 +16,9 @@ claude-project-bundle/
 # instead of happening. Nothing in it is source, and the eslint configs ignore it
 # for the same reason.
 _to_delete/
+
+# A vault's own folder, which only ever lands here by accident:
+# `install-into-vault.sh <path>` given a relative path writes
+# `<path>/.obsidian/plugins/...` inside the repository rather than into a vault.
+# That happened once and was committed before anybody noticed.
+.obsidian/
