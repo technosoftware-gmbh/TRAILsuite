@@ -771,3 +771,60 @@ being handed to the booking that supersedes it. And the four costs
 (stop, night, leg, and the booking note itself) still meet in exactly one
 place, `costs/estimates.ts`, so the block, the sheet and the itinerary cannot
 count different things.
+
+## 17. Prices to choose between, and things that may not happen
+
+Two shapes a priced line can take, added when the Nordkap trip needed both. A
+voyage was offered as two cabin categories at two prices, and nearly every day
+of the same brochure offered an excursion that may or may not be taken. They
+look alike in a note and are different questions, so they are two sub-keys
+rather than one.
+
+### 17.1 Variants are alternatives
+
+`variants:` is the several prices one thing is sold at: a cabin category, a
+room category, a two-hour or four-hour version of the same excursion. **They
+are never summed.** Exactly one is bought, and a total that added two of them
+would report a holiday nobody is taking -- the same class of lie §1 exists to
+prevent.
+
+Three rules follow, all in `costs/line-variants.ts` so that the itinerary row,
+the cost chip, the estimates and the trip document cannot answer them
+differently:
+
+- **The chosen one counts.** One, or none: a set of alternatives with two ticks
+  is not a choice, and the note would not say which figure the budget used.
+- **Until one is chosen, the first counts, and every row that shows the figure
+  says so.** Counting nothing would leave the largest figure on a trip out of
+  its own budget for as long as the trip is being decided, which is exactly the
+  argument §7.1 makes for `estimate` counting as committed. The note's own
+  order picks it, because an operator lists its cabins in the order it means
+  them to be read.
+- **A line with variants is priced from them; its own `cost` is not read.**
+  Otherwise the same thing counts twice. The editors move an existing figure
+  into the first variant rather than leaving a field nothing reads.
+
+### 17.2 Optional is the other axis
+
+`optional: true` says the line might not happen. It is priced like any other
+line and **stays out of the planned total** until `chosen: true` says somebody
+decided on it. Deciding sets `chosen` rather than clearing `optional`, so the
+note keeps the fact that it was an extra, which is what the trip document
+prints.
+
+What the untaken extras would add is its own figure beside the plan --
+`optionalTotal()` in `costs/estimates.ts`, shown on the costs block, the cost
+sheet and the trip document. Three properties of that figure are deliberate:
+
+- It goes through the same `plannedByCategory()`/`plannedTotal()` pair as the
+  plan, with no budget to compare against, so the currency rule is identical at
+  both ends: an estimate in another currency is skipped rather than converted
+  at a rate the reader cannot check.
+- It is null rather than zero when the trip offers nothing, like every other
+  total here.
+- It never reaches `estimateLines()`. That is the line to hold: an untaken
+  extra that got through would be counted as committed, would move the
+  variance, and would arrive in the settlement as a debt nobody owes.
+
+**An optional line with variants is both at once and needs no special case**:
+out of the plan until chosen, priced from its variants when it is in.

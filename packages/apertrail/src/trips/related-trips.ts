@@ -61,3 +61,19 @@ export function tripsWithPerson(board: TravelBoard, title: string): RelatedTripV
     .map((trip) => ({ trip, stops: [] }))
     .sort(byDepartureDesc);
 }
+
+/**
+ * Trips with a leg taken on `title`, most recent first.
+ *
+ * Matched against the leg's raw `vehicleTitle` rather than its resolved
+ * vehicle, for the reason `tripsWithPerson` matches raw names: a ship somebody
+ * typed the name of, with no note behind it, is still the ship they sailed on.
+ * The stops list is empty by construction -- being aboard is a fact about the
+ * leg, and the leg is not a stop.
+ */
+export function tripsOnVehicle(board: TravelBoard, title: string): RelatedTripVisit[] {
+  return board.trips
+    .filter((trip) => trip.transport.some((leg) => leg.vehicleTitle === title))
+    .map((trip) => ({ trip, stops: [] }))
+    .sort(byDepartureDesc);
+}

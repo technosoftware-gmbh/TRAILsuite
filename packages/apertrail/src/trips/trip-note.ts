@@ -28,6 +28,7 @@
  */
 import {
   normalizeCurrency,
+  readBooleanLike,
   readDateLike,
   readDateTimeLike,
   readNumberLike,
@@ -56,7 +57,7 @@ export function isTravelStatusValue(value: unknown): value is TravelStatusValue 
 }
 
 /** One itinerary entry. `place` may point at a City or any of the four place types -- see parseTripRecord's own note on why those share one bucket. */
-export interface TripStopInput {
+export interface TripStopInput extends TripLineChoiceInput {
   placeTitle: string;
   /** Which day of the trip, for a stop on a trip that has no dates yet. Null for a stop that names its own date. */
   day: number | null;
@@ -82,7 +83,7 @@ export interface TripStopInput {
   persons: string[];
 }
 
-export interface TripNightInput {
+export interface TripNightInput extends TripLineChoiceInput {
   accommodationTitle: string;
   /** Which day of the trip the stay begins and ends on, for a trip that has no dates yet. */
   checkInDay: number | null;
@@ -102,8 +103,44 @@ export const TRIP_LEG_DIRECTIONS = ['outbound', 'inbound'] as const;
 /** Transport modes offered by the editor. Free text on read, so a hand-written note may carry anything. */
 export const TRIP_LEG_MODES = ['train', 'plane', 'car', 'bus', 'boat', 'other'] as const;
 
-export interface TripLegInput {
+/**
+ * One of the several prices a line is sold at, as the editor hands it over.
+ *
+ * A cabin category on a voyage, a room category in a hotel, a two-hour or a
+ * four-hour version of the same excursion. The thing itself is the same on the
+ * same day; only the price and what you get for it differ, which is why a
+ * variant carries a price and a description and nothing about when or where
+ * the line happens.
+ */
+export interface TripVariantInput {
+  name: string | null;
+  /** What this one includes, in the words the operator used. */
+  description: string | null;
+  cost: number | null;
+  currency: string | null;
+  costUnit: CostUnit;
+  /** True on the one that has been settled on, and on no more than one. */
+  chosen: boolean;
+}
+
+/**
+ * What every priced line can say beyond its own figure.
+ *
+ * A stop, a stay and a leg all take these, the same way all three already take
+ * the four money sub-keys. `variants` are prices for one thing, of which
+ * exactly one is bought; `optional` says the line might not happen at all, and
+ * `chosen` is what settles that it will. See trips/costs/line-variants.ts.
+ */
+export interface TripLineChoiceInput {
+  variants: TripVariantInput[];
+  optional: boolean;
+  chosen: boolean;
+}
+
+export interface TripLegInput extends TripLineChoiceInput {
   direction: TripLegDirection;
+  /** The ship or named train it is taken on, by title. Separate from the carrier, which is who runs it. */
+  vehicleTitle: string | null;
   mode: string | null;
   /** Who runs it: an airline, a railway, a named train. */
   carrier: string | null;
@@ -238,6 +275,28 @@ export interface TripPropertyNames {
   legCurrencyField: string;
   legCostUnitField: string;
   legPersonsField: string;
+  legVehicleField: string;
+  /**
+   * What a priced line can say beyond its own figure: the variants it is sold
+   * at, whether it is optional, and whether an optional one has been chosen.
+   * The names inside a variant are shared across the three lists; see
+   * settings/types.ts for why.
+   */
+  stopVariantsField: string;
+  nightVariantsField: string;
+  legVariantsField: string;
+  variantNameField: string;
+  variantDescriptionField: string;
+  variantCostField: string;
+  variantCurrencyField: string;
+  variantCostUnitField: string;
+  variantChosenField: string;
+  stopOptionalField: string;
+  nightOptionalField: string;
+  legOptionalField: string;
+  stopChosenField: string;
+  nightChosenField: string;
+  legChosenField: string;
   /** The trip's own money: which currency it plans in, its per-category ceiling, and the rates it converts foreign bookings at. */
   tripCurrencyProperty: string;
   budgetProperty: string;
@@ -330,6 +389,77 @@ function cleanString(value: string | null | undefined): string | null {
 }
 
 /**
+ * A line's variants, as frontmatter entries, dropping the ones that say
+ * nothing.
+ *
+ * A variant with neither a name nor a price is an empty row somebody opened
+ * and left, exactly like the content-free leg the writer drops, and for the
+ * same reason: opening an editor must not write anything into a note.
+ *
+ * `chosen` is written only where it is true. False on every variant is the
+ * ordinary state of a choice nobody has made yet, and writing `chosen: false`
+ * five times would say it five times over.
+ */
+function variantEntries(
+  variants: TripVariantInput[] | undefined,
+  p: TripPropertyNames
+): Record<string, unknown>[] {
+  return (variants ?? [])
+    .filter((variant) => cleanString(variant.name) !== null || variant.cost !== null)
+    .map((variant) => {
+      const entry: Record<string, unknown> = {};
+      const name = cleanString(variant.name);
+      const description = cleanString(variant.description);
+      if (name) entry[p.variantNameField] = name;
+      if (description) entry[p.variantDescriptionField] = description;
+      writeLineCost(
+        entry,
+        { cost: variant.cost, currency: variant.currency, costUnit: variant.costUnit },
+        {
+          cost: p.variantCostField,
+          currency: p.variantCurrencyField,
+          unit: p.variantCostUnitField,
+        }
+      );
+      if (variant.chosen) entry[p.variantChosenField] = true;
+      return entry;
+    });
+}
+
+/**
+ * The three sub-keys every priced line shares beyond its money, written onto
+ * an entry that is already built.
+ *
+ * Written last, after the line's own fields, because that is the order they
+ * are read in: what the line is, then what it costs, then what is still open
+ * about it.
+ *
+ * **Both flags are written only when true.** `optional: false` on every
+ * ordinary stop of a fifteen-day trip would be forty lines of frontmatter
+ * saying nothing, and `chosen` means nothing at all on a line that is not
+ * optional -- so a line that is not optional never writes it, whatever the
+ * editor happens to be holding.
+ */
+function writeLineChoice(
+  entry: Record<string, unknown>,
+  line: Partial<TripLineChoiceInput>,
+  fields: { variants: string; optional: string; chosen: string },
+  p: TripPropertyNames
+): void {
+  const variants = variantEntries(line.variants, p);
+  if (variants.length > 0) entry[fields.variants] = variants;
+  if (line.optional) {
+    entry[fields.optional] = true;
+    if (line.chosen) entry[fields.chosen] = true;
+  }
+}
+
+/** Whether a line says anything through the three shared sub-keys, for the writers that drop an entry saying nothing at all. */
+function hasLineChoice(line: Partial<TripLineChoiceInput>, p: TripPropertyNames): boolean {
+  return variantEntries(line.variants, p).length > 0 || line.optional === true;
+}
+
+/**
  * The four cost sub-keys a stop, a night and a leg all write the same way.
  *
  * The unit is written whenever there is a figure, including when it is
@@ -353,7 +483,8 @@ function writeLineCost(
     costUnit?: CostUnit;
     persons?: string[];
   },
-  fields: { cost: string; currency: string; unit: string; persons: string }
+  /** `persons` is omitted by a line that has no party of its own: a leg's fare is a price, and who is travelling is a fact about the leg above it. */
+  fields: { cost: string; currency: string; unit: string; persons?: string }
 ): void {
   if (line.cost !== null && line.cost !== undefined) {
     entry[fields.cost] = line.cost;
@@ -367,7 +498,9 @@ function writeLineCost(
   const persons = (line.persons ?? [])
     .map((person) => cleanString(person))
     .filter((p2) => p2 !== null);
-  if (persons.length > 0) entry[fields.persons] = persons.map((person) => toWikilink(person));
+  if (persons.length > 0 && fields.persons) {
+    entry[fields.persons] = persons.map((person) => toWikilink(person));
+  }
 }
 
 /**
@@ -464,7 +597,15 @@ export function buildTripFrontmatter(input: TripFrontmatterInput): Record<string
   // dropped. Every sub-key is omitted individually when absent, the place
   // included now.
   const stops = input.stops
-    .filter((stop) => cleanString(stop.placeTitle) !== null || cleanString(stop.note) !== null)
+    .filter(
+      (stop) =>
+        cleanString(stop.placeTitle) !== null ||
+        cleanString(stop.note) !== null ||
+        // An excursion offered in three lengths and named by none of them is
+        // still work somebody has done, the same argument the leg's own
+        // filter makes.
+        hasLineChoice(stop, p)
+    )
     .map((stop) => {
       const entry: Record<string, unknown> = {};
       const place = cleanString(stop.placeTitle);
@@ -488,6 +629,12 @@ export function buildTripFrontmatter(input: TripFrontmatterInput): Record<string
         unit: p.stopCostUnitField,
         persons: p.stopPersonsField,
       });
+      writeLineChoice(
+        entry,
+        stop,
+        { variants: p.stopVariantsField, optional: p.stopOptionalField, chosen: p.stopChosenField },
+        p
+      );
       return entry;
     });
   if (stops.length > 0) yaml[p.stopsProperty] = stops;
@@ -534,6 +681,16 @@ export function buildTripFrontmatter(input: TripFrontmatterInput): Record<string
         unit: p.nightCostUnitField,
         persons: p.nightPersonsField,
       });
+      writeLineChoice(
+        entry,
+        night,
+        {
+          variants: p.nightVariantsField,
+          optional: p.nightOptionalField,
+          chosen: p.nightChosenField,
+        },
+        p
+      );
       return entry;
     });
   if (nights.length > 0) yaml[p.nightsProperty] = nights;
@@ -552,10 +709,15 @@ export function buildTripFrontmatter(input: TripFrontmatterInput): Record<string
         isoDateTimeValue(leg.from) !== null ||
         isoDateTimeValue(leg.to) !== null ||
         cleanString(leg.reference) !== null ||
+        cleanString(leg.vehicleTitle) !== null ||
         cleanString(leg.origin) !== null ||
         cleanString(leg.destination) !== null ||
         leg.cost !== null ||
-        (leg.persons?.length ?? 0) > 0
+        (leg.persons?.length ?? 0) > 0 ||
+        // A leg whose only content is the prices it can be bought at is a leg
+        // somebody has done real work on, so it is worth keeping even before
+        // it says where it goes.
+        hasLineChoice(leg, p)
     )
     .map((leg) => {
       const entry: Record<string, unknown> = { [p.legDirectionField]: leg.direction };
@@ -573,6 +735,8 @@ export function buildTripFrontmatter(input: TripFrontmatterInput): Record<string
       if (from) entry[p.legFromField] = from;
       if (to) entry[p.legToField] = to;
       if (reference) entry[p.legReferenceField] = reference;
+      const vehicle = cleanString(leg.vehicleTitle);
+      if (vehicle) entry[p.legVehicleField] = toWikilink(vehicle);
       const origin = cleanString(leg.origin);
       const destination = cleanString(leg.destination);
       if (origin) entry[p.legOriginField] = origin;
@@ -583,6 +747,18 @@ export function buildTripFrontmatter(input: TripFrontmatterInput): Record<string
         unit: p.legCostUnitField,
         persons: p.legPersonsField,
       });
+      // After the leg's own figure rather than instead of it: the reader
+      // ignores `cost` once there are variants, and the editor moves the
+      // figure into the first variant when one is added, so the two are not
+      // written together by any path the plugin owns. A note that carries
+      // both by hand is not corrected here -- a write is not the place to
+      // delete a number somebody typed.
+      writeLineChoice(
+        entry,
+        leg,
+        { variants: p.legVariantsField, optional: p.legOptionalField, chosen: p.legChosenField },
+        p
+      );
       return entry;
     });
   if (transport.length > 0) yaml[p.transportProperty] = transport;
@@ -642,6 +818,49 @@ function readLines(raw: unknown): string[] {
 }
 
 /** Frontmatter list entries, as plain records -- anything that isn't an object is skipped rather than coerced. */
+/**
+ * The three shared sub-keys off one entry: its variants, and the two flags.
+ *
+ * One reader for all three lists, because a variant is one shape wherever it
+ * appears. A variant with neither a name nor a price says nothing anybody
+ * could choose between and is dropped rather than rendered as a blank row;
+ * everything else is kept in the note's own order, which is information -- an
+ * operator lists its cabins in the order it means them to be read.
+ *
+ * `chosen` is read only on an optional line. On any other line the word means
+ * nothing, and honouring it there would give a stop two ways of saying it is
+ * in the plan, one of which nothing writes.
+ */
+function readLineChoice(
+  entry: Record<string, unknown>,
+  fields: { variants: string; optional: string; chosen: string },
+  p: TripPropertyNames
+): ParsedTripLineChoice {
+  const optional = readBooleanLike(entry[fields.optional]) === true;
+  return {
+    variants: objectEntries(entry[fields.variants]).flatMap((variant) => {
+      const name = readString(variant[p.variantNameField]);
+      const cost = readNumberLike(variant[p.variantCostField]);
+      if (name === null && cost === null) return [];
+      return [
+        {
+          name,
+          description: readString(variant[p.variantDescriptionField]),
+          cost,
+          currency: normalizeCurrency(readString(variant[p.variantCurrencyField])),
+          costUnit: parseCostUnit(readString(variant[p.variantCostUnitField])),
+          // Null reads as false: a variant nobody has marked is one nobody
+          // has chosen, which is the ordinary state of a choice still being
+          // made.
+          chosen: readBooleanLike(variant[p.variantChosenField]) === true,
+        },
+      ];
+    }),
+    optional,
+    chosen: optional && readBooleanLike(entry[fields.chosen]) === true,
+  };
+}
+
 function objectEntries(raw: unknown): Record<string, unknown>[] {
   if (!Array.isArray(raw)) return [];
   return raw.filter(
@@ -656,7 +875,23 @@ export interface ParsedTripDay {
   note: string | null;
 }
 
-export interface ParsedTripStop {
+/**
+ * What every priced line says beyond its own figure, as the note carries it.
+ *
+ * `variants` are the several prices one thing is sold at, in the note's own
+ * order; when the list is not empty the line is priced from it and the line's
+ * own `cost` is not read, because counting both would count the same thing
+ * twice. `optional` says the line might not happen -- most of a brochure day
+ * is exactly this -- and such a line joins the plan only once `chosen` says
+ * somebody decided on it. See trips/costs/line-variants.ts.
+ */
+export interface ParsedTripLineChoice {
+  variants: ParsedTripVariant[];
+  optional: boolean;
+  chosen: boolean;
+}
+
+export interface ParsedTripStop extends ParsedTripLineChoice {
   /** Which day of the trip, or null for a stop that names its own date. See `relative-days.ts`. */
   day: number | null;
   /** True when the entry names a place that did not parse, as against naming none at all. A typo has to stay visible; a line that is only a time and a sentence has nothing to warn about. */
@@ -673,7 +908,7 @@ export interface ParsedTripStop {
   persons: string[];
 }
 
-export interface ParsedTripNight {
+export interface ParsedTripNight extends ParsedTripLineChoice {
   /** Which day of the trip the stay begins and ends on, or null for one that names its own dates. */
   checkInDay: number | null;
   checkOutDay: number | null;
@@ -711,7 +946,19 @@ export interface TripRateInput {
   rate: number | null;
 }
 
-export interface ParsedTripLeg {
+/** One of the several prices a line is sold at, as the note carries it. */
+export interface ParsedTripVariant {
+  /** What it is called: "Polar Aussenkabine". Null for one nobody has named, which still has a price to state. */
+  name: string | null;
+  description: string | null;
+  cost: number | null;
+  currency: string | null;
+  costUnit: CostUnit;
+  /** True only where the note says so. Nothing derives it: an unmade choice is a fact worth keeping. */
+  chosen: boolean;
+}
+
+export interface ParsedTripLeg extends ParsedTripLineChoice {
   /** Which day of the trip the leg leaves and arrives on, or null for one that names its own dates. */
   day: number | null;
   toDay: number | null;
@@ -737,6 +984,16 @@ export interface ParsedTripLeg {
   /** What the figure is per. A ticket is quoted per passenger, so two people on a leg is two fares. */
   costUnit: CostUnit;
   persons: string[];
+  /**
+   * The vehicle this leg is taken on, as written: a wikilink read down to its
+   * target.
+   *
+   * Separate from `carrier` on purpose. That field was documented as "the
+   * airline, the railway, or the train's own name", and the "or" was two facts
+   * wearing one field: Hurtigruten runs the voyage, MS Trollfjord is the ship
+   * you are on, and a leg often wants to say both.
+   */
+  vehicleTitle: string | null;
 }
 
 /** One picture in a trip's gallery, as the note carries it. */
@@ -857,6 +1114,15 @@ export function parseTripRecord(input: ParseTripRecordInput): ParsedTripRecord {
         currency: normalizeCurrency(readString(entry[p.stopCurrencyField])),
         costUnit: parseCostUnit(readString(entry[p.stopCostUnitField])),
         persons: wikilinkTargets(entry[p.stopPersonsField]),
+        ...readLineChoice(
+          entry,
+          {
+            variants: p.stopVariantsField,
+            optional: p.stopOptionalField,
+            chosen: p.stopChosenField,
+          },
+          p
+        ),
       };
     }),
     nights: objectEntries(fm[p.nightsProperty]).map((entry) => ({
@@ -869,6 +1135,15 @@ export function parseTripRecord(input: ParseTripRecordInput): ParsedTripRecord {
       currency: normalizeCurrency(readString(entry[p.nightCurrencyField])),
       costUnit: parseCostUnit(readString(entry[p.nightCostUnitField])),
       persons: wikilinkTargets(entry[p.nightPersonsField]),
+      ...readLineChoice(
+        entry,
+        {
+          variants: p.nightVariantsField,
+          optional: p.nightOptionalField,
+          chosen: p.nightChosenField,
+        },
+        p
+      ),
     })),
     currency: normalizeCurrency(readString(fm[p.tripCurrencyProperty])),
     budget: objectEntries(fm[p.budgetProperty]).map((entry) => ({
@@ -907,12 +1182,21 @@ export function parseTripRecord(input: ParseTripRecordInput): ParsedTripRecord {
         // A wikilink reads down to its target so `[[Zürich]]` and `Zürich`
         // arrive the same, and the renderer links whichever the vault has a
         // note for. Most airports never will.
+        // A wikilink read down to its target, like the carrier beside it. A
+        // vehicle that has no note reads as its plain text rather than as
+        // nothing, so a ship somebody only typed the name of still prints.
+        vehicleTitle: placeLabel(entry[p.legVehicleField]),
         origin: placeLabel(entry[p.legOriginField]),
         destination: placeLabel(entry[p.legDestinationField]),
         cost: readNumberLike(entry[p.legCostField]),
         currency: normalizeCurrency(readString(entry[p.legCurrencyField])),
         costUnit: parseCostUnit(readString(entry[p.legCostUnitField])),
         persons: wikilinkTargets(entry[p.legPersonsField]),
+        ...readLineChoice(
+          entry,
+          { variants: p.legVariantsField, optional: p.legOptionalField, chosen: p.legChosenField },
+          p
+        ),
       };
     }),
   };

@@ -248,6 +248,32 @@ presence means something wherever it shows: a same-day hop prints
 because a stay *is* the two dates; a flight is a departure with an arrival
 hanging off it.
 
+### A leg that runs for days is the stay's case, not the flight's
+
+`+1` is the timetable's word for **one** night, and nothing anybody prints says
+`+14`. A Hurtigruten voyage written as `day: 1 / toDay: 15` had no clock times
+at all, so there was no marker anywhere and the row said `1. Tag` and nothing
+else: the longest thing on the trip read like its shortest. Reported from a
+real note.
+
+So past one night, or where there is no arrival clock to hang a marker on, a
+leg states both ends and how long it runs -- `1. Tag -> 15. Tag - 14 Nächte` --
+which is the stay's shape, because a leg like that is a stay that moves. One
+night with a clock beside it is untouched and still reads as a flight card.
+`statesItsSpan()` in `journey-text.ts` is where that line falls, and
+`legNights()` counts in nights rather than days because nights is the count
+nobody argues about: day 1 to day 15 is fourteen nights however each end is
+spent.
+
+**And it is named on the day it ends.** Legs stay in the transport band, for
+the reason recorded on `TripDocumentJourney` -- a return flight lands the day
+after the trip and would otherwise be filed under a day it does not happen on.
+That reasoning covers a flight and not a fortnight: the day a voyage ends is a
+real day of the itinerary with stops on it. `leg-arrivals.ts` names such a leg
+on that day and nowhere else, and only when the itinerary already draws the
+day, which is what keeps the return flight outside the day-by-day. It is a
+marker, not a row: the leg is still edited, priced and booked in its own band.
+
 **A stopover is two legs**, not a field. ZRH-DOH and DOH-JNB each have their
 own times, reference and price, and one leg against two is already the
 difference between non-stop and a change.

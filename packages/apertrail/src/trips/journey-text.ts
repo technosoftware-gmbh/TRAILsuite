@@ -11,6 +11,14 @@
  * a hotel confirmation says, because a stay IS the two dates; a flight is a
  * departure with an arrival hanging off it.
  *
+ * **A leg that runs for days is the stay's case, not the flight's.** A
+ * fifteen-day voyage is not a departure with an arrival hanging off it; it is
+ * the trip. `+1` beside a clock is the timetable's word for one night and
+ * nothing prints "+14", so past one night, or where there is no clock to hang
+ * a marker on, the leg states both ends and how long it runs instead. This
+ * was reported from a real note: a leg from day 1 to day 15 said "Day 1" and
+ * nothing else, so the longest thing on the trip looked like its shortest.
+ *
  * Translated but App-free, the same arrangement `places/photo-spot-text.ts`
  * has. Two consumers -- the itinerary block and the trip document -- which is
  * why it is a module rather than a helper inside one of them.
@@ -55,18 +63,60 @@ export function legClock(leg: LegSpan, departure: string | null): string | null 
   return t('itinerary.untilTime', { time: to ?? '' });
 }
 
-/**
- * Which day the leg leaves on: the date once the trip has one, the day number
- * before that.
- *
- * The departure only. The arrival is what `+1` above is for, and saying both
- * was the thing that read like nothing anybody prints.
- */
-export function legWhen(leg: LegSpan, departure: string | null): string | null {
-  const date = endpointDate(ends(leg).from, departure);
+/** One end of a leg, said the way the reader can place it: a date once the trip has one, a day number before that. */
+function endpointLabel(point: RelativeEndpoint, departure: string | null): string | null {
+  const date = endpointDate(point, departure);
   if (date) {
     const parsed = parseDayTitle(date);
     return parsed ? formatMediumDate(parsed) : null;
   }
-  return leg.day === null ? null : t('itinerary.dayNumber', { number: leg.day });
+  return point.day === null || point.day === undefined
+    ? null
+    : t('itinerary.dayNumber', { number: point.day });
+}
+
+/**
+ * Whether the leg should say where it ends rather than leave it to the clock.
+ *
+ * One night with a clock beside it is a flight card and reads as one: the
+ * `+1` on the arrival time says it in the vocabulary every timetable uses.
+ * Two nights is no longer that shape, and a leg with no arrival time has no
+ * marker anywhere -- which is how a fifteen-day voyage came to say only "Day
+ * 1".
+ */
+function statesItsSpan(leg: LegSpan, offset: number | null): boolean {
+  if (offset === null || offset < 1) return false;
+  return offset > 1 || clockTime(leg.to) === null;
+}
+
+/**
+ * How long a leg runs, in nights, or null when it does not run overnight.
+ *
+ * Nights rather than days, because it is the unquestionable count: day 1 to
+ * day 15 is fourteen nights however each end is spent, where "fifteen days"
+ * is the operator's way of counting and "fourteen days" is somebody else's.
+ */
+export function legNights(leg: LegSpan, departure: string | null): number | null {
+  const offset = dayOffset(ends(leg).from, ends(leg).to, departure);
+  return offset !== null && offset > 0 ? offset : null;
+}
+
+/**
+ * When the leg happens: the day it leaves, and where it ends when that is not
+ * the same day.
+ *
+ * The departure alone for an ordinary leg, which is what the `+1` on the
+ * clock above is for. Both ends and the night count for one that runs for
+ * days -- see `statesItsSpan` for where the line falls and why.
+ */
+export function legWhen(leg: LegSpan, departure: string | null): string | null {
+  const { from, to } = ends(leg);
+  const start = endpointLabel(from, departure);
+  const offset = dayOffset(from, to, departure);
+  if (!statesItsSpan(leg, offset)) return start;
+
+  const end = endpointLabel(to, departure);
+  const span = start && end ? `${start} \u2192 ${end}` : (start ?? end);
+  if (!span) return null;
+  return offset === null ? span : `${span} \u00b7 ${t('itinerary.legNights', { count: offset })}`;
 }

@@ -52,7 +52,7 @@ A note counts as an APERtrail entity only when it is **under the configured fold
 
 That strictness is what makes the [entity type health check](../features/travel.md#entity-type-health-check) worth running: a `type: fnb` note in the Landmarks folder is not a mis-filed FnB, it is invisible. Because each of the twelve folders maps to exactly one type, the check always has a confident suggestion.
 
-The ten recognized values are fixed (`src/vault/entity-types.ts`): `trip`, `booking`, `country`, `state`, `city`, `accommodation`, `fnb`, `landmark`, `location`, `photospot`. `booking` is the one that is not a place and not a container: it is a purchase belonging to one trip, with no coordinates and no standing as an itinerary stop (see [Trip budget and bookings](trip-budget-and-bookings.md)). `person` and `company` are not among them: they live in `src/crm/entity-types.ts` and are configurable rather than fixed, for the reason given above.
+The eleven recognized values are fixed (`src/vault/entity-types.ts`): `trip`, `booking`, `country`, `state`, `city`, `accommodation`, `fnb`, `landmark`, `location`, `photospot`, `vehicle`. `vehicle` is the ship or named train a leg is taken on, and is not a place either: no coordinates, never an itinerary stop, and its cabins are a catalogue rather than prices (see [Vehicles](vehicles.md)). `booking` is the one that is not a place and not a container: it is a purchase belonging to one trip, with no coordinates and no standing as an itinerary stop (see [Trip budget and bookings](trip-budget-and-bookings.md)). `person` and `company` are not among them: they live in `src/crm/entity-types.ts` and are configurable rather than fixed, for the reason given above.
 
 ## Relationships are wikilinks, resolved by title
 
@@ -156,6 +156,91 @@ transport:
       - "[[Stefan]]"
 ---
 ```
+
+### Prices to choose between, and things that may not happen
+
+Two more sub-keys belong to a stop, a stay and a leg alike, the same way the
+four money sub-keys already do. They are independent of each other and a line
+may carry both.
+
+**`variants` are the several prices one thing is sold at.** A voyage offered as
+an outside cabin at one price and a superior outside cabin at another is **one**
+journey on one set of days; a room offered as double or single is one stay; an
+excursion offered in a two-hour and a four-hour version is one afternoon. So it
+is one line with a list under it rather than several lines beside each other,
+which would also mean typing the same days, route and carrier twice and letting
+them drift apart:
+
+```yaml
+transport:
+  - direction: outbound
+    mode: boat
+    carrier: Hurtigruten
+    day: 1
+    toDay: 15
+    variants:
+      - name: Polar Aussenkabine
+        description: Aussenkabine mit Fenster
+        cost: 4479
+        costUnit: person
+        currency: CHF
+        chosen: true
+      - name: Arktis Aussenkabine Superior
+        cost: 5299
+        costUnit: person
+        currency: CHF
+```
+
+They are **alternatives, never extras**: exactly one of them is bought, so
+nothing ever sums them. `chosen` is written only where it is true, because
+false on every variant is the ordinary state of a choice nobody has made yet
+and writing it five times would say it five times over.
+
+**A line carrying variants is priced from them and its own `cost` is not
+read**, or the same thing would count twice; the editors move an existing
+figure into the first variant rather than leaving it above them. Until one is
+chosen the **first** counts, and every row that shows the figure says so: the
+largest figure on a trip must not fall out of its own budget for as long as the
+trip is being decided, which is exactly when the budget is read. The note's own
+order picks it, the same rule the itinerary applies to its days -- an operator
+lists its cabins in the order it means them to be read.
+
+A variant that names no currency inherits the line's, then the trip's. One with
+neither a name nor a price is dropped on write, like any other row somebody
+opened and left.
+
+**`optional: true` says the line might not happen at all.** Nearly every day of
+a cruise brochure offers something -- "Nehmen Sie an einem optionalen Ausflug
+teil" -- and several on one day are independent of each other, so each is its
+own line:
+
+```yaml
+stops:
+  - place: "[[Tromsø]]"
+    day: 7
+    note: Hundeschlittenfahrt durch die verschneite Landschaft
+    cost: 220
+    costUnit: person
+    currency: CHF
+    optional: true
+    chosen: true
+```
+
+Such a line is priced like any other and **stays out of the planned total**
+until `chosen` says somebody decided on it; what the untaken ones would add is
+reported beside the plan rather than inside it, so a total never quietly
+includes a decision nobody has made. Deciding to do one sets `chosen` rather
+than clearing `optional`, so the note goes on saying it was an extra -- which
+is what the trip document prints.
+
+**`chosen` is read only on an optional line.** On any other the word means
+nothing, and honouring it there would give a line two ways of saying it is in
+the plan, one of which nothing writes. Both flags are written only when true:
+`optional: false` on every ordinary stop of a fifteen-day trip would be forty
+lines of frontmatter saying nothing.
+
+See `trips/costs/line-variants.ts` for the arithmetic and
+`trips/costs/estimates.ts` for the split.
 
 The two costs above say different things, which is the whole reason
 `costUnit` exists: 890 is a fare per passenger, charged here to the one

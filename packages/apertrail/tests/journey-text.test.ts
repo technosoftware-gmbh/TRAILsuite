@@ -13,7 +13,7 @@
  * arrival hanging off it.
  */
 import { describe, expect, it } from 'vitest';
-import { legClock, legWhen, LegSpan } from '../src/trips/journey-text';
+import { legClock, legNights, legWhen, LegSpan } from '../src/trips/journey-text';
 import { dayOffset } from '../src/trips/relative-days';
 
 const DEPARTURE = '2026-11-02';
@@ -97,5 +97,65 @@ describe('when a leg leaves', () => {
 
   it('says nothing for a leg that names no day at all', () => {
     expect(legWhen(leg({ from: '20:30' }), null)).toBeNull();
+  });
+});
+
+/**
+ * A leg that runs for days is the stay's case, not the flight's.
+ *
+ * Reported from a real note: a Hurtigruten voyage written as day 1 to day 15
+ * printed "1. Tag" and nothing else, so the longest thing on the trip looked
+ * like its shortest. `+1` is the timetable's word for one night and nothing
+ * prints "+14", so past one night the leg says both ends and how long it runs.
+ */
+describe('a leg that runs for days', () => {
+  const VOYAGE = leg({ day: 1, toDay: 15 });
+
+  it('says where it ends and how long it runs', () => {
+    expect(legWhen(VOYAGE, null)).toBe('Day 1 → Day 15 · 14 nights');
+  });
+
+  it('says it in dates once the trip has a departure', () => {
+    const when = legWhen(VOYAGE, DEPARTURE) ?? '';
+
+    // Day 1 is 2 November and day 15 is 16 November, whatever the locale
+    // writes those as.
+    expect(when).toContain('2');
+    expect(when).toContain('16');
+    expect(when).toContain('→');
+    expect(when).toContain('14 nights');
+  });
+
+  /** One night with a clock beside it is still a flight card, and reads as one. */
+  it('leaves the overnight flight alone', () => {
+    expect(legWhen(REDEYE, null)).toBe('Day 0');
+  });
+
+  /**
+   * The same one night with no clock has no marker anywhere, which is the
+   * case that started this: nothing on the row would otherwise say the leg
+   * does not end on the day it began.
+   */
+  it('states the span for one night when there is no clock to mark it on', () => {
+    expect(legWhen(leg({ day: 1, toDay: 2 }), null)).toBe('Day 1 → Day 2 · 1 night');
+  });
+
+  it('says nothing extra for a leg that lands the day it leaves', () => {
+    expect(legWhen(leg({ day: 3, toDay: 3, from: '09:00', to: '13:00' }), null)).toBe('Day 3');
+  });
+});
+
+describe('how long a leg runs', () => {
+  it('is the nights between its two ends', () => {
+    expect(legNights(leg({ day: 1, toDay: 15 }), null)).toBe(14);
+  });
+
+  /** Null rather than zero: a leg that ends the day it starts has no nights to report. */
+  it('is nothing for a leg inside one day', () => {
+    expect(legNights(leg({ day: 3, toDay: 3 }), null)).toBeNull();
+  });
+
+  it('is nothing for a leg that names no arrival', () => {
+    expect(legNights(leg({ day: 3, from: '09:00' }), null)).toBeNull();
   });
 });

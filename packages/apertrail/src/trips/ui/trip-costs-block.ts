@@ -24,7 +24,7 @@ import { readTravelBoard } from '../../vault/read-entities';
 import { TravelBooking, TravelTrip } from '../../vault/types';
 import { TripInput, tripToInput, updateTripNote } from '../write-trip';
 import { estimateLabels } from '../costs/estimate-labels';
-import { estimateLines } from '../costs/estimates';
+import { estimateLines, optionalTotal } from '../costs/estimates';
 import { tripInvoice } from '../costs/invoice-model';
 import { tripSettlement } from '../costs/split';
 import { tripCostTotals, TripCostTotals } from '../costs/totals';
@@ -124,7 +124,7 @@ class TripCostsRenderer extends MarkdownRenderChild {
     });
 
     this.renderActions(el, trip);
-    this.renderSummary(el, totals);
+    this.renderSummary(el, totals, optionalTotal(trip, estimateLabels(), currency));
 
     if (priced.length === 0) {
       el.createDiv({ cls: 'apt-itinerary-empty', text: t('costs.noBookings') });
@@ -250,7 +250,12 @@ class TripCostsRenderer extends MarkdownRenderChild {
    * converted total can be trusted. A reader who can see "EUR 220 at 0.94"
    * knows exactly which figure is somebody's own arithmetic.
    */
-  private renderSummary(container: HTMLElement, totals: TripCostTotals): void {
+  private renderSummary(
+    container: HTMLElement,
+    totals: TripCostTotals,
+    /** What the extras nobody has taken would add. Null when the trip offers none. */
+    optional: number | null
+  ): void {
     const strip = container.createDiv({ cls: 'apt-trip-costs-summary' });
 
     const tile = (label: string, value: string | null, cls = ''): void => {
@@ -275,6 +280,13 @@ class TripCostsRenderer extends MarkdownRenderChild {
       t('costs.paid'),
       totals.paidConverted === null ? null : formatMoney(totals.paidConverted, totals.currency)
     );
+
+    // A tile of its own, and only when the trip offers something: what has
+    // been offered is not what anybody has decided to spend, and folding it
+    // into the planned tile would report a decision nobody made.
+    if (optional !== null) {
+      tile(t('costs.optional'), formatMoney(optional, totals.currency));
+    }
 
     if (totals.plannedTotal !== null && totals.committedConverted !== null) {
       const variance = Math.round((totals.plannedTotal - totals.committedConverted) * 100) / 100;

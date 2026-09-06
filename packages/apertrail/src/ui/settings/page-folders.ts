@@ -27,6 +27,7 @@ type FolderKey =
   | 'landmarksFolder'
   | 'locationsFolder'
   | 'photoSpotsFolder'
+  | 'vehiclesFolder'
   | 'crmFolder'
   | 'personsFolder'
   | 'companiesFolder';
@@ -61,6 +62,11 @@ const MODULES: FolderModule[] = [
       { key: 'landmarksFolder', label: 'settings.folders.landmarks' },
       { key: 'locationsFolder', label: 'settings.folders.locations' },
       { key: 'photoSpotsFolder', label: 'settings.folders.photoSpots' },
+      // A vehicle is not a place, and its folder hangs off the Places root all
+      // the same: every folder here is derived from one of the three module
+      // roots, which is what keeps a module relocatable as a unit, and a
+      // fourth root for one note type would buy nothing.
+      { key: 'vehiclesFolder', label: 'settings.folders.vehicles' },
     ],
   },
   {

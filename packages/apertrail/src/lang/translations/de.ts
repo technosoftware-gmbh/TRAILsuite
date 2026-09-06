@@ -19,6 +19,8 @@ export const deTranslations: Translations = {
     newFnb: 'Neu: Essen & Trinken',
     newLandmark: 'Neue Sehenswürdigkeit',
     newLocation: 'Neuer Ort',
+    newVehicle: 'Neues Schiff oder neuer Zug',
+    editVehicleCabins: 'Kabinen und Angaben zu diesem Schiff oder Zug',
     newPhotoSpot: 'Neuer Fotospot',
     exportPhotoSpotSheet: 'Diesen Fotospot als Spickzettel exportieren',
     exportTripDocument: 'Diese Reise als Dokument exportieren',
@@ -56,6 +58,7 @@ export const deTranslations: Translations = {
     editBudget: 'Budget',
     editRates: 'Kurse',
     planned: 'Geplant',
+    optional: 'Optional zusätzlich',
     committed: 'Verbindlich',
     paid: 'Bezahlt',
     left: 'Übrig',
@@ -134,6 +137,12 @@ export const deTranslations: Translations = {
     gallery: 'Bilder',
     day: 'Tag {number}',
     days: { one: '1 Tag', other: '{count} Tage' },
+    variants: 'Varianten',
+    variantChosen: 'gewählt',
+    arrivals: 'Ankunft heute: {legs}',
+    optional: 'Optional',
+    optionalTaken: 'Optional, gebucht',
+    optionalTotal: 'Optional zusätzlich',
     fileSuffix: 'Reisedokument',
     written: 'Reisedokument geschrieben nach {path}.',
     failed: 'Das Reisedokument konnte nicht geschrieben werden.',
@@ -267,9 +276,10 @@ export const deTranslations: Translations = {
   },
   relatedTrips: {
     empty: 'Hier hat bisher kein Trip Halt gemacht.',
+    emptyVehicle: 'Noch keine Reisen damit.',
     emptyPerson: 'Bisher nennt kein Trip diese Person.',
     notASubject:
-      'Diese Notiz ist keine Stadt, kein Ort und keine Person, oder sie liegt nicht in einem eingestellten APERtrail-Ordner.',
+      'Diese Notiz ist keine Stadt, kein Ort, keine Person und kein Verkehrsmittel, oder sie liegt nicht in einem eingestellten APERtrail-Ordner.',
     noDate: '(ohne Datum)',
   },
   itinerary: {
@@ -303,6 +313,18 @@ export const deTranslations: Translations = {
     unnamedNight: 'Unterkunft',
     unnamedStop: 'Station',
     travellers: { one: '1 Person', other: '{count} Personen' },
+    legNights: { one: '1 Nacht', other: '{count} Nächte' },
+    legArrival: 'Ankunft: {leg}',
+    variants: 'Varianten',
+    variantUnnamed: 'Variante {number}',
+    variantChosen: 'Gewählt',
+    variantClear: 'Wahl offenlassen',
+    variantChoose: 'Diese Variante rechnen',
+    variantAssumed: 'Noch nichts gewählt, deshalb rechnet das Budget mit der ersten Variante.',
+    optional: 'Optional',
+    optionalTake: 'In die Planung übernehmen',
+    optionalDrop: 'Wieder aus der Planung nehmen',
+    optionalTaken: 'Optional, gebucht',
     outbound: 'Hinweg',
     inbound: 'Rückweg',
     unknownPlace: '(nicht aufgelöster Link)',
@@ -452,6 +474,22 @@ export const deTranslations: Translations = {
       legMode: 'Verkehrsmittel',
       legDay: 'Abfahrt an Tag',
       legToDay: 'Ankunft an Tag',
+      variants: 'Varianten zur Auswahl',
+      variantsDesc:
+        'Die Preise, zu denen dasselbe gebucht werden kann: eine Kabinenkategorie, eine Zimmerkategorie, eine längere Fassung desselben Ausflugs. Gerechnet wird immer nur die gewählte, und bis zur Wahl die erste.',
+      addVariant: 'Variante hinzufügen',
+      removeVariant: 'Variante entfernen',
+      variantNumber: 'Variante {number}',
+      variantName: 'Bezeichnung',
+      variantNamePlaceholder: 'Polar Aussenkabine',
+      variantDescription: 'Was enthalten ist',
+      variantChosen: 'Diese ist es',
+      optional: 'Optional',
+      optionalDesc:
+        'Etwas, das stattfinden kann oder auch nicht: ein angebotener Ausflug, ein Transfer, den Sie vielleicht nicht nehmen. Der Preis wird gezeigt, bleibt aber ausserhalb der Planung, bis Sie sich dafür entscheiden.',
+      optionalChosen: 'Wird gemacht',
+      optionalChosenDesc:
+        'Rechnet es in die Planung ein, während die Notiz weiterhin sagt, dass es ein Zusatz war.',
       legFrom: 'Abfahrt',
       legTo: 'Ankunft',
       legOrigin: 'Von',
@@ -471,6 +509,10 @@ export const deTranslations: Translations = {
       costDesc:
         'Was du in der Planung erwartest. Eine Buchung mit derselben Referenz ersetzt den Wert, sobald du buchst.',
       costPlaceholder: '890',
+      legVehicle: 'Schiff oder Zug',
+      legVehicleDesc:
+        'Auf welchem Schiff oder benannten Zug dieser Abschnitt gefahren wird -- im Unterschied dazu, wer ihn betreibt. Verlinkt auf eine Verkehrsmittel-Notiz erscheinen deren Kabinenbeschreibungen unter den Preisen.',
+      legVehiclePlaceholder: 'MS Trollfjord',
       legCarrier: 'Durchgeführt von',
       legCarrierDesc:
         'Die Fluggesellschaft, die Bahn oder der Name des Zuges. Freitext, oder ein Wikilink, wenn der Vault eine Notiz dafür hat.',
@@ -632,6 +674,23 @@ export const deTranslations: Translations = {
       ratePlaceholder: '0.94',
       invalid: 'Ein Kurs braucht eine Währung und eine Zahl über null.',
     },
+    newVehicleModal: {
+      title: 'Neues Schiff oder neuer Zug',
+      operatorField: 'Betrieben von',
+      created: '"{title}" angelegt.',
+    },
+    vehicleCabins: {
+      title: 'Kabinen und Angaben',
+      cabins: 'Kabinenkategorien',
+      cabinsDesc:
+        'Die Kategorien, in denen es verkauft wird, und was jeweils enthalten ist. Ein Katalog, keine Preise: was eine Kabine kostet, gehört zur Reise, die sie bucht, und wird dort eingetragen.',
+      cabinNumber: 'Kabine {number}',
+      cabinPlaceholder: 'Polar Aussenkabine',
+      addCabin: 'Kabine hinzufügen',
+      removeCabin: 'Kabine entfernen',
+      saved: 'Gespeichert.',
+      saveFailed: 'Diese Notiz konnte nicht gespeichert werden.',
+    },
     newPhotoSpotModal: {
       title: 'Neuer Fotospot',
       created: 'Fotospot "{title}" erstellt.',
@@ -785,6 +844,7 @@ export const deTranslations: Translations = {
         landmarksFolderName: 'Sehenswürdigkeiten',
         locationsFolderName: 'Sonstige Orte',
         photoSpotsFolderName: 'Fotospots',
+        vehiclesFolderName: 'Verkehrsmittel',
         crmFolderName: 'CRM',
         personsFolderName: 'Personen',
         companiesFolderName: 'Firmen',
@@ -865,6 +925,11 @@ export const deTranslations: Translations = {
         desc: 'Orte, zu denen du fährst, um ein bestimmtes Bild zu machen.',
         placeholder: 'Orte/Fotospots',
       },
+      vehicles: {
+        name: 'Verkehrsmittel',
+        desc: 'Die Schiffe und benannten Züge, mit denen du reist -- im Unterschied zu den Orten, zu denen du reist. Hier abgelegt, weil jeder Ordner an einer der drei Modulwurzeln hängt.',
+        placeholder: 'Orte/Verkehrsmittel',
+      },
       crmHeading: 'CRM',
       crmIntro:
         'Die Personen und Firmen hinter einer Reise. APERtrail liest sie aus deinen eigenen Notizen, statt eine eigene Kontaktliste zu führen.',
@@ -912,6 +977,9 @@ export const deTranslations: Translations = {
         photoSpots: 'Fotospots',
         photoSpotsIntro:
           'Die Zugangsangaben, die ein gedruckter Location-Guide in seinen grauen Kasten setzt, dazu die Motive und Beispielbilder.',
+        vehicles: 'Verkehrsmittel',
+        vehiclesIntro:
+          'Was eine Notiz zu einem Schiff oder einem benannten Zug trägt. Die Kabinen sind ein Katalog, keine Preise: was eine Kabine kostet, gehört zur Reise, die sie bucht, und steht dort.',
         crm: 'Personen und Firmen',
         crmIntro:
           'Die Kontaktfelder, die APERtrail und CULItrail aus denselben Notizen lesen -- beide Plugins müssen sich darauf einigen.',
@@ -1110,6 +1178,35 @@ export const deTranslations: Translations = {
           name: 'Eigenschaft "Beispielbilder"',
           desc: 'Beispielaufnahmen vom Spot, jeweils einem Motiv zugeordnet.',
         },
+        vehicleMode: {
+          name: 'Verkehrsmittel-Art',
+          desc: 'Um was es sich handelt: Schiff, Zug, Bus. Dieselben Wörter, die ein Reiseabschnitt verwendet.',
+        },
+        vehicleOperator: {
+          name: 'Betreiber-Eigenschaft',
+          desc: 'Wer es betreibt, als Link auf eine Firmennotiz. Eine Angabe zum Schiff; eine Reise wird dadurch nicht mit einer Firma verknüpft.',
+        },
+        vehicleBuilt: { name: 'Baujahr-Eigenschaft', desc: 'Das Jahr der Indienststellung.' },
+        vehicleRefurbished: {
+          name: 'Umbau-Eigenschaft',
+          desc: 'Das Jahr des letzten Umbaus, sofern erwähnenswert.',
+        },
+        vehicleCapacity: {
+          name: 'Kapazitäts-Eigenschaft',
+          desc: 'Wie viele Passagiere es fasst.',
+        },
+        vehicleLength: {
+          name: 'Längen-Eigenschaft',
+          desc: 'Wie geschrieben: "135 m", "20 Wagen".',
+        },
+        vehicleTonnage: {
+          name: 'Tonnage-Eigenschaft',
+          desc: 'Bruttoraumzahl, bei Schiffen die eine angeben.',
+        },
+        vehicleCabins: {
+          name: 'Kabinen-Eigenschaft',
+          desc: 'Die Kabinenkategorien, in denen es verkauft wird, je mit dem, was enthalten ist. Ein Katalog, keine Preise: was eine Kabine kostet, gehört zur Reise und steht dort.',
+        },
         personTag: {
           name: 'Tag-Eigenschaft für Personen',
           desc: 'Die Eigenschaft mit den Tags einer Person, genutzt vom Filter für zugelassene Personen.',
@@ -1260,6 +1357,7 @@ export const deTranslations: Translations = {
         landmarks: 'Sehenswürdigkeiten',
         locations: 'Orte',
         photoSpots: 'Fotospots',
+        vehicles: 'Verkehrsmittel',
         persons: 'Personen',
         companies: 'Firmen',
       },

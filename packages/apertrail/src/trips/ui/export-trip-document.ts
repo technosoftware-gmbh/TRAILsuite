@@ -18,7 +18,7 @@ import { App, Notice, TFile, normalizePath } from 'obsidian';
 import { parseDayTitle, sanitizeTitle } from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import { APERtrailSettings } from '../../settings/types';
-import { TravelTrip } from '../../vault/types';
+import { TravelTrip, TravelVehicle } from '../../vault/types';
 import { ABSOLUTE_URL_RE, resolveImageFile } from '../../ui/components/image-resolve';
 import { ensureParentFolders } from '../../shared/note-creation';
 import { itineraryDays } from '../itinerary-days';
@@ -27,6 +27,10 @@ import { legClock, legWhen } from '../journey-text';
 import { estimateLabels } from '../costs/estimate-labels';
 import { plannedByCategory, plannedTotal } from '../costs/planned-total';
 import { legRoute, tripItemEstimates } from '../costs/estimates';
+import { legsArrivingOn } from '../leg-arrivals';
+import { ParsedTripLineChoice } from '../trip-note';
+import { cabinDescription } from '../../places/vehicle-note';
+import { optionalTotal, plannedEstimates } from '../costs/estimates';
 import { tripExportFolder } from '../trip-folder';
 import { loadTripSummary } from '../write-trip-summary';
 import {
@@ -34,6 +38,7 @@ import {
   TripDocument,
   TripDocumentCostRow,
   TripDocumentDay,
+  TripDocumentFare,
   TripDocumentJourney,
   TripDocumentPicture,
 } from '../export-trip-document';
@@ -126,6 +131,42 @@ function timeRange(from: string | null, to: string | null): string | null {
 }
 
 /**
+ * The prices a line can be bought at, as the document prints them.
+ *
+ * All of them, not only the chosen one: this page is what somebody decides
+ * from, and a brochure listing only the cabin already ticked would have taken
+ * the decision off the page it exists to support.
+ */
+function documentFares(
+  line: ParsedTripLineChoice & { currency: string | null },
+  trip: TravelTrip,
+  settings: APERtrailSettings,
+  /** The vehicle the line is taken on, for the cabin descriptions it holds. Null for every line that is not a leg with one. */
+  vehicle: TravelVehicle | null = null
+): TripDocumentFare[] {
+  return line.variants.map((variant, index) => ({
+    label: variant.name ?? t('itinerary.variantUnnamed', { number: index + 1 }),
+    // The ship's own words where the trip does not have its own: a cabin is
+    // described once, in the ship's note, and priced per sailing here.
+    description: variant.description ?? cabinDescription(vehicle, variant.name),
+    amount:
+      variant.cost === null
+        ? null
+        : formatMoney(
+            variant.cost,
+            variant.currency ?? line.currency ?? trip.currency ?? settings.homeCurrency
+          ),
+    chosen: variant.chosen,
+  }));
+}
+
+/** What a line that may not happen says about itself, or null for the ordinary one. */
+function optionalLabel(line: ParsedTripLineChoice): string | null {
+  if (!line.optional) return null;
+  return line.chosen ? t('tripDocument.optionalTaken') : t('tripDocument.optional');
+}
+
+/**
  * The itinerary, as numbered days.
  *
  * **The day's own number, not a running count.** A trip written as day one to
@@ -137,16 +178,28 @@ function timeRange(from: string | null, to: string | null): string | null {
  * A group with no number at all is the stops before the first dated one on a
  * trip that says nothing else. It prints unnumbered, which is what it is.
  */
-function documentDays(trip: TravelTrip): TripDocumentDay[] {
+function documentDays(trip: TravelTrip, settings: APERtrailSettings): TripDocumentDay[] {
+  const joiner = t('itinerary.legJoiner');
   return itineraryDays(trip.stops, trip.departure, trip.days).map((group) => ({
     label: group.number === null ? null : t('tripDocument.day', { number: group.number }),
     title: group.title,
     date: group.date ? formatDay(group.date) : null,
+    // A leg that runs for days ends on a day of the itinerary, and the
+    // transport section below has no days in it to say so. See
+    // trips/leg-arrivals.ts for why this is the one thing a leg says outside
+    // its own section.
+    arrivals: legsArrivingOn(trip.transport, group, trip.departure).map((leg) =>
+      t('tripDocument.arrivals', {
+        legs: legRoute(leg, joiner) ?? leg.carrier ?? t('itinerary.unnamedLeg'),
+      })
+    ),
     note: group.note,
     entries: group.stops.map((stop) => ({
       time: timeRange(stop.from, stop.to),
       place: stop.placeTitle,
       note: stop.note,
+      optional: optionalLabel(stop),
+      fares: documentFares(stop, trip, settings),
     })),
   }));
 }
@@ -200,7 +253,7 @@ function journeyWhen(
  * the trip itself, day one to the last day; a flight is settled later and
  * lands outside those days as often as not.
  */
-function documentTransport(trip: TravelTrip): TripDocumentJourney[] {
+function documentTransport(trip: TravelTrip, settings: APERtrailSettings): TripDocumentJourney[] {
   const joiner = t('itinerary.legJoiner');
   return trip.transport.map((leg) => ({
     // A flight card: when it leaves, then the clock with `+1` hanging off the
@@ -212,15 +265,20 @@ function documentTransport(trip: TravelTrip): TripDocumentJourney[] {
       [
         t(leg.direction === 'inbound' ? 'itinerary.inbound' : 'itinerary.outbound'),
         leg.carrier,
+        // The ship between who runs it and the booking reference, which is the
+        // order somebody reads a ticket in.
+        leg.vehicleTitle,
         leg.reference,
       ]
         .filter((part): part is string => !!part)
         .join(' \u00b7 ') || null,
     when: legWhen(leg, trip.departure),
+    fares: documentFares(leg, trip, settings, leg.vehicle),
+    optional: optionalLabel(leg),
   }));
 }
 
-function documentStays(trip: TravelTrip): TripDocumentJourney[] {
+function documentStays(trip: TravelTrip, settings: APERtrailSettings): TripDocumentJourney[] {
   return trip.nights.map((night) => ({
     time: null,
     label: night.accommodationTitle ?? t('itinerary.unnamedNight'),
@@ -230,6 +288,8 @@ function documentStays(trip: TravelTrip): TripDocumentJourney[] {
       { day: night.checkOutDay, value: night.checkOut },
       trip.departure
     ),
+    fares: documentFares(night, trip, settings),
+    optional: optionalLabel(night),
   }));
 }
 
@@ -266,11 +326,23 @@ function transportHint(trip: TravelTrip): string | null {
 function documentCosts(
   trip: TravelTrip,
   settings: APERtrailSettings
-): { costs: TripDocumentCostRow[]; costTotal: TripDocumentCostRow | null } {
+): {
+  costs: TripDocumentCostRow[];
+  costTotal: TripDocumentCostRow | null;
+  costOptional: TripDocumentCostRow | null;
+} {
   const currency = trip.currency ?? settings.homeCurrency;
-  const lines = plannedByCategory(trip.budget, tripItemEstimates(trip, estimateLabels()), currency);
+  const estimates = tripItemEstimates(trip, estimateLabels());
+  const lines = plannedByCategory(trip.budget, plannedEstimates(estimates), currency);
   const total = plannedTotal(lines);
-  if (total === null) return { costs: [], costTotal: null };
+  const optional = optionalTotal(trip, estimateLabels(), currency);
+
+  const costOptional =
+    optional === null
+      ? null
+      : { label: t('tripDocument.optionalTotal'), amount: formatMoney(optional, currency) };
+
+  if (total === null) return { costs: [], costTotal: null, costOptional };
 
   return {
     costs: lines.map((line) => ({
@@ -284,6 +356,7 @@ function documentCosts(
       label: t('costs.planned'),
       amount: formatMoney(total, currency),
     },
+    costOptional,
   };
 }
 
@@ -323,9 +396,9 @@ export async function buildTripDocument(
       .split(/\n\s*\n/)
       .map((paragraph) => paragraph.trim())
       .filter((paragraph) => paragraph !== ''),
-    days: documentDays(trip),
-    transport: documentTransport(trip),
-    stays: documentStays(trip),
+    days: documentDays(trip, settings),
+    transport: documentTransport(trip, settings),
+    stays: documentStays(trip, settings),
     transportHint: transportHint(trip),
     ...documentCosts(trip, settings),
     gallery,
@@ -337,6 +410,7 @@ export async function buildTripDocument(
       stays: t('tripDocument.stays'),
       costs: t('tripDocument.costs'),
       gallery: t('tripDocument.gallery'),
+      fareChosen: t('tripDocument.variantChosen'),
     },
     caveat: t('tripDocument.caveat'),
     footer: t('tripDocument.footer', { date: formatMediumDate(today) }),

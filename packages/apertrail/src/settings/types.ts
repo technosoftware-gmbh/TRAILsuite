@@ -209,6 +209,27 @@ export interface APERtrailSettings {
   nightCostUnitField: string;
   nightPersonsField: string;
 
+  // ══════════════════════════════════════════════════════════════════════
+  // The vehicle: the ship or named train a leg is taken on, as a note of its
+  // own. Its cabins are a catalogue rather than prices -- what a cabin costs
+  // belongs to the sailing, and lives on the leg's variants. See
+  // docs/design/vehicles.md.
+  // ══════════════════════════════════════════════════════════════════════
+  vehiclesFolder: string;
+  /** What kind it is, from the same vocabulary a leg's `mode` uses. */
+  vehicleModeProperty: string;
+  /** Who runs it, as a link to a Company note. A fact about the ship, not about any trip that sails on it. */
+  vehicleOperatorProperty: string;
+  vehicleBuiltProperty: string;
+  vehicleRefurbishedProperty: string;
+  vehicleCapacityProperty: string;
+  vehicleLengthProperty: string;
+  vehicleTonnageProperty: string;
+  /** The cabin categories it is sold in, and the two sub-keys inside each. */
+  vehicleCabinsProperty: string;
+  cabinNameField: string;
+  cabinDescriptionField: string;
+
   transportProperty: string;
   legDirectionField: string;
   /** Which day of the trip a leg leaves and arrives on. Two, because an overnight leg is ordinary. */
@@ -243,6 +264,44 @@ export interface APERtrailSettings {
   /** What the leg's figure is per. A ticket is quoted per passenger, which is why this exists at all. */
   legCostUnitField: string;
   legPersonsField: string;
+  /** Which vehicle the leg is taken on, as a link. Separate from `carrier`, which is who runs it: Hurtigruten is not MS Trollfjord. */
+  legVehicleField: string;
+
+  // ══════════════════════════════════════════════════════════════════════
+  // What a priced line can say beyond its own figure.
+  //
+  // Two things, and they are orthogonal. **Variants** are the several prices
+  // one thing is sold at -- a cabin category, a room category, a two-hour or
+  // four-hour excursion -- of which exactly one is ever bought, so they are
+  // never summed. **Optional** says the line might not happen at all, which is
+  // most of a brochure's day: "Nehmen Sie an einem optionalen Ausflug teil".
+  // An optional line counts only once it is chosen, and until then its money
+  // is reported beside the plan rather than inside it.
+  //
+  // Both belong to a stop, a stay and a leg alike, which is why the outer
+  // names are per list like every other sub-key here. **The names inside a
+  // variant are shared**, and deliberately: a variant is one shape wherever
+  // it appears, one level deeper than anything else in this schema, and three
+  // identical copies of six names would say the opposite.
+  // ══════════════════════════════════════════════════════════════════════
+  stopVariantsField: string;
+  nightVariantsField: string;
+  legVariantsField: string;
+  variantNameField: string;
+  variantDescriptionField: string;
+  variantCostField: string;
+  variantCurrencyField: string;
+  variantCostUnitField: string;
+  /** True on the one variant settled on. Absent on the rest, and absent everywhere while the choice is open. */
+  variantChosenField: string;
+  /** True on a line that might not happen: an excursion offered, a transfer you may not take. */
+  stopOptionalField: string;
+  nightOptionalField: string;
+  legOptionalField: string;
+  /** True on an optional line that has been decided on, which is what makes it count. Meaningless on a line that is not optional. */
+  stopChosenField: string;
+  nightChosenField: string;
+  legChosenField: string;
   // ══════════════════════════════════════════════════════════════════════
   // Photo spot structure -- the access details a printed location guide
   // prints in its grey box, plus the motifs you actually came for and the

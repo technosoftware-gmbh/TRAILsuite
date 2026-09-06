@@ -166,6 +166,20 @@ const PROPERTY_GROUPS: PropertyGroup[] = [
     ],
   },
   {
+    heading: 'settings.properties.groups.vehicles',
+    intro: 'settings.properties.groups.vehiclesIntro',
+    fields: [
+      { key: 'vehicleModeProperty', label: 'vehicleMode' },
+      { key: 'vehicleOperatorProperty', label: 'vehicleOperator' },
+      { key: 'vehicleBuiltProperty', label: 'vehicleBuilt' },
+      { key: 'vehicleRefurbishedProperty', label: 'vehicleRefurbished' },
+      { key: 'vehicleCapacityProperty', label: 'vehicleCapacity' },
+      { key: 'vehicleLengthProperty', label: 'vehicleLength' },
+      { key: 'vehicleTonnageProperty', label: 'vehicleTonnage' },
+      { key: 'vehicleCabinsProperty', label: 'vehicleCabins' },
+    ],
+  },
+  {
     heading: 'settings.properties.groups.crm',
     intro: 'settings.properties.groups.crmIntro',
     fields: [

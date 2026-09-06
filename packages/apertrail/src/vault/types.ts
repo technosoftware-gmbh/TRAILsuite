@@ -16,11 +16,13 @@ import { TravelPlaceType } from './entity-types';
 import {
   ParsedTripBudgetLine,
   ParsedTripDay,
+  ParsedTripLineChoice,
   ParsedTripPicture,
   ParsedTripRate,
   TravelStatusValue,
 } from '../trips/trip-note';
 import { ParsedPhotoSpot } from '../places/photo-spot-note';
+import { ParsedVehicle } from '../places/vehicle-note';
 import { ParsedBooking } from '../trips/costs/booking-note';
 import { CostUnit } from '../trips/costs/line-cost';
 
@@ -120,6 +122,19 @@ export interface TravelPlace {
   photoSpot: TravelPhotoSpotDetail | null;
 }
 
+/**
+ * A ship, a named train, a riverboat: the thing a leg is taken on.
+ *
+ * Not a place -- no coordinates, no country, never an itinerary stop -- and
+ * not the carrier either, which is who runs it. Its cabins are a catalogue
+ * that outlives every sailing; what one costs belongs to the leg that books
+ * it. See places/vehicle-note.ts.
+ */
+export interface TravelVehicle extends ParsedVehicle {
+  file: TFile;
+  title: string;
+}
+
 export interface TravelTrip {
   file: TFile;
   title: string;
@@ -172,7 +187,7 @@ export interface TravelTrip {
  */
 export type TravelStopTargetKind = 'city' | TravelPlaceType;
 
-export interface TravelTripStop {
+export interface TravelTripStop extends ParsedTripLineChoice {
   /** Which day of the trip, or null for a stop that names its own date. Resolved against the trip's departure at render time and never written back -- see trips/relative-days.ts. */
   day: number | null;
   /** True when the entry names a place that did not parse, as against naming none at all. A brochure line is only a time and a sentence; a typo has to stay visible. */
@@ -198,7 +213,7 @@ export interface TravelTripStop {
   persons: string[];
 }
 
-export interface TravelTripNight {
+export interface TravelTripNight extends ParsedTripLineChoice {
   /** Which day of the trip the stay begins and ends on, or null for one that names its own dates. */
   checkInDay: number | null;
   checkOutDay: number | null;
@@ -216,7 +231,7 @@ export interface TravelTripNight {
   persons: string[];
 }
 
-export interface TravelTripLeg {
+export interface TravelTripLeg extends ParsedTripLineChoice {
   /** Which day of the trip the leg leaves and arrives on, or null for one that names its own dates. */
   day: number | null;
   toDay: number | null;
@@ -236,6 +251,10 @@ export interface TravelTripLeg {
   /** What that figure is per. A fare is quoted per passenger, so two people is two tickets. */
   costUnit: CostUnit;
   persons: string[];
+  /** The vehicle it is taken on, as written. A wikilink reads down to its target; a name the vault has no note for stands as typed. */
+  vehicleTitle: string | null;
+  /** The same, resolved. Null for a leg that names none, which is most of them, and for a name the vault has no note for. */
+  vehicle: TravelVehicle | null;
 }
 
 /**
@@ -255,6 +274,8 @@ export interface TravelBooking extends ParsedBooking {
 
 export interface TravelBoard {
   trips: TravelTrip[];
+  /** Every vehicle note in the vault, in title order. */
+  vehicles: TravelVehicle[];
   /** Every booking in the vault, in title order. Attached to trips by title rather than by reference; see TravelBooking. */
   bookings: TravelBooking[];
   countries: TravelCountry[];

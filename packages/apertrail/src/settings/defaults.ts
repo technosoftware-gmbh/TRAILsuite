@@ -129,6 +129,18 @@ export const DEFAULT_SETTINGS: APERtrailSettings = {
   nightCostUnitField: 'costUnit',
   nightPersonsField: 'persons',
 
+  vehiclesFolder: 'Places/Vehicles',
+  vehicleModeProperty: 'mode',
+  vehicleOperatorProperty: 'operator',
+  vehicleBuiltProperty: 'built',
+  vehicleRefurbishedProperty: 'refurbished',
+  vehicleCapacityProperty: 'capacity',
+  vehicleLengthProperty: 'length',
+  vehicleTonnageProperty: 'tonnage',
+  vehicleCabinsProperty: 'cabins',
+  cabinNameField: 'name',
+  cabinDescriptionField: 'description',
+
   transportProperty: 'transport',
   legDirectionField: 'direction',
   legDayField: 'day',
@@ -144,6 +156,22 @@ export const DEFAULT_SETTINGS: APERtrailSettings = {
   legCurrencyField: 'currency',
   legCostUnitField: 'costUnit',
   legPersonsField: 'persons',
+  legVehicleField: 'vehicle',
+  stopVariantsField: 'variants',
+  nightVariantsField: 'variants',
+  legVariantsField: 'variants',
+  variantNameField: 'name',
+  variantDescriptionField: 'description',
+  variantCostField: 'cost',
+  variantCurrencyField: 'currency',
+  variantCostUnitField: 'costUnit',
+  variantChosenField: 'chosen',
+  stopOptionalField: 'optional',
+  nightOptionalField: 'optional',
+  legOptionalField: 'optional',
+  stopChosenField: 'chosen',
+  nightChosenField: 'chosen',
+  legChosenField: 'chosen',
 
   timezoneProperty: 'timezone',
   openingHoursProperty: 'openingHours',
@@ -225,6 +253,7 @@ export type FolderDefaultKey =
   | 'landmarksFolder'
   | 'locationsFolder'
   | 'photoSpotsFolder'
+  | 'vehiclesFolder'
   | 'crmFolder'
   | 'personsFolder'
   | 'companiesFolder';
@@ -270,6 +299,7 @@ export function getLocalizedFolderDefaults(saved: SavedFolderRoots = {}): Folder
     landmarksFolder: DEFAULT_SETTINGS.landmarksFolder,
     locationsFolder: DEFAULT_SETTINGS.locationsFolder,
     photoSpotsFolder: DEFAULT_SETTINGS.photoSpotsFolder,
+    vehiclesFolder: DEFAULT_SETTINGS.vehiclesFolder,
     crmFolder: DEFAULT_SETTINGS.crmFolder,
     personsFolder: DEFAULT_SETTINGS.personsFolder,
     companiesFolder: DEFAULT_SETTINGS.companiesFolder,
@@ -306,6 +336,7 @@ export function getLocalizedFolderDefaults(saved: SavedFolderRoots = {}): Folder
       fnbFolder: joinFolder(placesFolder, t('settings.folders.defaults.fnbFolderName')),
       landmarksFolder: joinFolder(placesFolder, t('settings.folders.defaults.landmarksFolderName')),
       locationsFolder: joinFolder(placesFolder, t('settings.folders.defaults.locationsFolderName')),
+      vehiclesFolder: joinFolder(placesFolder, t('settings.folders.defaults.vehiclesFolderName')),
       photoSpotsFolder: joinFolder(
         placesFolder,
         t('settings.folders.defaults.photoSpotsFolderName')
@@ -345,6 +376,7 @@ function resolveFallback(fallback: FolderDefaults, saved: SavedFolderRoots): Fol
     landmarksFolder: joinFolder(placesFolder, 'Landmarks'),
     locationsFolder: joinFolder(placesFolder, 'Locations'),
     photoSpotsFolder: joinFolder(placesFolder, 'Photo Spots'),
+    vehiclesFolder: joinFolder(placesFolder, 'Vehicles'),
     crmFolder,
     personsFolder: joinFolder(crmFolder, 'People'),
     companiesFolder: joinFolder(crmFolder, 'Companies'),

@@ -100,6 +100,7 @@ function company(title: string): CrmCompany {
 function board(overrides: Partial<TravelBoard> = {}): TravelBoard {
   return {
     trips: [],
+    vehicles: [],
     bookings: [],
     countries: [],
     states: [],

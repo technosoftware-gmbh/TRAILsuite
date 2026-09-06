@@ -415,6 +415,14 @@ describe('tripToInput', () => {
       costUnit: 'total',
       persons: [],
       motifName: undefined,
+      day: undefined,
+      // The three shared sub-keys arrive on every line, saying nothing: this
+      // stop is not optional and is sold at one price. Asserted rather than
+      // ignored, because a hand-built line that arrived without them is
+      // exactly the shape that broke twice before.
+      variants: [],
+      optional: false,
+      chosen: false,
     });
     expect(input.nights[0].accommodationTitle).toBe('Hotel');
     expect(input.transport[0].mode).toBe('car');

@@ -154,6 +154,9 @@ describe('buildTripFrontmatter -> parseTripRecord round trip', () => {
           currency: null,
           costUnit: 'total',
           persons: [],
+          variants: [],
+          optional: false,
+          chosen: false,
         },
         {
           placeTitle: 'Restaurant Falknis',
@@ -169,6 +172,9 @@ describe('buildTripFrontmatter -> parseTripRecord round trip', () => {
           currency: 'CHF',
           costUnit: 'person',
           persons: [],
+          variants: [],
+          optional: false,
+          chosen: false,
         },
       ],
     });
@@ -202,6 +208,9 @@ describe('buildTripFrontmatter -> parseTripRecord round trip', () => {
           currency: 'chf',
           costUnit: 'night',
           persons: [],
+          variants: [],
+          optional: false,
+          chosen: false,
         },
       ],
       transport: [
@@ -209,6 +218,7 @@ describe('buildTripFrontmatter -> parseTripRecord round trip', () => {
           direction: 'outbound',
           mode: 'plane',
           carrier: 'Swiss',
+          vehicleTitle: null,
           day: null,
           toDay: null,
           from: '2026-04-26T07:00',
@@ -220,11 +230,15 @@ describe('buildTripFrontmatter -> parseTripRecord round trip', () => {
           currency: null,
           costUnit: 'person',
           persons: [],
+          variants: [],
+          optional: false,
+          chosen: false,
         },
         {
           direction: 'inbound',
           mode: 'train',
           carrier: null,
+          vehicleTitle: 'Rovos Rail Pride of Africa',
           day: null,
           toDay: null,
           from: '2026-04-28T14:00',
@@ -238,6 +252,9 @@ describe('buildTripFrontmatter -> parseTripRecord round trip', () => {
           // Only one of them took the train back, which is the case the
           // whole persons list exists for.
           persons: ['Stefan Muster'],
+          variants: [],
+          optional: false,
+          chosen: false,
         },
       ],
     });
@@ -258,6 +275,12 @@ describe('buildTripFrontmatter -> parseTripRecord round trip', () => {
         // costs, it is what a night of it costs.
         costUnit: 'night',
         persons: [],
+        // The three shared sub-keys, saying nothing: one price, and a stay
+        // that is going to happen. A note that writes none of them reads back
+        // as exactly this.
+        variants: [],
+        optional: false,
+        chosen: false,
       },
     ]);
 
@@ -651,6 +674,9 @@ describe('a stop that names no place', () => {
             currency: null,
             costUnit: 'total',
             persons: [],
+            variants: [],
+            optional: false,
+            chosen: false,
           },
         ],
       })
@@ -677,6 +703,9 @@ describe('a stop that names no place', () => {
             currency: null,
             costUnit: 'total',
             persons: [],
+            variants: [],
+            optional: false,
+            chosen: false,
           },
         ],
       })
@@ -751,6 +780,259 @@ describe('a leg that says who runs it', () => {
   it('is enough on its own to keep a leg', () => {
     const yaml = buildTripFrontmatter(
       input({ transport: [aLegInput({ direction: 'inbound', carrier: 'Rovos Rail' })] })
+    );
+
+    expect(yaml.transport).toHaveLength(1);
+  });
+});
+
+/**
+ * A leg sold at more than one price.
+ *
+ * The note gains a list of fares under the leg rather than a second leg
+ * beside it: three cabin categories on one voyage is one journey on one set
+ * of days with a decision still open on it. Round-tripped through the real
+ * builder and parser rather than asserted against hand-written frontmatter,
+ * so a builder and a parser that disagree cannot both pass.
+ */
+describe('the prices a line can be bought at', () => {
+  const FARES = [
+    {
+      name: 'Polar outside',
+      description: 'Window, about 12 m²',
+      cost: 4479,
+      currency: 'CHF',
+      costUnit: 'person' as const,
+      chosen: true,
+    },
+    {
+      name: 'Arctic superior',
+      description: null,
+      cost: 5299,
+      currency: 'CHF',
+      costUnit: 'person' as const,
+      chosen: false,
+    },
+  ];
+
+  it('writes them under the leg, in the order they were given', () => {
+    const yaml = buildTripFrontmatter(
+      input({ transport: [aLegInput({ carrier: 'Hurtigruten', variants: FARES })] })
+    );
+    const legs = yaml.transport as Record<string, unknown>[];
+
+    expect(legs[0].variants).toEqual([
+      {
+        name: 'Polar outside',
+        description: 'Window, about 12 m²',
+        cost: 4479,
+        costUnit: 'person',
+        currency: 'CHF',
+        chosen: true,
+      },
+      { name: 'Arctic superior', cost: 5299, costUnit: 'person', currency: 'CHF' },
+    ]);
+  });
+
+  it('comes back the same way it went in', () => {
+    const parsed = roundTrip({
+      transport: [aLegInput({ carrier: 'Hurtigruten', variants: FARES })],
+    });
+
+    expect(parsed.transport[0].variants).toEqual(FARES);
+  });
+
+  /**
+   * False on every fare is the ordinary state of a choice nobody has made,
+   * and writing it five times would say it five times over.
+   */
+  it('writes chosen only where it is true', () => {
+    const yaml = buildTripFrontmatter(
+      input({ transport: [aLegInput({ variants: [{ ...FARES[1] }] })] })
+    );
+    const legs = yaml.transport as Record<string, unknown>[];
+    const options = legs[0].variants as Record<string, unknown>[];
+
+    expect(options[0]).not.toHaveProperty('chosen');
+  });
+
+  /** Opening an editor and leaving a row blank must not write anything into a note. */
+  it('drops a fare that names neither a price nor a name', () => {
+    const yaml = buildTripFrontmatter(
+      input({
+        transport: [
+          aLegInput({
+            carrier: 'Hurtigruten',
+            variants: [
+              {
+                name: null,
+                description: 'no',
+                cost: null,
+                currency: null,
+                costUnit: 'person',
+                chosen: false,
+              },
+            ],
+          }),
+        ],
+      })
+    );
+    const legs = yaml.transport as Record<string, unknown>[];
+
+    expect(legs[0]).not.toHaveProperty('variants');
+  });
+
+  /** A leg somebody has priced three ways has had real work done on it, whatever else it does not say yet. */
+  it('is enough on its own to keep a leg', () => {
+    const yaml = buildTripFrontmatter(
+      input({ transport: [aLegInput({ variants: [{ ...FARES[0] }] })] })
+    );
+
+    expect(yaml.transport).toHaveLength(1);
+  });
+
+  it('is left off entirely by a leg with one price', () => {
+    const yaml = buildTripFrontmatter(input({ transport: [aLegInput({ carrier: 'Swiss' })] }));
+    const legs = yaml.transport as Record<string, unknown>[];
+
+    expect(legs[0]).not.toHaveProperty('variants');
+  });
+
+  /** The same rule the parser applies to a stop whose link is a typo: a row that says something stays visible. */
+  it('reads a hand-written fare that names only a price', () => {
+    const parsed = parseTripRecord({
+      properties: PROPS,
+      frontmatter: { transport: [{ direction: 'outbound', variants: [{ cost: 3200 }] }] },
+    });
+
+    expect(parsed.transport[0].variants).toEqual([
+      {
+        name: null,
+        description: null,
+        cost: 3200,
+        currency: null,
+        costUnit: 'total',
+        chosen: false,
+      },
+    ]);
+  });
+});
+
+/**
+ * A line that may not happen.
+ *
+ * Both flags are written only when they are true, which is what keeps a
+ * fifteen-day itinerary from carrying forty lines of `optional: false`. And
+ * `chosen` is meaningless on a line that was never in question, so it is
+ * neither written nor read there -- a second way of saying "planned" is a
+ * second thing to get wrong.
+ */
+describe('an optional line', () => {
+  it('writes the flag on a stop, a stay and a leg alike', () => {
+    const yaml = buildTripFrontmatter(
+      input({
+        stops: [aStopInput({ placeTitle: 'Tromsø', optional: true })],
+        nights: [aNightInput({ accommodationTitle: 'Ice hotel', optional: true })],
+        transport: [aLegInput({ carrier: 'Coach', optional: true })],
+      })
+    );
+
+    for (const key of ['stops', 'nights', 'transport'] as const) {
+      const entries = yaml[key] as Record<string, unknown>[];
+      expect(entries[0].optional, key).toBe(true);
+    }
+  });
+
+  it('writes nothing at all for an ordinary line', () => {
+    const yaml = buildTripFrontmatter(input({ stops: [aStopInput({ placeTitle: 'Tromsø' })] }));
+    const stops = yaml.stops as Record<string, unknown>[];
+
+    expect(stops[0]).not.toHaveProperty('optional');
+    expect(stops[0]).not.toHaveProperty('chosen');
+  });
+
+  it('writes chosen once the extra has been taken', () => {
+    const yaml = buildTripFrontmatter(
+      input({ stops: [aStopInput({ placeTitle: 'Tromsø', optional: true, chosen: true })] })
+    );
+    const stops = yaml.stops as Record<string, unknown>[];
+
+    expect(stops[0].chosen).toBe(true);
+  });
+
+  /** A control whose value is ignored, in note form. Writing it would leave a word that means nothing where it stands. */
+  it('never writes chosen on a line that is not optional', () => {
+    const yaml = buildTripFrontmatter(
+      input({ stops: [aStopInput({ placeTitle: 'Tromsø', chosen: true })] })
+    );
+    const stops = yaml.stops as Record<string, unknown>[];
+
+    expect(stops[0]).not.toHaveProperty('chosen');
+  });
+
+  it('reads back the way it went in', () => {
+    const parsed = roundTrip({
+      stops: [aStopInput({ placeTitle: 'Tromsø', optional: true, chosen: true })],
+    });
+
+    expect(parsed.stops[0].optional).toBe(true);
+    expect(parsed.stops[0].chosen).toBe(true);
+  });
+
+  /** A note hand-edited to say `chosen` on an ordinary stop is not a stop with a decision on it. */
+  it('ignores chosen written by hand on a line that is not optional', () => {
+    const parsed = parseTripRecord({
+      properties: PROPS,
+      frontmatter: { stops: [{ place: '[[Tromsø]]', chosen: true }] },
+    });
+
+    expect(parsed.stops[0].chosen).toBe(false);
+  });
+
+  /** An excursion somebody marked as offered and has not named yet is still work done on the note. */
+  it('is enough on its own to keep a stop', () => {
+    const yaml = buildTripFrontmatter(input({ stops: [aStopInput({ optional: true })] }));
+
+    expect(yaml.stops).toHaveLength(1);
+  });
+});
+
+/**
+ * Which ship or train a leg is taken on.
+ *
+ * Its own sub-key rather than more work for `carrier`, which is who runs it:
+ * Hurtigruten is not MS Trollfjord, and a leg often wants to say both.
+ */
+describe('the vehicle a leg is taken on', () => {
+  it('is written as a wikilink and read back down to its title', () => {
+    const parsed = roundTrip({
+      transport: [aLegInput({ carrier: 'Hurtigruten', vehicleTitle: 'MS Trollfjord' })],
+    });
+
+    expect(parsed.transport[0].vehicleTitle).toBe('MS Trollfjord');
+    expect(parsed.transport[0].carrier).toBe('Hurtigruten');
+  });
+
+  it('keeps plain text for a ship the vault has no note for', () => {
+    const parsed = parseTripRecord({
+      properties: PROPS,
+      frontmatter: { transport: [{ direction: 'outbound', vehicle: 'A nameless riverboat' }] },
+    });
+
+    expect(parsed.transport[0].vehicleTitle).toBe('A nameless riverboat');
+  });
+
+  it('is left off entirely by a leg that names none', () => {
+    const yaml = buildTripFrontmatter(input({ transport: [aLegInput({ carrier: 'Swiss' })] }));
+    const legs = yaml.transport as Record<string, unknown>[];
+
+    expect(legs[0]).not.toHaveProperty('vehicle');
+  });
+
+  /** A leg that says only which ship it is on is still a leg worth keeping. */
+  it('is enough on its own to keep a leg', () => {
+    const yaml = buildTripFrontmatter(
+      input({ transport: [aLegInput({ vehicleTitle: 'MS Trollfjord' })] })
     );
 
     expect(yaml.transport).toHaveLength(1);

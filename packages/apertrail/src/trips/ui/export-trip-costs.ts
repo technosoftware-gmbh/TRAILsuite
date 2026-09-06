@@ -16,7 +16,7 @@ import { ensureParentFolders } from '../../shared/note-creation';
 import { TravelBooking, TravelTrip } from '../../vault/types';
 import { buildCostSheetHtml, CostSheet, CostSheetTotalRow } from '../costs/export-trip-costs';
 import { estimateLabels } from '../costs/estimate-labels';
-import { estimateLines } from '../costs/estimates';
+import { estimateLines, optionalTotal } from '../costs/estimates';
 import { tripSettlement } from '../costs/split';
 import { lineCurrency, tripCostTotals } from '../costs/totals';
 import { tripExportFolder } from '../trip-folder';
@@ -74,6 +74,13 @@ export function buildCostSheet(
       label: t('costs.committed'),
       value: formatMoney(totals.committedConverted, currency),
     });
+  }
+  // Beside the planned figure rather than inside it: what has been offered is
+  // not what anybody has decided to spend, and a sheet that added the two
+  // would report a trip nobody is taking.
+  const optional = optionalTotal(trip, estimateLabels(), currency);
+  if (optional !== null) {
+    summary.push({ label: t('costs.optional'), value: formatMoney(optional, currency) });
   }
   if (totals.paidConverted !== null) {
     summary.push({ label: t('costs.paid'), value: formatMoney(totals.paidConverted, currency) });

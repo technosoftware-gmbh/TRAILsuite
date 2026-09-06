@@ -963,6 +963,79 @@ body.is-mobile .apt-star {
    the day and the lines are its schedule. The size carries that on its own --
    `--text-normal` rather than a mid grey of our own, because a hand-picked
    tone between normal and muted is right in one theme and wrong in the rest. */
+.apt-itinerary-arrival {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0.1rem 0 0.35rem 0;
+}
+.apt-itinerary-arrival-icon {
+  display: inline-flex;
+  color: var(--text-faint);
+}
+/* The fares under a leg. Indented against the leg's own text so the list
+   reads as belonging to it rather than as three more legs. */
+.apt-itinerary-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin: 0.25rem 0 0.1rem 0;
+}
+.apt-itinerary-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  padding: 0.15rem 0.3rem;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+}
+.apt-itinerary-option:hover {
+  background: var(--background-modifier-hover);
+}
+.apt-itinerary-option.is-chosen {
+  background: var(--background-modifier-active-hover);
+}
+.apt-itinerary-option-mark {
+  display: inline-flex;
+  color: var(--text-faint);
+  padding-block-start: 0.05rem;
+}
+.apt-itinerary-option.is-chosen .apt-itinerary-option-mark {
+  color: var(--interactive-accent);
+}
+.apt-itinerary-option-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+.apt-itinerary-option-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+.apt-itinerary-option-name {
+  font-size: 0.85rem;
+}
+.apt-itinerary-option.is-chosen .apt-itinerary-option-name {
+  font-weight: var(--font-semibold);
+}
+.apt-itinerary-option-price {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+/* An offered extra, and the control that takes it into the plan. */
+.apt-itinerary-optional {
+  cursor: pointer;
+  border-style: dashed;
+}
+.apt-itinerary-optional.is-chosen {
+  border-style: solid;
+  color: var(--text-normal);
+}
 .apt-itinerary-day-note {
   font-size: 0.95rem;
   color: var(--text-normal);

@@ -15,6 +15,47 @@ naming and do not get renamed. See
 
 ## [Unreleased]
 
+### Added
+
+- **A stop, a stay or a leg can carry the prices it may be bought at.** A cabin
+  category, a room category, a two-hour or four-hour version of the same
+  excursion: the same thing at a different price, as a `variants:` list under
+  the line with a name, a description and a price each. They are alternatives
+  and are never summed; the chosen one is what every total counts, and until
+  one is chosen the first counts and every row that shows the figure says so. A
+  line carrying variants is priced from them and its own `cost` is not read.
+  The itinerary lists them under the line and a click chooses one; the trip
+  document prints them all, because that page is what somebody decides from.
+  Nothing changes for a line with one price.
+- **A ship or a named train can be a note of its own** (`type: vehicle`), with
+  what it is, who runs it, when it was built, how many it carries, a picture,
+  and the cabin categories it is sold in. A leg points at one through a new
+  `vehicle:` sub-key, separate from `carrier:`, which stays what it was: who
+  runs the leg, not what you are on. **The cabins are a catalogue, not prices**
+  -- what a cabin costs differs per sailing and stays on the leg -- so a leg's
+  variant that names a cabin borrows its description from the ship at render
+  time, and correcting it there corrects every trip that ever sailed. Two
+  commands create one and edit its cabins, the related-trips block on it lists
+  the trips that used it, and the entity-type health check covers its folder.
+- **A line can be optional.** `optional: true` says it might not happen -- an
+  excursion offered, a transfer you may not take, which is most of a brochure
+  day. It is priced like any other line and stays out of the planned total
+  until `chosen: true` says you decided on it; what the untaken ones would add
+  is reported beside the plan, on the costs block, the cost sheet and the trip
+  document, rather than inside it.
+
+### Changed
+
+- **A leg that runs for days now says where it ends and how long it runs.** A
+  voyage written as day 1 to day 15 printed only "Day 1": `+1` beside a clock
+  is the timetable's word for one night, and a leg with no clock had no marker
+  anywhere. Past one night, or with no arrival time to mark, the leg now reads
+  "Day 1 -> Day 15 - 14 nights". The overnight flight is unchanged.
+- **A leg is named on the day of the itinerary it arrives on**, where that day
+  is one the itinerary already draws. Legs keep their own band; this is one
+  line saying a fortnight-long voyage ends here. A return flight landing after
+  the last day still appears nowhere in the day-by-day.
+
 ## [1.0.0] - 2026-09-04
 
 The first public release. Nothing in a vault changes: the note formats,

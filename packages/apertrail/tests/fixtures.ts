@@ -21,6 +21,7 @@ import { TFile } from 'obsidian';
 import {
   ParsedTripDay,
   ParsedTripLeg,
+  ParsedTripVariant,
   ParsedTripNight,
   ParsedTripStop,
   TripLegInput,
@@ -31,6 +32,7 @@ import {
   TravelBoard,
   TravelTrip,
   TravelTripLeg,
+  TravelVehicle,
   TravelTripNight,
   TravelTripStop,
 } from '../src/vault/types';
@@ -56,6 +58,9 @@ export function aParsedStop(over: Partial<ParsedTripStop> = {}): ParsedTripStop 
     currency: null,
     costUnit: 'total',
     persons: [],
+    variants: [],
+    optional: false,
+    chosen: false,
     ...over,
   };
 }
@@ -71,6 +76,22 @@ export function aParsedNight(over: Partial<ParsedTripNight> = {}): ParsedTripNig
     currency: null,
     costUnit: 'total',
     persons: [],
+    variants: [],
+    optional: false,
+    chosen: false,
+    ...over,
+  };
+}
+
+/** A fare on a leg, for the tests that need one. The default is a named fare nobody has chosen. */
+export function aParsedVariant(over: Partial<ParsedTripVariant> = {}): ParsedTripVariant {
+  return {
+    name: null,
+    description: null,
+    cost: null,
+    currency: null,
+    costUnit: 'person',
+    chosen: false,
     ...over,
   };
 }
@@ -80,6 +101,7 @@ export function aParsedLeg(over: Partial<ParsedTripLeg> = {}): ParsedTripLeg {
     day: null,
     toDay: null,
     carrier: null,
+    vehicleTitle: null,
     direction: 'outbound',
     mode: 'plane',
     from: null,
@@ -91,6 +113,9 @@ export function aParsedLeg(over: Partial<ParsedTripLeg> = {}): ParsedTripLeg {
     currency: null,
     costUnit: 'total',
     persons: [],
+    variants: [],
+    optional: false,
+    chosen: false,
     ...over,
   };
 }
@@ -114,6 +139,9 @@ export function aStopInput(over: Partial<TripStopInput> = {}): TripStopInput {
     currency: null,
     costUnit: 'total',
     persons: [],
+    variants: [],
+    optional: false,
+    chosen: false,
     ...over,
   };
 }
@@ -129,6 +157,9 @@ export function aNightInput(over: Partial<TripNightInput> = {}): TripNightInput 
     currency: null,
     costUnit: 'night',
     persons: [],
+    variants: [],
+    optional: false,
+    chosen: false,
     ...over,
   };
 }
@@ -138,6 +169,7 @@ export function aLegInput(over: Partial<TripLegInput> = {}): TripLegInput {
     direction: 'outbound',
     mode: null,
     carrier: null,
+    vehicleTitle: null,
     day: null,
     toDay: null,
     from: null,
@@ -149,6 +181,9 @@ export function aLegInput(over: Partial<TripLegInput> = {}): TripLegInput {
     currency: null,
     costUnit: 'person',
     persons: [],
+    variants: [],
+    optional: false,
+    chosen: false,
     ...over,
   };
 }
@@ -165,7 +200,27 @@ export function aNight(over: Partial<TravelTripNight> = {}): TravelTripNight {
 }
 
 export function aLeg(over: Partial<TravelTripLeg> = {}): TravelTripLeg {
-  return { ...aParsedLeg(), ...over };
+  return { ...aParsedLeg(), vehicle: null, ...over };
+}
+
+/** A vehicle as the board leaves one: a ship or a named train with its cabins. */
+export function aVehicle(title: string, over: Partial<TravelVehicle> = {}): TravelVehicle {
+  return {
+    file: aFile(title),
+    title,
+    mode: null,
+    operatorTitle: null,
+    built: null,
+    refurbished: null,
+    capacity: null,
+    length: null,
+    tonnage: null,
+    website: null,
+    image: null,
+    gallery: [],
+    cabins: [],
+    ...over,
+  };
 }
 
 export function aTrip(title: string, over: Partial<TravelTrip> = {}): TravelTrip {
@@ -202,6 +257,7 @@ export function aTrip(title: string, over: Partial<TravelTrip> = {}): TravelTrip
 export function aBoard(over: Partial<TravelBoard> = {}): TravelBoard {
   return {
     trips: [],
+    vehicles: [],
     bookings: [],
     countries: [],
     states: [],

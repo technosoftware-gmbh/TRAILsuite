@@ -52,6 +52,7 @@ export type EntityFolderLocation =
   | 'landmarks'
   | 'locations'
   | 'photoSpots'
+  | 'vehicles'
   | 'persons'
   | 'companies';
 
@@ -90,6 +91,7 @@ function locationConfigs(settings: APERtrailSettings): LocationConfig[] {
     { location: 'landmarks', folder: settings.landmarksFolder, expectedType: 'landmark' },
     { location: 'locations', folder: settings.locationsFolder, expectedType: 'location' },
     { location: 'photoSpots', folder: settings.photoSpotsFolder, expectedType: 'photospot' },
+    { location: 'vehicles', folder: settings.vehiclesFolder, expectedType: 'vehicle' },
     // Configured rather than literal, and trimmed here so a value saved
     // with stray whitespace still compares equal to what a note carries.
     { location: 'persons', folder: settings.personsFolder, expectedType: settings.personTypeValue },

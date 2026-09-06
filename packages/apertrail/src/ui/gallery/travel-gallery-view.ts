@@ -70,8 +70,16 @@ export const TRAVEL_GALLERY_VIEW_TYPE = 'apertrail-gallery-view';
  * would make the gallery worse rather than more complete. Its evidence lives
  * in the trip's costs block instead. See
  * docs/design/trip-budget-and-bookings.md §7.5.
+ *
+ * **Vehicles are excluded for the second half of that argument only.** A ship
+ * has a picture and would look right here, and the rest of the view would not:
+ * every facet beside the chips is a place facet -- visited, last visit, rating
+ * -- and a vehicle answers none of them, so touching one would empty the grid
+ * of exactly the rows somebody had just filtered to. Worth doing properly
+ * later; see docs/design/vehicles.md.
  */
-export type GalleryTypeFilter = 'all' | Exclude<TravelEntityType, 'booking'> | CrmEntityType;
+export type GalleryTypeFilter =
+  'all' | Exclude<TravelEntityType, 'booking' | 'vehicle'> | CrmEntityType;
 
 /**
  * A gallery row. The facet fields below are null/empty for entity types

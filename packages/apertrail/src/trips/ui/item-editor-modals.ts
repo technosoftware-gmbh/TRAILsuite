@@ -24,6 +24,8 @@ import { APERtrailSettings } from '../../settings/types';
 import {
   TripDayInput,
   TripLegInput,
+  TripLineChoiceInput,
+  TripVariantInput,
   TripNightInput,
   TripStopInput,
   TRIP_LEG_MODES,
@@ -105,6 +107,165 @@ function photoSpotByTitle(
  * alone cannot say what it means. The dropdown opens on whichever unit that
  * kind of line is normally quoted in, which is why `kind` is here.
  */
+/**
+ * What a line costs, in all three of the shapes it may take.
+ *
+ * One helper for the stop, the stay and the leg, because the question is the
+ * same on all three: one price, or several to choose between, and does this
+ * line happen at all. Three copies of it would be three places for the rules
+ * below to drift apart.
+ *
+ * **One figure or a list of variants, never both on screen.** A line carrying
+ * variants is priced from them and its own `cost` is not read, so leaving the
+ * plain field there would be a control whose value is ignored -- this
+ * package's recurring defect shape in UI form.
+ */
+function renderPriceFields(
+  containerEl: HTMLElement,
+  costLabel: string,
+  value: TripLineChoiceInput & { cost: number | null; currency: string | null; costUnit: CostUnit },
+  settings: APERtrailSettings,
+  kind: 'stop' | 'night' | 'leg',
+  rerender: () => void
+): void {
+  if (value.variants.length === 0) {
+    renderCostField(containerEl, costLabel, value, settings, kind);
+  }
+  renderVariantFields(containerEl, costLabel, value, settings, kind, rerender);
+  renderOptionalField(containerEl, value, rerender);
+}
+
+/**
+ * The several prices one thing is sold at.
+ *
+ * Alternatives rather than extras: a cabin category, a room category, a longer
+ * version of the same excursion. Exactly one is ever bought, which is why
+ * ticking one unticks the rest here rather than leaving a note that says two
+ * prices are both the price.
+ */
+function renderVariantFields(
+  containerEl: HTMLElement,
+  costLabel: string,
+  value: TripLineChoiceInput & { cost: number | null; currency: string | null; costUnit: CostUnit },
+  settings: APERtrailSettings,
+  kind: 'stop' | 'night' | 'leg',
+  rerender: () => void
+): void {
+  new Setting(containerEl)
+    .setName(t('modals.tripEditor.variants'))
+    .setDesc(t('modals.tripEditor.variantsDesc'))
+    .addButton((button) =>
+      button.setButtonText(t('modals.tripEditor.addVariant')).onClick(() => {
+        // The first variant takes over the line's own figure rather than
+        // starting empty beside it. A price already typed is the price of one
+        // of these; leaving it above would be a number nothing reads, and
+        // clearing it without moving it would lose it.
+        const first = value.variants.length === 0;
+        const variant: TripVariantInput = {
+          name: null,
+          description: null,
+          cost: first ? value.cost : null,
+          currency: first ? value.currency : null,
+          costUnit: first ? value.costUnit : (costUnitsFor(kind)[0] ?? 'total'),
+          chosen: false,
+        };
+        if (first) value.cost = null;
+        value.variants.push(variant);
+        rerender();
+      })
+    );
+
+  value.variants.forEach((variant, index) => {
+    // Numbered, because the three rows below are identically labelled and a
+    // second set of them appearing underneath the first reads as nothing
+    // having happened. Reported as exactly that: "clicking it doesn't give any
+    // feedback", on a leg where the click had in fact worked every time.
+    new Setting(containerEl)
+      .setName(t('modals.tripEditor.variantNumber', { number: index + 1 }))
+      .setHeading();
+
+    new Setting(containerEl)
+      .setName(t('modals.tripEditor.variantName'))
+      .addText((text) =>
+        text
+          .setPlaceholder(t('modals.tripEditor.variantNamePlaceholder'))
+          .setValue(variant.name ?? '')
+          .onChange((raw) => {
+            variant.name = raw.trim() === '' ? null : raw;
+          })
+      )
+      .addToggle((toggle) =>
+        toggle
+          .setTooltip(t('modals.tripEditor.variantChosen'))
+          .setValue(variant.chosen)
+          .onChange((on) => {
+            // Exactly one, or none. A set of alternatives with two ticks is
+            // not a choice, and the note would not say which figure the
+            // budget used.
+            for (const other of value.variants) other.chosen = false;
+            variant.chosen = on;
+            rerender();
+          })
+      )
+      .addExtraButton((button) =>
+        button
+          .setIcon('trash-2')
+          .setTooltip(t('modals.tripEditor.removeVariant'))
+          .onClick(() => {
+            value.variants.splice(index, 1);
+            rerender();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName(t('modals.tripEditor.variantDescription'))
+      .addTextArea((text) =>
+        text.setValue(variant.description ?? '').onChange((raw) => {
+          variant.description = raw.trim() === '' ? null : raw;
+        })
+      );
+
+    renderCostField(containerEl, costLabel, variant, settings, kind);
+  });
+}
+
+/**
+ * Whether the line happens at all, and whether it has been decided on.
+ *
+ * The second switch appears only once the first is on, because "chosen" means
+ * nothing on a line that was never in question -- and a control whose value is
+ * ignored is the shape this file exists to avoid.
+ */
+function renderOptionalField(
+  containerEl: HTMLElement,
+  value: TripLineChoiceInput,
+  rerender: () => void
+): void {
+  new Setting(containerEl)
+    .setName(t('modals.tripEditor.optional'))
+    .setDesc(t('modals.tripEditor.optionalDesc'))
+    .addToggle((toggle) =>
+      toggle.setValue(value.optional).onChange((on) => {
+        value.optional = on;
+        // Turning it back off leaves nothing behind to be read later as a
+        // decision about a line that is no longer optional.
+        if (!on) value.chosen = false;
+        rerender();
+      })
+    );
+
+  if (!value.optional) return;
+
+  new Setting(containerEl)
+    .setName(t('modals.tripEditor.optionalChosen'))
+    .setDesc(t('modals.tripEditor.optionalChosenDesc'))
+    .addToggle((toggle) =>
+      toggle.setValue(value.chosen).onChange((on) => {
+        value.chosen = on;
+      })
+    );
+}
+
 function renderCostField(
   containerEl: HTMLElement,
   label: string,
@@ -428,12 +589,13 @@ export class StopEditorModal extends ItemEditorModal<TripStopInput> {
     // The museum entry, the guide, the cable car: the third kind of
     // estimate, and the one that previously had nowhere to live but a
     // booking note of its own.
-    renderCostField(
+    renderPriceFields(
       containerEl,
       t('modals.tripEditor.stopCost'),
       this.value,
       this.settings,
-      'stop'
+      'stop',
+      () => this.render()
     );
     renderTravellersField(containerEl, this.value, this.participants);
   }
@@ -605,12 +767,13 @@ export class NightEditorModal extends ItemEditorModal<TripNightInput> {
       );
     }
 
-    renderCostField(
+    renderPriceFields(
       containerEl,
       t('modals.tripEditor.nightCost'),
       this.value,
       this.settings,
-      'night'
+      'night',
+      () => this.render()
     );
     renderTravellersField(containerEl, this.value, this.participants);
   }
@@ -695,6 +858,22 @@ export class LegEditorModal extends ItemEditorModal<TripLegInput> {
         }
       );
     }
+    // The ship or named train, under the carrier: Hurtigruten is who runs it
+    // and MS Trollfjord is what you are on, and a leg often wants to say both.
+    // A wikilink where the vault has a note for it, plain text where it does
+    // not, exactly like the carrier above.
+    new Setting(containerEl)
+      .setName(t('modals.tripEditor.legVehicle'))
+      .setDesc(t('modals.tripEditor.legVehicleDesc'))
+      .addText((text) =>
+        text
+          .setPlaceholder(t('modals.tripEditor.legVehiclePlaceholder'))
+          .setValue(this.value.vehicleTitle ?? '')
+          .onChange((raw) => {
+            this.value.vehicleTitle = raw.trim() === '' ? null : raw;
+          })
+      );
+
     // Above the reference, because who flies it is the thing somebody knows
     // first: an airline is chosen with the leg, and a booking number arrives
     // weeks later.
@@ -718,7 +897,14 @@ export class LegEditorModal extends ItemEditorModal<TripLegInput> {
         })
       );
 
-    renderCostField(containerEl, t('modals.tripEditor.legCost'), this.value, this.settings, 'leg');
+    renderPriceFields(
+      containerEl,
+      t('modals.tripEditor.legCost'),
+      this.value,
+      this.settings,
+      'leg',
+      () => this.render()
+    );
     renderTravellersField(containerEl, this.value, this.participants);
   }
 }

@@ -43,6 +43,9 @@ import { moveInList } from '../../shared/reorder';
 import { itineraryDays, ItineraryDayGroup, spannedDates } from '../itinerary-days';
 import { clockTime, endpointDate, RelativeEndpoint } from '../relative-days';
 import { legClock, legWhen } from '../journey-text';
+import { legsArrivingOn } from '../leg-arrivals';
+import { cabinDescription } from '../../places/vehicle-note';
+import { countsInPlan, lineFigure } from '../costs/line-variants';
 import { insertDayBefore, removeDay } from '../day-shift';
 import {
   dayAnchor,
@@ -60,13 +63,19 @@ import { legRoute } from '../costs/estimates';
 import { CostUnit, lineCost, LineCost, lineTravellers } from '../costs/line-cost';
 import { BookingPreset, NewBookingModal } from './new-booking-modal';
 import { exportTripDocument } from './export-trip-document';
-import { TravelBooking } from '../../vault/types';
+import { TravelBooking, TravelVehicle } from '../../vault/types';
 import { resolveImageFile } from '../../ui/components/image-resolve';
 import { hour12For } from '../../shared/clock';
 import { formatDistanceIn } from '../../shared/units';
 import { stopMotif } from '../trip-light';
 import { TRAVEL_ITINERARY_BLOCK_LANG, TripInput, tripToInput, updateTripNote } from '../write-trip';
-import { TripLegInput, TripNightInput, TripStopInput } from '../trip-note';
+import {
+  ParsedTripLineChoice,
+  TripLegInput,
+  TripLineChoiceInput,
+  TripNightInput,
+  TripStopInput,
+} from '../trip-note';
 import { TravelPlace, TravelStopTargetKind, TravelTrip, TravelTripStop } from '../../vault/types';
 import {
   DayEditorModal,
@@ -85,7 +94,7 @@ export { TRAVEL_ITINERARY_BLOCK_LANG };
  * shape covers them. The stay's dates are optional because only a stay has
  * any.
  */
-interface PricedLine {
+interface PricedLine extends ParsedTripLineChoice {
   cost: number | null;
   currency: string | null;
   costUnit: CostUnit;
@@ -259,6 +268,23 @@ function renderAddButton(container: HTMLElement, label: string, onClick: () => v
  * up. Redrawing on the cache's own 'changed' event instead removes the
  * race rather than papering over it with a delay.
  */
+/**
+ * What a freshly added line says about its own choices: nothing yet.
+ *
+ * Named rather than typed out at each of the three drafts, so a fourth field
+ * on the shape is a compile error in one place rather than three silent
+ * defaults.
+ *
+ * **A function rather than a constant, and that is the whole point.** Spreading
+ * a shared constant copies its array by reference, so every draft would have
+ * held the same `variants` array: a price added to one new line would have
+ * turned up on every line created after it, for the rest of the session. A
+ * fresh object each call cannot do that.
+ */
+export function emptyChoice(): TripLineChoiceInput {
+  return { variants: [], optional: false, chosen: false };
+}
+
 class ItineraryRenderer extends MarkdownRenderChild {
   constructor(
     private readonly app: App,
@@ -403,6 +429,23 @@ class ItineraryRenderer extends MarkdownRenderChild {
       // is where a brochure puts it.
       if (group.note) {
         this.el.createDiv({ cls: 'apt-itinerary-day-note', text: group.note });
+      }
+
+      // What ends here. A leg lives in the transport band and is edited
+      // there; this is the one line saying the fifteen-day voyage finishes on
+      // this day, which the band cannot say because it has no days in it.
+      for (const leg of legsArrivingOn(trip.transport, group, trip.departure)) {
+        const arrival = this.el.createDiv({ cls: 'apt-itinerary-arrival' });
+        setIcon(
+          arrival.createSpan({ cls: 'apt-itinerary-arrival-icon' }),
+          (leg.mode && MODE_ICONS[leg.mode]) || 'route'
+        );
+        arrival.createSpan({
+          text: t('itinerary.legArrival', {
+            leg:
+              legRoute(leg, t('itinerary.legJoiner')) ?? leg.carrier ?? t('itinerary.unnamedLeg'),
+          }),
+        });
       }
 
       // A backdrop, not a control: where the day's stops actually fall
@@ -563,8 +606,10 @@ class ItineraryRenderer extends MarkdownRenderChild {
     }
 
     this.renderSpotBadges(body, stop);
+    this.renderVariants(trip, body, stop, (input) => input.stops[index]);
     const stopBookings = bookingsForPlace(this.bookings, stop.placeTitle);
     this.renderCostChips(body, stopBookings, stop, trip.personTitles);
+    this.renderOptionalChip(trip, body, stop, (input) => input.stops[index]);
 
     renderRowActions(row, [
       {
@@ -687,10 +732,19 @@ class ItineraryRenderer extends MarkdownRenderChild {
   }
 
   /** The line's own arithmetic, done against the trip's people. Redone on every render, stored nowhere. */
+  /**
+   * What the row's own figure comes to.
+   *
+   * Through `lineFigure` rather than off the line directly, so a row priced
+   * by variant shows the same number the totals counted. A row that showed
+   * one cabin's price while the budget counted another's would be the exact
+   * failure the money rules exist to prevent.
+   */
   private figureFor(line: PricedLine, participants: string[]): LineCost {
+    const figure = lineFigure(line);
     return lineCost({
-      cost: line.cost,
-      unit: line.costUnit,
+      cost: figure.cost,
+      unit: figure.costUnit,
       persons: line.persons,
       participants,
       checkIn: line.checkIn,
@@ -742,12 +796,18 @@ class ItineraryRenderer extends MarkdownRenderChild {
     // it. The working is spelled out because the multiplication is redone on
     // every render and stored nowhere, so the only defence against a wrong
     // total is being able to read where it came from.
-    if (pending !== null && figure) {
-      const currency = line?.currency ?? this.tripCurrency;
+    if (pending !== null && figure && line) {
+      // The variant's currency where there is one, since that is where the
+      // figure came from.
+      const currency = lineFigure(line).currency ?? this.tripCurrency;
       const chip = row.createSpan({ cls: 'apt-chip apt-itinerary-estimate' });
       setIcon(chip.createSpan({ cls: 'apt-chip-icon' }), 'circle-dashed');
       chip.createSpan({ text: formatMoney(pending, currency) });
-      chip.setAttr('title', `${t('costs.estimateChip')} · ${costWorking(figure, currency)}`);
+      // An extra nobody has taken is priced and not planned, and the chip has
+      // to say which of the two it is: the same number means different things
+      // in a total that counts it and one that does not.
+      const kind = countsInPlan(line) ? t('costs.estimateChip') : t('itinerary.optional');
+      chip.setAttr('title', `${kind} · ${costWorking(figure, currency)}`);
     }
 
     for (const booking of bookings) {
@@ -828,10 +888,26 @@ class ItineraryRenderer extends MarkdownRenderChild {
       // the row is about, and "Outward journey, LX288" is what qualifies it.
       const route = legRoute(leg, t('itinerary.legJoiner'));
       body.createSpan({ text: route ?? direction });
-      const detail = [route ? direction : null, leg.carrier, leg.reference]
+      // The ship's name between the carrier and the reference: Hurtigruten is
+      // who runs it and MS Trollfjord is what you are on, and the row reads in
+      // that order.
+      const detail = [route ? direction : null, leg.carrier, leg.vehicleTitle, leg.reference]
         .filter((part): part is string => !!part)
         .join(' · ');
       if (detail) body.createDiv({ cls: 'apt-itinerary-note', text: detail });
+      // A link only where the vault has the note. A ship somebody only typed
+      // the name of still reads, in the line above.
+      if (leg.vehicle) {
+        const open = body.createDiv({ cls: 'apt-itinerary-note' });
+        const link = open.createEl('a', {
+          cls: 'apt-itinerary-link',
+          text: leg.vehicle.title,
+        });
+        link.addEventListener('click', (event) => {
+          event.preventDefault();
+          this.deps.openFile(leg.vehicle?.file.path ?? '');
+        });
+      }
       // Transport legs sit in their own band with no day header above
       // them, so without this an outbound leg on the 8th and an inbound
       // one on the 12th render as two bare time ranges on what looks like
@@ -840,6 +916,8 @@ class ItineraryRenderer extends MarkdownRenderChild {
       // which is how a timetable says it and how this used to say it twice.
       const span = legWhen(leg, trip.departure);
       if (span) body.createDiv({ cls: 'apt-itinerary-note', text: span });
+      this.renderVariants(trip, body, leg, (input) => input.transport[index], leg.vehicle);
+      this.renderOptionalChip(trip, body, leg, (input) => input.transport[index]);
       // A leg has no identity of its own, so it is matched on the reference
       // both sides already carry.
       const legBookings = bookingsForReference(this.bookings, leg.reference);
@@ -868,6 +946,138 @@ class ItineraryRenderer extends MarkdownRenderChild {
     });
   }
 
+  /**
+   * The prices one line can be bought at, and which of them the budget counts.
+   *
+   * Drawn under the line rather than as lines of their own, because they are
+   * one thing: three cabins on the same voyage on the same days is one leg
+   * with a decision still open on it, not three legs.
+   *
+   * The chosen one is marked and every other stays legible, which is the
+   * point -- the reason to keep the alternatives in the note is to be able to
+   * change your mind with the prices still in front of you. Clicking the
+   * chosen one again leaves the choice open, because withdrawing a decision is
+   * a thing people do and re-typing four prices to do it is not.
+   *
+   * `pick` hands back the same line out of a fresh `TripInput`, which is what
+   * lets one renderer serve a stop, a stay and a leg: only the caller knows
+   * which list its row came from.
+   */
+  private renderVariants(
+    trip: TravelTrip,
+    body: HTMLElement,
+    line: ParsedTripLineChoice & { currency: string | null },
+    pick: (input: TripInput) => TripLineChoiceInput | undefined,
+    /**
+     * The vehicle this line is taken on, where there is one.
+     *
+     * A cabin's description is a fact about the ship and is written once, in
+     * the ship's own note; the price is a fact about this sailing and is
+     * written here. So a variant with no description of its own borrows the
+     * catalogue's, at render time and never on disk -- correcting the ship
+     * note corrects every trip that ever sailed on it.
+     */
+    vehicle: TravelVehicle | null = null
+  ): void {
+    if (line.variants.length === 0) return;
+
+    const settings = this.deps.getSettings();
+    const list = body.createDiv({ cls: 'apt-itinerary-options' });
+
+    line.variants.forEach((variant, variantIndex) => {
+      const row = list.createDiv({
+        cls: variant.chosen ? 'apt-itinerary-option is-chosen' : 'apt-itinerary-option',
+      });
+      setIcon(
+        row.createSpan({ cls: 'apt-itinerary-option-mark' }),
+        variant.chosen ? 'circle-check' : 'circle'
+      );
+      const text = row.createDiv({ cls: 'apt-itinerary-option-body' });
+      const head = text.createDiv({ cls: 'apt-itinerary-option-head' });
+      head.createSpan({
+        cls: 'apt-itinerary-option-name',
+        text: variant.name ?? t('itinerary.variantUnnamed', { number: variantIndex + 1 }),
+      });
+      if (settings.budgetEnabled && variant.cost !== null) {
+        head.createSpan({
+          cls: 'apt-itinerary-option-price',
+          text: formatMoney(variant.cost, variant.currency ?? line.currency ?? this.tripCurrency),
+        });
+      }
+      const description = variant.description ?? cabinDescription(vehicle, variant.name);
+      if (description) {
+        text.createDiv({ cls: 'apt-itinerary-note', text: description });
+      }
+
+      row.setAttr('role', 'button');
+      row.setAttr(
+        'aria-label',
+        variant.chosen ? t('itinerary.variantClear') : t('itinerary.variantChoose')
+      );
+      row.addEventListener('click', () => {
+        this.save(trip, (input) => {
+          const target = pick(input);
+          if (!target) return;
+          // Exactly one, or none: a set of alternatives with two ticks is not
+          // a choice, and the reader of the note would have no way to tell
+          // which figure the budget used.
+          target.variants.forEach((candidate, candidateIndex) => {
+            candidate.chosen = candidateIndex === variantIndex && !variant.chosen;
+          });
+        });
+      });
+    });
+
+    // Said once, under the list: the budget is counting a figure nobody has
+    // picked, and a row that showed a number without saying so would be
+    // claiming a decision that has not been made.
+    if (!line.variants.some((variant) => variant.chosen)) {
+      list.createDiv({ cls: 'apt-itinerary-note', text: t('itinerary.variantAssumed') });
+    }
+  }
+
+  /**
+   * A line that may not happen, and whether it has been taken.
+   *
+   * A chip rather than a row of its own, and it is the control as well as the
+   * label: clicking it is how an offered excursion becomes part of the plan.
+   * Nothing is drawn for the ordinary line, which is most of them.
+   */
+  private renderOptionalChip(
+    trip: TravelTrip,
+    body: HTMLElement,
+    line: ParsedTripLineChoice,
+    pick: (input: TripInput) => TripLineChoiceInput | undefined
+  ): void {
+    if (!line.optional) return;
+
+    const row = body.createDiv({ cls: 'apt-chips apt-itinerary-costs' });
+    const chip = row.createSpan({
+      cls: line.chosen
+        ? 'apt-chip apt-itinerary-optional is-chosen'
+        : 'apt-chip apt-itinerary-optional',
+    });
+    setIcon(
+      chip.createSpan({ cls: 'apt-chip-icon' }),
+      line.chosen ? 'circle-check' : 'circle-help'
+    );
+    chip.createSpan({
+      text: line.chosen ? t('itinerary.optionalTaken') : t('itinerary.optional'),
+    });
+    chip.setAttr('role', 'button');
+    chip.setAttr(
+      'aria-label',
+      line.chosen ? t('itinerary.optionalDrop') : t('itinerary.optionalTake')
+    );
+    chip.addEventListener('click', () => {
+      this.save(trip, (input) => {
+        const target = pick(input);
+        if (!target) return;
+        target.chosen = !line.chosen;
+      });
+    });
+  }
+
   private renderNights(trip: TravelTrip): void {
     const heading = this.el.createDiv({ cls: 'apt-itinerary-band-row' });
     heading.createSpan({
@@ -892,8 +1102,10 @@ class ItineraryRenderer extends MarkdownRenderChild {
         trip.departure
       );
       if (span) body.createDiv({ cls: 'apt-itinerary-note', text: span });
+      this.renderVariants(trip, body, night, (input) => input.nights[index]);
       const nightBookings = bookingsForPlace(this.bookings, night.accommodationTitle);
       this.renderCostChips(body, nightBookings, night, trip.personTitles);
+      this.renderOptionalChip(trip, body, night, (input) => input.nights[index]);
 
       renderRowActions(row, [
         {
@@ -994,6 +1206,7 @@ class ItineraryRenderer extends MarkdownRenderChild {
       // nothing still reads as a total; see costs/line-cost.ts.
       costUnit: 'person',
       persons: [],
+      ...emptyChoice(),
     };
     new StopEditorModal(
       this.app,
@@ -1090,6 +1303,7 @@ class ItineraryRenderer extends MarkdownRenderChild {
       // A hotel quotes a room per night, whoever is in it.
       costUnit: 'night',
       persons: [],
+      ...emptyChoice(),
     };
     new NightEditorModal(
       this.app,
@@ -1130,6 +1344,7 @@ class ItineraryRenderer extends MarkdownRenderChild {
       direction: hasOutbound ? 'inbound' : 'outbound',
       mode: null,
       carrier: null,
+      vehicleTitle: null,
       day: null,
       toDay: null,
       from: null,
@@ -1143,6 +1358,7 @@ class ItineraryRenderer extends MarkdownRenderChild {
       // exists: two people on this leg is two fares.
       costUnit: 'person',
       persons: [],
+      ...emptyChoice(),
     };
     new LegEditorModal(
       this.app,

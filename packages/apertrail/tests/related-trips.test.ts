@@ -4,9 +4,9 @@
  * See trips/related-trips.ts.
  */
 import { describe, expect, it } from 'vitest';
-import { relatedTrips, tripsWithPerson } from '../src/trips/related-trips';
+import { relatedTrips, tripsOnVehicle, tripsWithPerson } from '../src/trips/related-trips';
 import { TravelBoard, TravelTrip, TravelTripStop } from '../src/vault/types';
-import { aBoard, aStop, aTrip } from './fixtures';
+import { aBoard, aLeg, aStop, aTrip } from './fixtures';
 
 function stop(
   placeTitle: string | null,
@@ -135,5 +135,41 @@ describe('tripsWithPerson', () => {
   it('matches on the exact title, not a partial one', () => {
     const b = board([trip('A', { personTitles: ['Marcus'] })]);
     expect(tripsWithPerson(b, 'Marc')).toEqual([]);
+  });
+});
+
+/**
+ * The other side of a leg's vehicle link: which trips sailed on this ship.
+ *
+ * Matched on the raw title for the reason a person is: a ship somebody typed
+ * the name of, with no note behind it, is still the ship they sailed on.
+ */
+describe('trips on a vehicle', () => {
+  const nordkap = aTrip('Nordkap', {
+    departure: '2026-12-20',
+    transport: [aLeg({ vehicleTitle: 'MS Trollfjord' })],
+  });
+  const jura = aTrip('Jura', {
+    departure: '2026-06-14',
+    transport: [aLeg({ carrier: 'SBB' })],
+  });
+
+  it('finds the trip with a leg on it', () => {
+    const board = aBoard({ trips: [nordkap, jura] });
+
+    expect(tripsOnVehicle(board, 'MS Trollfjord').map((visit) => visit.trip.title)).toEqual([
+      'Nordkap',
+    ]);
+  });
+
+  /** Being aboard is a fact about the leg, and a leg is not a stop. */
+  it('names no stops', () => {
+    const board = aBoard({ trips: [nordkap] });
+
+    expect(tripsOnVehicle(board, 'MS Trollfjord')[0]?.stops).toEqual([]);
+  });
+
+  it('finds nothing for a ship no trip names', () => {
+    expect(tripsOnVehicle(aBoard({ trips: [nordkap, jura] }), 'MS Nordlys')).toEqual([]);
   });
 });

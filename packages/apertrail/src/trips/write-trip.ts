@@ -22,6 +22,7 @@ import type { TripGalleryInput } from './trip-note';
 import { touchModified } from '../vault/note-stamps';
 import { TravelTrip } from '../vault/types';
 import {
+  ParsedTripLineChoice,
   TravelStatusValue,
   TripBudgetInput,
   TripDayInput,
@@ -119,6 +120,26 @@ function initialBody(): string {
  * everything else unchanged rather than rebuilding it field by field.
  * Used by the itinerary block's per-item editing.
  */
+/**
+ * The three shared sub-keys, copied rather than aliased.
+ *
+ * The variants are copied one by one rather than by a spread of the line: a
+ * shared array would let an editor's change reach the board the block is still
+ * rendering from, which is the one thing a read-time projection must not do.
+ *
+ * `?? []` and `?? false` for the reason `cleanDay` takes undefined in
+ * trip-note.ts: a line assembled by hand, or by a caller written before these
+ * existed, leaves the sub-key off rather than passing a value for it, and an
+ * editor opened on such a line must not fall over.
+ */
+function lineChoiceOf(line: Partial<ParsedTripLineChoice>): ParsedTripLineChoice {
+  return {
+    variants: (line.variants ?? []).map((variant) => ({ ...variant })),
+    optional: line.optional ?? false,
+    chosen: line.chosen ?? false,
+  };
+}
+
 export function tripToInput(trip: TravelTrip): TripInput {
   return {
     subtitle: trip.subtitle,
@@ -153,6 +174,7 @@ export function tripToInput(trip: TravelTrip): TripInput {
       currency: stop.currency,
       costUnit: stop.costUnit,
       persons: [...stop.persons],
+      ...lineChoiceOf(stop),
     })),
     nights: trip.nights.map((night) => ({
       accommodationTitle: night.accommodationTitle ?? '',
@@ -164,8 +186,13 @@ export function tripToInput(trip: TravelTrip): TripInput {
       currency: night.currency,
       costUnit: night.costUnit,
       persons: [...night.persons],
+      ...lineChoiceOf(night),
     })),
-    transport: trip.transport.map((leg) => ({ ...leg, persons: [...leg.persons] })),
+    transport: trip.transport.map((leg) => ({
+      ...leg,
+      persons: [...leg.persons],
+      ...lineChoiceOf(leg),
+    })),
   };
 }
 

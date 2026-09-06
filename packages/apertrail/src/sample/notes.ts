@@ -125,6 +125,7 @@ export function sampleNotes(settings: APERtrailSettings, now: Date): SampleNote[
     ...states(settings),
     ...cities(settings),
     ...places(settings),
+    ...vehicles(settings),
     ...trips(settings),
     ...crm(settings),
   ];
@@ -467,6 +468,9 @@ function trips(settings: APERtrailSettings): SampleNote[] {
         currency: null,
         costUnit: 'total',
         persons: [],
+        variants: [],
+        optional: false,
+        chosen: false,
       },
       {
         placeTitle: 'Table Mountain',
@@ -480,6 +484,9 @@ function trips(settings: APERtrailSettings): SampleNote[] {
         currency: 'ZAR',
         costUnit: 'person',
         persons: [],
+        variants: [],
+        optional: false,
+        chosen: false,
       },
       {
         placeTitle: 'Signal Hill',
@@ -496,6 +503,9 @@ function trips(settings: APERtrailSettings): SampleNote[] {
         currency: null,
         costUnit: 'total',
         persons: [],
+        variants: [],
+        optional: false,
+        chosen: false,
       },
     ],
     nights: [
@@ -511,6 +521,9 @@ function trips(settings: APERtrailSettings): SampleNote[] {
         // by the people in it. The leg below is the other case.
         costUnit: 'night',
         persons: [],
+        variants: [],
+        optional: false,
+        chosen: false,
       },
     ],
     transport: [
@@ -521,6 +534,9 @@ function trips(settings: APERtrailSettings): SampleNote[] {
         // its title either way, which is what lets an airline that will never
         // be a note stand as plain text in the same field.
         carrier: link('Rovos Rail Charters'),
+        // The company runs it; the train is the thing you are on. The sample
+        // carries both because the pair is the whole reason the field exists.
+        vehicleTitle: 'Rovos Rail Pride of Africa',
         day: null,
         toDay: null,
         from: '2026-02-09T09:00',
@@ -532,11 +548,23 @@ function trips(settings: APERtrailSettings): SampleNote[] {
         currency: 'ZAR',
         costUnit: 'person',
         persons: [],
+        // One price, which is what a line usually has. The variants a line
+        // can carry, and the optional flag beside them, are demonstrated in
+        // the tests rather than here: the sample vault is a fixture other
+        // suites assert figures against, and a second price on it would be a
+        // second figure to keep in step.
+        variants: [],
+        optional: false,
+        chosen: false,
       },
       {
         direction: 'inbound',
         mode: 'plane',
         carrier: 'Swiss',
+        // A flight is not a vehicle note. Nobody keeps a note per airframe,
+        // which is why this is a link somebody may make rather than a field
+        // every leg fills in.
+        vehicleTitle: null,
         day: null,
         toDay: null,
         from: '2026-02-14T18:30',
@@ -548,6 +576,14 @@ function trips(settings: APERtrailSettings): SampleNote[] {
         currency: 'CHF',
         costUnit: 'person',
         persons: [],
+        // One price, which is what a line usually has. The variants a line
+        // can carry, and the optional flag beside them, are demonstrated in
+        // the tests rather than here: the sample vault is a fixture other
+        // suites assert figures against, and a second price on it would be a
+        // second figure to keep in step.
+        variants: [],
+        optional: false,
+        chosen: false,
       },
     ],
     currency: 'CHF',
@@ -634,6 +670,55 @@ function trips(settings: APERtrailSettings): SampleNote[] {
  * one more person than these two is not a vault this plugin should decline to
  * help.
  */
+/**
+ * The thing you travel on, as against the places you travel to.
+ *
+ * One note, and it is the train the sample's own trip is taken on, so the
+ * `vehicle:` on that leg resolves to something a reader can open. It carries
+ * the two halves that are easy to get wrong: an `operator:` pointing at the
+ * Company note beside it -- a fact about the train, and still no link from a
+ * trip to a company -- and a cabin catalogue with no prices in it, because
+ * what a suite costs belongs to the sailing that books it and lives on the
+ * leg's variants.
+ */
+function vehicles(settings: APERtrailSettings): SampleNote[] {
+  return [
+    {
+      folder: settings.vehiclesFolder,
+      title: 'Rovos Rail Pride of Africa',
+      typeValue: 'vehicle',
+      properties: {
+        [settings.vehicleModeProperty]: 'train',
+        [settings.vehicleOperatorProperty]: link('Rovos Rail Charters'),
+        [settings.vehicleBuiltProperty]: '1989',
+        [settings.vehicleRefurbishedProperty]: '2019',
+        [settings.vehicleCapacityProperty]: 72,
+        [settings.vehicleLengthProperty]: '20 coaches',
+        [settings.websiteProperty]: 'https://rovos-charters.example/pride-of-africa',
+        [settings.vehicleCabinsProperty]: [
+          {
+            [settings.cabinNameField]: 'Pullman Suite',
+            [settings.cabinDescriptionField]:
+              'Two berths, a shower room, and a window seat that converts. About 7 m2.',
+          },
+          {
+            [settings.cabinNameField]: 'Deluxe Suite',
+            [settings.cabinDescriptionField]:
+              'Twin or double, a private bathroom with a shower, and a small lounge area. About 10 m2.',
+          },
+          {
+            [settings.cabinNameField]: 'Royal Suite',
+            [settings.cabinDescriptionField]:
+              'Half a carriage: a lounge, a bathroom with a Victorian bath, and both windows. About 16 m2.',
+          },
+        ],
+      },
+      body: relatedTripsBody(),
+      ensureBlock: TRAVEL_RELATED_TRIPS_BLOCK_LANG,
+    },
+  ];
+}
+
 function crm(settings: APERtrailSettings): SampleNote[] {
   const person = (title: string, email: string): SampleNote => ({
     folder: settings.personsFolder,

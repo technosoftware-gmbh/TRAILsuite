@@ -23,8 +23,10 @@
  * Pure. See docs/design/trip-budget-and-bookings.md.
  */
 import { BookingCategory, ParsedBooking } from './booking-note';
+import { countsInPlan, lineFigure, VariedLine } from './line-variants';
 import { lineCost, LineCost, lineTravellers } from './line-cost';
 import { ParsedTripLeg, ParsedTripNight, ParsedTripStop } from '../trip-note';
+import { plannedByCategory, plannedTotal } from './planned-total';
 
 /** The three words the labels supply, kept out of here so this file never learns what language it is in. */
 export interface EstimateLabelWords {
@@ -43,7 +45,7 @@ export interface EstimatedTrip {
 }
 
 /** Any line that can carry a figure. The three differ in everything else and in nothing here. */
-type LineFigure = Pick<ParsedTripLeg, 'cost' | 'currency' | 'costUnit' | 'persons'>;
+type PricedLine = VariedLine & { persons: string[] };
 
 /** One priced itinerary item, in the shape the totals understand. */
 export interface ItemEstimate {
@@ -58,6 +60,16 @@ export interface ItemEstimate {
   persons: string[];
   /** The multiplication behind the amount, so a row can show its working instead of asking to be trusted. */
   cost: LineCost;
+  /**
+   * True for an extra nobody has taken.
+   *
+   * Such a line is priced like any other and is deliberately still returned:
+   * what the extras would add is a figure worth showing, beside the plan
+   * rather than inside it. `plannedEstimates()` and `optionalEstimates()`
+   * below are the two ends of that split, and nothing should filter on this
+   * field by hand.
+   */
+  optional: boolean;
 }
 
 const key = (value: string | null): string => (value ?? '').trim().toLowerCase();
@@ -93,12 +105,7 @@ export function tripItemEstimates(trip: EstimatedTrip, labels: EstimateLabelWord
   const push = (
     label: string,
     category: BookingCategory,
-    line: {
-      cost: number | null;
-      currency: string | null;
-      costUnit: LineFigure['costUnit'];
-      persons: string[];
-    },
+    line: PricedLine,
     reference: string | null,
     dates: {
       checkIn?: string | null;
@@ -107,22 +114,31 @@ export function tripItemEstimates(trip: EstimatedTrip, labels: EstimateLabelWord
       checkOutDay?: number | null;
     } = {}
   ): void => {
+    // The figure comes through `lineFigure` for every kind of line, so a
+    // row priced by variant and a plain one cannot take different paths to
+    // the same total. It also settles what happens to a line stating both a
+    // price and a set of variants: the variants win.
+    const figure = lineFigure(line);
     const cost = lineCost({
-      cost: line.cost,
-      unit: line.costUnit,
+      cost: figure.cost,
+      unit: figure.costUnit,
       persons: line.persons,
       participants,
       ...dates,
     });
     if (cost.amount === null) return;
     estimates.push({
-      label,
+      // A row that said only "Oslo to Copenhagen" would not say which cabin
+      // its number is for, and that is the whole difference between the two
+      // figures on such a line.
+      label: figure.variant?.name ? `${label} · ${figure.variant.name}` : label,
       category,
       amount: cost.amount,
-      currency: line.currency,
+      currency: figure.currency,
       reference,
       persons: lineTravellers(line.persons, participants),
       cost,
+      optional: !countsInPlan(line),
     });
   };
 
@@ -180,6 +196,23 @@ export function unmatchedEstimates(
 }
 
 /**
+ * The estimates that belong in the plan: everything but an extra nobody has
+ * taken.
+ *
+ * A named function rather than a filter written out at each call site, so
+ * "what counts as planned" has one definition and the trip document, the cost
+ * sheet and the costs block cannot drift apart on it.
+ */
+export function plannedEstimates(estimates: readonly ItemEstimate[]): ItemEstimate[] {
+  return estimates.filter((estimate) => !estimate.optional);
+}
+
+/** The other half: what the extras nobody has taken would add. */
+export function optionalEstimates(estimates: readonly ItemEstimate[]): ItemEstimate[] {
+  return estimates.filter((estimate) => estimate.optional);
+}
+
+/**
  * An estimate in the shape the totals already understand.
  *
  * Rather than a second code path through `tripCostTotals()`: an estimate is
@@ -224,8 +257,39 @@ export function estimateLines(
   tripTitle: string,
   labels: EstimateLabelWords
 ): (ParsedBooking & { title: string })[] {
-  return unmatchedEstimates(tripItemEstimates(trip, labels), bookings).map((estimate) => ({
-    ...asEstimateBooking(estimate, tripTitle),
-    title: estimate.label,
-  }));
+  // Planned only. An extra nobody has taken is a price, not money owed, and
+  // letting one through here would put it in the committed total, the
+  // variance and the settlement -- three places where it would read as a
+  // decision somebody made.
+  return unmatchedEstimates(plannedEstimates(tripItemEstimates(trip, labels)), bookings).map(
+    (estimate) => ({
+      ...asEstimateBooking(estimate, tripTitle),
+      title: estimate.label,
+    })
+  );
+}
+
+/**
+ * What the extras nobody has taken would add, in the trip's own currency.
+ *
+ * Through the same two functions the plan goes through, with no budget to
+ * compare against, because an offered excursion has no ceiling anybody set.
+ * Reusing them rather than writing a second sum is what keeps the currency
+ * rule identical at both ends: an estimate in another currency is skipped
+ * here exactly as it is there, rather than converted at a rate the reader
+ * cannot check.
+ *
+ * Null when the trip offers nothing, which is not the same as zero.
+ *
+ * One function for the three places that show this figure -- the costs block,
+ * the cost sheet and the trip document -- so a screen and a printout cannot
+ * disagree about what saying yes to everything would cost.
+ */
+export function optionalTotal(
+  trip: EstimatedTrip,
+  labels: EstimateLabelWords,
+  currency: string
+): number | null {
+  const extras = optionalEstimates(tripItemEstimates(trip, labels));
+  return plannedTotal(plannedByCategory([], extras, currency));
 }

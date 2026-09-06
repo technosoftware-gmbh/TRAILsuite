@@ -17,6 +17,8 @@ import { App, TFile } from 'obsidian';
 import { TRAVEL_RELATED_TRIPS_BLOCK_LANG } from '../trips/related-trips-block-lang';
 import { APT_PHOTO_SPOT_BLOCK_LANG } from '../places/photo-spot-block-lang';
 import { APERtrailSettings } from '../settings/types';
+import { buildVehicleFrontmatter } from '../places/vehicle-note';
+import { vehicleProperties } from './read-entities';
 import { createdEntry, frontmatterObject } from '@technosoftware/trail-core';
 import { renderFrontmatterBlock } from '@technosoftware/trail-core/obsidian';
 import { isUnderFolder } from '@technosoftware/trail-core';
@@ -235,6 +237,48 @@ export function createPhotoSpotNote(
   now: Date = new Date()
 ): Promise<TFile> {
   return createPlaceNote(app, settings, 'photospot', title, country, city, now);
+}
+
+/**
+ * A ship or a named train.
+ *
+ * Creation collects the two facts somebody knows when they first write the
+ * note down -- what kind of thing it is, and who runs it -- and nothing else.
+ * The cabin catalogue is filled in afterwards, through the Cabins command, for
+ * the same reason a photo spot collects no motifs at creation: a ship you have
+ * only just heard of is worth a note before you know what its suites are
+ * called.
+ *
+ * It carries the related-trips block from the moment it exists, so the note
+ * answers "which trips sailed on this" as soon as one does.
+ */
+export async function createVehicleNote(
+  app: App,
+  settings: APERtrailSettings,
+  title: string,
+  draft: { mode?: string | null; operatorTitle?: string | null } = {},
+  now: Date = new Date()
+): Promise<TFile> {
+  const rest = buildVehicleFrontmatter(
+    {
+      mode: draft.mode ?? null,
+      operatorTitle: draft.operatorTitle ?? null,
+      built: null,
+      refurbished: null,
+      capacity: null,
+      length: null,
+      tonnage: null,
+      website: null,
+      cabins: [],
+    },
+    vehicleProperties(settings)
+  );
+
+  const content =
+    renderFrontmatterBlock(
+      frontmatterObject(propertyName(settings), 'vehicle', createdEntry(settings, now), rest)
+    ) + relatedTripsBody();
+  return createNote(app, settings.vehiclesFolder, title, content);
 }
 
 export function createLocationNote(

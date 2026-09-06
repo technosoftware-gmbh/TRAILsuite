@@ -251,14 +251,35 @@ The Trip schema's own property names are real settings, honored by both the read
 | `nightCurrencyField` | `currency` | Sub-key: the currency that figure is in |
 | `nightCostUnitField` | `costUnit` | Sub-key: per night, in total, or per person |
 | `nightPersonsField` | `persons` | Sub-key: who the stay is for; empty means everybody |
+| `vehiclesFolder` | `Places/Vehicles` | The ships and named trains you travel on. Not a place, and filed under the Places root all the same: every folder here hangs off one of the three module roots, which is what keeps a module relocatable as a unit |
+| `vehicleModeProperty` | `mode` | What kind of thing it is, from the vocabulary a leg's `mode` uses |
+| `vehicleOperatorProperty` | `operator` | Who runs it, as a link to a Company note. A fact about the ship; no code joins a trip to a company through it |
+| `vehicleBuiltProperty` | `built` | The year it entered service |
+| `vehicleRefurbishedProperty` | `refurbished` | The year it was last rebuilt |
+| `vehicleCapacityProperty` | `capacity` | How many passengers it carries |
+| `vehicleLengthProperty` | `length` | As written: "135 m", "20 coaches" |
+| `vehicleTonnageProperty` | `tonnage` | Gross tonnage, for a ship that states one |
+| `vehicleCabinsProperty` | `cabins` | The cabin categories it is sold in |
+| `cabinNameField` | `name` | Sub-key of a cabin: what the category is called, and what a leg's variant matches on |
+| `cabinDescriptionField` | `description` | Sub-key of a cabin: what it includes |
+
+A vehicle's cabins are a **catalogue, not prices**. What a cabin costs differs
+per sailing, so the figure lives on the leg that books it, in its `variants`,
+and a variant naming a cabin borrows the description from here at render time.
+Nothing is copied and nothing is written back, which is what makes correcting a
+description here correct it on every trip that ever sailed. A vehicle also
+reads `imageProperty` and `tripGalleryProperty` and does **not** own them: an
+edit clears the keys above and leaves a picture alone.
+
 | `transportProperty` | `transport` | The transport-legs list |
 | `legDirectionField` | `direction` | Sub-key: `outbound` or `inbound` |
 | `legModeField` | `mode` | Sub-key: train, plane, car, ... |
+| `legVehicleField` | `vehicle` | Sub-key: which ship or named train the leg is taken on, as a link to a vehicle note. Separate from `carrier`, which is who runs it |
 | `legCarrierField` | `carrier` | Sub-key: the airline, the railway, or the train's own name. Free text, or a wikilink when the vault has a note for it |
 | `legFromField` | `from` | Sub-key: departure time |
 | `legToField` | `to` | Sub-key: arrival time |
 | `legDayField` | `day` | Sub-key: which day of the trip the leg departs on. 0 and negative are allowed, for a flight leaving the evening before day one |
-| `legToDayField` | `toDay` | Sub-key: which day it arrives on. A later day prints as `+1` on the arrival time rather than as a stop |
+| `legToDayField` | `toDay` | Sub-key: which day it arrives on. One night beside a clock prints as `+1` on the arrival time; a leg that runs longer, or one with no clock to mark, states both ends and its nights instead |
 | `legOriginField` | `origin` | Sub-key: where the leg departs from |
 | `legDestinationField` | `destination` | Sub-key: where it arrives |
 | `legReferenceField` | `reference` | Sub-key: booking or ticket reference |
@@ -266,6 +287,45 @@ The Trip schema's own property names are real settings, honored by both the read
 | `legCurrencyField` | `currency` | Sub-key: the currency that figure is in |
 | `legCostUnitField` | `costUnit` | Sub-key: per person, or in total |
 | `legPersonsField` | `persons` | Sub-key: who is on this leg; empty means everybody |
+| `stopVariantsField` | `variants` | Sub-key: the prices this stop can be bought at, where there is more than one |
+| `nightVariantsField` | `variants` | Sub-key: the same, on a stay |
+| `legVariantsField` | `variants` | Sub-key: the same, on a leg |
+| `variantNameField` | `name` | Sub-key of a variant: what it is called, "Polar outside cabin" |
+| `variantDescriptionField` | `description` | Sub-key of a variant: what it includes, in the operator's own words |
+| `variantCostField` | `cost` | Sub-key of a variant: what it costs |
+| `variantCurrencyField` | `currency` | Sub-key of a variant: the currency that figure is in; empty inherits the line's, then the trip's |
+| `variantCostUnitField` | `costUnit` | Sub-key of a variant: per person, per night, or in total |
+| `variantChosenField` | `chosen` | Sub-key of a variant: true on the one settled on, and written on no other. Absent everywhere while the choice is open |
+| `stopOptionalField` | `optional` | Sub-key: true on a stop that may not happen, which is most of a brochure day |
+| `nightOptionalField` | `optional` | Sub-key: the same, on a stay |
+| `legOptionalField` | `optional` | Sub-key: the same, on a leg |
+| `stopChosenField` | `chosen` | Sub-key: true on an optional stop that has been decided on, which is what makes it count |
+| `nightChosenField` | `chosen` | Sub-key: the same, on a stay |
+| `legChosenField` | `chosen` | Sub-key: the same, on a leg |
+
+**The names inside a variant are shared across the three lists**, unlike every
+other sub-key here, which is deliberate: a variant is one shape wherever it
+appears, one level deeper than anything else in this schema, and three
+identical copies of six names would say the opposite.
+
+A line's variants are **alternatives, never extras**: a cabin category, a room
+category, a two-hour or a four-hour version of the same excursion. Exactly one
+of them is ever bought, so they are never summed. The chosen one is what every
+total counts, and until one is chosen the first counts, because the largest
+figure on a trip must not fall out of its own budget for as long as the trip is
+being decided. A line that carries variants is priced from them and its own
+`cost` is not read, which is what keeps the same thing from counting twice; the
+editors move an existing figure into the first variant rather than leaving it
+above them.
+
+**`optional` is the other axis and is independent of that one.** It says the
+line might not happen: an excursion offered, a transfer you may not take. Such
+a line is priced like any other, stays out of the planned total, and joins it
+when `chosen` says somebody decided on it. What the untaken ones would add is
+reported beside the plan -- "Optional zusätzlich CHF 1,240" -- rather than
+inside it, so a total never quietly includes a decision nobody has made.
+`chosen` is read only on an optional line: on any other the word means nothing,
+and honouring it there would give a line two ways of saying it is in the plan.
 
 The three `cost` sub-keys are estimates, not bookings: they are what a trip
 believes a line will cost before there is anything to book. A booking that

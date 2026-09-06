@@ -105,6 +105,7 @@ function makeTrip(title: string, overrides: Partial<TravelTrip> = {}): TravelTri
 function emptyBoard(overrides: Partial<TravelBoard> = {}): TravelBoard {
   return {
     trips: [],
+    vehicles: [],
     bookings: [],
     countries: [],
     states: [],

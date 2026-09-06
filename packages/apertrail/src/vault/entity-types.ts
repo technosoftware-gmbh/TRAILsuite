@@ -23,6 +23,12 @@ export const TRAVEL_ENTITY_TYPES = [
   'landmark',
   'location',
   'photospot',
+  // The thing you travel ON, as against the places you travel to: a ship, a
+  // named train, a riverboat. Not a member of TRAVEL_PLACE_TYPES for the same
+  // reason a booking is not -- it has no coordinates, is never an itinerary
+  // stop, and is not somewhere you went. A leg names it; see
+  // docs/design/vehicles.md.
+  'vehicle',
 ] as const;
 
 export type TravelEntityType = (typeof TRAVEL_ENTITY_TYPES)[number];

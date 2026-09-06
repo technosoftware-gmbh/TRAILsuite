@@ -151,6 +151,22 @@ export function mergeSettings(raw: unknown): APERtrailSettings {
     nightCostUnitField: str(r.nightCostUnitField, d.nightCostUnitField),
     nightPersonsField: str(r.nightPersonsField, d.nightPersonsField),
 
+    // `f` and not `d`, like every other folder: a vault that renamed its
+    // Places root gets a folder ADDED later under that root rather than under
+    // the pristine English default. Written as `d` first, which would have put
+    // "Places/Vehicles" beside an existing "Plätze".
+    vehiclesFolder: str(r.vehiclesFolder, f.vehiclesFolder),
+    vehicleModeProperty: str(r.vehicleModeProperty, d.vehicleModeProperty),
+    vehicleOperatorProperty: str(r.vehicleOperatorProperty, d.vehicleOperatorProperty),
+    vehicleBuiltProperty: str(r.vehicleBuiltProperty, d.vehicleBuiltProperty),
+    vehicleRefurbishedProperty: str(r.vehicleRefurbishedProperty, d.vehicleRefurbishedProperty),
+    vehicleCapacityProperty: str(r.vehicleCapacityProperty, d.vehicleCapacityProperty),
+    vehicleLengthProperty: str(r.vehicleLengthProperty, d.vehicleLengthProperty),
+    vehicleTonnageProperty: str(r.vehicleTonnageProperty, d.vehicleTonnageProperty),
+    vehicleCabinsProperty: str(r.vehicleCabinsProperty, d.vehicleCabinsProperty),
+    cabinNameField: str(r.cabinNameField, d.cabinNameField),
+    cabinDescriptionField: str(r.cabinDescriptionField, d.cabinDescriptionField),
+
     transportProperty: str(r.transportProperty, d.transportProperty),
     legDirectionField: str(r.legDirectionField, d.legDirectionField),
     legDayField: str(r.legDayField, d.legDayField),
@@ -166,6 +182,22 @@ export function mergeSettings(raw: unknown): APERtrailSettings {
     legCurrencyField: str(r.legCurrencyField, d.legCurrencyField),
     legCostUnitField: str(r.legCostUnitField, d.legCostUnitField),
     legPersonsField: str(r.legPersonsField, d.legPersonsField),
+    legVehicleField: str(r.legVehicleField, d.legVehicleField),
+    stopVariantsField: str(r.stopVariantsField, d.stopVariantsField),
+    nightVariantsField: str(r.nightVariantsField, d.nightVariantsField),
+    legVariantsField: str(r.legVariantsField, d.legVariantsField),
+    variantNameField: str(r.variantNameField, d.variantNameField),
+    variantDescriptionField: str(r.variantDescriptionField, d.variantDescriptionField),
+    variantCostField: str(r.variantCostField, d.variantCostField),
+    variantCurrencyField: str(r.variantCurrencyField, d.variantCurrencyField),
+    variantCostUnitField: str(r.variantCostUnitField, d.variantCostUnitField),
+    variantChosenField: str(r.variantChosenField, d.variantChosenField),
+    stopOptionalField: str(r.stopOptionalField, d.stopOptionalField),
+    nightOptionalField: str(r.nightOptionalField, d.nightOptionalField),
+    legOptionalField: str(r.legOptionalField, d.legOptionalField),
+    stopChosenField: str(r.stopChosenField, d.stopChosenField),
+    nightChosenField: str(r.nightChosenField, d.nightChosenField),
+    legChosenField: str(r.legChosenField, d.legChosenField),
 
     timezoneProperty: str(r.timezoneProperty, d.timezoneProperty),
     openingHoursProperty: str(r.openingHoursProperty, d.openingHoursProperty),

@@ -23,8 +23,11 @@ import { NewCountryModal } from './places/ui/new-country-modal';
 import { NewStateModal } from './places/ui/new-state-modal';
 import { NewCityModal } from './places/ui/new-city-modal';
 import { NewPlaceModal } from './places/ui/new-place-modal';
+import { NewVehicleModal } from './places/ui/new-vehicle-modal';
+import { VehicleCabinsModal } from './places/ui/vehicle-cabins-modal';
+import { vehicleToInput } from './places/vehicle-note';
 import { NewCrmEntityModal } from './crm/ui/new-crm-entity-modal';
-import { TravelPlace, TravelTrip } from './vault/types';
+import { TravelPlace, TravelTrip, TravelVehicle } from './vault/types';
 import { readTravelBoard } from './vault/read-entities';
 import { exportPhotoSpotSheet } from './places/ui/export-photo-spot';
 import { exportTripDocument } from './trips/ui/export-trip-document';
@@ -145,6 +148,31 @@ export default class APERtrailPlugin extends Plugin {
       id: 'new-photo-spot',
       name: t('commands.newPhotoSpot'),
       callback: () => this.openNewPhotoSpotModal(),
+    });
+    this.addCommand({
+      id: 'new-vehicle',
+      name: t('commands.newVehicle'),
+      callback: () => this.openNewVehicleModal(),
+    });
+    // A checkCallback for the reason the photo spot sheet has one: a cabin
+    // catalogue is meaningless anywhere but in a vehicle note.
+    this.addCommand({
+      id: 'edit-vehicle-cabins',
+      name: t('commands.editVehicleCabins'),
+      checkCallback: (checking: boolean) => {
+        const vehicle = this.activeVehicle();
+        if (!vehicle) return false;
+        if (!checking) {
+          new VehicleCabinsModal(
+            this.app,
+            this.getSettings(),
+            vehicle.file,
+            vehicleToInput(vehicle),
+            () => this.refreshAllViews()
+          ).open();
+        }
+        return true;
+      },
     });
     // A checkCallback rather than a callback: the command is meaningless
     // anywhere but in a photo spot note, and an entry in the palette that
@@ -282,6 +310,17 @@ export default class APERtrailPlugin extends Plugin {
       (candidate) => candidate.kind === 'photospot' && candidate.file.path === file.path
     );
     return place ?? null;
+  }
+
+  openNewVehicleModal(): void {
+    new NewVehicleModal(this.app, this.getSettings(), () => this.refreshAllViews()).open();
+  }
+
+  private activeVehicle(): TravelVehicle | null {
+    const file = this.app.workspace.getActiveFile();
+    if (!file) return null;
+    const board = readTravelBoard(this.app, this.getSettings());
+    return board.vehicles.find((candidate) => candidate.file.path === file.path) ?? null;
   }
 
   openNewBookingModal(tripTitle: string | null = null): void {

@@ -11,6 +11,12 @@ const PLACES_SUBFOLDER_KEYS = [
   'landmarksFolder',
   'locationsFolder',
   'photoSpotsFolder',
+  // Not a place, and a Places sub-folder all the same: every folder hangs off
+  // one of the three module roots. It was added to this list a settings
+  // release too late -- the merge fell back to the English default while a
+  // German vault already called its root "Plätze", and this list is what
+  // could have said so and did not, because it is typed by hand.
+  'vehiclesFolder',
 ] as const;
 
 const CRM_SUBFOLDER_KEYS = ['personsFolder', 'companiesFolder'] as const;

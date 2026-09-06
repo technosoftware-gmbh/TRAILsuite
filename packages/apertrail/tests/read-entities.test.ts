@@ -12,6 +12,7 @@ vi.mock('obsidian', () => ({
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import { readTravelBoard } from '../src/vault/read-entities';
 import { makeFakeVault } from './fake-vault';
+import { cabinDescription } from '../src/places/vehicle-note';
 
 const settings = DEFAULT_SETTINGS;
 
@@ -257,5 +258,98 @@ describe('readTravelBoard', () => {
     ]);
     const board = readTravelBoard(app, settings);
     expect(board.places.every((p) => p.geoLocation === null)).toBe(true);
+  });
+});
+
+/**
+ * The whole chain, read off a vault rather than assembled by hand: a ship
+ * note, a trip whose leg names it, and the cabin description arriving on the
+ * trip's own variant without either note carrying it twice.
+ */
+describe('a leg on a ship', () => {
+  const vault = () =>
+    makeFakeVault([
+      {
+        path: `${settings.vehiclesFolder}/MS Trollfjord.md`,
+        frontmatter: {
+          type: 'vehicle',
+          mode: 'boat',
+          operator: '[[Hurtigruten]]',
+          capacity: 500,
+          cabins: [
+            { name: 'Polar Aussenkabine', description: 'Outside cabin with a window.' },
+            { name: 'Arktis Superior', description: 'Larger, upper deck.' },
+          ],
+        },
+      },
+      {
+        path: `${settings.tripsFolder}/Nordkap.md`,
+        frontmatter: {
+          type: 'trip',
+          transport: [
+            {
+              direction: 'outbound',
+              carrier: 'Hurtigruten',
+              vehicle: '[[MS Trollfjord]]',
+              day: 1,
+              toDay: 15,
+              currency: 'CHF',
+              variants: [{ name: 'Polar Aussenkabine', cost: 4479, costUnit: 'person' }],
+            },
+          ],
+        },
+      },
+    ]);
+
+  it('reads the ship, its operator and its catalogue', () => {
+    const board = readTravelBoard(vault().app, settings);
+    const ship = board.vehicles[0];
+
+    expect(ship?.title).toBe('MS Trollfjord');
+    expect(ship?.operatorTitle).toBe('Hurtigruten');
+    expect(ship?.capacity).toBe(500);
+    expect(ship?.cabins.map((cabin) => cabin.name)).toEqual([
+      'Polar Aussenkabine',
+      'Arktis Superior',
+    ]);
+  });
+
+  it('resolves the leg to it, and keeps the title either way', () => {
+    const board = readTravelBoard(vault().app, settings);
+    const leg = board.trips[0]?.transport[0];
+
+    expect(leg?.vehicleTitle).toBe('MS Trollfjord');
+    expect(leg?.vehicle?.title).toBe('MS Trollfjord');
+  });
+
+  /**
+   * The point of the whole arrangement: the price is written on the trip, the
+   * description is written on the ship, and neither note carries the other's.
+   */
+  it('lets the trip variant borrow the cabin description', () => {
+    const board = readTravelBoard(vault().app, settings);
+    const leg = board.trips[0]?.transport[0];
+
+    expect(leg?.variants[0]?.cost).toBe(4479);
+    expect(leg?.variants[0]?.description).toBeNull();
+    expect(cabinDescription(leg?.vehicle ?? null, leg?.variants[0]?.name ?? null)).toBe(
+      'Outside cabin with a window.'
+    );
+  });
+
+  it('leaves the leg unresolved, and readable, for a ship the vault has no note for', () => {
+    const { app } = makeFakeVault([
+      {
+        path: `${settings.tripsFolder}/Nordkap.md`,
+        frontmatter: {
+          type: 'trip',
+          transport: [{ direction: 'outbound', vehicle: 'A nameless riverboat' }],
+        },
+      },
+    ]);
+    const leg = readTravelBoard(app, settings).trips[0]?.transport[0];
+
+    expect(leg?.vehicleTitle).toBe('A nameless riverboat');
+    expect(leg?.vehicle).toBeNull();
   });
 });

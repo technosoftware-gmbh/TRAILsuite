@@ -9,9 +9,12 @@
  * be matched, and is deliberately kept rather than guessed at.
  */
 import { describe, expect, it } from 'vitest';
-import { aParsedLeg, aParsedNight, aParsedStop } from './fixtures';
+import { aParsedLeg, aParsedVariant, aParsedNight, aParsedStop } from './fixtures';
 import {
   asEstimateBooking,
+  optionalEstimates,
+  optionalTotal,
+  plannedEstimates,
   EstimatedTrip,
   estimateLines,
   ItemEstimate,
@@ -46,6 +49,7 @@ function estimate(overrides: Partial<ItemEstimate> = {}): ItemEstimate {
     currency: null,
     reference: 'LX288',
     persons: TWO,
+    optional: false,
     cost: { amount: 890, unitAmount: 890, unit: 'total', multiplier: 1, people: 2, nights: null },
     ...overrides,
   };
@@ -264,5 +268,154 @@ describe('estimateLines', () => {
     expect(lines.map((line) => line.title)).toEqual(['Hotel 224']);
     expect(lines[0].status).toBe('estimate');
     expect(lines[0].category).toBe('accommodation');
+  });
+});
+
+/**
+ * A leg sold at more than one price.
+ *
+ * The one thing that must never happen is both fares landing in the total:
+ * they are the same journey, and exactly one of them will be bought. The
+ * second thing is that the line says which cabin the figure is for, since
+ * without it a cost sheet states a number nobody can check.
+ */
+describe('a line with several prices', () => {
+  const POLAR = aParsedVariant({ name: 'Polar outside', cost: 4479, currency: 'CHF' });
+  const SUPERIOR = aParsedVariant({ name: 'Arctic superior', cost: 5299, currency: 'CHF' });
+
+  it('counts one figure, not the sum of them', () => {
+    const estimates = tripItemEstimates(
+      trip({
+        transport: [
+          aParsedLeg({ origin: 'Oslo', destination: 'Copenhagen', variants: [POLAR, SUPERIOR] }),
+        ],
+      }),
+      LABELS
+    );
+
+    expect(estimates).toHaveLength(1);
+    // 4479 per person for two, and nothing of the 5299 anywhere in it.
+    expect(estimates[0].amount).toBe(8958);
+  });
+
+  it('counts the chosen fare rather than the first', () => {
+    const estimates = tripItemEstimates(
+      trip({
+        personTitles: ['Stefan'],
+        transport: [aParsedLeg({ variants: [POLAR, { ...SUPERIOR, chosen: true }] })],
+      }),
+      LABELS
+    );
+
+    expect(estimates[0].amount).toBe(5299);
+  });
+
+  it('names the fare on the line, beside the route', () => {
+    const estimates = tripItemEstimates(
+      trip({
+        transport: [
+          aParsedLeg({ origin: 'Oslo', destination: 'Copenhagen', variants: [POLAR, SUPERIOR] }),
+        ],
+      }),
+      LABELS
+    );
+
+    expect(estimates[0].label).toBe('Oslo to Copenhagen · Polar outside');
+  });
+
+  /** The leg's own figure is not read once there are fares, or the journey would be counted twice. */
+  it('ignores a figure left on the leg itself', () => {
+    const estimates = tripItemEstimates(
+      trip({
+        personTitles: ['Stefan'],
+        transport: [aParsedLeg({ cost: 99999, variants: [POLAR] })],
+      }),
+      LABELS
+    );
+
+    expect(estimates).toHaveLength(1);
+    expect(estimates[0].amount).toBe(4479);
+  });
+});
+
+/**
+ * An extra nobody has taken.
+ *
+ * Nearly every day of a cruise brochure offers one, and the whole point of
+ * writing them down is to see what they would add without them quietly
+ * joining the plan. So the split has to hold at both ends: out of everything
+ * the money machinery reads, and present in the figure that reports them.
+ */
+describe('an optional line', () => {
+  const trip = (over: Partial<EstimatedTrip> = {}): EstimatedTrip => ({
+    stops: [],
+    nights: [],
+    transport: [],
+    personTitles: ['Stefan'],
+    ...over,
+  });
+
+  const DOGSLED = aParsedStop({
+    placeTitle: 'Tromsø',
+    cost: 220,
+    currency: 'CHF',
+    costUnit: 'person',
+    optional: true,
+  });
+
+  it('is still priced, and marked rather than dropped', () => {
+    const estimates = tripItemEstimates(trip({ stops: [DOGSLED] }), LABELS);
+
+    expect(estimates).toHaveLength(1);
+    expect(estimates[0].amount).toBe(220);
+    expect(estimates[0].optional).toBe(true);
+  });
+
+  it('is not part of the plan', () => {
+    const estimates = tripItemEstimates(trip({ stops: [DOGSLED] }), LABELS);
+
+    expect(plannedEstimates(estimates)).toEqual([]);
+    expect(optionalEstimates(estimates)).toHaveLength(1);
+  });
+
+  /** Deciding to do it is what puts it in, and the note goes on saying it was an extra. */
+  it('joins the plan once it is chosen', () => {
+    const taken = { ...DOGSLED, chosen: true };
+    const estimates = tripItemEstimates(trip({ stops: [taken] }), LABELS);
+
+    expect(plannedEstimates(estimates)).toHaveLength(1);
+    expect(optionalEstimates(estimates)).toEqual([]);
+  });
+
+  /**
+   * The line to hold. An estimate that reached here would be counted as
+   * committed, would move the variance, and would reach the settlement as a
+   * debt nobody owes.
+   */
+  it('never reaches the lines the money machinery reads', () => {
+    expect(estimateLines(trip({ stops: [DOGSLED] }), [], 'Nordkap', LABELS)).toEqual([]);
+  });
+
+  it('is what the optional figure reports', () => {
+    expect(optionalTotal(trip({ stops: [DOGSLED] }), LABELS, 'CHF')).toBe(220);
+  });
+
+  /** Null rather than zero: a trip that offers nothing has no figure to show, which is not a figure of nothing. */
+  it('reports nothing when the trip offers nothing', () => {
+    expect(optionalTotal(trip({ stops: [aParsedStop({ cost: 40 })] }), LABELS, 'CHF')).toBeNull();
+  });
+
+  /** Both axes at once, which is the case the two were designed to compose for. */
+  it('is priced from its variants like any other line', () => {
+    const excursion = aParsedStop({
+      placeTitle: 'Alta',
+      optional: true,
+      variants: [
+        aParsedVariant({ name: 'Two hours', cost: 120, currency: 'CHF' }),
+        aParsedVariant({ name: 'Half day', cost: 260, currency: 'CHF' }),
+      ],
+    });
+
+    expect(optionalTotal(trip({ stops: [excursion] }), LABELS, 'CHF')).toBe(120);
   });
 });

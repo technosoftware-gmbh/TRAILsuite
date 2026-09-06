@@ -230,8 +230,8 @@ function seededTitles(notes: readonly SampleNote[]): Set<string> {
 describe('the sample notes', () => {
   const notes = sampleNotes(settings, NOW);
 
-  it('is sixteen notes across the folders the default settings name', () => {
-    expect(notes).toHaveLength(16);
+  it('is seventeen notes across the folders the default settings name', () => {
+    expect(notes).toHaveLength(17);
     expect(sampleFolders(notes)).toEqual([
       'Places/Countries',
       'Places/States',
@@ -241,6 +241,10 @@ describe('the sample notes', () => {
       'Places/Landmarks',
       'Places/Locations',
       'Places/Photo Spots',
+      // Not a place, and filed under the Places root all the same: every
+      // folder is derived from one of the three module roots, which is what
+      // keeps a module relocatable as a unit.
+      'Places/Vehicles',
       // A trip is a folder of its own, named after the trip: see trip-folder.ts.
       'Trips/Rovos Rail 2026',
       'Trips/Aargau Weekend',
@@ -624,7 +628,7 @@ describe('planning a run against a vault that is not empty', () => {
     expect(sampleVaultWritable(plan)).toBe(true);
 
     const result = await writeSampleVault(vault.app, settings, plan, NOW);
-    expect(result.created).toBe(16);
+    expect(result.created).toBe(17);
     expect(result.failed).toEqual([]);
     // Written beside, not over: the other plugin's company is exactly as it was.
     expect(vault.files.get(other)).toBe('---\ntype: "company"\n---\n');
@@ -706,7 +710,7 @@ describe('planning a run against a vault that is not empty', () => {
     expect(stefan?.augment).toBe(true);
 
     const result = await writeSampleVault(vault.app, settings, plan, NOW);
-    expect(result.created).toBe(15);
+    expect(result.created).toBe(16);
     expect(result.augmented).toBe(1);
     expect(result.failed).toEqual([]);
 

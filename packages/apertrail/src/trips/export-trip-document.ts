@@ -36,11 +36,32 @@ export interface TripDocumentEntry {
   time: string | null;
   place: string | null;
   note: string | null;
+  /**
+   * Said on a line that may not happen, already localized. Null for an
+   * ordinary one.
+   *
+   * A brochure day is mostly this -- "Nehmen Sie an einem optionalen Ausflug
+   * teil" -- and a printed day that did not distinguish the two would read as
+   * a schedule of things that are all going to happen.
+   */
+  optional: string | null;
+  /** The prices this line can be bought at, where there is more than one. */
+  fares: TripDocumentFare[];
 }
 
 export interface TripDocumentDay {
   /** "Day 3", already localized. Null for the stops before the first dated one, which are not a numbered day of anything. */
   label: string | null;
+  /**
+   * What ends on this day, already localized: "Arrives today: Oslo to Copenhagen".
+   *
+   * Legs have their own section and stay there, for the reason on
+   * `TripDocumentJourney` below. A leg that runs for days is the exception the
+   * reason does not cover: the day a fortnight-long voyage ends is a real day
+   * of the itinerary, and printing nothing about it left the longest thing on
+   * the trip absent from the day it finishes.
+   */
+  arrivals: string[];
   /** What the day is called: "Pretoria", beside its number. */
   title: string | null;
   date: string | null;
@@ -66,8 +87,28 @@ export interface TripDocumentJourney {
   label: string;
   /** The direction and the reference, under the route. */
   detail: string | null;
-  /** When it leaves: "Tag 0", or the date once the trip has one. A stay says its span here instead. */
+  /** When it leaves: "Tag 0", or the date once the trip has one. A leg that runs for days says both ends and how long, and a stay says its span. */
   when: string | null;
+  /** The prices this line can be bought at, where there is more than one. Empty for the ordinary line. */
+  fares: TripDocumentFare[];
+  /** Said on a line that may not happen: "Optional" or "Optional, taken", already localized. Null for an ordinary line. */
+  optional: string | null;
+}
+
+/**
+ * One of the prices a line can be bought at, as the document prints it.
+ *
+ * Printed in full, prices and all, because this page is what somebody decides
+ * from: a brochure that listed only the cabin already ticked would have
+ * removed the decision it exists to support.
+ */
+export interface TripDocumentFare {
+  label: string;
+  description: string | null;
+  /** Already formatted with its currency, or null for a fare nobody has priced. */
+  amount: string | null;
+  /** Marked rather than filtered: the chosen one is what the costs section counted. */
+  chosen: boolean;
 }
 
 export interface TripDocumentCostRow {
@@ -77,6 +118,8 @@ export interface TripDocumentCostRow {
 }
 
 export interface TripDocumentLabels {
+  /** The word beside the price that was chosen, in brackets after it. */
+  fareChosen: string;
   highlights: string;
   overview: string;
   itinerary: string;
@@ -110,6 +153,16 @@ export interface TripDocument {
   costs: TripDocumentCostRow[];
   /** The plan's total, set apart from the lines above it. Null when the trip carries no budget. */
   costTotal: TripDocumentCostRow | null;
+  /**
+   * What the extras nobody has taken would add, beside the total rather than
+   * inside it.
+   *
+   * Its own figure on purpose: folding it into the total would report a trip
+   * costing more than anybody has decided to spend, and leaving it out
+   * entirely would hide the difference between a fifteen-day cruise and the
+   * same cruise with six excursions on it. Null when the trip offers none.
+   */
+  costOptional: TripDocumentCostRow | null;
   gallery: TripDocumentPicture[];
   labels: TripDocumentLabels;
   caveat: string;
@@ -177,6 +230,19 @@ const STYLE = `
   .journey b { font-weight: 600; }
   .journey div { font-size: 9.5pt; color: #565c66; }
   .journey .clock { font-variant-numeric: tabular-nums; }
+  /* The fares under a leg, indented so the list reads as belonging to it
+     rather than as three more journeys. */
+  .journey ul.fares { list-style: none; margin: 1mm 0 0; padding: 0 0 0 4mm;
+                      border-left: 0.5pt solid #e2e4e8; }
+  .journey ul.fares li { padding: 0.6mm 0; font-size: 9.5pt; color: #2a2f37; }
+  .journey ul.fares li.chosen b { font-weight: 700; }
+  .journey ul.fares .price { color: #565c66; font-variant-numeric: tabular-nums; }
+  .journey ul.fares div { font-size: 9pt; color: #6b7079; white-space: pre-line; }
+  .day .arrival { font-size: 9.5pt; color: #565c66; margin: 0 0 1.5mm; }
+  /* An offered extra reads as offered rather than scheduled. */
+  .optional { font-size: 8.5pt; color: #6b7079; border: 0.4pt dashed #c9ccd2;
+              border-radius: 1mm; padding: 0.2mm 1.2mm; white-space: nowrap; }
+  table.costs tr.optional-total td { border-top: none; font-weight: 400; color: #565c66; }
   .hint { font-size: 9pt; color: #6b7079; margin: 0 0 2mm; }
   table.costs { width: 100%; border-collapse: collapse; font-size: 10pt; }
   table.costs td { padding: 1.2mm 0; border-bottom: 0.3pt solid #e2e4e8; }
@@ -221,12 +287,15 @@ function dayBlock(day: TripDocumentDay): string {
   const heading = named ? `<h3>${esc(named)}</h3>` : '';
   const date = day.date ? `<div class="meta">${esc(day.date)}</div>` : '';
   const note = day.note ? `<p class="day-note">${esc(day.note)}</p>` : '';
+  const arrivals = day.arrivals.map((arrival) => `<p class="arrival">${esc(arrival)}</p>`).join('');
 
   const entries = day.entries
     .map((entry) => {
       const what = [
         entry.place ? `<b>${esc(entry.place)}</b>` : '',
+        entry.optional ? ` <span class="optional">${esc(entry.optional)}</span>` : '',
         entry.note ? `<div>${esc(entry.note)}</div>` : '',
+        fareList(entry.fares, ''),
       ].join('');
       return `<div class="stop">
         <div class="when">${esc(entry.time ?? '')}</div>
@@ -235,10 +304,26 @@ function dayBlock(day: TripDocumentDay): string {
     })
     .join('');
 
-  return `<section class="day${named ? '' : ' undated'}">${heading}${date}${note}${entries}</section>`;
+  return `<section class="day${named ? '' : ' undated'}">${heading}${date}${arrivals}${note}${entries}</section>`;
 }
 
-function journeyBlocks(rows: TripDocumentJourney[]): string[] {
+function fareList(fares: TripDocumentFare[], chosenWord: string): string {
+  if (fares.length === 0) return '';
+  const items = fares
+    .map((fare) => {
+      const price = [fare.amount, fare.chosen ? `(${chosenWord})` : null]
+        .filter((part): part is string => !!part)
+        .join(' ');
+      return `<li class="${fare.chosen ? 'chosen' : ''}">
+        <b>${esc(fare.label)}</b>${price ? ` <span class="price">${esc(price)}</span>` : ''}
+        ${fare.description ? `<div>${esc(fare.description)}</div>` : ''}
+      </li>`;
+    })
+    .join('');
+  return `<ul class="fares">${items}</ul>`;
+}
+
+function journeyBlocks(rows: TripDocumentJourney[], chosenWord: string): string[] {
   return rows.map((row) => {
     // The day and the clock on one line, the way a boarding pass prints
     // them: "Tag 0 &middot; 20:30 - 10:00 +1".
@@ -247,12 +332,14 @@ function journeyBlocks(rows: TripDocumentJourney[]): string[] {
         <b>${esc(row.label)}</b>
         ${clock ? `<div class="clock">${esc(clock)}</div>` : ''}
         ${row.detail ? `<div>${esc(row.detail)}</div>` : ''}
+        ${row.optional ? `<div><span class="optional">${esc(row.optional)}</span></div>` : ''}
+        ${fareList(row.fares, chosenWord)}
       </div>`;
   });
 }
 
 function costsTable(sheet: TripDocument): string {
-  if (sheet.costs.length === 0 && !sheet.costTotal) return '';
+  if (sheet.costs.length === 0 && !sheet.costTotal && !sheet.costOptional) return '';
 
   const lines = sheet.costs
     .map((row) => `<tr><td>${esc(row.label)}</td><td class="num">${esc(row.amount)}</td></tr>`)
@@ -261,8 +348,14 @@ function costsTable(sheet: TripDocument): string {
     ? `<tr class="total"><td>${esc(sheet.costTotal.label)}</td>
        <td class="num">${esc(sheet.costTotal.amount)}</td></tr>`
     : '';
+  // Under the rule rather than above it: it is not part of the sum, and a row
+  // sitting inside the table's own total would read as though it were.
+  const optional = sheet.costOptional
+    ? `<tr class="optional-total"><td>${esc(sheet.costOptional.label)}</td>
+       <td class="num">${esc(sheet.costOptional.amount)}</td></tr>`
+    : '';
 
-  return `<table class="costs">${lines}${total}</table>`;
+  return `<table class="costs">${lines}${total}${optional}</table>`;
 }
 
 /**
@@ -328,14 +421,14 @@ export function buildTripDocumentHtml(sheet: TripDocument): string {
   // The hint rides with the first leg rather than standing on its own, so the
   // heading, the sentence explaining what a day outside the trip means, and
   // the first row a reader applies it to are one thing.
-  const journeys = journeyBlocks(sheet.transport);
+  const journeys = journeyBlocks(sheet.transport, sheet.labels.fareChosen);
   const hint = sheet.transportHint ? `<p class="hint">${esc(sheet.transportHint)}</p>` : '';
   const transport = section(
     sheet.labels.transport,
     journeys.length === 0 ? [] : [`${hint}${journeys[0]}`, ...journeys.slice(1)]
   );
 
-  const stays = section(sheet.labels.stays, journeyBlocks(sheet.stays));
+  const stays = section(sheet.labels.stays, journeyBlocks(sheet.stays, sheet.labels.fareChosen));
 
   const table = costsTable(sheet);
   const costs = section(sheet.labels.costs, table === '' ? [] : [table]);

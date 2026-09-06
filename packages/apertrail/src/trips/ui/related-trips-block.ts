@@ -23,7 +23,7 @@ import { APERtrailSettings } from '../../settings/types';
 import { dateTimeDatePart, dateTimeTimePart, parseDayTitle } from '@technosoftware/trail-core';
 import { readTravelBoard } from '../../vault/read-entities';
 import { readCrmBoard } from '../../crm/read-crm';
-import { relatedTrips, tripsWithPerson } from '../related-trips';
+import { relatedTrips, tripsOnVehicle, tripsWithPerson } from '../related-trips';
 import { TravelBoard, TravelTrip } from '../../vault/types';
 
 import { TRAVEL_RELATED_TRIPS_BLOCK_LANG } from '../related-trips-block-lang';
@@ -45,7 +45,7 @@ function titleFromPath(sourcePath: string): string {
 }
 
 /** Which question this note is the subject of, or null when it is neither, so the block can say "no trips yet" rather than "wrong note". */
-type BlockSubject = 'place' | 'person';
+type BlockSubject = 'place' | 'person' | 'vehicle';
 
 /**
  * The travel board is checked first and the CRM folders are only read when
@@ -65,6 +65,10 @@ function blockSubject(
   ) {
     return 'place';
   }
+  // A vehicle answers the same question a place does, from the other side:
+  // "which trips sailed on this ship". One more subject rather than a second
+  // block, which is the rule a Person note already set.
+  if (board.vehicles.some((vehicle) => vehicle.file.path === sourcePath)) return 'vehicle';
   const crmBoard = readCrmBoard(app, settings);
   return crmBoard.persons.some((person) => person.file.path === sourcePath) ? 'person' : null;
 }
@@ -156,11 +160,21 @@ export function renderRelatedTrips(
   }
 
   const title = titleFromPath(sourcePath);
-  const visits = subject === 'person' ? tripsWithPerson(board, title) : relatedTrips(board, title);
+  const visits =
+    subject === 'person'
+      ? tripsWithPerson(board, title)
+      : subject === 'vehicle'
+        ? tripsOnVehicle(board, title)
+        : relatedTrips(board, title);
   if (visits.length === 0) {
     el.createDiv({
       cls: 'apt-itinerary-empty',
-      text: subject === 'person' ? t('relatedTrips.emptyPerson') : t('relatedTrips.empty'),
+      text:
+        subject === 'person'
+          ? t('relatedTrips.emptyPerson')
+          : subject === 'vehicle'
+            ? t('relatedTrips.emptyVehicle')
+            : t('relatedTrips.empty'),
     });
     return;
   }

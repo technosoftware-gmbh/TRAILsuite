@@ -28,13 +28,20 @@ function sheet(overrides: Partial<TripDocument> = {}): TripDocument {
     overview: ['Zwoelf Tage im Zug.', 'Von Pretoria bis Swakopmund.'],
     days: [
       {
+        arrivals: [],
         label: 'Day 1',
         title: 'Pretoria',
         note: 'Ankunft und Einschiffung.',
         date: '13 February 2026',
         entries: [
-          { time: '09:00', place: 'Pretoria', note: 'Boarding at Capital Park' },
-          { time: null, place: 'Rovos Rail', note: null },
+          {
+            time: '09:00',
+            place: 'Pretoria',
+            note: 'Boarding at Capital Park',
+            optional: null,
+            fares: [],
+          },
+          { time: null, place: 'Rovos Rail', note: null, optional: null, fares: [] },
         ],
       },
     ],
@@ -43,18 +50,31 @@ function sheet(overrides: Partial<TripDocument> = {}): TripDocument {
       { label: 'Accommodation', amount: 'CHF 800.00' },
     ],
     costTotal: { label: 'Budget', amount: 'CHF 5,000.00' },
+    costOptional: null,
     gallery: [{ src: 'data:image/jpeg;base64,BBBB', caption: 'Die Dune 45' }],
     transport: [
       {
+        fares: [],
+        optional: null,
         time: '20:40 - 06:10',
         label: 'Zürich to Pretoria',
         detail: 'Outward journey · LX288',
         when: 'Day 0 → Day 1',
       },
     ],
-    stays: [{ time: null, label: 'Rovos Rail', detail: null, when: 'Day 1 → Day 12' }],
+    stays: [
+      {
+        time: null,
+        label: 'Rovos Rail',
+        detail: null,
+        when: 'Day 1 → Day 12',
+        fares: [],
+        optional: null,
+      },
+    ],
     transportHint: 'Day 0 is the day before the trip starts.',
     labels: {
+      fareChosen: 'chosen',
       highlights: 'Highlights',
       overview: 'The trip in brief',
       itinerary: 'Day by day',
@@ -110,7 +130,9 @@ describe('a trip document', () => {
   /** A day nobody dated or named is not day one of anything, and prints unnumbered. */
   it('prints an unnamed, undated day without a heading', () => {
     const html = buildTripDocumentHtml(
-      sheet({ days: [{ label: null, title: null, note: null, date: null, entries: [] }] })
+      sheet({
+        days: [{ label: null, title: null, note: null, date: null, entries: [], arrivals: [] }],
+      })
     );
 
     expect(html).toContain('class="day undated"');
@@ -133,7 +155,9 @@ describe('a trip document', () => {
   it('prints a named day that has no stops at all', () => {
     const html = buildTripDocumentHtml(
       sheet({
-        days: [{ label: 'Day 4', title: 'Seetag', note: null, date: null, entries: [] }],
+        days: [
+          { label: 'Day 4', title: 'Seetag', note: null, date: null, entries: [], arrivals: [] },
+        ],
       })
     );
 
@@ -343,7 +367,9 @@ describe('getting there and back', () => {
   it('escapes a route somebody typed markup into', () => {
     const html = buildTripDocumentHtml(
       sheet({
-        transport: [{ time: null, label: '<b>X</b>', detail: null, when: null }],
+        transport: [
+          { time: null, label: '<b>X</b>', detail: null, when: null, fares: [], optional: null },
+        ],
       })
     );
 
@@ -371,11 +397,20 @@ describe('a note written as two paragraphs', () => {
       sheet({
         days: [
           {
+            arrivals: [],
             label: 'Day 9',
             title: null,
             note: null,
             date: null,
-            entries: [{ time: null, place: null, note: 'Erster Absatz.\n\nZweiter Absatz.' }],
+            entries: [
+              {
+                time: null,
+                place: null,
+                note: 'Erster Absatz.\n\nZweiter Absatz.',
+                optional: null,
+                fares: [],
+              },
+            ],
           },
         ],
       })
@@ -395,6 +430,7 @@ describe('a note written as two paragraphs', () => {
         overview: ['Eins.\n\nZwei.'],
         days: [
           {
+            arrivals: [],
             label: 'Day 1',
             title: null,
             note: 'Drei.\n\nVier.',

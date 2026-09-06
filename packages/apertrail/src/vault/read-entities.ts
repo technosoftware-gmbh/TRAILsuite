@@ -41,6 +41,7 @@ import {
   TripPropertyNames,
 } from '../trips/trip-note';
 import { parsePhotoSpotRecord, photoSpotPropertyNames } from '../places/photo-spot-note';
+import { parseVehicle, VehiclePropertyNames } from '../places/vehicle-note';
 import {
   TravelBoard,
   TravelCity,
@@ -49,6 +50,7 @@ import {
   TravelState,
   TravelStopTargetKind,
   TravelTrip,
+  TravelVehicle,
   TravelTripNight,
   TravelTripStop,
   TravelBooking,
@@ -177,6 +179,47 @@ function readTravelBookings(app: App, settings: APERtrailSettings): TravelBookin
       ...parseBooking(fm, bookingProperties(settings)),
     }))
     .sort((a, b) => a.title.localeCompare(b.title));
+}
+
+/**
+ * Every vehicle note in the vault, with its operator resolved.
+ *
+ * Read before trips, because a leg points at one and nothing points back: a
+ * ship does not know which trips sailed on it, which is what keeps this a
+ * single pass while the Country/State/City cycle needs two.
+ *
+ * **The operator is kept as a title and resolved by nobody here.** It is
+ * written as a real `[[Wikilink]]`, so Obsidian opens it, backlinks it and
+ * graphs it without this plugin reading the Company folder on every render.
+ * That also keeps the plugin out of a link it was told to stay out of: the
+ * note says who runs the ship, and no code here joins a trip to a company.
+ */
+function readTravelVehicles(app: App, settings: APERtrailSettings): TravelVehicle[] {
+  const properties = vehicleProperties(settings);
+  return travelNotesOfType(app, settings, settings.vehiclesFolder, 'vehicle')
+    .map(({ file, title, frontmatter: fm }) => ({ file, title, ...parseVehicle(fm, properties) }))
+    .sort((a, b) => a.title.localeCompare(b.title));
+}
+
+/** The settings a vehicle is read through, gathered once so the parser stays free of the whole settings object. */
+export function vehicleProperties(settings: APERtrailSettings): VehiclePropertyNames {
+  return {
+    modeProperty: settings.vehicleModeProperty,
+    operatorProperty: settings.vehicleOperatorProperty,
+    builtProperty: settings.vehicleBuiltProperty,
+    refurbishedProperty: settings.vehicleRefurbishedProperty,
+    capacityProperty: settings.vehicleCapacityProperty,
+    lengthProperty: settings.vehicleLengthProperty,
+    tonnageProperty: settings.vehicleTonnageProperty,
+    websiteProperty: settings.websiteProperty,
+    imageProperty: settings.imageProperty,
+    galleryProperty: settings.tripGalleryProperty,
+    galleryImageField: settings.galleryImageField,
+    galleryCaptionField: settings.galleryCaptionField,
+    cabinsProperty: settings.vehicleCabinsProperty,
+    cabinNameField: settings.cabinNameField,
+    cabinDescriptionField: settings.cabinDescriptionField,
+  };
 }
 
 /** The settings a booking is read through, gathered once so the parser stays free of the whole settings object. */
@@ -332,6 +375,22 @@ export function tripPropertyNames(settings: APERtrailSettings): TripPropertyName
     legCurrencyField: settings.legCurrencyField,
     legCostUnitField: settings.legCostUnitField,
     legPersonsField: settings.legPersonsField,
+    legVehicleField: settings.legVehicleField,
+    stopVariantsField: settings.stopVariantsField,
+    nightVariantsField: settings.nightVariantsField,
+    legVariantsField: settings.legVariantsField,
+    variantNameField: settings.variantNameField,
+    variantDescriptionField: settings.variantDescriptionField,
+    variantCostField: settings.variantCostField,
+    variantCurrencyField: settings.variantCurrencyField,
+    variantCostUnitField: settings.variantCostUnitField,
+    variantChosenField: settings.variantChosenField,
+    stopOptionalField: settings.stopOptionalField,
+    nightOptionalField: settings.nightOptionalField,
+    legOptionalField: settings.legOptionalField,
+    stopChosenField: settings.stopChosenField,
+    nightChosenField: settings.nightChosenField,
+    legChosenField: settings.legChosenField,
     tripCurrencyProperty: settings.tripCurrencyProperty,
     budgetProperty: settings.budgetProperty,
     budgetCategoryField: settings.budgetCategoryField,
@@ -472,6 +531,10 @@ export function readTravelBoard(
   // so both of those have to be fully built and indexed first. Still one
   // pass, since nothing points back UP at a Trip.
   const placeByTitle = new Map(places.map((p) => [p.title, p]));
+  // Vehicles are read before trips and never point back at one, so they need
+  // no second pass: a ship does not know which trips sailed on it.
+  const vehicles = readTravelVehicles(app, settings);
+  const vehicleByTitle = new Map(vehicles.map((vehicle) => [vehicle.title, vehicle]));
   const trips: TravelTrip[] = readTravelTripsUnresolved(app, settings, today).map((t) => ({
     file: t.file,
     title: t.title,
@@ -499,7 +562,10 @@ export function readTravelBoard(
     days: t.record.days,
     stops: t.record.stops.map((stop) => resolveStop(stop, cityByTitle, placeByTitle)),
     nights: t.record.nights.map((night) => resolveNight(night, placeByTitle)),
-    transport: t.record.transport,
+    transport: t.record.transport.map((leg) => ({
+      ...leg,
+      vehicle: leg.vehicleTitle ? (vehicleByTitle.get(leg.vehicleTitle) ?? null) : null,
+    })),
   }));
 
   // Trips are read last, so this is the first point at which a place's
@@ -511,6 +577,7 @@ export function readTravelBoard(
 
   return {
     trips: trips.sort((a, b) => a.title.localeCompare(b.title)),
+    vehicles,
     bookings: readTravelBookings(app, settings),
     countries: countries.sort((a, b) => a.title.localeCompare(b.title)),
     states: states.sort((a, b) => a.title.localeCompare(b.title)),
