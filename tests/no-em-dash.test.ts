@@ -245,7 +245,11 @@ const TRANSLATION_FILES = packageDirs().flatMap((dir) =>
   filesUnder(join(dir, "src", "lang", "translations"), [".ts"]),
 );
 
-const CSS_FILES = packageDirs().flatMap((dir) => filesUnder(dir, [".css"]));
+const CSS_FILES = packageDirs()
+  .flatMap((dir) => filesUnder(dir, [".css"]))
+  // `snippets/` is shipped CSS a person copies into their own vault, so the
+  // house rule applies to it exactly as it does to a plugin's stylesheet.
+  .concat(filesUnder(join(ROOT, "snippets"), [".css"]));
 
 const MARKDOWN_FILES = packageDirs()
   .flatMap((dir) => [
@@ -260,7 +264,7 @@ describe("the em-dash rule", () => {
     // findings, which looks exactly like a repository in good order.
     expect(TS_FILES.length).toBeGreaterThan(300);
     expect(TRANSLATION_FILES.length).toBeGreaterThanOrEqual(6);
-    expect(CSS_FILES.length).toBeGreaterThanOrEqual(2);
+    expect(CSS_FILES.length).toBeGreaterThanOrEqual(3);
     expect(MARKDOWN_FILES.length).toBeGreaterThan(30);
   });
 

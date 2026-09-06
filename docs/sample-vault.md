@@ -155,3 +155,20 @@ and "which of these notes is already here" and writes nothing at all. Behaviour
 three plugins need is a contract, and a contract belongs in the core. The
 content does not: a sample note is product material in one product's voice, and
 it stays in the plugin that ships it.
+
+## Colour, which is separate and optional
+
+`snippets/trailsuite-brand.css` gives the folders the suite's own colours: a
+hue per plugin, a shade per folder. It is a plain Obsidian CSS snippet, so it
+is copied into `<vault>/.obsidian/snippets/` by hand and switched on under
+Settings, Appearance. **No plugin writes it and none of them reads it.**
+
+That is deliberate rather than a gap. Seeding a sample vault writes notes, and
+notes are the thing these plugins own. A snippet is Obsidian's configuration,
+it would have to be written by one plugin on behalf of three, and two of those
+three now live in a different repository. One file a person copies once is
+smaller than the machinery that would avoid the copying.
+
+The file lists both shipped sets of folder names, English and German, because
+those are the two a vault seeds with. A folder renamed to anything else drops
+its colour silently, and the file says which block to edit.

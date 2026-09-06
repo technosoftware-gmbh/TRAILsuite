@@ -778,3 +778,18 @@ one of them will quietly stop finding people.
 Backups are your vault's backups. None of them keeps a database, a cache or a
 store of its own. Everything they know is in your notes, which is the whole
 point.
+
+## 10. Colour, if you want it
+
+The three plugins ship no colours of their own: they use whatever your theme
+gives them, which is why they look at home in any of them.
+
+If you would rather see at a glance which plugin a folder belongs to,
+`snippets/trailsuite-brand.css` in the TRAILsuite repository paints the folder
+list in the suite's own colours, a hue per plugin and a shade per folder, and
+tints each plugin's views to match. Copy it into
+`<vault>/.obsidian/snippets/` and tick it under Settings, Appearance, CSS
+snippets.
+
+It is yours once it is in your vault. Nothing updates it, nothing reads it, and
+deleting it puts everything back exactly as it was.

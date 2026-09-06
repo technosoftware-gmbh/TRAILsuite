@@ -52,6 +52,11 @@ To put the built plugins into a vault:
 ./scripts/install-into-vault.sh /path/to/Vault
 ```
 
+`snippets/trailsuite-brand.css` is an optional Obsidian CSS snippet that paints
+the folder list and each plugin's views in the suite's colours. Copy it into
+`<vault>/.obsidian/snippets/` and enable it under Settings, Appearance. No
+plugin writes or reads it.
+
 That copies `main.js`, `styles.css` and `manifest.json` for both plugins
 into `<vault>/.obsidian/plugins/<id>/`. It deliberately does not build first, so
 what lands in a vault is whatever was last verified.
