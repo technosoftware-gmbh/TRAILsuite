@@ -1,0 +1,330 @@
+/**
+ * The figures that live on an itinerary item rather than on a booking note.
+ *
+ * **Why they exist at all.** The moment a trip gets priced is the moment
+ * before there is anything to book: you lay out the flights and the hotel,
+ * you look up what they cost, and two weeks later you actually book them.
+ * Making that first pass require a booking note per line would mean writing
+ * notes for things that do not exist yet, and then editing them into
+ * something else. So a leg and a night carry a `cost`, and it means "this is
+ * what I expect".
+ *
+ * **What keeps them from double counting.** A booking carrying the same
+ * `reference` as a leg IS that leg, paid for, so the estimate stops
+ * counting the moment such a booking exists. That is the same reference
+ * match the itinerary already uses to put a cost chip on a leg, which is
+ * what makes it worth reusing rather than inventing a second link.
+ *
+ * The rule has one honest hole, stated rather than hidden: an estimate with
+ * no reference cannot be matched to anything, so a booking made without one
+ * leaves both figures standing. The block shows an estimate as an estimate,
+ * so two chips on one row is visible rather than silent.
+ *
+ * Pure. See docs/design/trip-budget-and-bookings.md.
+ */
+import { BookingCategory, ParsedBooking } from './booking-note';
+import { countsInPlan, lineFigure, VariedLine } from './line-variants';
+import { lineCost, LineCost, lineTravellers } from './line-cost';
+import { ParsedTripLeg, ParsedTripNight, ParsedTripStop } from '../trip-note';
+import { plannedByCategory, plannedTotal } from './planned-total';
+
+/** The three words the labels supply, kept out of here so this file never learns what language it is in. */
+export interface EstimateLabelWords {
+  joiner: string;
+  legFallback: string;
+  nightFallback: string;
+  stopFallback: string;
+}
+
+/** What an estimate needs off a trip: its priced lines and who is on it. */
+export interface EstimatedTrip {
+  stops: ParsedTripStop[];
+  nights: ParsedTripNight[];
+  transport: ParsedTripLeg[];
+  personTitles: string[];
+}
+
+/** Any line that can carry a figure. The three differ in everything else and in nothing here. */
+type PricedLine = VariedLine & { persons: string[] };
+
+/** One priced itinerary item, in the shape the totals understand. */
+export interface ItemEstimate {
+  /** What the row is, for the document's line: "Zürich to Pretoria", "Hotel Dreieich". */
+  label: string;
+  category: BookingCategory;
+  amount: number;
+  currency: string | null;
+  /** What a booking has to carry to supersede this. Null when the item names none. */
+  reference: string | null;
+  /** Who it is for, resolved: the people the line names, or everybody on the trip. */
+  persons: string[];
+  /** The multiplication behind the amount, so a row can show its working instead of asking to be trusted. */
+  cost: LineCost;
+  /**
+   * True for an extra nobody has taken.
+   *
+   * Such a line is priced like any other and is deliberately still returned:
+   * what the extras would add is a figure worth showing, beside the plan
+   * rather than inside it. `plannedEstimates()` and `optionalEstimates()`
+   * below are the two ends of that split, and nothing should filter on this
+   * field by hand.
+   */
+  optional: boolean;
+}
+
+const key = (value: string | null): string => (value ?? '').trim().toLowerCase();
+
+/**
+ * Where a leg goes: "Zürich to Pretoria", or the one end it names, or null.
+ *
+ * Null rather than a fallback string, because the itinerary row and the
+ * document line fall back to different things: a row already prints the
+ * direction beside it, a document line has nothing else to say.
+ */
+export function legRoute(leg: ParsedTripLeg, joiner: string): string | null {
+  const ends = [leg.origin, leg.destination].filter((end): end is string => !!end);
+  if (ends.length === 2) return `${ends[0]} ${joiner} ${ends[1]}`;
+  return ends[0] ?? null;
+}
+
+/**
+ * A stop as one line of a cost document: where it is, and which excursion it
+ * is when it names one.
+ *
+ * The place alone stopped being enough the moment a trip offered two
+ * excursions in one port. The Nordkap plan lists Stavanger twice and Roervik
+ * twice, so its optional rows read as a city repeated with two different
+ * figures beside it, and the thing the reader is choosing between was the one
+ * word missing. The separator is the one a variant already appends with.
+ *
+ * The reference stays the place, because that is what a booking has to name to
+ * supersede this line, and an excursion is not a booking.
+ */
+export function stopLabel(stop: ParsedTripStop, fallback: string): string {
+  const parts = [stop.placeTitle, stop.excursionTitle].filter((part): part is string => !!part);
+  return parts.length === 0 ? fallback : parts.join(' · ');
+}
+
+/** A leg as one line of a cost document: its route where it has one, its reference otherwise. */
+export function legLabel(leg: ParsedTripLeg, joiner: string, fallback: string): string {
+  return legRoute(leg, joiner) ?? leg.reference ?? fallback;
+}
+
+/**
+ * Every priced item on a trip.
+ *
+ * Labels are passed in already localized, because this file has no business
+ * knowing what language the reader uses.
+ */
+export function tripItemEstimates(trip: EstimatedTrip, labels: EstimateLabelWords): ItemEstimate[] {
+  const estimates: ItemEstimate[] = [];
+  const participants = trip.personTitles;
+
+  const push = (
+    label: string,
+    category: BookingCategory,
+    line: PricedLine,
+    reference: string | null,
+    dates: {
+      checkIn?: string | null;
+      checkOut?: string | null;
+      checkInDay?: number | null;
+      checkOutDay?: number | null;
+    } = {}
+  ): void => {
+    // The figure comes through `lineFigure` for every kind of line, so a
+    // row priced by variant and a plain one cannot take different paths to
+    // the same total. It also settles what happens to a line stating both a
+    // price and a set of variants: the variants win.
+    const figure = lineFigure(line);
+    const cost = lineCost({
+      cost: figure.cost,
+      unit: figure.costUnit,
+      persons: line.persons,
+      participants,
+      ...dates,
+    });
+    if (cost.amount === null) return;
+    estimates.push({
+      // A row that said only "Oslo to Copenhagen" would not say which cabin
+      // its number is for, and that is the whole difference between the two
+      // figures on such a line.
+      label: figure.variant?.name ? `${label} · ${figure.variant.name}` : label,
+      category,
+      amount: cost.amount,
+      currency: figure.currency,
+      reference,
+      persons: lineTravellers(line.persons, participants),
+      cost,
+      optional: !countsInPlan(line),
+    });
+  };
+
+  for (const leg of trip.transport) {
+    push(legLabel(leg, labels.joiner, labels.legFallback), 'transport', leg, leg.reference);
+  }
+
+  for (const night of trip.nights) {
+    // A night has no reference of its own, so it is superseded by a booking
+    // that names the same accommodation instead.
+    push(
+      night.accommodationTitle ?? labels.nightFallback,
+      'accommodation',
+      night,
+      night.accommodationTitle,
+      {
+        checkIn: night.checkIn,
+        checkOut: night.checkOut,
+        checkInDay: night.checkInDay,
+        checkOutDay: night.checkOutDay,
+      }
+    );
+  }
+
+  for (const stop of trip.stops) {
+    push(stopLabel(stop, labels.stopFallback), 'activity', stop, stop.placeTitle);
+  }
+
+  return estimates;
+}
+
+/**
+ * The estimates a booking has not already replaced.
+ *
+ * A leg is matched on its reference and a night on its accommodation, both
+ * against the booking's own `reference` and `place`. Either match means the
+ * real figure exists and the guess should stop being counted.
+ */
+export function unmatchedEstimates(
+  estimates: ItemEstimate[],
+  bookings: ParsedBooking[]
+): ItemEstimate[] {
+  const references = new Set(
+    bookings.map((booking) => key(booking.reference)).filter((value) => value !== '')
+  );
+  const places = new Set(
+    bookings.map((booking) => key(booking.placeTitle)).filter((value) => value !== '')
+  );
+
+  return estimates.filter((estimate) => {
+    const reference = key(estimate.reference);
+    if (reference === '') return true;
+    return !references.has(reference) && !places.has(reference);
+  });
+}
+
+/**
+ * The estimates that belong in the plan: everything but an extra nobody has
+ * taken.
+ *
+ * A named function rather than a filter written out at each call site, so
+ * "what counts as planned" has one definition and the trip document, the cost
+ * sheet and the costs block cannot drift apart on it.
+ */
+export function plannedEstimates(estimates: readonly ItemEstimate[]): ItemEstimate[] {
+  return estimates.filter((estimate) => !estimate.optional);
+}
+
+/** The other half: what the extras nobody has taken would add. */
+export function optionalEstimates(estimates: readonly ItemEstimate[]): ItemEstimate[] {
+  return estimates.filter((estimate) => estimate.optional);
+}
+
+/**
+ * An estimate in the shape the totals already understand.
+ *
+ * Rather than a second code path through `tripCostTotals()`: an estimate is
+ * a booking with a status of `estimate` and nobody who has paid for it,
+ * which is exactly what it is. It carries no payer because nobody has paid.
+ *
+ * It carries who it is FOR because a printed line has to say so, and because
+ * that list is what a booking made from it needs. Note that this is NOT what
+ * keeps an estimate out of the settlement: `tripSettlement()` deliberately
+ * charges a payer-less booking to the people it names, so an estimate that
+ * reached it would invent a debt. Every caller passes it the real bookings
+ * only, and that is the line to hold.
+ */
+export function asEstimateBooking(estimate: ItemEstimate, tripTitle: string): ParsedBooking {
+  return {
+    tripTitle,
+    category: estimate.category,
+    status: 'estimate',
+    supplierTitle: null,
+    placeTitle: null,
+    date: null,
+    amount: estimate.amount,
+    currency: estimate.currency,
+    reference: estimate.reference,
+    payerTitle: null,
+    forTitles: [...estimate.persons],
+    documentPath: null,
+  };
+}
+
+/**
+ * The estimates that still count, as titled rows.
+ *
+ * The one entry point the costs block and the cost sheet share, so the
+ * document and the screen cannot end up counting different things. The title
+ * is the item's own label rather than a note name, because there is no note:
+ * that is the whole point of an estimate.
+ */
+export function estimateLines(
+  trip: EstimatedTrip,
+  bookings: ParsedBooking[],
+  tripTitle: string,
+  labels: EstimateLabelWords
+): (ParsedBooking & { title: string })[] {
+  // Planned only. An extra nobody has taken is a price, not money owed, and
+  // letting one through here would put it in the committed total, the
+  // variance and the settlement -- three places where it would read as a
+  // decision somebody made.
+  return unmatchedEstimates(plannedEstimates(tripItemEstimates(trip, labels)), bookings).map(
+    (estimate) => ({
+      ...asEstimateBooking(estimate, tripTitle),
+      title: estimate.label,
+    })
+  );
+}
+
+/**
+ * What the extras nobody has taken would add, in the trip's own currency.
+ *
+ * Through the same two functions the plan goes through, with no budget to
+ * compare against, because an offered excursion has no ceiling anybody set.
+ * Reusing them rather than writing a second sum is what keeps the currency
+ * rule identical at both ends: an estimate in another currency is skipped
+ * here exactly as it is there, rather than converted at a rate the reader
+ * cannot check.
+ *
+ * Null when the trip offers nothing, which is not the same as zero.
+ *
+ * One function for the three places that show this figure -- the costs block,
+ * the cost sheet and the trip document -- so a screen and a printout cannot
+ * disagree about what saying yes to everything would cost.
+ */
+/**
+ * The extras nobody has taken, one by one, in the note's own order.
+ *
+ * Beside `optionalTotal` rather than instead of it. A single figure reads as
+ * money somebody could spend, and on a trip offering an excursion on each of
+ * six days it is a sum nobody can reach: two extras on one day are a choice
+ * between them, not a pair. Thomas, on the Nordkap plan: *if more than one
+ * optional trip is possible it might anyway not be doable to do both.*
+ *
+ * So the surfaces print the rows and keep the sum as a ceiling. Nothing here
+ * knows which extras exclude each other, and nothing tries to guess: two rows
+ * on the same day are a conflict a reader can see and arithmetic cannot.
+ */
+export function optionalItems(trip: EstimatedTrip, labels: EstimateLabelWords): ItemEstimate[] {
+  return optionalEstimates(tripItemEstimates(trip, labels));
+}
+
+export function optionalTotal(
+  trip: EstimatedTrip,
+  labels: EstimateLabelWords,
+  currency: string
+): number | null {
+  const extras = optionalEstimates(tripItemEstimates(trip, labels));
+  return plannedTotal(plannedByCategory([], extras, currency));
+}

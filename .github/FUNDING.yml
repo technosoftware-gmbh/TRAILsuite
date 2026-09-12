@@ -1,0 +1,15 @@
+# The Sponsor button on this repository's page.
+#
+# One key and one name, because there is one place to sponsor this work: the
+# Technosoftware GmbH organization on GitHub. The `github` key takes an
+# organization plus up to four developers; naming individuals as well would
+# split the same donation into a choice nobody asked to make.
+#
+# **Sponsorship is not the commercial licence.** APERtrail and NODAtrail are
+# free for personal use, and any use in or for a business needs a licence from
+# Technosoftware GmbH, which is bought and invoiced the ordinary way -- see
+# NOTICE.md. A sponsorship issues no invoice and GitHub collects no VAT on it.
+# Keeping the two apart is what keeps the licence revenue on a proper invoice
+# trail, and this file is exactly where somebody would later stop noticing the
+# difference.
+github: technosoftware-gmbh

@@ -1,0 +1,63 @@
+# Dependency updates, batched rather than one at a time.
+#
+# Four workspaces share one lockfile, and between them they declare roughly
+# seventy dependencies of which **every single one is developer tooling**: the
+# only runtime dependency any plugin has is `trail-core`, which is this
+# repository, and `obsidian` is a peer. So there is no production surface to
+# treat differently from a test surface, and a separate pull request per
+# package would be a weekly inbox of eslint patch bumps nobody reads. A digest
+# that is read is worth more than a stream that is skimmed.
+#
+# **Security advisories ignore all of this.** Dependabot opens those
+# immediately, on their own, whatever the schedule and grouping say -- which is
+# how the `fast-uri` one arrived. That is the right asymmetry: a grouped weekly
+# digest for housekeeping, and an interruption for something that matters.
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    # The root, which is where the workspaces and the single lockfile live.
+    # Dependabot reads every `packages/*/package.json` from here; pointing it at
+    # each package instead would produce four pull requests for one lockfile
+    # change, and they would conflict with each other.
+    directory: /
+    schedule:
+      interval: weekly
+      # Not Monday. The `check` workflow's own weekly run is Monday morning, and
+      # so is the half hour this vault's owner spends on the week's meetings; a
+      # dependency digest landing in the middle of either is a digest that gets
+      # closed unread.
+      day: wednesday
+      time: '06:00'
+      timezone: Europe/Zurich
+    open-pull-requests-limit: 3
+    # `deps: bump x from a to b`, which is this repository's `scope: what
+    # happened` shape. The default is `chore(deps):`, a conventional-commit
+    # prefix the recent history does not use.
+    commit-message:
+      prefix: deps
+    groups:
+      tooling:
+        patterns:
+          - '*'
+        # Majors stay on their own. A major of eslint, vitest or typescript
+        # changes what the suite means rather than what it costs, and it
+        # deserves to be read by itself rather than buried in a list of
+        # fourteen patch bumps.
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: wednesday
+      time: '06:00'
+      timezone: Europe/Zurich
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns:
+          - '*'

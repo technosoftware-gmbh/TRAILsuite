@@ -1,0 +1,1836 @@
+/*
+ * NODAtrail's stylesheet.
+ *
+ * One `nod-` prefix for the whole UI kit, including anything a module
+ * contributes. Every colour is an Obsidian theme variable rather than a
+ * literal, so the plugin follows whatever theme the vault is wearing.
+ *
+ * The sheet is direction aware: inline offsets are written
+ * `margin-inline-start` and `padding-inline-start`, never `left` and `right`,
+ * so a right-to-left locale does not need a second stylesheet.
+ */
+
+/* Settings ------------------------------------------------------------- */
+
+.nod-settings .setting-item-name {
+  font-weight: var(--font-normal);
+}
+
+.nod-settings-page {
+  padding-block-start: 0.5em;
+}
+
+.nod-settings-intro,
+.nod-settings-note {
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  margin-block: 0.4em 0.8em;
+}
+
+.nod-settings-card {
+  margin-block-end: 1.2em;
+}
+
+.nod-settings-nav-row {
+  cursor: pointer;
+}
+
+.nod-settings-nav-row:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+.nod-settings-nav-value {
+  color: var(--text-muted);
+  margin-inline-end: 0.5em;
+}
+
+.nod-settings-nav-chevron {
+  color: var(--text-muted);
+  display: inline-flex;
+}
+
+.nod-settings-link-button {
+  align-items: center;
+  border-radius: var(--radius-s);
+  display: inline-flex;
+  gap: 0.35em;
+  padding: 0.3em 0.7em;
+  text-decoration: none;
+}
+
+.nod-settings-link-icon {
+  display: inline-flex;
+}
+
+/* Views ---------------------------------------------------------------- */
+
+.nod-view {
+  padding: 0.6em 0.9em 2em;
+}
+
+.nod-view-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+}
+
+.nod-greeting {
+  font-size: var(--font-ui-large);
+  margin-block: 0.2em 0.6em;
+}
+
+.nod-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em;
+  margin-block-end: 0.8em;
+}
+
+.nod-toolbar-button,
+.nod-section-action {
+  align-items: center;
+  background-color: var(--interactive-normal);
+  border: none;
+  border-radius: var(--radius-s);
+  color: var(--text-normal);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: var(--font-ui-smaller);
+  gap: 0.3em;
+  padding: 0.3em 0.6em;
+}
+
+.nod-toolbar-button:hover,
+.nod-section-action:hover {
+  background-color: var(--interactive-hover);
+}
+
+.nod-icon {
+  display: inline-flex;
+}
+
+/* Sections and stats --------------------------------------------------- */
+
+.nod-section {
+  margin-block-end: 1em;
+}
+
+.nod-section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1em;
+}
+
+.nod-section-header {
+  align-items: center;
+  border-block-end: 1px solid var(--background-modifier-border);
+  display: flex;
+  justify-content: space-between;
+  margin-block-end: 0.3em;
+  padding-block-end: 0.2em;
+}
+
+.nod-section-title {
+  font-size: var(--font-ui-small);
+  letter-spacing: 0.04em;
+  margin: 0;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.nod-stat-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  margin-block-end: 1em;
+}
+
+.nod-stat {
+  background-color: var(--background-secondary);
+  border-radius: var(--radius-m);
+  flex: 1 1 8em;
+  padding: 0.6em 0.8em;
+}
+
+.nod-stat-value {
+  font-size: var(--font-ui-large);
+  font-weight: var(--font-semibold);
+}
+
+.nod-stat-label {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+}
+
+.nod-stat-warn .nod-stat-value {
+  color: var(--text-error);
+}
+
+.nod-stat-good .nod-stat-value {
+  color: var(--text-success);
+}
+
+/* Rows ----------------------------------------------------------------- */
+
+.nod-row {
+  align-items: center;
+  border-radius: var(--radius-s);
+  display: flex;
+  gap: 0.5em;
+  padding: 0.35em 0.5em;
+}
+
+.nod-row-clickable {
+  cursor: pointer;
+}
+
+.nod-row-clickable:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+.nod-row-nested {
+  padding-inline-start: 1.6em;
+}
+
+.nod-row-done .nod-row-title {
+  color: var(--text-faint);
+  text-decoration: line-through;
+}
+
+.nod-row-lead {
+  display: inline-flex;
+}
+
+.nod-checkbox {
+  cursor: pointer;
+  margin: 0;
+}
+
+.nod-row-icon {
+  color: var(--text-muted);
+  display: inline-flex;
+}
+
+/* An icon that is text rather than an SVG -- an emoji a note named for
+   itself. Sized to match the Lucide glyph beside it in the next row down,
+   since a row whose icon is a third taller than its neighbour's reads as
+   misaligned rather than as different. Full colour, not --text-muted: an
+   emoji muted is an emoji with the colour taken out of it, which is most of
+   what an emoji was. */
+.nod-icon-text {
+  align-items: center;
+  color: var(--text-normal);
+  display: inline-flex;
+  font-size: 1em;
+  justify-content: center;
+  line-height: 1;
+  width: 1.15em;
+}
+
+.nod-row-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.nod-row-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nod-row-subtitle {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nod-row-trailing {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.nod-row-fix {
+  background-color: var(--interactive-accent);
+  border: none;
+  border-radius: var(--radius-s);
+  color: var(--text-on-accent);
+  cursor: pointer;
+  font-size: var(--font-ui-smaller);
+  padding: 0.2em 0.6em;
+}
+
+/* Chips, tones and empty states ---------------------------------------- */
+
+.nod-chip {
+  background-color: var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  font-size: var(--font-ui-smaller);
+  margin-inline-start: 0.4em;
+  padding: 0.1em 0.45em;
+  white-space: nowrap;
+}
+
+.nod-tone-warn {
+  color: var(--text-error);
+}
+
+.nod-tone-good {
+  color: var(--text-success);
+}
+
+.nod-tone-muted {
+  color: var(--text-muted);
+}
+
+.nod-empty {
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  font-style: italic;
+  padding: 0.5em;
+}
+
+/* Tabs ----------------------------------------------------------------- */
+
+.nod-tabs {
+  border-block-end: 1px solid var(--background-modifier-border);
+  display: flex;
+  gap: 0.2em;
+  margin-block-end: 0.8em;
+}
+
+.nod-tab {
+  background: none;
+  border: none;
+  border-block-end: 2px solid transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: var(--font-ui-small);
+  padding: 0.35em 0.7em;
+}
+
+.nod-tab:hover {
+  color: var(--text-normal);
+}
+
+.nod-tab-active {
+  border-block-end-color: var(--interactive-accent);
+  color: var(--text-normal);
+}
+
+.nod-tab-body {
+  display: flex;
+  flex-direction: column;
+}
+
+/* The plan view's header ----------------------------------------------- */
+
+/* Editorial rather than administrative: a small mono kicker, then the period's
+   own name at display size, then the controls. The tab strip above already
+   says which view this is, so the largest thing on screen says which period
+   you are looking at instead of repeating the word "Plan". */
+
+.nod-plan-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+  margin-block-end: 1em;
+}
+
+.nod-plan-kicker {
+  color: var(--text-muted);
+  font-family: var(--font-monospace);
+  font-size: var(--font-ui-smaller);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.nod-plan-kicker-mark {
+  color: var(--text-accent);
+  margin-inline-end: 0.6em;
+}
+
+.nod-plan-headline {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8em;
+  justify-content: space-between;
+}
+
+.nod-plan-name {
+  font-size: 2.1em;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin: 0;
+}
+
+.nod-plan-controls {
+  align-items: center;
+  display: flex;
+  gap: 0.5em;
+}
+
+/* The day, split ------------------------------------------------------- */
+
+/* The day's sections side by side rather than stacked, so a wide screen goes
+   to the day instead of to a margin. Whatever fits: three or four panels on a
+   desktop, two on an iPad in split view, one in a side pane, with no
+   breakpoint guessing where the line is.
+ *
+ * 18em is the floor because these are the sections themselves, unchanged --
+ * every row keeps the checkbox, the move, the close-with-a-reason, the edit --
+ * and those need more room than a week column's text line does. That is the
+ * whole difference between this and the calendar: the day is where a period is
+ * worked through, so its rows stay complete.
+ *
+ * `align-items: start` so a panel with one row is one row tall rather than
+ * stretched to match the tallest column beside it. */
+/* What you have to attend and what you have to do, side by side, each with
+   half the width. Two equal columns rather than an auto-fit of whatever fits:
+   these two are the day, and letting a quiet Termine panel shrink to a third
+   while Aufgaben took the rest would be the layout deciding which of them
+   matters today. They collapse to one column under 42em, which is a side pane
+   or a phone. */
+.nod-plan-day-main {
+  align-items: stretch;
+  display: grid;
+  gap: 0.9em;
+  grid-template-columns: repeat(auto-fit, minmax(21em, 1fr));
+  margin-block-end: 0.9em;
+}
+
+/* Deadlines, money and the day's thoughts: what the day contains rather than
+   what it asks of you. Narrower panels, because these are read and rarely
+   acted on from here. */
+.nod-plan-day-rest {
+  align-items: stretch;
+  display: grid;
+  gap: 0.9em;
+  grid-template-columns: repeat(auto-fit, minmax(17em, 1fr));
+}
+
+/* Scoped to this grid rather than added to .nod-section, which every other
+   view draws too: laid out as columns the sections need an edge to read as
+   separate things, and stacked down a page they do not. */
+.nod-plan-day-main > .nod-section,
+.nod-plan-day-rest > .nod-section {
+  background-color: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  margin-block-end: 0;
+  padding: 0.8em 0.8em 0.9em;
+}
+
+/* Today, on the day that is today. The same accent the week column and the
+   month cell carry, so the three views agree about what a frame means. */
+.nod-plan-day-main--today > .nod-section,
+.nod-plan-day-rest--today > .nod-section {
+  border-color: var(--text-accent);
+}
+
+/* A row's title wraps here, where everywhere else it truncates.
+ *
+ * `.nod-row-title` forces `nowrap` because a row is normally the width of a
+ * view and an ellipsis is the exception. In a panel a third that wide it is
+ * the rule, and "Meine Cardiofi..." identifies nothing. Vertical space costs
+ * little in this layout -- the panels stretch to the tallest of the row, so a
+ * short one has room going spare -- so the title takes the second line it
+ * needs. (They used to start-align, and the wrapping was free rather than
+ * cheap; stretching is what makes a day's two panels read as one row.)
+ *
+ * The subtitle keeps its ellipsis: it is the supporting line, and two wrapping
+ * lines per row would cost the panel more than the second one is worth. */
+.nod-plan-day-main .nod-row-title,
+.nod-plan-day-rest .nod-row-title {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+.nod-plan-day-main > .nod-section .nod-section-title,
+.nod-plan-day-rest > .nod-section .nod-section-title {
+  font-family: var(--font-monospace);
+  font-size: var(--font-ui-smaller);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* The week as seven columns -------------------------------------------- */
+
+/* auto-fit rather than repeat(7, 1fr): seven columns on a desktop, and as many
+   as fit in a side pane or on a phone, without a media query guessing where
+   the breakpoint is. 9em is about the narrowest a day's title stays readable
+   at. */
+.nod-plan-week {
+  display: grid;
+  gap: 0.6em;
+  grid-template-columns: repeat(auto-fit, minmax(9em, 1fr));
+}
+
+.nod-plan-day {
+  background-color: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  display: flex;
+  flex-direction: column;
+  /* A floor rather than a height: grid rows stretch to their tallest cell, so
+     this only shows on a week where every day is quiet. Kept low because the
+     columns wrap to two on a narrow pane, where seven tall empty cards would
+     be most of the screen. */
+  min-block-size: 7em;
+  padding: 0.7em 0.7em 0.8em;
+}
+
+/* Today is outlined and the days behind you are dimmed. Between them that is
+   the whole navigational content of the view: where you are in the week, and
+   how much of it is still ahead. */
+.nod-plan-day--today {
+  border-color: var(--text-accent);
+}
+
+.nod-plan-day--past {
+  opacity: 0.55;
+}
+
+.nod-plan-day-head {
+  align-items: baseline;
+  border-block-end: 1px solid var(--background-modifier-border);
+  display: flex;
+  font-family: var(--font-monospace);
+  font-size: var(--font-ui-smaller);
+  justify-content: space-between;
+  letter-spacing: 0.1em;
+  margin-block-end: 0.6em;
+  padding-block-end: 0.45em;
+  text-transform: uppercase;
+}
+
+/* Groups the weekday and its number so the pair stays together when the head
+   pushes the today marker to the far end. */
+.nod-plan-day-name {
+  align-items: baseline;
+  display: flex;
+}
+
+.nod-plan-day-weekday {
+  font-weight: var(--font-semibold);
+}
+
+.nod-plan-day--today .nod-plan-day-weekday {
+  color: var(--text-accent);
+}
+
+.nod-plan-day-number {
+  color: var(--text-faint);
+  margin-inline-start: 0.4em;
+}
+
+.nod-plan-now {
+  color: var(--text-accent);
+  font-size: 0.9em;
+}
+
+.nod-plan-day-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1em;
+}
+
+/* One entry, in a column or in a month cell ---------------------------- */
+
+.nod-plan-entry {
+  align-items: baseline;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  display: flex;
+  font-size: var(--font-ui-smaller);
+  gap: 0.45em;
+  line-height: 1.35;
+  padding: 0.2em 0.25em;
+}
+
+.nod-plan-entry:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+/* Stands where a time would be, so an untimed meeting lines up with the timed
+   ones above it instead of starting at the margin. */
+.nod-plan-entry-dot {
+  background-color: var(--text-faint);
+  block-size: 0.35em;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  inline-size: 0.35em;
+  transform: translateY(-0.15em);
+}
+
+.nod-plan-entry-text {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A band's meetings, in a box whose height is the same on every day of the
+   week.
+ *
+ * The row count comes from the busiest day and is set on the element, because
+ * it is a fact about the week rather than one of a fixed set of looks. What it
+ * buys is that the bands line up across the five columns, which is what makes
+ * the grid read as a timetable rather than as five lists standing next to each
+ * other. Overflow is hidden and counted in the row above rather than clipped
+ * silently: see `bandList`. */
+.nod-plan-band-slot {
+  --nod-plan-row: 1.75em;
+  block-size: calc(var(--nod-band-rows, 0) * var(--nod-plan-row));
+  font-size: var(--font-ui-smaller);
+  overflow: hidden;
+}
+
+/* What did not fit, in the last row of the band it belongs to. */
+.nod-plan-band-more {
+  block-size: var(--nod-plan-row);
+  color: var(--text-faint);
+  line-height: 1.35;
+  padding: 0.2em 0.25em;
+}
+
+/* The three bands of a day column.
+ *
+ * A rule with its name sitting on it, rather than a heading above a list: the
+ * band is a line across the day, and what makes seven of these columns read as
+ * a timetable is that the lines are at the same height in each. Drawn even when
+ * the band holds nothing, which is the point -- an empty afternoon is a fact
+ * about the week worth seeing. */
+.nod-plan-band {
+  border-block-start: 1px solid var(--background-modifier-border);
+  color: var(--text-faint);
+  font-family: var(--font-monospace);
+  font-size: var(--font-ui-smaller);
+  letter-spacing: 0.14em;
+  margin-block-start: 0.5em;
+  padding-block-start: 0.35em;
+  text-transform: uppercase;
+}
+
+/* Lunch is the one band that is a gap rather than a stretch of working day, so
+   its line is the one that reads as a divider. */
+.nod-plan-band--lunch {
+  border-block-start-style: dashed;
+}
+
+/* What the work-week setting does not draw, said in one line under the grid.
+   The setting hides two columns; it must not hide a bill. */
+.nod-plan-weekend {
+  color: var(--text-faint);
+  font-family: var(--font-monospace);
+  font-size: var(--font-ui-smaller);
+  letter-spacing: 0.04em;
+  margin-block-start: 0.8em;
+  white-space: pre-wrap;
+}
+
+/* A meeting leads with its time, which is the one thing in this view that has
+   one. Tabular figures so 9:00 and 14:30 line up down a column. */
+.nod-plan-entry-time {
+  color: var(--text-muted);
+  flex: 0 0 auto;
+  font-family: var(--font-monospace);
+  font-size: 0.92em;
+  font-variant-numeric: tabular-nums;
+}
+
+.nod-plan-entry--meeting .nod-plan-entry-text {
+  color: var(--text-normal);
+}
+
+/* The day view's schedule, which is the week's bands given a whole column.
+   Nothing is capped and nothing is padded here: there are no neighbouring
+   days to line up with, so a band is exactly as tall as what is in it. */
+.nod-plan-day-schedule {
+  margin-block-start: 0.2em;
+}
+
+/* What a meeting is about, or why it cannot be edited. Beside the title rather
+   than under it, and allowed to give up its width first: the title is the
+   thing being read. */
+.nod-plan-entry-note {
+  color: var(--text-faint);
+  flex: 0 1 auto;
+  font-size: var(--font-ui-smaller);
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A meeting you said no to. Still in its band, because the hour is still gone
+   from your day; faint, because you are not in it. */
+.nod-plan-entry--declined .nod-plan-entry-text {
+  color: var(--text-faint);
+  text-decoration: line-through;
+}
+
+/* What else falls on the day, as a count rather than as rows. Pushed to the
+   foot of the cell so it reads as a footnote to the meetings above it, and
+   muted because it is the one line here that is not a thing you can open. */
+.nod-plan-day-summary {
+  color: var(--text-faint);
+  /* Drawn empty on a day with nothing to report, so five columns end at the
+     same line. A footnote that vanishes takes a row of the column with it. */
+  min-block-size: 1.35em;
+  font-family: var(--font-monospace);
+  font-size: var(--font-ui-smaller);
+  letter-spacing: 0.04em;
+  margin-block-start: auto;
+  padding-block-start: 0.5em;
+}
+
+/* The month as a calendar grid ----------------------------------------- */
+
+.nod-plan-month {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+/* A 2.2em gutter for the ISO week number, then seven equal days. The number is
+   there because this plugin's weekly notes are titled by ISO week, so the
+   month has to name weeks the same way the level beside it does. */
+.nod-plan-month-row {
+  display: grid;
+  gap: 0.5em;
+  /* `minmax(0, 1fr)` rather than `1fr`, which is the whole reason the columns
+     are equal. A bare `1fr` is `minmax(auto, 1fr)`, and that `auto` floor is
+     the column's min-content width -- so one cell holding
+     `20260801_MUSTERVERSICHERUNG AG_1000000002` pushed itself several times
+     wider than its neighbours and the weekday header no longer lined up with
+     anything. The zero floor lets a column shrink past its content, which is
+     what the ellipsis on .nod-plan-entry-text is there to handle. */
+  grid-template-columns: 2.2em repeat(7, minmax(0, 1fr));
+}
+
+.nod-plan-month-row--head {
+  color: var(--text-faint);
+  font-family: var(--font-monospace);
+  font-size: var(--font-ui-smaller);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.nod-plan-weekday {
+  padding-inline: 0.3em;
+}
+
+.nod-plan-week-number {
+  color: var(--text-faint);
+  font-family: var(--font-monospace);
+  font-size: var(--font-ui-smaller);
+  padding-block-start: 0.6em;
+  text-align: end;
+}
+
+.nod-plan-cell {
+  background-color: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  display: flex;
+  flex-direction: column;
+  gap: 0.1em;
+  min-block-size: 5.2em;
+  padding: 0.4em 0.45em 0.5em;
+}
+
+/* Days either side of the month are drawn as outlines: the grid runs in whole
+   weeks, and a cell that looks identical to a real one would make the month
+   five days longer than it is. */
+.nod-plan-cell--outside {
+  background-color: transparent;
+  opacity: 0.45;
+}
+
+.nod-plan-cell--today {
+  border-color: var(--text-accent);
+}
+
+.nod-plan-cell-number {
+  color: var(--text-muted);
+  font-family: var(--font-monospace);
+  font-size: var(--font-ui-smaller);
+}
+
+.nod-plan-cell--today .nod-plan-cell-number {
+  color: var(--text-accent);
+  font-weight: var(--font-semibold);
+}
+
+/* Pushed to the bottom of the cell so the counter sits under the entries
+   however few of them there are, rather than floating directly beneath a
+   single line. */
+.nod-plan-cell-more {
+  color: var(--text-faint);
+  font-family: var(--font-monospace);
+  font-size: var(--font-ui-smaller);
+  margin-block-start: auto;
+}
+
+/* The jump-to-a-date field beside the period's name. Sized to its own content
+   so it does not stretch across a phone, and aligned to the heading's text
+   rather than its box, which is what the header's baseline layout wants. */
+.nod-plan-jump {
+  font-size: var(--font-ui-small);
+  inline-size: auto;
+  max-inline-size: 100%;
+}
+
+.nod-plan-path {
+  color: var(--text-faint);
+  font-size: var(--font-ui-smaller);
+}
+
+/* Modals and blocks ---------------------------------------------------- */
+
+/* A chip that is a control rather than a label: the open-task count on a
+   project row, which opens and closes the list under it. */
+.nod-chip-button {
+  cursor: pointer;
+}
+
+.nod-chip-button:hover {
+  background: var(--background-modifier-hover);
+}
+
+/* A task listed under the project it is about, indented past the project row
+   so the tree still reads as a tree. */
+.nod-row-task {
+  padding-inline-start: 2.2em;
+}
+
+/* The date box in a follow-up row. Sized to its content so three fields fit on
+   one line on a desktop and wrap sanely on a phone. */
+.nod-list-date {
+  inline-size: auto;
+  max-inline-size: 100%;
+}
+
+/* A sentence explaining the field above it. No name, so the border Obsidian
+   draws between settings would read as a divider under nothing. */
+.nod-form-note {
+  border-block-start: none;
+  padding-block-start: 0;
+}
+
+/* The multi-line boxes in the day-capture dialog. Every one of them takes a
+   list of short lines rather than a paragraph, and Obsidian's own default is
+   two rows, which makes a list of six look like an overflow. */
+.nod-form-area {
+  min-block-size: 6em;
+  inline-size: 100%;
+}
+
+/* A row whose control is the point of it.
+   Obsidian lays a setting row out as info on the left and control on the
+   right, and the control takes only the width it asks for. A textarea in one
+   is therefore a small square no matter what height it is given, and a
+   description of any length squeezes it further. Here the control takes the
+   room and the description is held to a column beside it. */
+.nod-form-multiline {
+  align-items: stretch;
+}
+
+.nod-form-multiline .setting-item-info {
+  flex: 0 1 18em;
+  margin-inline-end: 1em;
+}
+
+.nod-form-multiline .setting-item-control {
+  flex: 1 1 auto;
+  justify-content: stretch;
+}
+
+.nod-form-multiline .nod-form-area {
+  min-block-size: 9em;
+}
+
+.nod-form .setting-item {
+  border: none;
+  padding-block: 0.4em;
+}
+
+.nod-form-fields {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.nod-form-error:not(:empty) {
+  color: var(--text-error);
+  font-size: var(--font-ui-small);
+  padding-block: 0.4em;
+}
+
+/* The posting a dialog is about to write, shown before it writes it. */
+.nod-form-hint {
+  color: var(--text-muted);
+  font-family: var(--font-monospace);
+  font-size: var(--font-ui-smaller);
+  padding-block: 0.4em;
+}
+
+/* A hint that is a reason not to save, rather than a note about what will be. */
+.nod-form-hint-warn {
+  border-inline-start: 3px solid var(--text-error);
+  color: var(--text-normal);
+  padding-inline-start: 0.6em;
+}
+
+.nod-health .setting-item {
+  border: none;
+}
+
+.nod-health-body {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.nod-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1em;
+}
+
+.nod-whats-new .setting-item {
+  border: none;
+}
+
+.nod-whats-new-body {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.nod-whats-new-release {
+  border-block-end: 1px solid var(--background-modifier-border);
+  padding-block-end: 0.6em;
+}
+
+.nod-whats-new-release:last-child {
+  border-block-end: none;
+}
+
+/* The list editor ------------------------------------------------------ */
+
+.nod-list-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.nod-list-row {
+  align-items: center;
+  background-color: var(--background-secondary);
+  border-radius: var(--radius-s);
+  display: flex;
+  gap: 0.4em;
+  padding: 0.2em 0.4em;
+}
+
+.nod-list-fields {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.nod-list-setting {
+  border: none;
+  padding: 0.25em 0;
+}
+
+.nod-list-setting .setting-item-info {
+  display: none;
+}
+
+.nod-list-setting .setting-item-control {
+  flex-wrap: wrap;
+  gap: 0.3em;
+  justify-content: flex-start;
+}
+
+.nod-list-number {
+  max-width: 6em;
+}
+
+.nod-list-controls {
+  display: flex;
+  gap: 0.15em;
+}
+
+.nod-list-button {
+  background: none;
+  border: none;
+  box-shadow: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  padding: 0.2em;
+}
+
+.nod-list-button:disabled {
+  color: var(--text-faint);
+  cursor: default;
+}
+
+.nod-list-add {
+  align-items: center;
+  align-self: flex-start;
+  background-color: var(--interactive-normal);
+  border: none;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: var(--font-ui-smaller);
+  gap: 0.3em;
+  margin-block-start: 0.4em;
+  padding: 0.3em 0.6em;
+}
+
+.nod-row-action {
+  background-color: var(--interactive-normal);
+  border: none;
+  border-radius: var(--radius-s);
+  color: var(--text-normal);
+  cursor: pointer;
+  font-size: var(--font-ui-smaller);
+  margin-inline-start: 0.4em;
+  padding: 0.15em 0.5em;
+}
+
+/* The icon-only variant, for the actions that repeat on every row. Square and
+   tighter than the labelled one, and the icon is centred in it rather than
+   sitting on a text baseline that is no longer there. */
+.nod-row-action-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25em;
+}
+
+.nod-row-action-icon .nod-icon {
+  display: flex;
+}
+
+/* The same for a section header's action, where the word repeats down a view
+   whose rows are icons. Square, and no gap to hold a label that is not there. */
+.nod-section-action-icon {
+  gap: 0;
+  padding: 0.25em;
+}
+
+/* The statement import: a row per statement line, coloured by what would
+   happen to it. The colours are Obsidian's own semantic variables rather than
+   fixed hues, so a theme that redefines them redefines these too. */
+/* Wider than a default modal: five columns of a bank statement do not fit one. */
+.nod-import-modal {
+  max-width: min(60rem, 96vw);
+  width: min(60rem, 96vw);
+}
+
+.nod-import-body {
+  max-height: 45vh;
+  overflow-y: auto;
+}
+
+.nod-import-summary {
+  margin-block-end: 0.6em;
+}
+
+/* An import row: five columns that must stay in their columns however long the
+   bank's description is. Everything that can be long is allowed to shrink and
+   ellipsize; only the date, the figure and the control keep their width. */
+.nod-import-row {
+  align-items: center;
+  border-block-end: 1px solid var(--background-modifier-border);
+  display: flex;
+  font-size: var(--font-ui-small);
+  gap: 0.5em;
+  min-width: 0;
+  padding-block: 0.3em;
+}
+
+.nod-import-ready {
+  color: var(--text-normal);
+}
+
+.nod-import-attention {
+  color: var(--text-warning);
+}
+
+.nod-import-skipped {
+  color: var(--text-faint);
+}
+
+.nod-import-date {
+  flex: 0 0 6.5em;
+  font-variant-numeric: tabular-nums;
+}
+
+.nod-import-amount {
+  flex: 0 0 7em;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+.nod-import-text {
+  flex: 1 1 12em;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Shrinkable. These carry the invoice a row settles and the accounts it
+   divides across, either of which can be longer than the row is wide, and
+   before this they refused to give up a pixel and pushed a scrollbar under the
+   whole dialog. */
+.nod-import-note {
+  color: var(--text-muted);
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nod-import-select {
+  flex: 0 1 13em;
+  min-width: 7em;
+}
+
+.nod-import-ok {
+  color: var(--text-success);
+}
+
+.nod-import-warn {
+  color: var(--text-error);
+}
+
+.nod-import-footer {
+  border-block-start: 1px solid var(--background-modifier-border);
+  margin-block-start: 0.6em;
+}
+
+/* The calendar import reuses the rows above and adds two of its own: a scroll
+   box for what can be a hundred lines, and a column for a time span where the
+   statement import has a figure. */
+.nod-import-list {
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+.nod-import-time {
+  flex: 0 0 6em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Whether to learn a choice, on the import row it was made on. */
+.nod-import-remember {
+  align-items: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  font-size: var(--font-ui-smaller);
+  gap: 0.35em;
+  white-space: nowrap;
+}
+
+/* The time repair. It reuses the import rows above, and adds the four things
+   that dialog does not have: a line saying it is still reading, a column wide
+   enough for a before and an after, and the block a blocked line gets so its
+   reason can wrap instead of being cut off. */
+.nod-repair-busy {
+  color: var(--text-muted);
+  margin-block-end: 0.6em;
+}
+
+/* Both spans in one cell, so the change reads as one thing. Fixed width and
+   tabular figures, because a column of them is scanned rather than read. */
+.nod-repair-change {
+  flex: 0 0 13.5em;
+  font-variant-numeric: tabular-nums;
+}
+
+.nod-repair-blocked {
+  border-block-end: 1px solid var(--background-modifier-border);
+  font-size: var(--font-ui-small);
+  padding-block: 0.35em;
+}
+
+.nod-repair-head {
+  align-items: center;
+  color: var(--text-warning);
+  display: flex;
+  gap: 0.5em;
+  min-width: 0;
+}
+
+/* Wraps, unlike every other note in these dialogs. This one asks somebody to
+   carry a line from one note to another and names both, and an instruction cut
+   off at the edge of the column is not an instruction. */
+.nod-repair-why {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  padding-block-start: 0.15em;
+}
+
+/* The split editor. Four columns to a leg, so every row lines up down the
+   dialog however long an account name happens to be. Wider than a default
+   modal, because four controls do not fit one. */
+.nod-split-modal {
+  max-width: min(52rem, 94vw);
+  width: min(52rem, 94vw);
+}
+
+.nod-split-leg {
+  align-items: center;
+  border-block-start: 1px solid var(--background-modifier-border);
+  display: grid;
+  gap: 0.5em;
+  grid-template-columns: minmax(0, 1.7fr) 8em minmax(0, 1.5fr) auto;
+  padding-block: 0.45em;
+}
+
+/* One column more, for the invoice a leg pays. Only when splitting a bank row:
+   an invoice does not pay other invoices. */
+.nod-split-leg-bills {
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.3fr) 8em minmax(0, 1.2fr) auto;
+}
+
+.nod-split-bill {
+  min-width: 0;
+  width: 100%;
+}
+
+.nod-split-leg:first-of-type {
+  border-block-start: none;
+}
+
+.nod-split-account,
+.nod-split-text {
+  min-width: 0;
+  width: 100%;
+}
+
+/* Money reads down a column by its last digit. Eight ems holds 500'000.00
+   with room to spare, which is well past anything a household writes. */
+.nod-split-amount {
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  width: 100%;
+}
+
+.nod-split-remove {
+  align-items: center;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  padding: 0.3em;
+}
+
+.nod-split-remove:hover {
+  color: var(--text-error);
+}
+
+/* The row of legs is the one thing that scrolls, on a narrow window. */
+.nod-split {
+  overflow-x: hidden;
+}
+
+.nod-split-totals {
+  display: flex;
+  font-variant-numeric: tabular-nums;
+  gap: 0.8em;
+  justify-content: flex-end;
+  padding-block: 0.4em;
+}
+
+/* The ledger view: a report tree, an account statement, and the two selectors
+   above them. Indentation is logical padding so the sheet works right to left
+   as well. */
+/* The foldable group, shared by the ledger's report sections and the PARA
+   view's project statuses. One widget, one set of rules. */
+.nod-fold {
+  border-inline-start: 2px solid var(--background-modifier-border);
+  margin-block: 0.3em;
+  padding-inline-start: 0.6em;
+}
+
+/* A button rather than a div because folding the group is what it does, and a
+   tablet needs the whole width of the row to be the target. Obsidian's own
+   button styling has to be undone for it to keep reading as a report heading. */
+.nod-fold-header {
+  align-items: baseline;
+  background: none;
+  border: none;
+  box-shadow: none;
+  cursor: pointer;
+  display: flex;
+  font-size: var(--font-ui-small);
+  font-weight: var(--font-medium);
+  gap: 0.6em;
+  justify-content: space-between;
+  padding-inline: 0;
+  padding-block: 0.2em;
+  text-align: start;
+  width: 100%;
+}
+
+.nod-fold-header:hover {
+  background: var(--background-modifier-hover);
+}
+
+/* Baseline alignment puts an icon too low, so the chevron is centred against
+   the line it sits on instead. */
+.nod-fold-chevron {
+  align-self: center;
+  color: var(--text-faint);
+  display: flex;
+}
+
+.nod-fold-name {
+  color: var(--text-muted);
+  flex: 1;
+}
+
+.nod-fold-trailing {
+  font-variant-numeric: tabular-nums;
+}
+
+.nod-ledger-flat {
+  padding-inline-start: 0;
+}
+
+.nod-ledger-nested {
+  padding-inline-start: 0.4em;
+}
+
+/* The sentence beside a selector that says what it chose. */
+.nod-ledger-hint {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+}
+
+.nod-ledger-picker,
+.nod-period-bar {
+  align-items: center;
+  display: flex;
+  gap: 0.5em;
+  margin-block-end: 0.6em;
+}
+
+.nod-period-bar-title {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-medium);
+}
+
+/* A journal block, read as a table. The source stays one line per posting. */
+.nod-journal {
+  border-collapse: collapse;
+  font-size: var(--font-ui-small);
+  width: 100%;
+}
+
+.nod-journal th {
+  border-block-end: 1px solid var(--background-modifier-border);
+  color: var(--text-muted);
+  font-weight: var(--font-normal);
+  text-align: start;
+}
+
+.nod-journal td {
+  border-block-end: 1px solid var(--background-modifier-border-hover);
+  padding-block: 0.2em;
+  vertical-align: top;
+}
+
+.nod-journal tfoot td {
+  border-block-end: none;
+  color: var(--text-muted);
+}
+
+.nod-journal-date,
+.nod-journal-amount {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.nod-journal-amount {
+  text-align: end;
+}
+
+.nod-journal-bad {
+  color: var(--text-error);
+}
+
+.nod-journal-raw {
+  display: block;
+  font-family: var(--font-monospace);
+  opacity: 0.8;
+}
+
+.nod-journal-split {
+  color: var(--text-faint);
+  display: block;
+  font-size: var(--font-ui-smaller);
+}
+
+.nod-journal-empty {
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+/* Life dashboard -------------------------------------------------------
+ *
+ * The one surface in this plugin built from cards rather than rows. Twelve
+ * columns, and the column arithmetic lives in `src/ui/dashboard/cards.ts`: a
+ * caller asks for a span, never for a class.
+ */
+
+.nod-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 0.8em;
+}
+
+.nod-dashboard-span-4 {
+  grid-column: span 4;
+}
+
+.nod-dashboard-span-8 {
+  grid-column: span 8;
+}
+
+.nod-dashboard-span-12 {
+  grid-column: span 12;
+}
+
+.nod-dashboard-card {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  background-color: var(--background-primary);
+  padding: 0.7em 0.8em;
+  /* Without this a long unbroken title inside the card refuses to shrink and
+   * pushes its own track wider than the twelve it was given. */
+  min-width: 0;
+}
+
+/* A card nested inside a grid cell takes its column back, so it stacks down
+ * the cell rather than claiming a track of the outer grid. */
+.nod-dashboard-card .nod-dashboard-card {
+  grid-column: auto;
+}
+
+.nod-dashboard-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  flex-wrap: wrap;
+  margin-block-end: 0.5em;
+}
+
+/* One auto margin on the title puts a single gap before the whole control
+ * group. `justify-content: space-between` would put one before each control,
+ * and it does not survive the row wrapping. The title truncates rather than
+ * wraps, because a second line pushes the buttons past the card's edge and a
+ * control nobody can see is a control nobody knows is there. */
+.nod-dashboard-card-header .nod-dashboard-card-label {
+  font-weight: var(--font-semibold);
+  margin-inline-end: auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Two classes deep on purpose: Obsidian's own mobile stylesheet reaches a
+ * bare `button` with a selector that outranks a single class. */
+.nod-dashboard-card-header .nod-dashboard-header-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.3em 0.6em;
+  border-radius: var(--radius-s);
+  background-color: transparent;
+  box-shadow: none;
+  color: var(--text-accent);
+  font-size: var(--font-ui-small);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.nod-dashboard-card-header .nod-dashboard-header-btn:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+/* Sideways, never wrapping: a strip is one row tall whatever it holds, so
+ * adding a note never moves everything below it. */
+/* Six cards to a row, wrapping onto the next.
+ *
+ * It was a flex row that scrolled sideways, which suited four areas and broke
+ * down at fifteen projects: everything past the third was behind a gesture, and
+ * a dashboard is meant to be read rather than paged through. The count is one
+ * custom property so the narrow overrides below change it in one place instead
+ * of restating the whole track list.
+ *
+ * `minmax(0, 1fr)` rather than a fixed width: the cards share whatever the pane
+ * gives them, and the zero minimum is what lets a long title ellipsize instead
+ * of pushing the track wider than its share. */
+.nod-dashboard-strip {
+  --nod-hero-columns: 6;
+  display: grid;
+  grid-template-columns: repeat(var(--nod-hero-columns), minmax(0, 1fr));
+  gap: 0.6em;
+  padding-block-end: 0.2em;
+}
+
+/* The dashboard opened in a sidebar is a real width, not a phone. Six cards in
+ * 30rem are six thumbnails nobody can read, so the count drops rather than the
+ * cards shrinking past useful. */
+@media (max-width: 60rem) {
+  .nod-dashboard-strip {
+    --nod-hero-columns: 4;
+  }
+}
+
+@media (max-width: 40rem) {
+  .nod-dashboard-strip {
+    --nod-hero-columns: 2;
+  }
+}
+
+.nod-dashboard-hero {
+  position: relative;
+  /* No fixed width any more: the grid track decides, and `min-width: 0` is what
+     stops a long title from widening its own column. */
+  min-width: 0;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  overflow: hidden;
+  background-color: var(--background-primary);
+  cursor: pointer;
+}
+
+.nod-dashboard-hero:hover {
+  border-color: var(--interactive-accent);
+}
+
+.nod-dashboard-hero-selected {
+  border-color: var(--interactive-accent);
+  box-shadow: inset 0 0 0 1px var(--interactive-accent);
+}
+
+/* The aspect ratio is what holds the picture's share of the card's height,
+ * whatever the file's own dimensions are. */
+.nod-dashboard-hero-image {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background-color: var(--background-secondary);
+}
+
+.nod-dashboard-hero-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* A picture that was named and could not be shown, told apart from a card that
+ * never had one. Muted rather than loud: it is a fact about an attachment, not
+ * an error the reader has to act on now. */
+.nod-dashboard-hero-missing {
+  color: var(--text-warning);
+  background-color: var(--background-modifier-error-hover);
+}
+
+/* Same footprint as the image it stands in for, so a card with no picture is
+ * the same card and the strip does not step. */
+.nod-dashboard-hero-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-faint);
+}
+
+.nod-dashboard-hero-empty .nod-icon {
+  width: 1.6em;
+  height: 1.6em;
+}
+
+.nod-dashboard-hero-empty .nod-icon svg {
+  width: 1.6em;
+  height: 1.6em;
+}
+
+/* The height sum, and the reason it is written down: a card is a flex item in
+ * a row of cards, so one short card would leave its neighbours taller and the
+ * row ragged. 2.15 title + 0.2 gap + 1.15 meta + 1.0 padding.
+ * Adding a line here means adding to this sum. */
+.nod-dashboard-hero-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.45rem 0.55rem 0.55rem;
+  min-height: 4.5rem;
+}
+
+/* Clamped *and* given a height. The clamp caps two lines; the height also
+ * lifts a one-line title to the same size, which is the half that keeps the
+ * row level. */
+.nod-dashboard-hero-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 2.15rem;
+  font-size: var(--font-ui-small);
+  font-weight: var(--font-semibold);
+  line-height: 1.25;
+}
+
+/* Rendered whether or not it has anything to say, which is the whole reason
+ * it is drawn empty rather than skipped. */
+.nod-dashboard-hero-meta {
+  height: 1.15rem;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  line-height: 1.15rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Always visible rather than shown on hover: a hover-only control in a
+ * horizontal scroller is one nobody on a tablet ever finds. */
+.nod-dashboard-hero-edit {
+  position: absolute;
+  inset-block-start: 0.3em;
+  inset-inline-end: 0.3em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.7em;
+  height: 1.7em;
+  padding: 0;
+  border-radius: var(--radius-s);
+  background-color: var(--background-primary);
+  box-shadow: none;
+  opacity: 0.85;
+  cursor: pointer;
+}
+
+.nod-dashboard-hero-edit:hover {
+  opacity: 1;
+  background-color: var(--background-modifier-hover);
+}
+
+/* An icon-only button sizes its own svg. Obsidian's `.svg-icon` takes its
+ * size from `--icon-size`, which is not set in every context, and a button
+ * hosting an icon at zero looks like a button that failed to render. */
+.nod-dashboard-hero-edit .nod-icon svg {
+  width: 0.95em;
+  height: 0.95em;
+}
+
+/* Below this the twelve columns are a fiction: a third of a phone is not a
+ * card, it is a column of two-letter words. */
+@media (max-width: 700px) {
+  .nod-dashboard-span-4,
+  .nod-dashboard-span-8 {
+    grid-column: span 12;
+  }
+}
+
+/* Record cards -- an invoice, a statement line: several figures, each named. */
+.nod-card {
+  background-color: var(--background-secondary);
+  border-radius: var(--radius-m);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+  margin-bottom: 0.5em;
+  padding: 0.7em 0.85em;
+}
+
+.nod-card-clickable {
+  cursor: pointer;
+}
+
+.nod-card-clickable:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+.nod-card-head {
+  align-items: baseline;
+  display: flex;
+  gap: 0.5em;
+}
+
+.nod-card-icon {
+  color: var(--text-muted);
+  display: inline-flex;
+}
+
+.nod-card-name {
+  font-weight: var(--font-bold);
+}
+
+.nod-card-id {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+}
+
+/* Pushed to the end of the header rather than floated, so a long name shortens
+   the gap instead of pushing the buttons off the card. */
+.nod-card-actions {
+  display: flex;
+  gap: 0.3em;
+  margin-inline-start: auto;
+}
+
+.nod-card-action {
+  align-items: center;
+  background-color: var(--background-modifier-form-field);
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  /* Sized for a fingertip. These are the only controls on the card and there is
+     no hover on a tablet to find them by. */
+  min-height: 2em;
+  min-width: 2.4em;
+  padding: 0.2em 0.4em;
+}
+
+.nod-card-action:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+/* Wraps, so a narrow screen puts the later fields on a second line rather than
+   cutting the last figure in half. */
+.nod-card-meta {
+  align-items: center;
+  column-gap: 1.1em;
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 0.3em;
+}
+
+.nod-card-field {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.35em;
+}
+
+.nod-card-label {
+  color: var(--text-faint);
+  font-size: var(--font-ui-smaller);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.nod-card-value {
+  font-size: var(--font-ui-small);
+}
+
+/* The CRM view's search. Its own row above the list, and outside the element a
+   filter replaces, so the field is never rebuilt under somebody's fingers. */
+.nod-crm-search {
+  padding-block: 0.4em;
+}
+
+.nod-crm-search-input {
+  width: 100%;
+}
+
+.nod-crm-list {
+  display: contents;
+}
+
+/* The filter bar over the project dashboard.
+ *
+ * Wraps rather than scrolls, for the reason the card strips do: a control that
+ * has gone off the edge is a control nobody knows is set. The search field is
+ * given the leftover width because a project name is longer than a status. */
+.nod-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6em;
+  align-items: flex-end;
+  margin-block-end: 0.8em;
+}
+
+.nod-filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+  min-width: 8rem;
+}
+
+.nod-filter-field-wide {
+  flex: 1 1 12rem;
+}
+
+/* Above the control rather than beside it, so a row of four does not become a
+   row of eight competing widths. */
+.nod-filter-label {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+}
+
+.nod-filter-control {
+  width: 100%;
+}
+
+/* The sample-vault preview. A report rather than a form, so it borrows the
+   health check's scrolling body and adds a folder-and-titles pair per group. */
+.nod-sample .setting-item {
+  border: none;
+}
+
+.nod-sample-body {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.nod-sample-heading {
+  font-size: var(--font-ui-small);
+  margin-block: 1em 0.4em;
+}
+
+.nod-sample-group {
+  margin-block-end: 0.5em;
+}
+
+.nod-sample-folder {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+}
+
+.nod-sample-titles {
+  font-size: var(--font-ui-small);
+}
+
+/* The one section that is a refusal rather than a plan, marked as such so the
+   disabled button below has something visibly explaining it. */
+.nod-sample-blocked {
+  border-inline-start: 3px solid var(--text-error);
+  padding-inline-start: 0.6em;
+}

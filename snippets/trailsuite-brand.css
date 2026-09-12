@@ -1,0 +1,344 @@
+/* TRAILsuite brand colours for the vault
+ * ======================================
+ *
+ * Hue says which plugin owns a folder; shade says which folder it is.
+ *
+ *   NODAtrail   cyan -> violet   (plan, areas, goals, projects, resources,
+ *                                 archive, CRM, finance)
+ *   CULItrail   saffron          (eating)
+ *   APERtrail   silver           (places, trips)
+ *
+ * The hues come out of `brand/`: the cyan and violet are the trail through
+ * NODAtrail's node, the saffron is the three nodes on CULItrail's blade, and
+ * APERtrail's silver is the aperture and the peak.
+ *
+ * NODAtrail owns eight of the eleven top-level folders, so its ramp is a hue
+ * sweep at constant lightness and chroma: only the hue moves, which is what
+ * makes the eight read as one family rather than as eight unrelated colours.
+ * The stops follow the order the folders appear in the sidebar, so the ramp
+ * reads top to bottom. 214deg to 296deg, L 0.72 C 0.135 in OKLCH, with chroma
+ * reduced only where sRGB cannot hold it, which is the first stop or two.
+ *
+ * APERtrail stays nearly neutral on purpose. Silver against charcoal IS the
+ * brand, and a folder that is visibly metal rather than tinted is exactly the
+ * distinction the mark makes. Its two stops separate by lightness instead.
+ *
+ * ## Installing it
+ *
+ * Copy this file into `<vault>/.obsidian/snippets/` and switch it on under
+ * Settings, Appearance, CSS snippets. No plugin writes it for you and none of
+ * them reads it: it is yours once it is in your vault.
+ *
+ * ## Folder names
+ *
+ * Colours are keyed by path, and both sets of shipped defaults are listed
+ * below: the English names a vault seeds under an English Obsidian, and the
+ * German ones. **A renamed folder drops its colour silently**, so the
+ * assignment block is the one place to fix, and it is the only place that
+ * needs touching for a vault that spells its folders some third way.
+ *
+ * Two halves, and they are independent:
+ *   1. the folder list, under "Explorer"
+ *   2. the plugins' own views, under "Plugin views"
+ *
+ * The folder half drives Obsidian's built-in file explorer. If another
+ * navigator is showing instead, it paints its own rows from its own settings
+ * and these rules are simply not on screen; its colour picker takes the same
+ * hex values, listed against each folder below.
+ */
+
+/* ------------------------------------------------------------------ */
+/* The palette                                                         */
+/* ------------------------------------------------------------------ */
+
+body {
+  /* NODAtrail: eight stops, 214deg to 296deg, L 0.72 C 0.135 throughout. */
+  --ts-noda-1: #00b8d5; /* plan      */
+  --ts-noda-2: #11b5e4; /* areas     */
+  --ts-noda-3: #3eb0ee; /* goals     */
+  --ts-noda-4: #5baaf5; /* projects  */
+  --ts-noda-5: #73a4f9; /* resources */
+  --ts-noda-6: #889ef9; /* archive   */
+  --ts-noda-7: #9b98f6; /* CRM       */
+  --ts-noda-8: #ac92ef; /* finance   */
+
+  --ts-culi-1: #efb14e; /* eating */
+
+  --ts-aper-1: #a8a5b7; /* places */
+  --ts-aper-2: #d4d2e4; /* trips  */
+
+  /* The three plugins' own accents, for their views. Brighter than the
+     folder stops, since here they carry links and buttons rather than a
+     3px bar. Each is paired with a dark on-accent text colour: a saffron
+     or a silver button with white text on it is unreadable, and the theme
+     has no way to know the accent changed. */
+  --ts-noda-accent: #53d1ea;
+  --ts-noda-on-accent: #05222a;
+  --ts-culi-accent: #faba58;
+  --ts-culi-on-accent: #2a1c05;
+  --ts-aper-accent: #cecbdb;
+  --ts-aper-on-accent: #1b1b22;
+
+  /* How much of the colour reaches the row background and the label. */
+  --ts-row-tint: 10%;
+  --ts-row-label: 72%;
+}
+
+/* Light mode needs the same hues carrying a lot less lightness: the dark
+   ramp above is tuned to sit on charcoal, and on paper it disappears. Same
+   sweep, same constant-hue-only rule, L 0.55 instead of 0.72. */
+.theme-light {
+  --ts-noda-1: #007f94;
+  --ts-noda-2: #007da0;
+  --ts-noda-3: #007aaf;
+  --ts-noda-4: #2275bc;
+  --ts-noda-5: #426fbf;
+  --ts-noda-6: #5869c0;
+  --ts-noda-7: #6a64bd;
+  --ts-noda-8: #7a5eb6;
+
+  --ts-culi-1: #ab7401;
+
+  --ts-aper-1: #716f80;
+  --ts-aper-2: #4d4b5a;
+
+  --ts-noda-accent: #007aaf;
+  --ts-noda-on-accent: #ffffff;
+  --ts-culi-accent: #ab7401;
+  --ts-culi-on-accent: #ffffff;
+  --ts-aper-accent: #4d4b5a;
+  --ts-aper-on-accent: #ffffff;
+
+  --ts-row-tint: 12%;
+  --ts-row-label: 80%;
+}
+
+/* ------------------------------------------------------------------ */
+/* Explorer: which folder gets which stop                              */
+/* ------------------------------------------------------------------ */
+
+/* Each folder claims its own colour and hands it down its whole subtree, so
+   the folders under a project inherit without being listed. That is the one
+   thing this does better than a per-path setting in a plugin.
+ *
+ * English and German shipped defaults together. A vault has one set or the
+   other, and a rule matching nothing costs nothing. */
+
+.nav-folder-title[data-path='0 Plan'],
+.nav-folder-title[data-path^='0 Plan/'],
+.nav-folder-title[data-path='0 Planung'],
+.nav-folder-title[data-path^='0 Planung/'] {
+  --ts-brand: var(--ts-noda-1);
+}
+.nav-folder-title[data-path='1 Areas'],
+.nav-folder-title[data-path^='1 Areas/'],
+.nav-folder-title[data-path='1 Bereiche'],
+.nav-folder-title[data-path^='1 Bereiche/'] {
+  --ts-brand: var(--ts-noda-2);
+}
+.nav-folder-title[data-path='2 Goals'],
+.nav-folder-title[data-path^='2 Goals/'],
+.nav-folder-title[data-path='2 Ziele'],
+.nav-folder-title[data-path^='2 Ziele/'] {
+  --ts-brand: var(--ts-noda-3);
+}
+.nav-folder-title[data-path='3 Projects'],
+.nav-folder-title[data-path^='3 Projects/'],
+.nav-folder-title[data-path='3 Projekte'],
+.nav-folder-title[data-path^='3 Projekte/'] {
+  --ts-brand: var(--ts-noda-4);
+}
+.nav-folder-title[data-path='4 Resources'],
+.nav-folder-title[data-path^='4 Resources/'],
+.nav-folder-title[data-path='4 Ressourcen'],
+.nav-folder-title[data-path^='4 Ressourcen/'] {
+  --ts-brand: var(--ts-noda-5);
+}
+.nav-folder-title[data-path='6 Archive'],
+.nav-folder-title[data-path^='6 Archive/'],
+.nav-folder-title[data-path='6 Archiv'],
+.nav-folder-title[data-path^='6 Archiv/'] {
+  --ts-brand: var(--ts-noda-6);
+}
+.nav-folder-title[data-path='CRM'],
+.nav-folder-title[data-path^='CRM/'] {
+  --ts-brand: var(--ts-noda-7);
+}
+.nav-folder-title[data-path='Finance'],
+.nav-folder-title[data-path^='Finance/'],
+.nav-folder-title[data-path='Finanzen'],
+.nav-folder-title[data-path^='Finanzen/'] {
+  --ts-brand: var(--ts-noda-8);
+}
+
+.nav-folder-title[data-path='Eating'],
+.nav-folder-title[data-path^='Eating/'],
+.nav-folder-title[data-path='Essen'],
+.nav-folder-title[data-path^='Essen/'] {
+  --ts-brand: var(--ts-culi-1);
+}
+
+.nav-folder-title[data-path='Places'],
+.nav-folder-title[data-path^='Places/'],
+.nav-folder-title[data-path='Plätze'],
+.nav-folder-title[data-path^='Plätze/'] {
+  --ts-brand: var(--ts-aper-1);
+}
+.nav-folder-title[data-path='Trips'],
+.nav-folder-title[data-path^='Trips/'] {
+  --ts-brand: var(--ts-aper-2);
+}
+
+/* ------------------------------------------------------------------ */
+/* Explorer: what a claimed folder then looks like                     */
+/* ------------------------------------------------------------------ */
+
+/* Scoped to .nav-files-container throughout, purely for specificity: a
+   folder row is also a .tree-item-self, and most themes style that. One
+   extra class puts these rules above a single-class theme rule without
+   reaching for !important.
+ *
+ * One block for every folder row, claimed or not. The colour falls back to
+   the theme's own, so an unclaimed folder is untouched. */
+.nav-files-container .nav-folder-title {
+  position: relative;
+  background-color: color-mix(
+    in oklab,
+    var(--ts-brand, transparent) var(--ts-row-tint),
+    transparent
+  );
+  color: color-mix(
+    in oklab,
+    var(--ts-brand, var(--text-normal)) var(--ts-row-label),
+    var(--text-normal)
+  );
+}
+
+/* The bar is its own box rather than a border-inline-start, and that is the
+   whole reason this rule exists.
+ *
+ * A border follows the radius of the element it is on. Obsidian styles nav
+ * rows as full pills on iPhone and iPad and as barely-rounded rectangles on
+ * the desktop, so one border produced a straight bar on the Mac and a
+ * crescent on the tablet, which the coloured rows carried well enough and
+ * which turned APERtrail's near-neutral silver into what read as a white
+ * parenthesis rather than a metal edge.
+ *
+ * An absolutely positioned child has a radius of its own and ignores its
+ * parent's, so this is the same straight bar at every corner radius. It is
+ * inset a little from all sides so it sits comfortably inside a pill instead
+ * of poking past its curve, and it takes no space in the layout at all,
+ * which means an unclaimed folder lines up with a claimed one without a
+ * transparent border being reserved to hold the place. */
+.nav-files-container .nav-folder-title::after {
+  content: '';
+  position: absolute;
+  inset-block: 3px;
+  inset-inline-start: 2px;
+  width: 3px;
+  border-radius: 2px;
+  background-color: var(--ts-brand, transparent);
+  pointer-events: none;
+}
+
+/* The collapse arrow and the folder icon follow the label rather than
+   staying grey, which is what makes a row read as one object. */
+.nav-files-container .nav-folder-title .nav-folder-collapse-indicator,
+.nav-files-container .nav-folder-title .tree-item-icon {
+  color: inherit;
+}
+
+/* Hover and the active folder deepen the same tint instead of replacing it
+   with the theme's grey, so the colour does not blink out from under the
+   pointer. */
+.nav-files-container .nav-folder-title:hover,
+.nav-files-container .nav-folder-title.is-being-dragged-over,
+.nav-files-container .nav-folder.has-focus > .nav-folder-title,
+.nav-files-container .nav-folder-title.is-active {
+  background-color: color-mix(in oklab, var(--ts-brand, transparent) 22%, transparent);
+}
+
+/* Deeper folders keep the hue and give back the bar: at four levels of
+   indentation ten stacked bars are a barcode, not a signal. */
+.nav-files-container .nav-folder .nav-folder .nav-folder .nav-folder-title::after {
+  background-color: transparent;
+}
+.nav-files-container .nav-folder .nav-folder .nav-folder .nav-folder-title {
+  background-color: transparent;
+}
+
+/* ------------------------------------------------------------------ */
+/* Plugin views                                                        */
+/* ------------------------------------------------------------------ */
+
+/* Keyed on the view type Obsidian stamps on the leaf, not on class names.
+   All three plugins prefix every view type they register with their own
+   name, and none of them hard-codes a colour anywhere in its stylesheet:
+   they go through --text-accent and --interactive-accent throughout. So
+   rebinding those here reaches every view each plugin has, including any it
+   registers later, without a line of plugin code changing. */
+
+.workspace-leaf-content[data-type^='nodatrail-'],
+.workspace-tab-header[data-type^='nodatrail-'] {
+  --text-accent: var(--ts-noda-accent);
+  --text-accent-hover: var(--ts-noda-accent);
+  --interactive-accent: var(--ts-noda-accent);
+  --interactive-accent-hover: var(--ts-noda-accent);
+  --text-on-accent: var(--ts-noda-on-accent);
+}
+
+.workspace-leaf-content[data-type^='culitrail-'],
+.workspace-tab-header[data-type^='culitrail-'] {
+  --text-accent: var(--ts-culi-accent);
+  --text-accent-hover: var(--ts-culi-accent);
+  --interactive-accent: var(--ts-culi-accent);
+  --interactive-accent-hover: var(--ts-culi-accent);
+  --text-on-accent: var(--ts-culi-on-accent);
+}
+
+.workspace-leaf-content[data-type^='apertrail-'],
+.workspace-tab-header[data-type^='apertrail-'] {
+  --text-accent: var(--ts-aper-accent);
+  --text-accent-hover: var(--ts-aper-accent);
+  --interactive-accent: var(--ts-aper-accent);
+  --interactive-accent-hover: var(--ts-aper-accent);
+  --text-on-accent: var(--ts-aper-on-accent);
+}
+
+/* A hairline of the brand along the top of the view, so a tab you have
+   scrolled into still says which plugin it belongs to. */
+.workspace-leaf-content[data-type^='nodatrail-'],
+.workspace-leaf-content[data-type^='culitrail-'],
+.workspace-leaf-content[data-type^='apertrail-'] {
+  box-shadow: inset 0 2px 0 0 var(--text-accent);
+}
+
+/* ------------------------------------------------------------------ */
+/* Blocks inside a note                                                */
+/* ------------------------------------------------------------------ */
+
+/* A nod-tasks or a travel-itinerary block renders inside an ordinary
+   markdown leaf, where the view-type hook above cannot see it. Each plugin
+   prefixes every class it puts in the DOM, so the prefix is the hook: the
+   variable lands on the block's root element and inherits through it. */
+
+[class^='nod-'],
+[class*=' nod-'] {
+  --text-accent: var(--ts-noda-accent);
+  --interactive-accent: var(--ts-noda-accent);
+  --text-on-accent: var(--ts-noda-on-accent);
+}
+
+[class^='culi-'],
+[class*=' culi-'] {
+  --text-accent: var(--ts-culi-accent);
+  --interactive-accent: var(--ts-culi-accent);
+  --text-on-accent: var(--ts-culi-on-accent);
+}
+
+[class^='apt-'],
+[class*=' apt-'] {
+  --text-accent: var(--ts-aper-accent);
+  --interactive-accent: var(--ts-aper-accent);
+  --text-on-accent: var(--ts-aper-on-accent);
+}

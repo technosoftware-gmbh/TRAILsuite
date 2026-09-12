@@ -1,0 +1,36 @@
+/**
+ * Renders a full-screen image lightbox overlay and attaches click handlers to
+ * make existing <img> elements lightbox-able.
+ */
+export function openLightbox(src: string): void {
+  const overlay = activeDocument.body.createDiv({ cls: 'apt-lightbox-overlay' });
+
+  const closeBtn = overlay.createEl('button', { cls: 'apt-lightbox-close', text: '×' });
+  const img = overlay.createEl('img', { cls: 'apt-lightbox-img', attr: { src } });
+
+  const close = () => overlay.remove();
+  closeBtn.addEventListener('click', close);
+
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) close();
+  });
+
+  const onKey = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      close();
+      activeDocument.removeEventListener('keydown', onKey);
+    }
+  };
+  activeDocument.addEventListener('keydown', onKey);
+
+  img.addEventListener('click', (e) => e.stopPropagation());
+}
+
+export function makeLightboxable(img: HTMLImageElement): void {
+  img.addClass('apt-lightbox-trigger');
+  img.addEventListener('click', () => openLightbox(img.src));
+}
+
+export function attachLightboxToImages(container: HTMLElement): void {
+  container.querySelectorAll<HTMLImageElement>('img').forEach(makeLightboxable);
+}

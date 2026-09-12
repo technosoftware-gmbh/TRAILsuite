@@ -1,0 +1,16 @@
+# Line endings. LF everywhere, decided here once rather than by whichever
+# editor last saved the file. `.prettierrc` keeps `endOfLine: "auto"`, which
+# preserves what a file already has, so git owns the decision and prettier
+# does not argue with it.
+* text=auto eol=lf
+
+# Generated, tracked, and never read by a human. Collapsed in diffs and kept
+# out of the repo's language statistics.
+package-lock.json -diff linguist-generated=true
+
+# Binary, marked explicitly rather than left to git's content heuristic: a
+# PDF or PNG that gets line-ending conversion applied to it is a corrupt PDF
+# or PNG.
+*.png binary
+*.pdf binary
+*.ico binary
