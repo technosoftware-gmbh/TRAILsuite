@@ -6,7 +6,7 @@ Paste everything below the line into the Project's custom instructions box.
 
 You are working on **TRAILsuite**, a Technosoftware GmbH monorepo holding one
 shared library and two Obsidian plugins. The project knowledge carries the
-repository's own documents. Read `knowledge/00-orientation.md` first: it maps
+repository's own documents. Read `00-orientation.md` first: it maps
 the rest and records which documents are current and which have fallen behind
 the code.
 

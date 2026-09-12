@@ -1,9 +1,9 @@
 # The TRAILsuite Claude Project
 
 A Project on claude.ai that starts every conversation already knowing this
-repository: the three packages, the boundary, the promotion rules, the house
-conventions, what is being sold, and the ledger model that no other document
-here covers.
+repository: the three packages that ship from it, the boundary, the promotion
+rules, the house conventions, what is being sold, and the ledger model that no
+other document here covers.
 
 It is for the conversations that happen away from the code. Design arguments,
 "where should this live", "what did we decide about X and why". Claude Code
@@ -22,13 +22,18 @@ gitignored. Then, on claude.ai:
 2. Paste `claude-project-bundle/project-instructions.md` into the custom
    instructions box, everything below the horizontal rule.
 3. Upload the thirteen files in `claude-project-bundle/knowledge/` as Project
-   knowledge.
+   knowledge, **at the bare names the script prints**, which is where the
+   Project holds them.
 
-**Coming from an earlier bundle:** delete `knowledge/07-culitrail.md` and
-`knowledge/12-culitrail-data-model.md` from the Project by hand. CULItrail moved
-to its own repository and those two numbers are now gaps. Everything else keeps
-its name and is replaced in place by the upload, which is exactly why the gaps
-were left rather than closed up.
+**The numbering is 00 to 12 with no gaps, and it has changed once.** 07 and 12
+were CULItrail's, and when CULItrail left the two numbers were first held open
+as gaps: an upload replaces a file of the same name and merely sits beside one
+of a different name, so renumbering is paid for by hand, once per renamed file.
+The renumbering happened anyway in September 2026 and was completed, so the
+Project holds thirteen files and none of the old names survive beside them.
+**07 is now APERtrail's `CLAUDE.md` and 12 is now NODAtrail's data model.** If a
+name has to change again, delete the old one from the Project by hand in the
+same sitting; nothing in the script can reach it.
 
 ## Keeping it current
 
@@ -37,6 +42,17 @@ thirteen knowledge files are copies taken at the moment the script runs, so
 the bundle is never a fork of the repository's documents: re-run it rather than
 editing a copy, or the two will disagree and the Project will be the one that is
 wrong.
+
+**That is not a hypothetical, and it is why nothing generated is committed.**
+For a while the eleven copies were checked in under
+`docs/claude-project/knowledge/` alongside the two authored files, which made
+them a fork by definition. They were then uploaded from there, by hand, after
+the script had stopped running: the Project spent a release answering with an
+APERtrail data model from before excursions existed, while the repository's own
+copy of that document was perfectly current. Only the two authored files belong
+in git. `claude-project-bundle/` is gitignored, and the script now names every
+source it expects before it copies anything, so a rename reports itself instead
+of failing one `cp` at a time.
 
 **What the bundle carries, and what it points at.** The rule is that it carries
 what outlives a release and points at what does not. The `data-model.md` files
@@ -54,11 +70,14 @@ none at all for the largest, because `docs/architecture.md` deferred NODAtrail's
 note types to a document the bundle did not carry. **A deferral reads as
 coverage while the Project holds nothing.**
 
-**Upload them under a `knowledge/` prefix**, which is where the Project holds
-them: `knowledge/00-orientation.md` and so on. A file uploaded to the Project
-root does not replace the copy under `knowledge/`. It sits beside it, and the
-Project then holds two documents that disagree with no way to tell which is
-older. The bundle script says so as it finishes.
+**Upload each file at the path the Project already holds it**, which is the
+bare name at the Project root: `00-orientation.md` and so on. The `knowledge/`
+prefix was the layout until September 2026 and the reasoning behind it still
+stands in the abstract, which is exactly why the path is not a preference to be
+re-argued: a file uploaded to one path does not replace the copy held at the
+other, it sits beside it, and the Project then holds two documents that disagree
+with no way to tell which is older. Match what the Project shows. The bundle
+script says so as it finishes.
 
 Two files are authored and live in `docs/claude-project/knowledge/`:
 
@@ -67,7 +86,7 @@ Two files are authored and live in `docs/claude-project/knowledge/`:
   more than uploading the repository wholesale, and it is the one file whose
   accuracy nothing else can check. When you fix a stale document, delete its
   entry here. When you notice a new divergence, add one.
-- `09-ledger-and-money.md` covers the double-entry model, the journal format,
+- `08-ledger-and-money.md` covers the double-entry model, the journal format,
   the statement import and the bill and order matching. `docs/architecture.md`
   predates all of it.
 
