@@ -27,8 +27,8 @@
   },
   "license": "PolyForm-Noncommercial-1.0.0",
   "devDependencies": {
-    "@types/node": "^26.4.0",
-    "@typescript-eslint/eslint-plugin": "^8.69.0",
+    "@types/node": "^26.5.0",
+    "@typescript-eslint/eslint-plugin": "^8.70.0",
     "@typescript-eslint/parser": "^8.62.0",
     "conventional-changelog": "^8.0.1",
     "conventional-changelog-conventionalcommits": "^10.2.1",
@@ -44,7 +44,7 @@
     "prettier": "^3.5.3",
     "tslib": "^2.4.0",
     "typescript": "^7.0.2",
-    "typescript-eslint": "^8.69.0",
+    "typescript-eslint": "^8.70.0",
     "vitest": "^5.0.0",
     "yaml": "^2.6.0"
   },
