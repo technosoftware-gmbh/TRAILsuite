@@ -5,7 +5,11 @@
  * Once the two disagree there is no way back to the second unless it was kept,
  * and an export downloaded months ago is rarely still in a downloads folder.
  * So the file is copied into the vault beside the journal notes it fed, under
- * `_documents` in the year folder, exactly where an invoice for a bill goes.
+ * `_imports` in the year folder. **Not `_documents`**, where it used to go and
+ * where an invoice for a bill still goes: an invoice is a document somebody
+ * filed and looks at, a statement export is the source a run worked from and a
+ * file this plugin reads back by name. One folder is browsed, the other is
+ * machinery.
  *
  * **The file is the whole record.** No note is written about the import. What
  * is still unposted is worked out by replaying the archived file against the
@@ -14,10 +18,11 @@
  * rest of this plugin keeps about balances, and it means an import archive
  * cannot rot: correct a posting three years later and the count moves with it.
  *
- * What it costs is history. The day a file was imported is not kept, because a
- * synced vault's file dates are not trustworthy enough to be worth a field. If
- * that turns out to matter, a note per import is the upgrade, and this comment
- * is the record of why there is not one yet.
+ * **The day it was imported is now in the name**, which is the one thing this
+ * comment used to say was missing. It was not kept because a synced vault's
+ * file dates cannot be trusted, and that is still true -- which is why it is
+ * written into the name at the moment of the run rather than read off `stat`
+ * afterwards. A note per import is still not needed and still not here.
  *
  * Pure. The vault work is in `statement-archive-vault.ts`.
  */
@@ -28,6 +33,7 @@ import {
   parseStatement,
 } from '@technosoftware/trail-core';
 import type { BankStatementRow, StatementProfile } from '@technosoftware/trail-core';
+import { importFileName, readImportFileName, type ImportFileName } from '../shared/import-name';
 
 /** The formats this plugin can read, in the order a guess should try them. */
 export const KNOWN_PROFILES: readonly StatementProfile[] = [
@@ -38,51 +44,45 @@ export const KNOWN_PROFILES: readonly StatementProfile[] = [
 /**
  * The name an archived statement is filed under.
  *
- * `20260401-20260626_1013.csv`: the period it covers, then the account it was
- * imported into. The period first because that is how the rest of this vault's
- * documents are named and how somebody looks for one -- a folder of these sorts
- * into the order the months happened.
+ * `20260913-142530_1013_20260401-20260626.csv`: when it was imported, into
+ * which account, and the period the rows cover. The same three-part shape the
+ * calendar archive uses, from `shared/import-name.ts`, so one folder does not
+ * end up holding two conventions.
  *
- * The account is in the name rather than only in the folder because one year
- * folder holds every account's statements, and a file that does not say which
- * account it is for is a file somebody has to open to find out.
+ * The stamp first because the folder is a history of runs and sorting by name
+ * should sort by run. The account next because one year folder holds every
+ * account's statements, and a file that does not say which account it is for is
+ * a file somebody has to open to find out. The period last, where a reader
+ * looking for a month still finds it and where the replay still reads it.
  */
-export function statementFileName(account: number, rows: readonly BankStatementRow[]): string {
+export function statementFileName(
+  stamp: string,
+  account: number,
+  rows: readonly BankStatementRow[]
+): string {
   const first = rows[0]?.date ?? '';
   const last = rows[rows.length - 1]?.date ?? first;
-  return `${compact(first)}-${compact(last)}_${account}.csv`;
-}
-
-/** `2026-04-01` as `20260401`, which is how this vault names a document. */
-function compact(day: string): string {
-  return day.replace(/-/g, '');
+  return importFileName({ stamp, source: String(account), from: first, to: last }, 'csv');
 }
 
 /** What an archived statement's name says about it, or null when it says nothing. */
-export interface ArchivedName {
-  from: string;
-  to: string;
+export interface ArchivedName extends ImportFileName {
   account: number;
 }
 
 /**
  * Reading the name back.
  *
- * Only names this plugin wrote are recognised. A CSV somebody dropped into the
- * folder themselves is left alone rather than guessed at, because a wrong guess
- * here would put a statement against an account it has nothing to do with and
- * report rows unposted that were never that account's to post.
+ * Only names this plugin wrote are recognised, and only those whose source
+ * segment is a number. A CSV somebody dropped into the folder themselves is
+ * left alone rather than guessed at, because a wrong guess here would put a
+ * statement against an account it has nothing to do with and report rows
+ * unposted that were never that account's to post.
  */
 export function readStatementFileName(name: string): ArchivedName | null {
-  const match = /^(\d{8})-(\d{8})_(\d+)\.csv$/i.exec(name.trim());
-  if (!match) return null;
-
-  const [, from, to, account] = match;
-  if (!from || !to || !account) return null;
-
-  const day = (compacted: string) =>
-    `${compacted.slice(0, 4)}-${compacted.slice(4, 6)}-${compacted.slice(6, 8)}`;
-  return { from: day(from), to: day(to), account: Number(account) };
+  const read = readImportFileName(name, 'csv');
+  if (!read || !/^\d+$/.test(read.source)) return null;
+  return { ...read, account: Number(read.source) };
 }
 
 /**

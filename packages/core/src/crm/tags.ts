@@ -16,6 +16,7 @@
  *
  * App-free: no `obsidian` import.
  */
+import { caseFold } from '../text/case-fold.js';
 
 /**
  * Every tag in a frontmatter value, normalized.
@@ -56,8 +57,8 @@ export function parseTagFilter(value: string): string[] {
  * `FamilyBusiness`, which a plain `startsWith` would.
  */
 export function tagMatches(tag: string, filter: string): boolean {
-  const candidate = tag.trim().toLowerCase();
-  const wanted = filter.trim().toLowerCase();
+  const candidate = caseFold(tag);
+  const wanted = caseFold(filter);
   if (!candidate || !wanted) return false;
   return candidate === wanted || candidate.startsWith(`${wanted}/`);
 }

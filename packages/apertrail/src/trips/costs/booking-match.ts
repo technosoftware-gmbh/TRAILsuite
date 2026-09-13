@@ -12,8 +12,9 @@
  * Pure. See docs/design/trip-budget-and-bookings.md §7.3.
  */
 import { ParsedBooking } from './booking-note';
+import { caseFold } from '@technosoftware/trail-core';
 
-const key = (value: string | null): string => (value ?? '').trim().toLowerCase();
+const key = (value: string | null): string => caseFold(value);
 
 /** Bookings for a stop or a night at a given place, matched by title the way every wikilink here is. */
 export function bookingsForPlace<T extends ParsedBooking>(

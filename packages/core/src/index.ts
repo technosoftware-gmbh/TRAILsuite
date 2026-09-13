@@ -40,4 +40,5 @@ export * from './sample/index.js';
 export * from './settings/index.js';
 export * from './solar/index.js';
 export * from './tasks/index.js';
+export * from './text/index.js';
 export * from './vault/index.js';

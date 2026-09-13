@@ -23,13 +23,17 @@ function unmocked(name: string): never {
  * cast that would avoid it. A stub object cannot satisfy `instanceof`, so the
  * class has to exist for any suite that exercises a path lookup.
  *
- * Only the three members the plugin reads. It is never constructed by Obsidian
- * here -- a test builds one and puts it in a fake vault.
+ * Only the members the plugin reads. It is never constructed by Obsidian here
+ * -- a test builds one and puts it in a fake vault.
  */
 export class TFile {
   path = '';
   basename = '';
   extension = 'md';
+  // A fourth, and it is read the same way the other three are: the import
+  // migration has no other source for when a file this plugin wrote before the
+  // name carried a stamp was actually kept.
+  stat = { ctime: 0, mtime: 0, size: 0 };
 }
 
 export const getLanguage = (): never => unmocked('getLanguage');

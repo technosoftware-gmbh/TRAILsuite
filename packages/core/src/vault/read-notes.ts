@@ -13,6 +13,7 @@ import { readString } from '../frontmatter/read.js';
 import { stripWikilink } from '../links/wikilink.js';
 import { isUnderAnyFolder } from '../paths/folders.js';
 import type { VaultFile, VaultHost } from './ports.js';
+import { caseFold } from '../text/case-fold.js';
 
 export interface VaultNote<F extends VaultFile = VaultFile> {
   file: F;
@@ -122,7 +123,7 @@ export function indexByTitle<F extends VaultFile>(
   const index = new Map<string, VaultNote<F>>();
 
   for (const note of notes) {
-    const key = note.title.trim().toLowerCase();
+    const key = caseFold(note.title);
     if (!index.has(key)) index.set(key, note);
   }
   return index;
@@ -140,5 +141,5 @@ export function resolveByTitle<F extends VaultFile>(
   target: string | null | undefined
 ): VaultNote<F> | null {
   if (!target) return null;
-  return index.get(target.trim().toLowerCase()) ?? null;
+  return index.get(caseFold(target)) ?? null;
 }

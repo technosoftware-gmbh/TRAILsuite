@@ -26,6 +26,7 @@
  */
 import { readString, readStringList } from '../frontmatter/read.js';
 import { readTags } from './tags.js';
+import { caseFold } from '../text/case-fold.js';
 
 /** The two kinds of note this module reads. */
 export type CrmKind = 'person' | 'company';
@@ -184,7 +185,7 @@ export function parseCrmNote(
  * configure both.
  */
 export function companyHasRole(roles: readonly string[], required: string): boolean {
-  const target = required.trim().toLowerCase();
+  const target = caseFold(required);
   if (!target) return true;
-  return roles.some((role) => role.trim().toLowerCase() === target);
+  return roles.some((role) => caseFold(role) === target);
 }

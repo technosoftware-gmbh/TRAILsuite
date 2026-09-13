@@ -12,6 +12,7 @@
  * would be the parser deciding it knows better.
  */
 import type { ReheatAppliance } from './types.js';
+import { caseFold } from '../text/case-fold.js';
 
 export const DEFAULT_APPLIANCE_IDS = ['microwave', 'oven', 'steamer', 'skillet'] as const;
 
@@ -54,7 +55,7 @@ export const DEFAULT_APPLIANCES: ReheatAppliance[] = DEFAULT_APPLIANCE_IDS.map((
 }));
 
 function normalize(value: string): string {
-  return value.trim().toLowerCase();
+  return caseFold(value);
 }
 
 export interface ApplianceMatch {

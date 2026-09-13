@@ -13,7 +13,7 @@
  * is the rule the whole suite follows for a value that can be both stated and
  * derived.
  */
-import { titlesMatch } from '@technosoftware/trail-core';
+import { caseFold, titlesMatch } from '@technosoftware/trail-core';
 import type { ParsedArea, ParsedGoal, ParsedProject, ParsedResource } from './types';
 
 /** A parsed note paired with the file it came from. */
@@ -41,7 +41,7 @@ export interface ParaBoard<F = unknown> {
 function index<T, F>(records: readonly ParaRecord<T, F>[]): Map<string, ParaRecord<T, F>> {
   const map = new Map<string, ParaRecord<T, F>>();
   for (const record of records) {
-    const key = record.title.trim().toLowerCase();
+    const key = caseFold(record.title);
     if (!map.has(key)) map.set(key, record);
   }
   return map;
@@ -64,7 +64,7 @@ export function projectAreaTitle<F>(
 
   const byTitle = index(goals);
   for (const goalTitle of project.note.goalTitles) {
-    const goal = byTitle.get(goalTitle.trim().toLowerCase());
+    const goal = byTitle.get(caseFold(goalTitle));
     if (goal?.note.areaTitle) return goal.note.areaTitle;
   }
   return null;
@@ -158,11 +158,11 @@ export function unresolvedLinks<T, F>(
   linkOf: (note: T) => string[],
   known: readonly { title: string }[]
 ): { record: ParaRecord<T, F>; target: string }[] {
-  const titles = new Set(known.map((entry) => entry.title.trim().toLowerCase()));
+  const titles = new Set(known.map((entry) => caseFold(entry.title)));
 
   return records.flatMap((record) =>
     linkOf(record.note)
-      .filter((target) => !titles.has(target.trim().toLowerCase()))
+      .filter((target) => !titles.has(caseFold(target)))
       .map((target) => ({ record, target }))
   );
 }

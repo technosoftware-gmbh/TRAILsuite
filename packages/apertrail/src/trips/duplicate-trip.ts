@@ -23,6 +23,7 @@
  * `ui/duplicate-trip.ts` does the vault.
  */
 import type { TripInput } from './write-trip';
+import { caseFold } from '@technosoftware/trail-core';
 
 /** Where the original's own folder is, and where the copy's is, so pictures can follow. */
 export interface TripRehome {
@@ -129,7 +130,7 @@ export function duplicateTitle(title: string, taken: readonly string[]): string 
   const base = title.trim();
   if (!base) return base;
 
-  const used = new Set(taken.map((name) => name.trim().toLowerCase()));
+  const used = new Set(taken.map((name) => caseFold(name)));
   for (let n = 2; ; n += 1) {
     const candidate = `${base} (${n})`;
     if (!used.has(candidate.toLowerCase())) return candidate;

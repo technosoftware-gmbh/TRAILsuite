@@ -16,6 +16,7 @@
  */
 import { projectsInArea, type GoalRecord, type ProjectRecord } from './board';
 import type { ParaStatus } from './types';
+import { caseFold } from '@technosoftware/trail-core';
 
 export interface ProjectFilter {
   /** An area title, or '' for every area. */
@@ -62,14 +63,14 @@ export function filterProjects<F>(
   const byArea = filter.areaTitle
     ? projectsInArea(filter.areaTitle, projects, goals)
     : [...projects];
-  const wanted = filter.goalTitle.trim().toLowerCase();
-  const needle = filter.search.trim().toLowerCase();
+  const wanted = caseFold(filter.goalTitle);
+  const needle = caseFold(filter.search);
 
   return byArea.filter((project) => {
     if (filter.status !== null && project.note.status !== filter.status) return false;
-    if (wanted && !project.note.goalTitles.some((title) => title.trim().toLowerCase() === wanted)) {
+    if (wanted && !project.note.goalTitles.some((title) => caseFold(title) === wanted)) {
       return false;
     }
-    return !needle || project.title.toLowerCase().includes(needle);
+    return !needle || caseFold(project.title).includes(needle);
   });
 }

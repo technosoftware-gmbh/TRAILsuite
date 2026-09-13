@@ -7,6 +7,7 @@
  */
 import {
   bearing,
+  caseFold,
   compassPoint,
   CompassPoint,
   distanceKm,
@@ -77,7 +78,7 @@ export function photoSpotView(
   const anchorPoint = parseGeoPoint(anchor);
   const motifs = orderedMotifs(spot);
 
-  const key = (name: string | null): string => (name ?? '').trim().toLowerCase();
+  const key = (name: string | null): string => caseFold(name);
   const known = new Set(motifs.map((motif) => key(motif.name)).filter((name) => name !== ''));
 
   return {

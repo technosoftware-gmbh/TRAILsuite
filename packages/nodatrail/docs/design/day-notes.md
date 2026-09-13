@@ -159,11 +159,12 @@ because until now the only write was ticking a box. A `composeTaskLine` belongs
 next to the reader: the format is a statement about a file, which is the
 promotion test that does not care how many consumers there are.
 
-**The three body markers are NODAtrail's**, and settings rather than literals:
+**The body markers are NODAtrail's**, and settings rather than literals:
 
 | Setting | Default | What it marks |
 |---|---|---|
 | `dayMeetingMarker` | `👥` | A meeting or appointment |
+| `daySpanMarker` | `🏖️` | Something that runs over several days |
 | `dayNoteMarker` | `📝` | Something that happened, or was said |
 | `dayIdeaMarker` | `💡` | Something to think about later |
 
@@ -188,15 +189,58 @@ that is the two-consumer test and the day to move it.
 
 ### The dialog
 
-One dialog, from a command and the ribbon. Four kinds, and **the kind decides
+One dialog, from a command and the ribbon. Five kinds, and **the kind decides
 the section** -- nothing asks you which heading you meant.
 
 | Kind | Section | Written as |
 |---|---|---|
 | Aufgabe | Fokus | `- [ ] text [[link]] ⏫ 📅 date` |
 | Termin | Termine | `- 👥 HH:mm text [[link]]` |
+| Mehrere Tage | Termine | `- 🏖️ text [[link]]`, once per day |
 | Notiz | Gedanken | `- 📝 text` |
 | Idee | Gedanken | `- 💡 text` |
+
+### Several days
+
+**There is still no multi-day entry in the format, and this does not add one.**
+§E.3 of `calendar-import.md` settled that when the importer needed it: the note
+format is one line in one day's note, and a holiday from the 13th to the 26th is
+fourteen untimed lines. That is not a compromise, it is the only shape under
+which the week view shows the holiday on the days it covers, which is the whole
+reason for looking at a week.
+
+What the span kind adds is a person being able to write one without an `.ics`.
+A last-day field on the dialog, offered for the three kinds whose line says
+nothing about time -- span, note and idea -- and `write-day-span.ts` puts the
+same line into every day note in the range, creating the ones that do not exist
+and skipping any that already say it.
+
+**Its own marker rather than the meeting's**, because a fortnight of `👥` reads
+as fourteen appointments. It files under the schedule with the meetings all the
+same: a fortnight away is the reason nothing else is in those days, which is the
+question that section answers.
+
+**Taking one back is the half that needed designing.** Nothing marks these lines
+as belonging together -- a counter (`Ferien (3/14)`) would have made it trivial
+and would have put a new element into a format that is much easier to add to
+than to take back, and it would have broken the property §D of
+`calendar-import.md` depends on: a typed line and an imported one are the same
+thing. So `day-span.ts` recovers the span the way the importer recovers its
+history, by reading what is there now. Walk out from the day that was clicked
+while the neighbouring note holds **exactly one** entry of the same kind saying
+the same thing; the first day that does not is the edge. Editing or deleting
+then offers this day or the whole span, named in full rather than counted.
+
+**Where the walk stops is part of the answer.** A day saying it twice gives no
+way to tell which line belongs to the span, and a day whose line says more than
+the dialog can compose back must not be rewritten at all. Both are boundaries,
+both are reported, and the dialog says the span may run further rather than
+quietly claiming it does not -- which is how two days would otherwise be left
+behind by a delete that looked complete.
+
+What this cannot do is tell a span from a coincidence: `Sport` on two adjacent
+days is one span to the walk. That is the honest cost of storing nothing, and it
+is visible in the dialog before anything is written.
 
 A task offers the text, a project or area, a due date and a star. A meeting
 offers a time, the text, a project or area, **and two multi-line boxes**: what

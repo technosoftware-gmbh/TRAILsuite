@@ -62,6 +62,7 @@ already has. See [`architecture.md`](architecture.md) section 1.1.
 | `recurringSubfolder` | `'{YYYY}'` |
 | `journalSubfolder` | `'{YYYY}'` |
 | `documentSubfolder` | `'_documents'` |
+| `importSubfolder` | `'_imports'` |
 | `taskFolders` | `'0 Plan, 1 Areas, 2 Goals, 3 Projects'` |
 
 ## CRM, shared with the sibling plugins
@@ -99,6 +100,7 @@ second heading beside the first.
 | `dayMeetingDeclinedMarker` | `'🚫'` |
 | `dayNoteMarker` | `'📝'` |
 | `dayIdeaMarker` | `'💡'` |
+| `daySpanMarker` | `'🏖️'` |
 | `weekWorkdaysOnly` | `false` |
 | `weekLunchStart` | `'12:00'` |
 | `weekLunchEnd` | `'13:00'` |

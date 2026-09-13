@@ -100,6 +100,21 @@ export interface NODAtrailSettings {
    * plugin moving files about.
    */
   documentSubfolder: string;
+  /**
+   * Where a file an importer read is kept, beside the notes it fed.
+   *
+   * `_imports` sits next to `_documents` and means something different: a
+   * document is a thing you filed, an import is the source a run worked from.
+   * Keeping them apart matters because the import files are machinery -- the
+   * calendar replay and the statement archive read them back by name -- and a
+   * folder somebody browses for an invoice should not be full of them.
+   *
+   * Blank keeps nothing at all, the same reading `documentSubfolder` has: there
+   * is nowhere to put the file that is not somebody else's folder. It costs the
+   * calendar import its "gone from the export" list and the ledger its unposted
+   * count, both of which are replayed from these files and from nothing else.
+   */
+  importSubfolder: string;
   /** Comma separated. Deliberately not the whole vault. */
   taskFolders: string;
 
@@ -255,6 +270,16 @@ export interface NODAtrailSettings {
   dayMeetingDeclinedMarker: string;
   dayNoteMarker: string;
   dayIdeaMarker: string;
+  /**
+   * What marks a line that runs over several days: a holiday, a course, a
+   * fortnight away.
+   *
+   * Its own marker rather than the meeting's, because a fortnight of `👥` reads
+   * as fourteen appointments. Blank switches the distinction off and a span
+   * becomes an unmarked line under the schedule, which is the same degradation
+   * a blank `dayIdeaMarker` gives an idea.
+   */
+  daySpanMarker: string;
 
   // Display -------------------------------------------------------------
   homeCurrency: string;

@@ -96,6 +96,10 @@ them without reformatting:
   responsible for and any non-obvious constraint. No revision history.
 - **No em dashes** anywhere shipped. `tests/no-em-dash.test.ts` enforces it;
   this file is exempt because it is not shipped.
+- **A name is compared through `trail-core`'s `caseFold()`**, never through
+  `trim().toLowerCase()` and never through a bare `toLowerCase()` on a title.
+  macOS writes an umlaut two ways, so a file name and a title somebody pasted are
+  the two sides that disagree. `tests/name-fold.test.ts` at the root enforces it.
 - **Frontmatter access goes through typed helpers, never raw casts.**
   `frontmatterOf()` in `shared/vault-host.ts`, then `trail-core`'s readers.
 - **Frontmatter property names are always settings**, never a literal in logic.

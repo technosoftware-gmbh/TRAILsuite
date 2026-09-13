@@ -19,6 +19,7 @@
  *
  * App-free.
  */
+import { caseFold } from '../text/case-fold.js';
 
 /** A named thing and how many of it. The whole vocabulary this needs. */
 export interface Counted {
@@ -27,7 +28,7 @@ export interface Counted {
   quantity: number;
 }
 
-const key = (name: string): string => name.trim().toLowerCase();
+const key = (name: string): string => caseFold(name);
 
 /**
  * One entry per name, summed, in the order the names first appear.

@@ -19,6 +19,7 @@
  *
  * App-free.
  */
+import { caseFold } from '../text/case-fold.js';
 
 /** How a callout folds: `+` starts open, `-` starts collapsed, '' does not fold. */
 export type CalloutFold = '' | '+' | '-';
@@ -53,7 +54,7 @@ const QUOTED = /^>\s?(.*)$/;
  * paragraph somebody added under the summary is not swallowed into it.
  */
 export function findCallout(lines: readonly string[], kind: string): Callout | null {
-  const wanted = kind.trim().toLowerCase();
+  const wanted = caseFold(kind);
 
   for (let index = 0; index < lines.length; index++) {
     const found = calloutAt(lines, index, wanted);
@@ -77,7 +78,7 @@ export function findCallout(lines: readonly string[], kind: string): Callout | n
  * and not a second find.
  */
 export function findCallouts(lines: readonly string[], kind: string): Callout[] {
-  const wanted = kind.trim().toLowerCase();
+  const wanted = caseFold(kind);
   const found: Callout[] = [];
 
   for (let index = 0; index < lines.length; index++) {

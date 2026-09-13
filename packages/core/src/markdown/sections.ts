@@ -12,6 +12,7 @@
  *
  * App-free.
  */
+import { caseFold } from '../text/case-fold.js';
 
 export interface MarkdownSection {
   /** How many `#` the heading carried. 1 for `# Reheating`, 2 for `## Eating History`. */
@@ -72,7 +73,7 @@ export function splitSections(body: string): MarkdownBody {
  * from not knowing there were more.
  */
 export function sectionsNamed(body: MarkdownBody, heading: string): MarkdownSection[] {
-  const wanted = heading.trim().toLowerCase();
+  const wanted = caseFold(heading);
   return body.sections.filter((section) => section.heading.toLowerCase() === wanted);
 }
 
@@ -102,7 +103,7 @@ export interface SectionGroup {
  * `# Instructions` does not get swept in.
  */
 export function groupsUnder(body: MarkdownBody, heading: string): SectionGroup[] {
-  const wanted = heading.trim().toLowerCase();
+  const wanted = caseFold(heading);
   const groups: SectionGroup[] = [];
 
   for (let i = 0; i < body.sections.length; i++) {

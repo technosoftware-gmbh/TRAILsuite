@@ -39,6 +39,27 @@ export function documentFolderFor(
   return joinFolder(noteFolderFor(settings, type, date), subfolder);
 }
 
+/**
+ * Where a file an importer read is kept, given the date its notes are filed by.
+ *
+ * The same arithmetic as `documentFolderFor` against a different setting, and
+ * deliberately a second function rather than a parameter: the two folders
+ * answer to different settings and mean different things, and a call site that
+ * passed the wrong one would file an export where somebody looks for invoices
+ * and be found only by reading it.
+ *
+ * Empty when the subfolder setting is blank, which here means keep nothing.
+ */
+export function importFolderFor(
+  settings: NODAtrailSettings,
+  type: NodaFolderType,
+  date: Date | null
+): string {
+  const subfolder = settings.importSubfolder.trim();
+  if (!subfolder) return '';
+  return joinFolder(noteFolderFor(settings, type, date), subfolder);
+}
+
 /** The last segment of a path, extension and all. */
 export function fileNameOf(path: string): string {
   const cleaned = path.replace(/\\+$/, '');

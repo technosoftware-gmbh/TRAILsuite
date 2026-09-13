@@ -15,6 +15,7 @@ import {
   type BillRecord,
   type AccountBudgetRecord,
   type PurchaseRecord,
+  caseFold,
 } from '@technosoftware/trail-core';
 import { purchaseTotalsDisagree } from '@technosoftware/trail-core';
 import type { GoalRecord, ProjectRecord, ParaRecord } from '../../para/board';
@@ -87,12 +88,12 @@ export function linkFindings<T, F>(
   targetsOf: (note: T) => (string | null)[],
   known: readonly { title: string }[]
 ): Finding[] {
-  const titles = new Set(known.map((entry) => entry.title.trim().toLowerCase()));
+  const titles = new Set(known.map((entry) => caseFold(entry.title)));
 
   return records.flatMap((record) =>
     targetsOf(record.note)
       .filter((target): target is string => target !== null)
-      .filter((target) => !titles.has(target.trim().toLowerCase()))
+      .filter((target) => !titles.has(caseFold(target)))
       .map((target) => ({
         kind: 'brokenLink' as const,
         path: pathOf(record),

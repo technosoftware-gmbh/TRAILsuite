@@ -148,16 +148,16 @@ test process and looks for German folders under English names.
 test runs. A fresh clone plus `npm install` in the sandbox is the way to run
 `npm run check` from anywhere but the Mac.
 
-## The test suites, measured 12 September 2026
+## The test suites, measured 13 September 2026
 
-From `npm run check` on a clean clone, exit 0.
+From `npm run check` on a fresh clone and install in a Linux sandbox, exit 0.
 
 | Package | Test files | Tests |
 |---|---|---|
-| core | 72 | 1666 |
+| core | 73 | 1678 |
 | apertrail | 88, of which 1 skips without a real vault | 1185, of which 5 skip |
-| nodatrail | 86, of which 1 skips without a real vault | 873, of which 7 skip |
-| the suite itself | 4 | 24 |
+| nodatrail | 89, of which 1 skips without a real vault | 931, of which 7 skip |
+| the suite itself | 5 | 32 |
 
 ## What the tests enforce, as distinct from what the docs ask for
 
@@ -170,8 +170,11 @@ A convention with a test behind it is not a preference. These fail the build:
 - `display-locale` (root) -- no plugin formats a number or a date in the
   machine's convention.
 - `settings-reference` (root) -- a setting with no row in its package's settings
-  reference, or a row for a setting that no longer exists. It is the fourth root
-  test and is easy to miss when the other three are listed from memory.
+  reference, or a row for a setting that no longer exists.
+- `name-fold` (root) -- a name trimmed and lower-cased by hand, or a title
+  lowered on its own, rather than folded with the core's `caseFold()`. There are
+  **five** root tests, and the last two are the ones easy to miss when the others
+  are listed from memory.
 - `obsidian-free` (core) -- the core imports no `obsidian`, reads no filesystem,
   and calls no unmockable clock. It reads the source text, because a lint rule
   can be silenced by the same edit that breaks it.

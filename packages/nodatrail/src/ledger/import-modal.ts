@@ -656,7 +656,8 @@ export class ImportStatementModal extends Modal {
         settings,
         this.intoAccount,
         rows,
-        this.fileText
+        this.fileText,
+        this.deps.now()
       );
       new Notice(
         kept ? t('ledger.statementKept', { path: kept }) : t('ledger.statementAlreadyKept')
@@ -860,7 +861,8 @@ export class ImportStatementModal extends Modal {
           settings,
           this.intoAccount ?? 0,
           rows,
-          this.fileText
+          this.fileText,
+          this.deps.now()
         );
         if (kept) new Notice(t('ledger.statementKept', { path: kept }));
       } catch (error) {

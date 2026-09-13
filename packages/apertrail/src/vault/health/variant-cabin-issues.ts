@@ -31,6 +31,7 @@ import { App, TFile } from 'obsidian';
 import { APERtrailSettings } from '../../settings/types';
 import { TravelTrip, TravelVehicle } from '../types';
 import { readTravelBoard } from '../read-entities';
+import { caseFold } from '@technosoftware/trail-core';
 
 export interface VariantCabinWarning {
   /** The ship the leg is taken on, as the leg names her. */
@@ -43,9 +44,9 @@ export interface VariantCabinWarning {
 
 export type VariantCabinIssue = VariantCabinWarning & { file: TFile; tripTitle: string };
 
-/** The same matching rule `cabinDescription()` uses, down to the trim and the case fold: a stricter copy here would warn about variants the itinerary has already matched. */
+/** The same matching rule `cabinDescription()` uses, down to the fold: a stricter copy here would warn about variants the itinerary has already matched. */
 function key(name: string): string {
-  return name.trim().toLowerCase();
+  return caseFold(name);
 }
 
 /** Enough of a leg to find it in a list of them: where it goes, else who runs it, else its position. */

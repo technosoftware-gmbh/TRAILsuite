@@ -27,7 +27,7 @@ vi.mock('obsidian', async () => {
 const { planTimeRepair, writeTimeRepair, repairable } = await import('../src/plan/repair-times');
 
 const SCHEDULE = '## 📅 Schedule';
-const ARCHIVE = '0 Plan/1 Daily/2026/_documents';
+const ARCHIVE = '0 Plan/1 Daily/2026/_imports';
 const path = (iso: string) => `0 Plan/1 Daily/${iso.slice(0, 4)}/${iso}.md`;
 
 /** An `.ics` holding one event, stated the way the bug bit. */
@@ -91,7 +91,7 @@ function vaultOf(notes: Record<string, string>, archives: Record<string, string>
 
 /** One week's export holding a single 06:00Z meeting, which is 08:00 here. */
 const WEEK = {
-  '20260907-20260913_business.ics': ics(
+  '20260913-142530_business_20260907-20260913.ics': ics(
     utcEvent('a@example.invalid', 'Inbox Complaints', '20260911T060000Z', '20260911T062500Z')
   ),
 };
@@ -127,7 +127,7 @@ describe('planTimeRepair', () => {
     const { app } = vaultOf(
       { [path('2026-09-11')]: note('- 👥 08:00-08:25 Inbox Complaints') },
       {
-        '20260907-20260913_business.ics': ics([
+        '20260913-142530_business_20260907-20260913.ics': ics([
           'UID:a@example.invalid',
           'SUMMARY:Inbox Complaints',
           'DTSTART;TZID=Europe/Zurich:20260911T080000',
@@ -146,7 +146,7 @@ describe('planTimeRepair', () => {
     const { app } = vaultOf(
       { [path('2026-09-11')]: note('- 👥 23:00-23:45 Late call') },
       {
-        '20260907-20260913_business.ics': ics(
+        '20260913-142530_business_20260907-20260913.ics': ics(
           utcEvent('b@example.invalid', 'Late call', '20260911T230000Z', '20260911T234500Z')
         ),
       }
@@ -193,10 +193,10 @@ describe('planTimeRepair', () => {
     const { app } = vaultOf(
       { [path('2026-09-11')]: note('- 👥 06:00-06:25 Inbox Complaints') },
       {
-        '20260907-20260913_business.ics': ics(
+        '20260913-142530_business_20260907-20260913.ics': ics(
           utcEvent('a@example.invalid', 'Inbox Complaints', '20260911T060000Z', '20260911T062500Z')
         ),
-        '20260901-20260930_business.ics': ics(
+        '20260913-142530_business_20260901-20260930.ics': ics(
           utcEvent('a@example.invalid', 'Inbox Complaints', '20260911T060000Z', '20260911T062500Z')
         ),
       }
@@ -208,7 +208,7 @@ describe('planTimeRepair', () => {
   it('names an archived file it cannot read rather than dropping it', async () => {
     const { app } = vaultOf(
       { [path('2026-09-11')]: note('- 👥 06:00-06:25 Inbox Complaints') },
-      { '20260907-20260913_business.ics': 'not a calendar at all' }
+      { '20260913-142530_business_20260907-20260913.ics': 'not a calendar at all' }
     );
 
     const plan = await planTimeRepair(app, DEFAULT_SETTINGS);
@@ -253,7 +253,7 @@ describe('writeTimeRepair', () => {
         ),
       },
       {
-        '20260907-20260913_business.ics': ics(
+        '20260913-142530_business_20260907-20260913.ics': ics(
           utcEvent('a@example.invalid', 'Inbox Complaints', '20260911T060000Z', '20260911T062500Z'),
           utcEvent('b@example.invalid', 'Focus-Time', '20260911T070000Z', '20260911T080000Z')
         ),
@@ -306,7 +306,7 @@ describe('writeTimeRepair', () => {
     const { app, writes } = vaultOf(
       { [path('2026-09-11')]: note('- 👥 23:00-23:45 Late call') },
       {
-        '20260907-20260913_business.ics': ics(
+        '20260913-142530_business_20260907-20260913.ics': ics(
           utcEvent('b@example.invalid', 'Late call', '20260911T230000Z', '20260911T234500Z')
         ),
       }
@@ -328,7 +328,7 @@ describe('the order the repaired line ends up in', () => {
   // line corrected from 07:00 to 09:00 keeps the slot 07:00 earned. In one real
   // vault eleven lines ended up sitting between 09:30 and 10:00.
   const MONDAY = {
-    '20260907-20260913_business.ics': ics(
+    '20260913-142530_business_20260907-20260913.ics': ics(
       utcEvent(
         'c@example.invalid',
         'Check-in Care Management',
@@ -466,7 +466,7 @@ describe('the order the repaired line ends up in', () => {
         ),
       },
       {
-        '20260907-20260913_business.ics': ics(
+        '20260913-142530_business_20260907-20260913.ics': ics(
           utcEvent(
             'c@example.invalid',
             'Check-in Care Management',

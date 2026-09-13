@@ -45,6 +45,10 @@ move between them without reformatting:
 - **File headers.** Every `.ts` file opens with a short JSDoc: what it is
   responsible for, and any non-obvious constraint. No revision history.
 - **No em dashes** anywhere in source, comments or docs.
+- **A name is compared through `caseFold()`, never through `trim().toLowerCase()`.**
+  macOS writes an umlaut two ways and the two spellings compare unequal, so a
+  file name and a pasted title are the pair that disagree. Enforced by
+  `tests/name-fold.test.ts` at the root.
 - **Small, single-purpose files.**
 - **History belongs in git, not in comments.**
 - Prettier settings match the plugin repos exactly (`.prettierrc`).
@@ -104,6 +108,14 @@ light is that app's schema. The boundaries are here and the names for the spans
 between them are not. Product logic never moves here on the strength of being
 tidy: the trip and photo-spot schemas belong to APERtrail, and this package
 holds no view, no string and no settings object.
+
+**`text` is here on the two-consumer test, with the third arriving late.**
+`caseFold` is one line of code and the reason it is shared is not reuse: it is
+that two packages folding a name their own way can disagree about whether two
+notes are the same note, and the disagreement is silent. APERtrail and NODAtrail
+both call it today. CULItrail is the package whose vault the unfolded comparison
+was actually breaking, and it gets the fix the day it takes a core with this in
+it.
 
 **No user-facing strings.** The core throws typed errors and lets the caller
 translate. A module that wants to call `t()` is a module that belongs in a

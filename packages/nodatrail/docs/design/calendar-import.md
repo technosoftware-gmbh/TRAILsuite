@@ -176,6 +176,40 @@ its own range, and diffs. Nothing is remembered; the raw export is kept, which
 is also the only way to ever re-run an import differently; and no settings key,
 validator entry or reference row is needed at all.
 
+**Amended, September 2026, in two ways that this section had wrong.**
+
+*It is kept in `_imports`, not in `_documents`.* Filing it beside the invoices
+read well as an analogy to `archiveStatement` and badly as a folder: an invoice
+is a document somebody filed and looks at, an export is the source a run worked
+from and a file this plugin recognises by name and reads back. Putting the two
+together made a browsable folder unbrowsable and made a machine-read file look
+like something safe to rename. `importSubfolder` is the setting, `_imports` the
+default, and blanking it keeps nothing and costs this whole section.
+
+*The name leads with the run, not with the range:*
+`20260913-142530_business_20260907-20260913.ics`. The range led because these
+files sat among documents filed by period; an imports folder is a history of
+runs and wants to sort as one. `shared/import-name.ts` holds the shape for both
+importers so one folder does not end up with two conventions.
+
+**And the stamp turned out to settle a question this section got wrong.** "The
+next run reads the newest archived file" was implemented as newest *range*,
+which is the same answer only while nobody backfills. Import the week of the
+14th on Monday, then re-import August on Friday to fill a gap, and the August
+file is the later word about August while its range ends first. §D's "later runs
+win" was never about ranges; it was about runs, and until the name carried a
+stamp there was nothing in the vault that could tell them apart. Now there is,
+and `priorImportsOf` orders by it.
+
+**Vaults imported under the old scheme need `Move imported files into the
+imports folder`**, a command rather than a migration on load: it renames files
+in somebody's vault, and doing that before anybody has agreed to it is not a
+thing to do on the first launch after an update. The old names carry no stamp,
+so a migrated file takes the vault's own creation time, and the last day of its
+range at midnight when even that is missing. Approximate, and allowed to be:
+everything migrated is older than everything since, so the order that matters
+holds however far off a single second is.
+
 **What replay can and cannot say, exactly.** It recovers what an earlier export
 *offered*, not what the importer *wrote* -- a line already in the note was
 offered and skipped, and the two are indistinguishable afterwards. That is a

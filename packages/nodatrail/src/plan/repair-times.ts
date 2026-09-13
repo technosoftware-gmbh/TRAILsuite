@@ -262,6 +262,10 @@ async function ambiguousOn(
   return (
     meetings.filter(
       (record) =>
+        // Meetings only. A span shares the section and is untimed, so without
+        // this an all-day meeting would read as ambiguous against a holiday of
+        // the same name and be refused a repair it could have had.
+        record.kind === 'meeting' &&
         record.draft.startTime === was.from &&
         record.draft.endTime === was.to &&
         record.draft.text === summary

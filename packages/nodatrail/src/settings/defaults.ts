@@ -70,6 +70,7 @@ export const DEFAULT_SETTINGS: NODAtrailSettings = {
   // level that could hold anything.
   journalSubfolder: '{YYYY}',
   documentSubfolder: '_documents',
+  importSubfolder: '_imports',
   taskFolders: '0 Plan, 1 Areas, 2 Goals, 3 Projects',
 
   crmFolder: 'CRM',
@@ -111,6 +112,7 @@ export const DEFAULT_SETTINGS: NODAtrailSettings = {
   dayMeetingDeclinedMarker: '🚫',
   dayNoteMarker: '📝',
   dayIdeaMarker: '💡',
+  daySpanMarker: '🏖️',
   // Blank on purpose: see the note on these in `types.ts`. Narrowing an
   // unclassified vault's pickers to nothing would be worse than not narrowing.
   billVendorRole: '',

@@ -172,6 +172,7 @@ export const enTranslations = {
     kinds: {
       task: 'Task',
       meeting: 'Meeting',
+      span: 'Several days',
       note: 'Note',
       idea: 'Idea',
     },
@@ -179,6 +180,20 @@ export const enTranslations = {
     context: 'Project or area',
     from: 'From',
     until: 'Until',
+    lastDay: 'Last day',
+    lastDayHint:
+      'Leave blank for one day. With a last day, the same line is written into every day note from the date above to that one, and the notes that do not exist yet are created.',
+    spanWrote: 'Written into {count} day notes.',
+    spanNothing: 'Every one of those days already says this. Nothing written.',
+    spanScope: 'Applies to',
+    spanScopeDay: 'This day only',
+    spanScopeAll: 'The whole span, {from} to {to} ({count} days)',
+    spanBroken:
+      'Not the whole span: {count} of those days say this twice, or say it differently. Those days are left alone.',
+    spanChanged: 'Changed on {count} days.',
+    spanDeleted: 'Removed from {count} days.',
+    spanRefused: 'Left as they were, because those notes changed since this was opened: {days}',
+    lastDayBefore: 'The last day is before the first.',
     attendance: {
       label: 'Attending',
       going: 'Yes',
@@ -703,6 +718,23 @@ export const enTranslations = {
     count: { one: '{count} task', other: '{count} tasks' },
   },
 
+  // The one-off move of archived imports out of the documents folder. Only the
+  // dialog: the files themselves carry no translated text.
+  imports: {
+    migrate: {
+      title: 'Move imported files into the imports folder',
+      nothing: 'Nothing to move. Every kept import is already in its imports folder.',
+      intro:
+        '{count} files will be moved beside the notes they fed, into the imports folder, and renamed so the name leads with when they were imported. Nothing is written, nothing is deleted, and no note is touched.',
+      stamps:
+        'The old names carried no time of import, so the time each file was created in the vault is used instead. These files are all older than anything a new import will keep, so they stay in the right order whatever that time is off by.',
+      heading: '{count} files to move',
+      button: 'Move {count} files',
+      done: '{count} files moved.',
+      failed: 'Left where they were: {files}',
+    },
+  },
+
   commands: {
     openDashboard: 'Open the life dashboard',
     openPara: 'Open PARA',
@@ -721,6 +753,7 @@ export const enTranslations = {
     unarchiveNote: 'Move this note out of the archive',
     runHealthCheck: 'Check the vault',
     createSampleVault: 'Create the sample notes',
+    migrateImports: 'Move imported files into the imports folder',
   },
 
   // The sample vault. Only the command name, the modal's labels and its notices
@@ -864,6 +897,7 @@ export const enTranslations = {
         'An imported invitation is written with the marker for what you answered. Clear one to write those like any other meeting.',
       noteMarker: 'Marker for a note',
       ideaMarker: 'Marker for an idea',
+      spanMarker: 'Marker for several days',
       markerDesc:
         'A task needs no marker: it is a checkbox in the Tasks plugin format. Blank writes a plain bullet.',
     },
@@ -926,6 +960,9 @@ export const enTranslations = {
       documentSubfolder: 'Documents beside a note',
       documentSubfolderDesc:
         'The folder an invoice or a statement is filed into, beside the note about it, the way an attachment folder works. Leave blank to keep documents wherever they already are. A document already in the vault is moved and its links follow; one chosen from this computer is copied in.',
+      importSubfolder: 'Imported files beside a note',
+      importSubfolderDesc:
+        'The folder a calendar export or a bank statement is kept in after it has been imported, beside the notes it fed. Not the same folder as documents: these files are read back by name, to work out what an earlier import offered and which rows are still unposted. Leave blank to keep nothing, which switches both of those off.',
       subfolder: 'file under',
       subfolderDesc:
         'Where a new note goes beneath its folder. Tokens: {YYYY} and {MM}, filled in from the date the note is about. Leave one blank to file that kind flat. Only new notes are affected; every reader looks through the whole folder whatever is in here.',

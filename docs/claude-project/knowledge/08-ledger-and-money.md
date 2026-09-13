@@ -126,13 +126,26 @@ one month's reference.
 ## Keeping the statement
  
 The file an import came from is copied into the vault beside the journal notes
-it fed, under the same `_documents` subfolder the invoices use, named
-`<from>-<to>_<account>.csv`. Filed by the year of the **last** row, which is the
-same rule the card profile uses to date a row.
+it fed, under the `_imports` subfolder (`importSubfolder`), named
+`<stamp>_<account>_<from>-<to>.csv` -- `20260913-142530_1013_20260401-20260626.csv`.
+Filed by the year of the **last** row, which is the same rule the card profile
+uses to date a row.
+ 
+**This changed in September 2026 and older conversations will say otherwise.**
+It used to live in `_documents` beside the invoices, named `<from>-<to>_<account>.csv`.
+The calendar archive moved the same day and for the same reason: an invoice is a
+document somebody filed, an export is the source a run worked from and a file
+the plugin reads back by name, and one folder should not be both. The shape of
+the name is now `shared/import-name.ts`'s and is shared by both importers. A
+vault written under the old scheme is moved by the command `Move imported files
+into the imports folder`, which renames rather than copies and leaves the notes
+alone.
  
 **Never overwrites and never stores identical bytes twice.** Re-importing a file
 already archived is the normal way somebody finishes the rows they left
-undecided. A *different* file covering the same period gets a numbered name,
+undecided. Since the name now carries the run's own stamp, sameness is no longer
+a question about one name: every file kept for that account and period is
+compared by bytes. A *different* file covering the same period is a second file,
 because two exports of one month are two documents and the later is not
 necessarily the better one.
  

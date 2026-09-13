@@ -11,6 +11,7 @@
  *
  * Pure: no Obsidian import, so parsing is testable without a vault.
  */
+import { caseFold } from '@technosoftware/trail-core';
 
 /**
  * How a goal stands.
@@ -75,7 +76,7 @@ const LEGACY_STATUSES: Readonly<Record<string, ParaStatus>> = Object.freeze({
 /** A stored value as one of the eight, or null when it is none of them. */
 export function readParaStatus(value: unknown): ParaStatus | null {
   if (typeof value !== 'string') return null;
-  const trimmed = value.trim().toLowerCase();
+  const trimmed = caseFold(value);
   const known = PARA_STATUSES.find((status) => status === trimmed);
   return known ?? LEGACY_STATUSES[trimmed] ?? null;
 }

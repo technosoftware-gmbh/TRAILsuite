@@ -35,6 +35,7 @@ import { addDays, formatDayTitle, parseDayTitle } from '../dates/day.js';
 import { lastDayOf } from './ics.js';
 import { inZone } from './zones.js';
 import type { EventOccurrence, Expansion, UnsupportedSeries } from './recurrence.js';
+import { caseFold } from '../text/case-fold.js';
 
 /**
  * A line the vault already holds under a day's schedule heading.
@@ -280,7 +281,7 @@ export interface CalendarImportPlan {
  * the failure nobody notices.
  */
 function normalize(text: string): string {
-  return text.replace(/\s+/g, ' ').trim().toLowerCase();
+  return caseFold(text.replace(/\s+/g, ' '));
 }
 
 /**

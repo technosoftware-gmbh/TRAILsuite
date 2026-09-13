@@ -31,6 +31,7 @@ import { App, MarkdownPostProcessorContext, MarkdownRenderChild, Notice, setIcon
 import { t } from '../../lang/I18nManager';
 import { APERtrailSettings } from '../../settings/types';
 import {
+  caseFold,
   dateTimeDatePart,
   dateTimeTimePart,
   formatDayTitle,
@@ -765,7 +766,7 @@ class ItineraryRenderer extends MarkdownRenderChild {
     if (!place?.photoSpot) return;
 
     const input = photoSpotToInput(place);
-    const key = (name: string | null): string => (name ?? '').trim().toLowerCase();
+    const key = (name: string | null): string => caseFold(name);
     const at = input.motifs.findIndex((motif) => key(motif.name) === key(entry.motifName));
     if (at < 0) return;
 

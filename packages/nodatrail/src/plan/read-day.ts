@@ -30,7 +30,7 @@ import {
   type DayEntryDraft,
   type DayEntryKind,
 } from './add-to-day';
-import { meetingMarkers, parseScheduleLine, type ScheduleEntry } from './read-schedule';
+import { scheduleMarkers, parseScheduleLine, type ScheduleEntry } from './read-schedule';
 
 export interface DayEntryRecord {
   kind: DayEntryKind;
@@ -114,12 +114,17 @@ function childrenOf(lines: readonly { line: string; at: number }[], index: numbe
 }
 
 /**
- * The meeting entries of a body, with their positions, without a file.
+ * The schedule entries of a body, with their positions, without a file.
  *
  * Exported for the one caller that has to move an entry rather than rewrite it
  * in place: it needs the positions of the entries around the one it is moving,
  * on a body it is holding in memory between two edits, which a reader taking a
  * `TFile` cannot give it.
+ *
+ * **Spans are in here with the meetings**, because they share the section and
+ * that caller is asking where the lines are. A span sorts nowhere -- its start
+ * is blank, and blank is not greater than any time -- so it is never a boundary
+ * and never moves, which is the same treatment an untimed meeting already gets.
  */
 export function meetingsIn(body: string, settings: NODAtrailSettings): DayEntryRecord[] {
   return meetings(body, settings);
@@ -133,24 +138,32 @@ function meetings(body: string, settings: NODAtrailSettings): DayEntryRecord[] {
     const row = lines[index];
     if (!row || /^\s/.test(row.line)) continue;
 
-    const parsed = parseScheduleLine(row.line, meetingMarkers(settings));
+    const parsed = parseScheduleLine(row.line, scheduleMarkers(settings));
     if (!parsed) continue;
 
-    const end = childrenOf(lines, index);
+    // **Only a meeting adopts the lines indented under it.** Those children are
+    // what was said in the room and what came out of it; a span is a fortnight
+    // away and has no room. Swallowing the next meeting's children into a span
+    // that happened to sit above it would take them out of the note the moment
+    // the span was edited.
+    const end = parsed.kind === 'span' ? index + 1 : childrenOf(lines, index);
     const own = lines.slice(index, end).map((entry) => entry.line);
-    const draft: DayEntryDraft = {
-      ...emptyDraft('meeting'),
-      attendance: parsed.attendance,
-      text: parsed.text,
-      context: parsed.links[0] ?? '',
-      startTime: parsed.from,
-      endTime: parsed.to,
-      notes: childText(own, settings.dayNoteMarker),
-      followUps: childTasks(own),
-    };
+    const draft: DayEntryDraft =
+      parsed.kind === 'span'
+        ? { ...emptyDraft('span'), text: parsed.text, context: parsed.links[0] ?? '' }
+        : {
+            ...emptyDraft('meeting'),
+            attendance: parsed.attendance,
+            text: parsed.text,
+            context: parsed.links[0] ?? '',
+            startTime: parsed.from,
+            endTime: parsed.to,
+            notes: childText(own, settings.dayNoteMarker),
+            followUps: childTasks(own),
+          };
 
     out.push({
-      kind: 'meeting',
+      kind: parsed.kind,
       draft,
       label: parsed.text,
       span: parsed.from && parsed.to ? `${parsed.from}-${parsed.to}` : parsed.from || parsed.to,
@@ -221,6 +234,7 @@ function thoughts(body: string, settings: NODAtrailSettings): DayEntryRecord[] {
       tentative: '',
       unanswered: '',
       declined: '',
+      span: '',
     });
     if (!parsed) continue;
 
@@ -286,11 +300,18 @@ export async function findDayEntry(
   app: App,
   settings: NODAtrailSettings,
   file: TFile,
-  wanted: Pick<ScheduleEntry, 'from' | 'to' | 'text'>
+  wanted: Pick<ScheduleEntry, 'from' | 'to' | 'text'> & Partial<Pick<ScheduleEntry, 'kind'>>
 ): Promise<DayEntryRecord | null> {
   const { meetings: found } = await readDayEntries(app, settings, file);
+  // **The kind is part of the match now that two shapes share the section.** A
+  // span and an all-day meeting are both untimed, so a span called `Ferien` and
+  // an imported all-day `Ferien` on one day are indistinguishable on time and
+  // text alone -- and the importer, which passes no kind, must never be handed
+  // the span as the meeting it wrote.
+  const kind = wanted.kind ?? 'meeting';
   const matches = found.filter(
     (record) =>
+      record.kind === kind &&
       record.draft.startTime === wanted.from &&
       record.draft.endTime === wanted.to &&
       record.draft.text === wanted.text

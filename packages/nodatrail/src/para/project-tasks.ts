@@ -15,11 +15,11 @@
  * anchor already stripped by the parser. A link is a note title, and a title is
  * how everything else in this suite identifies a note.
  */
-import { isOpen, type ParsedTask } from '@technosoftware/trail-core';
+import { caseFold, isOpen, type ParsedTask } from '@technosoftware/trail-core';
 
 /** Open tasks naming this title. */
 export function tasksAbout<T extends ParsedTask>(tasks: readonly T[], title: string): T[] {
-  const wanted = title.trim().toLowerCase();
+  const wanted = caseFold(title);
   // No guard on a blank title, and that is deliberate rather than missing. The
   // core drops empty link targets when it parses a line, so no task can carry
   // one, and a blank title therefore matches nothing on its own -- which is the
@@ -27,7 +27,7 @@ export function tasksAbout<T extends ParsedTask>(tasks: readonly T[], title: str
   // the guard broke no test, which is how it was found: correct code standing
   // somewhere it could never run is the shape this repository keeps meeting.
   return tasks.filter(
-    (task) => isOpen(task) && task.links.some((link) => link.trim().toLowerCase() === wanted)
+    (task) => isOpen(task) && task.links.some((link) => caseFold(link) === wanted)
   );
 }
 
@@ -44,7 +44,7 @@ export function openTaskCounts(tasks: readonly ParsedTask[]): Map<string, number
     if (!isOpen(task)) continue;
     // A task naming the same note twice counts once: it is one task about one
     // thing, however many times the line mentions it.
-    for (const link of new Set(task.links.map((value) => value.trim().toLowerCase()))) {
+    for (const link of new Set(task.links.map((value) => caseFold(value)))) {
       if (link) counts.set(link, (counts.get(link) ?? 0) + 1);
     }
   }

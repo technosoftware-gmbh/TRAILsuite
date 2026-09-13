@@ -444,7 +444,8 @@ export class ImportCalendarModal extends Modal {
         this.fileName,
         this.from,
         this.to,
-        this.fileText
+        this.fileText,
+        this.deps.now()
       );
       if (path) new Notice(t('calendar.kept', { path }));
     } catch {

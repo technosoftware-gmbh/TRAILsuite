@@ -43,9 +43,12 @@ import {
   emptyDraft,
   entryLines,
   headingsFor,
+  spans,
   type DayEntryDraft,
   type DayEntryKind,
 } from './add-to-day';
+import { findDaySpan, type FoundSpan } from './day-span';
+import { daysOfSpan, rewriteDaySpan, writeDaySpan } from './write-day-span';
 import type { Attendance } from './read-schedule';
 
 export interface AddToDayDeps {
@@ -69,6 +72,28 @@ export interface CaptureTarget {
 export class AddToDayModal extends FormModal {
   private draft: DayEntryDraft;
   private day: string;
+  /**
+   * The last day of a capture that runs over several days, or blank for one.
+   *
+   * Blank is the default and stays the default: almost everything written into
+   * a day note is about that day, and a range field that started filled in
+   * would put a fortnight of lines in front of somebody who wanted one.
+   */
+  private lastDay = '';
+  /**
+   * The span the entry being edited turns out to belong to, read in `load()`.
+   *
+   * Null while it is being read, and for a kind that cannot span. One day long
+   * for an entry whose neighbours say nothing like it, which is the ordinary
+   * case and the one where no choice is offered.
+   */
+  private found: FoundSpan | null = null;
+  /**
+   * Whether Save and Delete act on this day or on the whole span.
+   *
+   * Not `scope`, which is Obsidian's own on `Modal` and holds its keymap.
+   */
+  private applyTo: 'day' | 'span' = 'day';
   /** Projects made from this form, which the metadata cache has not indexed yet. */
   private readonly createdContexts: string[] = [];
 
@@ -104,6 +129,43 @@ export class AddToDayModal extends FormModal {
   }
 
   /**
+   * Works out whether the entry being edited is one day of something longer.
+   *
+   * **Before the form is drawn, not after.** A dialog that came up saying "this
+   * day only" and then grew a second choice a moment later is one somebody has
+   * already pressed Save on. `openLoaded()` is what waits, which is why both
+   * call sites use it.
+   *
+   * A failure here is a failure to open: `FormModal` refuses rather than
+   * showing a form that cannot say what it would do.
+   */
+  protected override async load(): Promise<void> {
+    const target = this.editing;
+    if (!target || !spans(target.entry.kind)) return;
+
+    this.found = await findDaySpan(this.deps.app, this.deps.getSettings(), this.day, {
+      file: target.file,
+      entry: target.entry,
+    });
+    // Defaulting to the whole span would be the destructive reading: somebody
+    // who opened one day and pressed Delete means that day.
+    this.applyTo = 'day';
+  }
+
+  /** The span, but only while it is still the thing the form would write. */
+  private spanChoice(): FoundSpan | null {
+    const target = this.editing;
+    const found = this.found;
+    if (!target || !found || found.days.length < 2) return null;
+    // **A changed kind is a changed section**, which turns a rewrite into a
+    // delete and an append in a different part of the note. Offering to do
+    // that across a fortnight, from a dialog that shows one day, is more than
+    // this is willing to promise. Change the kind on the day, or change the
+    // span first.
+    return this.draft.kind === target.entry.kind ? found : null;
+  }
+
+  /**
    * Deleting, offered only while editing.
    *
    * A meeting goes with its children, because they were captured as one thing
@@ -122,6 +184,21 @@ export class AddToDayModal extends FormModal {
         run: async () => {
           const target = this.editing;
           if (!target) return;
+
+          const found = this.spanChoice();
+          if (found && this.applyTo === 'span') {
+            const result = await rewriteDaySpan(
+              this.deps.app,
+              this.deps.getSettings(),
+              found.days,
+              []
+            );
+            this.sayRefused(result.refused);
+            new Notice(t('day.spanDeleted', { count: String(result.changed) }));
+            target.onDone();
+            return;
+          }
+
           await this.rewrite(target.file, target.entry, []);
           new Notice(t('day.deleted'));
           target.onDone();
@@ -131,7 +208,14 @@ export class AddToDayModal extends FormModal {
   }
 
   protected override blocker(): string | null {
-    return this.draft.text.trim() === '' ? t('common.incomplete') : null;
+    if (this.draft.text.trim() === '') return t('common.incomplete');
+    // A last day before the first is a typo, and writing it would silently do
+    // nothing at all: `daysOfSpan` hands back an empty range and the dialog
+    // would close reporting success.
+    if (this.lastDay.trim() !== '' && daysOfSpan(this.day, this.lastDay).length === 0) {
+      return t('day.lastDayBefore');
+    }
+    return null;
   }
 
   protected fields(container: HTMLElement): void {
@@ -171,9 +255,18 @@ export class AddToDayModal extends FormModal {
         // task should not have to type it again.
         const { text, context } = this.draft;
         this.draft = { ...emptyDraft(next), text, context };
+        // A range left over from a span would otherwise still be set on a
+        // meeting, where nothing shows it and nothing writes it -- the same
+        // reason the due date is dropped here.
+        if (!spans(next)) this.lastDay = '';
         this.rerender();
       }
     );
+
+    // Under the kind, because the kind is what decides whether it applies, and
+    // above the text for the same reason the date is: it says where this is
+    // going, and everything below it is what goes there.
+    this.spanFields(container);
 
     if (this.draft.kind === 'meeting') {
       this.time(
@@ -264,6 +357,69 @@ export class AddToDayModal extends FormModal {
       dropdown.setValue(this.draft.attendance);
       dropdown.onChange((value) => (this.draft.attendance = value as Attendance));
     });
+  }
+
+  /**
+   * The range: a last day when capturing, a scope when editing.
+   *
+   * **Never both, and never for a kind that cannot span.** A meeting carries a
+   * clock and a task carries a due date; repeating either over a fortnight
+   * would be a claim about each of those days rather than one thing that lasts
+   * that long. `SPANNING_KINDS` holds that decision and this only reads it.
+   */
+  private spanFields(container: HTMLElement): void {
+    if (!spans(this.draft.kind)) return;
+
+    if (!this.editing) {
+      this.date(
+        container,
+        t('day.lastDay'),
+        () => this.lastDay,
+        (value) => (this.lastDay = value ?? '')
+      );
+      this.hint(container, t('day.lastDayHint'));
+      return;
+    }
+
+    const found = this.spanChoice();
+    if (!found) return;
+
+    // **Named in full rather than counted.** "The whole span" over a number is
+    // a button somebody presses without knowing which fortnight it means, and
+    // this one rewrites notes they have had for months.
+    new Setting(container).setName(t('day.spanScope')).addDropdown((dropdown) => {
+      dropdown.addOption('day', t('day.spanScopeDay'));
+      dropdown.addOption(
+        'span',
+        t('day.spanScopeAll', {
+          from: found.from,
+          to: found.to,
+          count: String(found.days.length),
+        })
+      );
+      dropdown.setValue(this.applyTo);
+      dropdown.onChange((value) => (this.applyTo = value === 'span' ? 'span' : 'day'));
+    });
+
+    // Where the walk stopped for a reason other than the span ending. Said
+    // here rather than swallowed: the span may really run further, and a dialog
+    // that quietly claimed otherwise would leave two stray days behind after a
+    // delete that looked complete.
+    if (found.refused.length > 0) {
+      this.hint(container, t('day.spanBroken', { count: String(found.refused.length) }));
+    }
+  }
+
+  /**
+   * Days a span edit did not touch, named rather than counted.
+   *
+   * A count would say the run was incomplete; a list says which days to go and
+   * look at. Running the edit again from one of them is the fix, and that is a
+   * thing somebody can only do if they know where.
+   */
+  private sayRefused(refused: readonly string[]): void {
+    if (refused.length === 0) return;
+    new Notice(t('day.spanRefused', { days: refused.join(', ') }));
   }
 
   private contextField(container: HTMLElement): void {
@@ -391,6 +547,18 @@ export class AddToDayModal extends FormModal {
 
     const target = this.editing;
     if (target) {
+      // The whole span first, because it is the only branch that touches more
+      // than this one note and it must not fall through into the single-day
+      // rewrite below and change one day of fourteen.
+      const found = this.spanChoice();
+      if (found && this.applyTo === 'span') {
+        const result = await rewriteDaySpan(this.deps.app, settings, found.days, lines);
+        this.sayRefused(result.refused);
+        new Notice(t('day.spanChanged', { count: String(result.changed) }));
+        target.onDone();
+        return;
+      }
+
       // A kind that changed has to move sections, which is a delete and an
       // append rather than a rewrite in place. Done in that order, so a failure
       // between the two leaves the entry missing rather than duplicated: one is
@@ -405,6 +573,29 @@ export class AddToDayModal extends FormModal {
       await touchModified(this.deps.app, settings, target.file);
       new Notice(t('day.updated'));
       target.onDone();
+      return;
+    }
+
+    // **A range is a different write, and it is decided before the period
+    // fallback below.** A span has to land on days: the period note is one note
+    // for a week, and writing a fortnight's holiday into it once would say
+    // nothing about the days it covers, which is the whole reason for
+    // expanding at all. So a last day requires a first one.
+    const first = parseDayTitle(this.day);
+    if (spans(this.draft.kind) && this.lastDay.trim() !== '' && first) {
+      const result = await writeDaySpan(
+        this.deps.app,
+        settings,
+        this.draft,
+        this.day,
+        this.lastDay,
+        this.deps.now()
+      );
+      new Notice(
+        result.written > 0
+          ? t('day.spanWrote', { count: String(result.written) })
+          : t('day.spanNothing')
+      );
       return;
     }
 

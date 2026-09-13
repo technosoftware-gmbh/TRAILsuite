@@ -37,24 +37,28 @@ import {
 import { joinFolder } from '@technosoftware/trail-core';
 import { noteFolderFor } from './paths';
 import { vaultZone } from './vault-zone';
+import {
+  byStamp,
+  freeImportName,
+  importFileName,
+  importStamp,
+  readImportFileName,
+  type ImportFileName,
+} from '../shared/import-name';
 import type { NODAtrailSettings } from '../settings/types';
 
-/** What an archived calendar file's name says about it. */
-export interface CalendarArchiveName {
-  /** The source it came from: the stem of the file that was imported. */
-  source: string;
-  from: string;
-  to: string;
-}
+/**
+ * What an archived calendar file's name says about it.
+ *
+ * The shape is `shared/import-name.ts`'s, shared with the statement archive so
+ * the imports folder holds one kind of name rather than two. `source` here is
+ * the stem of the file that was imported, slugged.
+ */
+export type CalendarArchiveName = ImportFileName;
 
 export interface ArchivedCalendar {
   file: TFile;
   name: CalendarArchiveName;
-}
-
-/** `2026-09-01` as `20260901`, which is how this vault names a document. */
-function compact(day: string): string {
-  return day.replace(/-/g, '');
 }
 
 /**
@@ -62,8 +66,8 @@ function compact(day: string): string {
  *
  * Lower case, and everything that is not a letter or a digit becomes a hyphen.
  * The name has to round-trip through the archive's own filename, where a
- * literal `_` would split the source from the range and an accent would come
- * back differently depending on which machine wrote it.
+ * literal `_` would split the source from the stamp and the range, and an
+ * accent would come back differently depending on which machine wrote it.
  */
 export function sourceSlug(fileName: string): string {
   const stem = fileName.replace(/\.[^./]*$/, '');
@@ -73,21 +77,21 @@ export function sourceSlug(fileName: string): string {
     .replace(/^-+|-+$/g, '');
   // A name made entirely of characters that do not survive is still a name
   // somebody chose. Calling it "calendar" keeps the archive readable and keeps
-  // two such files apart by their range, which is the rest of the name.
+  // two such files apart by their stamp and range, which is the rest of the
+  // name.
   return slug === '' ? 'calendar' : slug;
 }
 
 /**
- * `20260907-20260913_business.ics`: the range it was imported under, then the
- * source.
+ * `20260913-142530_business_20260907-20260913.ics`: when it was imported, from
+ * where, and for which days.
  *
- * The range first because that is how the rest of this vault's documents are
- * named and how somebody looks for one, and because the range is what the
- * replay needs: an archived file is only evidence about the days it was read
- * for.
+ * The stamp first because this folder is a history of runs and sorting by name
+ * should sort by run. `import-name.ts` says why each of the three parts is
+ * there, and what the range in particular is load-bearing for.
  */
-export function calendarFileName(source: string, from: string, to: string): string {
-  return `${compact(from)}-${compact(to)}_${sourceSlug(source)}.ics`;
+export function calendarFileName(stamp: string, source: string, from: string, to: string): string {
+  return importFileName({ stamp, source: sourceSlug(source), from, to }, 'ics');
 }
 
 /**
@@ -99,27 +103,24 @@ export function calendarFileName(source: string, from: string, to: string): stri
  * never read for, which is the exact failure §I.2 exists to prevent.
  */
 export function readCalendarFileName(name: string): CalendarArchiveName | null {
-  const match = /^(\d{8})-(\d{8})_([a-z0-9-]+)\.ics$/i.exec(name.trim());
-  if (!match) return null;
-
-  const [, from, to, source] = match;
-  if (!from || !to || !source) return null;
-
-  const day = (value: string) => `${value.slice(0, 4)}-${value.slice(4, 6)}-${value.slice(6, 8)}`;
-  return { source: source.toLowerCase(), from: day(from), to: day(to) };
+  return readImportFileName(name, 'ics');
 }
 
 /**
- * Where an archived calendar is filed: the day notes' document folder, for the
+ * Where an archived calendar is filed: the day notes' imports folder, for the
  * month the range starts in.
  *
- * Beside the notes it fed, which is where the statement archive puts a CSV and
- * where an invoice for a bill goes. Empty when `documentSubfolder` is blank --
- * "leave documents where they are" -- and here that means keep nothing, because
- * there is nowhere to put it that is not somebody else's folder.
+ * Beside the notes it fed, which is where the statement archive puts its CSV.
+ * **Not beside the invoices**, which is where this used to go and where it did
+ * not belong: an export is not a document somebody filed, it is the source a
+ * run worked from and a file this plugin reads back by name. `_documents` is
+ * browsed; `_imports` is machinery kept where the machinery can find it.
+ *
+ * Empty when `importSubfolder` is blank -- keep nothing -- because there is
+ * nowhere to put it that is not somebody else's folder.
  */
 export function calendarArchiveFolder(settings: NODAtrailSettings, from: string): string {
-  const subfolder = settings.documentSubfolder.trim();
+  const subfolder = settings.importSubfolder.trim();
   const day = parseDayTitle(from);
   if (!subfolder || day === null) return '';
   return joinFolder(noteFolderFor(settings, 'day', day), subfolder);
@@ -128,11 +129,18 @@ export function calendarArchiveFolder(settings: NODAtrailSettings, from: string)
 /**
  * Keeps the file an import read.
  *
- * **Never overwrites, and never stores the same bytes twice.** Re-importing a
- * range that is already archived is a normal thing to do, and it must not leave
- * a second copy behind each time. A *different* export of the same range and
- * source gets a numbered name, because two exports of one week are two
- * documents and the later one is not necessarily the better one.
+ * **Never stores the same bytes twice.** Re-importing a range that is already
+ * archived is a normal thing to do, and it must not leave a second copy behind
+ * each time. Since the name now carries the run's own stamp, sameness can no
+ * longer be a question about one name: every file already kept for this source
+ * and range is compared, and an identical one ends the matter. That is a
+ * stronger check than the name was, not a weaker one -- it recognises a file
+ * kept under a stamp this run has no way to guess.
+ *
+ * **And never overwrites.** A *different* export of the same range and source
+ * is a second file, because two exports of one week are two documents and the
+ * later one is not necessarily the better one. The stamp keeps them apart by
+ * itself; `freeImportName` is only for the impatient double-click.
  *
  * Returns the path it landed at, or null when nothing was written.
  */
@@ -142,7 +150,8 @@ export async function archiveCalendar(
   source: string,
   from: string,
   to: string,
-  text: string
+  text: string,
+  now: Date
 ): Promise<string | null> {
   const folder = calendarArchiveFolder(settings, from);
   if (!folder || text.trim() === '') return null;
@@ -150,21 +159,18 @@ export async function archiveCalendar(
   const path = normalizePath(folder);
   if (!app.vault.getFolderByPath(path)) await app.vault.createFolder(path);
 
-  const wanted = calendarFileName(source, from, to);
+  const slug = sourceSlug(source);
   const existing = app.vault.getFolderByPath(path)?.children ?? [];
   const taken = new Set(existing.map((child) => child.name));
 
-  const sameName = existing.find((child) => child.name === wanted);
-  if (sameName instanceof TFile) {
-    const held = await app.vault.cachedRead(sameName);
-    if (held === text) return sameName.path;
+  for (const child of existing) {
+    if (!(child instanceof TFile)) continue;
+    const name = readCalendarFileName(child.name);
+    if (!name || name.source !== slug || name.from !== from || name.to !== to) continue;
+    if ((await app.vault.cachedRead(child)) === text) return child.path;
   }
 
-  let name = wanted;
-  for (let index = 2; taken.has(name) && index < 100; index += 1) {
-    name = wanted.replace(/\.ics$/i, ` ${index}.ics`);
-  }
-
+  const name = freeImportName(calendarFileName(importStamp(now), source, from, to), taken);
   const written = await app.vault.create(`${path}/${name}`, text);
   return written.path;
 }
@@ -177,7 +183,7 @@ export async function archiveCalendar(
  * history, not one month of it.
  */
 export function readCalendarArchive(app: App, settings: NODAtrailSettings): ArchivedCalendar[] {
-  const subfolder = settings.documentSubfolder.trim();
+  const subfolder = settings.importSubfolder.trim();
   if (!subfolder) return [];
 
   const found: ArchivedCalendar[] = [];
@@ -189,7 +195,12 @@ export function readCalendarArchive(app: App, settings: NODAtrailSettings): Arch
     if (name) found.push({ file, name });
   }
 
-  return found.sort((a, b) => b.name.to.localeCompare(a.name.to));
+  // By range, still: this is the list somebody reads, and a reader looking for
+  // the week of the 7th is looking for a range. The stamp settles two files
+  // covering one range, which is now possible and was not before.
+  return found.sort(
+    (a, b) => b.name.to.localeCompare(a.name.to) || b.name.stamp.localeCompare(a.name.stamp)
+  );
 }
 
 /**
@@ -218,9 +229,14 @@ export async function priorImportsOf(
   const slug = sourceSlug(source);
   const files = readCalendarArchive(app, settings).filter((one) => one.name.source === slug);
 
-  // Oldest first, so the plan's "later runs win" reading of the history is the
-  // order these actually happened in.
-  files.reverse();
+  // Oldest RUN first, so the plan's "later runs win" reading of the history is
+  // the order these actually happened in. That used to be the range order read
+  // backwards, which is the same answer only while nobody backfills: a week in
+  // August imported this morning is a later word about August than the August
+  // import was, and reading it as the earlier one would offer its corrections
+  // again as though they had never been made. The stamp is what finally says
+  // which run came first, and this is the reason it is in the name.
+  files.sort((a, b) => byStamp(a.name, b.name));
 
   const out: PriorImport[] = [];
   for (const archived of files) {
