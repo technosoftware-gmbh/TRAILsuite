@@ -8,7 +8,7 @@
  * made a second one, and two copies of "8.9 km SSW of the anchor" would
  * have drifted in wording before they drifted in arithmetic.
  */
-import { compassPoint, parseDayTitle, SunTimes } from '@technosoftware/trail-core';
+import { caseFold, compassPoint, parseDayTitle, SunTimes } from '@technosoftware/trail-core';
 import { t } from '../lang/I18nManager';
 import { formatDistanceIn, UnitSystem } from '../shared/units';
 import { shortUrl } from '../shared/short-url';
@@ -87,7 +87,7 @@ export function localizedCompass(point: string): string {
 }
 
 export function gearLabel(raw: string): string {
-  const key = raw.trim().toLowerCase();
+  const key = caseFold(raw);
   return TRANSLATED_GEAR.has(key) ? t(`photoSpot.gear.${key}`) : raw.trim();
 }
 
@@ -171,7 +171,7 @@ export function logisticsRows(place: TravelPlace, spot: ParsedPhotoSpot): Logist
 
   for (const row of spot.transit) {
     if (!row.mode && !row.detail) continue;
-    const mode = (row.mode ?? '').trim().toLowerCase();
+    const mode = caseFold(row.mode);
     const known = mode in TRANSIT_ICONS;
     rows.push({
       icon: known ? TRANSIT_ICONS[mode] : 'route',
@@ -184,7 +184,7 @@ export function logisticsRows(place: TravelPlace, spot: ParsedPhotoSpot): Logist
   if (spot.openingHours)
     rows.push({ icon: 'clock', label: t('photoSpot.openingHours'), value: spot.openingHours });
   if (spot.entryFee) {
-    const free = spot.entryFee.trim().toLowerCase() === 'none';
+    const free = caseFold(spot.entryFee) === 'none';
     rows.push({
       icon: 'ticket',
       label: t('photoSpot.entryFee'),

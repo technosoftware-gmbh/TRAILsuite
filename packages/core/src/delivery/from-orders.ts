@@ -17,6 +17,7 @@
 import { countsOf, outstandingOf, sumCounted, type Counted } from '../fulfilment/outstanding.js';
 import type { OrderSelection } from '../order/types.js';
 import type { DeliveryItem } from './types.js';
+import { caseFold } from '../text/case-fold.js';
 
 /** Enough of an order to know what it asked for and what a delivery would name it. */
 export interface OrderedFrom {
@@ -32,7 +33,7 @@ export interface DeliveredIn {
 
 /** Titles are compared the way wikilinks are: trimmed and case-insensitively. */
 function key(title: string): string {
-  return title.trim().toLowerCase();
+  return caseFold(title);
 }
 
 /**

@@ -24,6 +24,7 @@
 import { emptyPer100g, type Per100gNutrition } from './draft.js';
 import { defaultUnitFor, inNutrientOrder, type NutrientEntry } from './nutrients.js';
 import { type MealNutritionPer100g } from './nutrition-model.js';
+import { caseFold } from '../text/case-fold.js';
 
 /**
  * `- **Calories:** 585.2 kcal`, with the value optional.
@@ -64,7 +65,7 @@ function readFields(markdown: string): Map<string, number | null> {
     if (!match) continue;
 
     const value = match[2] === undefined ? null : Number(match[2]);
-    fields.set((match[1] ?? '').trim().toLowerCase(), Number.isFinite(value) ? value : null);
+    fields.set(caseFold(match[1]), Number.isFinite(value) ? value : null);
   }
 
   return fields;

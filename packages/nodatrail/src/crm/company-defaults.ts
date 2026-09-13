@@ -24,6 +24,7 @@ import {
   readNotesOfType,
   type CompanyDefaultProperties,
   type CompanyDefaults,
+  caseFold,
 } from '@technosoftware/trail-core';
 import { hostFor } from '../shared/vault-host';
 import type { NODAtrailSettings } from '../settings/types';
@@ -131,7 +132,7 @@ export function readsAsYes(value: unknown): boolean {
   if (value === undefined || value === null) return false;
   if (typeof value === 'boolean') return value;
   if (typeof value === 'number') return value !== 0;
-  if (typeof value === 'string') return !DENIED.has(value.trim().toLowerCase());
+  if (typeof value === 'string') return !DENIED.has(caseFold(value));
   return false;
 }
 

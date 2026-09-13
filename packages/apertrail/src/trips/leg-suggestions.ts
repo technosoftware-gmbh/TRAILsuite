@@ -18,6 +18,7 @@
  *
  * Pure, and free of the vault: it takes the titles and cabins it needs.
  */
+import { caseFold } from '@technosoftware/trail-core';
 
 /** A vehicle as this module wants it: what it is called, who runs it, and what it is sold in. */
 export interface SuggestableVehicle {
@@ -26,7 +27,7 @@ export interface SuggestableVehicle {
   cabins: { name: string }[];
 }
 
-const fold = (value: string | null | undefined): string => (value ?? '').trim().toLowerCase();
+const fold = (value: string | null | undefined): string => caseFold(value);
 
 /**
  * The ships to offer for a leg whose carrier reads `carrier`.

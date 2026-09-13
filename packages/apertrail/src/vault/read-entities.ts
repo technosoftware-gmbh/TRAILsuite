@@ -26,6 +26,7 @@ import {
   wikilinkTarget,
   wikilinkTargets,
   type VaultNote,
+  caseFold,
 } from '@technosoftware/trail-core';
 import {
   TRAVEL_PLACE_FOLDER_SETTING,
@@ -111,7 +112,7 @@ function travelNotesInFolders(
  */
 function readBool(value: unknown): boolean {
   if (typeof value === 'boolean') return value;
-  if (typeof value === 'string') return value.trim().toLowerCase() === 'true';
+  if (typeof value === 'string') return caseFold(value) === 'true';
   return false;
 }
 

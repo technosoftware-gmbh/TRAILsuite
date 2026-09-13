@@ -11,6 +11,7 @@
  * String-to-string transforms, so whichever host hands them a file's contents
  * gets the same answer.
  */
+import { caseFold } from '../text/case-fold.js';
 
 /** Any heading, which is what ends a section. */
 const HEADING = /^(#{1,6})\s+(.+)/;
@@ -31,19 +32,12 @@ function headingName(heading: string): string {
 }
 
 function findHeadingLine(lines: string[], name: string): number {
-  const target = name.trim().toLowerCase();
+  const target = caseFold(name);
   if (!target) return -1;
 
   for (let i = 0; i < lines.length; i++) {
     const match = HEADING.exec(lines[i] ?? '');
-    if (
-      match &&
-      (match[2] ?? '')
-        .replace(/\s+#+$/, '')
-        .trim()
-        .toLowerCase() === target
-    )
-      return i;
+    if (match && caseFold((match[2] ?? '').replace(/\s+#+$/, '')) === target) return i;
   }
   return -1;
 }
@@ -61,7 +55,7 @@ function findHeadingLine(lines: string[], name: string): number {
  * delete the group heading somebody typed.
  */
 export function sectionSource(contents: string, heading: string): string {
-  const target = heading.trim().toLowerCase();
+  const target = caseFold(heading);
   if (!target) return '';
 
   const lines = contents.slice(bodyStart(contents)).split('\n');
@@ -70,13 +64,7 @@ export function sectionSource(contents: string, heading: string): string {
   let level = 0;
   for (let i = 0; i < lines.length; i++) {
     const match = HEADING.exec(lines[i] ?? '');
-    if (
-      match &&
-      (match[2] ?? '')
-        .replace(/\s+#+$/, '')
-        .trim()
-        .toLowerCase() === target
-    ) {
+    if (match && caseFold((match[2] ?? '').replace(/\s+#+$/, '')) === target) {
       start = i;
       level = (match[1] ?? '').length;
       break;

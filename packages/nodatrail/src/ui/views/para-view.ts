@@ -10,7 +10,7 @@
  * suggest otherwise.
  */
 import type { TFile } from 'obsidian';
-import { byUrgency } from '@technosoftware/trail-core';
+import { byUrgency, caseFold } from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import {
   byPriority,
@@ -252,7 +252,7 @@ export class ParaView extends NodaView {
     // What is still open for this project, which for a job that collects tasks
     // from several meetings is the only way to see it: the tasks themselves are
     // scattered across as many day notes as there were meetings.
-    const open = this.counts.get(project.title.trim().toLowerCase()) ?? 0;
+    const open = this.counts.get(caseFold(project.title)) ?? 0;
     if (open === 0) return;
 
     const shown = this.expanded.has(project.title);
@@ -333,9 +333,7 @@ export class ParaView extends NodaView {
     const goals = board.goals.filter(
       (goal) =>
         goal.note.areaTitle === null ||
-        !board.areas.some(
-          (area) => area.title.toLowerCase() === goal.note.areaTitle?.trim().toLowerCase()
-        )
+        !board.areas.some((area) => caseFold(area.title) === caseFold(goal.note.areaTitle))
     );
     if (goals.length === 0) return;
 

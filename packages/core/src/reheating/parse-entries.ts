@@ -15,6 +15,7 @@
  */
 import { matchAppliance } from './appliances.js';
 import type { ApplianceEntry, ReheatAppliance } from './types.js';
+import { caseFold } from '../text/case-fold.js';
 
 const LIST_MARKER = /^\s*(?:\d+\.|[-*+])\s+/;
 
@@ -148,7 +149,7 @@ export function parseApplianceEntry(
 
   const heading = block.heading.trim();
   const reserved = options.reserved ?? [];
-  if (reserved.some((name) => name.trim().toLowerCase() === heading.toLowerCase())) return null;
+  if (reserved.some((name) => caseFold(name) === caseFold(heading))) return null;
 
   const fields = options.fields ?? DEFAULT_REHEAT_FIELDS;
 

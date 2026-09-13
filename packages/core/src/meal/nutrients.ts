@@ -46,6 +46,7 @@
  * `nutrition.ts`, where the mistake is known to be a mistake. Read plainly, in
  * any other context, `Sodium` means sodium.
  */
+import { caseFold } from '../text/case-fold.js';
 
 /** The macronutrients a declaration carries, in Regulation (EU) 1169/2011 order. */
 export const MACRONUTRIENT_IDS = [
@@ -263,7 +264,7 @@ export const NUTRIENT_ORDER: readonly KnownNutrientId[] = [
  * of which caller it was rather than a thing a note meant.
  */
 function normalize(value: string): string {
-  return value.trim().replace(/\s+/g, ' ').replace(/:$/, '').trim().toLowerCase();
+  return caseFold(value.trim().replace(/\s+/g, ' ').replace(/:$/, ''));
 }
 
 /**

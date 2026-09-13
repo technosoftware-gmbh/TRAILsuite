@@ -13,6 +13,7 @@
  *
  * App-free.
  */
+import { caseFold } from '../text/case-fold.js';
 
 /** A non-empty trimmed string, or null. */
 export function readString(value: unknown): string | null {
@@ -53,7 +54,7 @@ export function readBooleanLike(value: unknown): boolean | null {
   if (typeof value === 'boolean') return value;
 
   if (typeof value === 'string') {
-    const normalized = value.trim().toLowerCase();
+    const normalized = caseFold(value);
     if (['true', 'yes', 'y', '1'].includes(normalized)) return true;
     if (['false', 'no', 'n', '0'].includes(normalized)) return false;
   }
@@ -148,14 +149,14 @@ export function findValue(
 
   const byLowerName = new Map<string, string>();
   for (const key of Object.keys(frontmatter)) {
-    const lower = key.toLowerCase();
+    const lower = caseFold(key);
     if (!byLowerName.has(lower)) byLowerName.set(lower, key);
   }
 
   for (const name of names) {
     if (!name) continue;
 
-    const key = byLowerName.get(name.trim().toLowerCase());
+    const key = byLowerName.get(caseFold(name));
     if (key === undefined) continue;
 
     const value = frontmatter[key];

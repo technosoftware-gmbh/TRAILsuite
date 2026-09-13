@@ -20,6 +20,34 @@ what counts as a breaking change:
 
 ## [Unreleased]
 
+### Added
+
+- **`caseFold()`**, the one fold a name goes through before it is compared:
+  composed, trimmed and lower-cased, in that order. It exists because macOS
+  writes an umlaut two ways and the two spellings compare unequal, which made a
+  file name and a title pasted into frontmatter the pair that disagree. On an
+  ASCII value it is `trim().toLowerCase()` to the letter, which is what makes it
+  safe to reach for everywhere rather than only where an umlaut is expected.
+
+### Fixed
+
+- **`indexByTitle()` and `resolveByTitle()` now resolve a link whose target is
+  spelled differently from the file name it points at**, which is the bug the
+  fold was written for. In a vault of 1866 notes, 40 meal notes had a decomposed
+  file name and every plan entry naming one of them resolved to nothing: the
+  index was keyed on the basename and looked up with the frontmatter's text. The
+  symptom was a row rendered without its picture or its nutrients, which looks
+  exactly like a meal note nobody ever wrote. **This changes what these two
+  functions match**, and is a fix rather than a breaking change because the
+  titles they now match are the ones Obsidian itself has always treated as one
+  note.
+- **`titlesMatch()`**, and every other name comparison in the package, fold the
+  same way: `crm` roles and tags, `frontmatter`'s property-name lookup (both
+  sides of it, which previously disagreed), `meal` headings and nutrient labels,
+  `plan` weekday headings, `reheating` appliance names and headings, `markdown`
+  callout kinds and section headings, `delivery` and `fulfilment` item names, and
+  `calendar`'s event matching.
+
 ## [2.0.0] - 2026-09-12
 
 ### Added

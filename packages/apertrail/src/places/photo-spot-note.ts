@@ -26,7 +26,7 @@
  *    like a deletion.
  */
 
-import { readString } from '@technosoftware/trail-core';
+import { caseFold, readString } from '@technosoftware/trail-core';
 import { APERtrailSettings } from '../settings/types';
 
 /**
@@ -424,7 +424,7 @@ export function photoSpotManagedKeys(p: PhotoSpotPropertyNames): string[] {
 
 function readBool(raw: unknown): boolean {
   if (typeof raw === 'boolean') return raw;
-  if (typeof raw === 'string') return raw.trim().toLowerCase() === 'true';
+  if (typeof raw === 'string') return caseFold(raw) === 'true';
   return false;
 }
 

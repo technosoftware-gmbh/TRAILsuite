@@ -25,6 +25,7 @@ import { APERtrailSettings } from '../../settings/types';
 import { readTravelBoard } from '../../vault/read-entities';
 import { photoSpotView } from '../photo-spot-view';
 import {
+  caseFold,
   formatDayTitle,
   parseGeoPoint,
   SUN_ELEVATIONS,
@@ -540,7 +541,7 @@ class PhotoSpotRenderer extends MarkdownRenderChild {
     if (motif.gear.length > 0) {
       const chips = card.createDiv({ cls: 'apt-chips apt-photo-spot-gear' });
       for (const item of motif.gear) {
-        renderChip(chips, gearLabel(item), GEAR_ICONS[item.trim().toLowerCase()] ?? 'package');
+        renderChip(chips, gearLabel(item), GEAR_ICONS[caseFold(item)] ?? 'package');
       }
     }
 

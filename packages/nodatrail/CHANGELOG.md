@@ -16,6 +16,17 @@ note carries is not an error. See
 
 ## [Unreleased]
 
+### Fixed
+
+- **An area, goal, project or company whose title carries an umlaut now matches
+  the notes that name it**, whichever way the two sides happen to be normalized.
+  macOS writes an umlaut two ways and the two spellings compare unequal, so a
+  file name and a title pasted into frontmatter were the pair that disagreed.
+  Every title comparison now goes through `trail-core`'s `caseFold()`: the PARA
+  board's goal and area matching, the orphan check, the project task counts, the
+  finance blocks and the project search, whose haystack was lowered without being
+  composed while its needle now is.
+
 ### Added
 
 - **A day entry can run over several days.** A fifth kind in the capture

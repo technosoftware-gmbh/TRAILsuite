@@ -13,6 +13,7 @@
  */
 import { App, MarkdownPostProcessorContext, TFile } from 'obsidian';
 import type { NODAtrailSettings } from '../../settings/types';
+import { caseFold } from '@technosoftware/trail-core';
 
 export interface BlockDeps {
   app: App;
@@ -30,7 +31,7 @@ export function blockArgs(source: string): Map<string, string> {
     const separator = line.indexOf(':');
     if (separator === -1) continue;
 
-    const key = line.slice(0, separator).trim().toLowerCase();
+    const key = caseFold(line.slice(0, separator));
     const value = line.slice(separator + 1).trim();
     if (key) args.set(key, value);
   }

@@ -22,6 +22,7 @@ import { isoWeekOf, startOfWeekTitle } from '../dates/iso-week.js';
 import { parseDayTitle } from '../dates/day.js';
 import { splitSections } from '../markdown/sections.js';
 import { parsePlanLine, renderPlanLine, type PlanEntry } from './line.js';
+import { caseFold } from '../text/case-fold.js';
 
 /** English weekday headings, Monday first, as the notes write them. */
 export const WEEKDAYS = [
@@ -51,7 +52,7 @@ export const QUEUE_HEADING = 'Meal Plan Queue';
 const QUEUE_ALIASES = ['meal plan queue', 'queue', 'unscheduled'];
 
 export function isQueueHeading(heading: string): boolean {
-  return QUEUE_ALIASES.includes(heading.trim().toLowerCase());
+  return QUEUE_ALIASES.includes(caseFold(heading));
 }
 
 /**
@@ -71,7 +72,7 @@ export function slotHeading(slot: PlanSlot): string {
 
 /** The slot a heading names, or null when it names neither. */
 export function slotOfHeading(heading: string): PlanSlot | null {
-  const trimmed = heading.trim().toLowerCase();
+  const trimmed = caseFold(heading);
   if (isQueueHeading(trimmed)) return 'queue';
 
   return WEEKDAYS.find((day) => day.toLowerCase() === trimmed) ?? null;
@@ -327,9 +328,7 @@ export function readPlanNote(body: string, week: string): ReadEntry[] {
 
   const out: ReadEntry[] = [];
   for (const section of splitSections(body).sections) {
-    const index = WEEKDAYS.findIndex(
-      (day) => day.toLowerCase() === section.heading.trim().toLowerCase()
-    );
+    const index = WEEKDAYS.findIndex((day) => caseFold(day) === caseFold(section.heading));
     if (index === -1) continue;
 
     const date = dates[index];

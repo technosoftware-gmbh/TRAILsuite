@@ -27,6 +27,7 @@
  * which is the other entity format that carries a list of maps.
  */
 import {
+  caseFold,
   readNumberLike,
   readString,
   readTextLines,
@@ -271,19 +272,20 @@ export function vehicleToInput(vehicle: ParsedVehicle): VehicleInput {
 /**
  * What a cabin of this name includes, according to the vehicle.
  *
- * Matched on the name after trimming and case-folding, because the name is
- * typed twice -- once in the ship's catalogue and once on the leg that books
- * it -- and "Polar Aussenkabine" and "polar aussenkabine" are the same cabin
- * to everybody except a comparison. Null when the vehicle says nothing about
+ * Matched on the folded name, because the name is typed twice -- once in the
+ * ship's catalogue and once on the leg that books it -- and "Polar Aussenkabine"
+ * and "polar aussenkabine" are the same cabin to everybody except a comparison.
+ * The fold composes as well as lowers, which matters here more than anywhere:
+ * a category is pasted off an operator's page onto the leg and typed by hand
+ * into the ship's dialog, so the two sides reach this function from the two
+ * places that spell an umlaut differently. Null when the vehicle says nothing about
  * it, which includes the ordinary case of a leg with no vehicle at all.
  */
 export function cabinDescription(
   vehicle: Pick<ParsedVehicle, 'cabins'> | null,
   name: string | null
 ): string | null {
-  const wanted = name?.trim().toLowerCase();
+  const wanted = caseFold(name);
   if (!vehicle || !wanted) return null;
-  return (
-    vehicle.cabins.find((cabin) => cabin.name.trim().toLowerCase() === wanted)?.description ?? null
-  );
+  return vehicle.cabins.find((cabin) => caseFold(cabin.name) === wanted)?.description ?? null;
 }

@@ -14,6 +14,7 @@
  */
 import { DEFAULT_REHEAT_FIELDS, type ReheatFieldNames } from './parse-entries.js';
 import type { ApplianceEntry } from './types.js';
+import { caseFold } from '../text/case-fold.js';
 
 export interface RenderReheatOptions {
   /** The section heading, as this vault spells it. `Reheating` by default. */
@@ -97,12 +98,12 @@ export function findSection(
   heading: string
 ): { start: number; end: number; level: number } | null {
   const lines = body.split('\n');
-  const wanted = heading.trim().toLowerCase();
+  const wanted = caseFold(heading);
   if (!wanted) return null;
 
   for (let index = 0; index < lines.length; index++) {
     const match = HEADING_LINE.exec(lines[index] ?? '');
-    if (!match || (match[2] ?? '').trim().toLowerCase() !== wanted) continue;
+    if (!match || caseFold(match[2]) !== wanted) continue;
 
     const level = (match[1] ?? '#').length;
 

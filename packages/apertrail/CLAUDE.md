@@ -123,6 +123,10 @@ These are deliberate and worth not undoing by accident:
 - **No em dashes** in comments, docs, or any user-facing text shipped as
   part of the plugin (source comments, README, in-app strings, and
   similar). This working-notes file is exempt since it isn't shipped.
+- **A name is compared through `trail-core`'s `caseFold()`**, never through
+  `trim().toLowerCase()` and never through a bare `toLowerCase()` on a title.
+  macOS writes an umlaut two ways, so a file name and a title somebody pasted are
+  the two sides that disagree. `tests/name-fold.test.ts` at the root enforces it.
 - **Frontmatter access goes through typed helpers, never raw casts.**
   `cache?.frontmatter` is `any` -- always route through
   `shared/vault-host.ts`'s `frontmatterOf()` and then `trail-core`'s

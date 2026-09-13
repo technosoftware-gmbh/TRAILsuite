@@ -27,6 +27,7 @@ import { countsInPlan, lineFigure, VariedLine } from './line-variants';
 import { lineCost, LineCost, lineTravellers } from './line-cost';
 import { ParsedTripLeg, ParsedTripNight, ParsedTripStop } from '../trip-note';
 import { plannedByCategory, plannedTotal } from './planned-total';
+import { caseFold } from '@technosoftware/trail-core';
 
 /** The three words the labels supply, kept out of here so this file never learns what language it is in. */
 export interface EstimateLabelWords {
@@ -72,7 +73,7 @@ export interface ItemEstimate {
   optional: boolean;
 }
 
-const key = (value: string | null): string => (value ?? '').trim().toLowerCase();
+const key = (value: string | null): string => caseFold(value);
 
 /**
  * Where a leg goes: "Zürich to Pretoria", or the one end it names, or null.

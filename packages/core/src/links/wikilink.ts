@@ -22,6 +22,7 @@
  *
  * App-free.
  */
+import { caseFold } from '../text/case-fold.js';
 
 /** `[[Target]]` or `[[Target|Alias]]`, anchored so a value has to BE a link rather than merely contain one. */
 const WIKILINK = /^!?\[\[([^\]|]+)(?:\|[^\]]*)?\]\]$/;
@@ -197,8 +198,14 @@ export function formatWikilink(title: string): string {
   return `"${wikilinkValue(title)}"`;
 }
 
-/** True when two note titles refer to the same note. Case-insensitive, because Obsidian's own link resolution is. */
+/**
+ * True when two note titles refer to the same note.
+ *
+ * Case-insensitive, because Obsidian's own link resolution is, and composed
+ * first, because one of the two titles is usually a file name and the other is
+ * usually text somebody pasted. See `caseFold`.
+ */
 export function titlesMatch(a: string | null | undefined, b: string | null | undefined): boolean {
   if (!a || !b) return false;
-  return a.trim().toLowerCase() === b.trim().toLowerCase();
+  return caseFold(a) === caseFold(b);
 }

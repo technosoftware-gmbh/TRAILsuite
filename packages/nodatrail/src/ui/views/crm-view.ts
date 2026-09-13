@@ -18,6 +18,7 @@ import { readCrmBoard, type CrmRecord } from '../../crm/read-crm-board';
 import { card, emptyState, section, stat, statRow, tabs, type CardField } from '../kit/elements';
 import { NodaView } from './base-view';
 import { CRM_VIEW_TYPE } from './view-types';
+import { caseFold } from '@technosoftware/trail-core';
 
 const TABS = ['persons', 'companies'] as const;
 type Tab = (typeof TABS)[number];
@@ -132,7 +133,7 @@ export class CrmView extends NodaView {
 
   /** Name, roles and every contact field, because that is what a CRM card is for. */
   private matches(record: CrmRecord): boolean {
-    const query = this.query.trim().toLowerCase();
+    const query = caseFold(this.query);
     if (!query) return true;
 
     return [

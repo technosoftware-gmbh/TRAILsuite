@@ -27,6 +27,7 @@
  *
  * App-free: it is given the names it may choose from.
  */
+import { caseFold } from '@technosoftware/trail-core';
 
 /**
  * The stem of the file a project should fall back to, or null.
@@ -45,17 +46,17 @@ export function defaultImageStem(
   stems: readonly string[],
   word: string
 ): string | null {
-  const suffix = word.trim().toLowerCase();
+  const suffix = caseFold(word);
   if (!suffix) return null;
 
-  const name = title.trim().toLowerCase();
+  const name = caseFold(title);
   if (!name) return null;
 
   let best: string | null = null;
   let bestPrefix = -1;
 
   for (const stem of stems) {
-    const lower = stem.trim().toLowerCase();
+    const lower = caseFold(stem);
     if (!lower.endsWith(suffix)) continue;
 
     const prefix = lower.slice(0, lower.length - suffix.length);

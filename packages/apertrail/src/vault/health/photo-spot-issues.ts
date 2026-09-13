@@ -16,7 +16,7 @@
  * as everywhere else.
  */
 import { App, TFile } from 'obsidian';
-import { GeoPoint, parseGeoPoint } from '@technosoftware/trail-core';
+import { caseFold, GeoPoint, parseGeoPoint } from '@technosoftware/trail-core';
 import { APERtrailSettings } from '../../settings/types';
 import { ParsedPhotoSpot } from '../../places/photo-spot-note';
 import { readTravelBoard } from '../read-entities';
@@ -53,7 +53,7 @@ export function photoSpotWarnings(spot: ParsedPhotoSpot): PhotoSpotWarning[] {
   // trim and the case fold. A stricter copy here would warn about samples
   // the block has already put under their motif, which is the health-check
   // failure mode the codebase works hardest to avoid.
-  const key = (name: string | null): string => (name ?? '').trim().toLowerCase();
+  const key = (name: string | null): string => caseFold(name);
   const known = new Set(spot.motifs.map((motif) => key(motif.name)).filter((name) => name !== ''));
 
   for (const sample of spot.samples) {

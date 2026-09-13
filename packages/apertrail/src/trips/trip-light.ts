@@ -10,7 +10,7 @@
  *
  * See docs/design/photo-spots.md §6.
  */
-import { distanceKm, GeoPoint, parseGeoPoint } from '@technosoftware/trail-core';
+import { caseFold, distanceKm, GeoPoint, parseGeoPoint } from '@technosoftware/trail-core';
 import { lightWindowRange } from '../places/solar';
 import {
   ParsedPhotoSpot,
@@ -63,7 +63,7 @@ export function stopMotif(
   spot: ParsedPhotoSpot,
   motifName: string | null
 ): ParsedPhotoSpotMotif | null {
-  const key = (value: string | null): string => (value ?? '').trim().toLowerCase();
+  const key = (value: string | null): string => caseFold(value);
   if (key(motifName) !== '') {
     const named = spot.motifs.find((motif) => key(motif.name) === key(motifName));
     if (named) return named;
