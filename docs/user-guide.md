@@ -714,6 +714,21 @@ windows, and check the sun panel for the date you will be there. When adding a
 photo spot to a trip's itinerary, the times offered are the golden and blue
 hours for that day at those coordinates.
 
+**Something that lasts several days.** Pick `Mehrere Tage` as the kind in the
+capture dialog and fill in a last day, and the same line is written into every
+day note from the first to the last, creating the ones that are not there yet. A
+fortnight's holiday is a line on each of its fourteen days, which is what makes
+the week show it on the days it covers. A note and an idea take a last day too;
+a task carries its own due date and a meeting carries a clock, so neither does.
+
+Opening one of those lines afterwards offers a choice: this day only, or the
+whole span. The dialog names the span in full -- the two dates and how many days
+-- because it works the range out by reading the neighbouring notes rather than
+from anything written down, and you should see what it decided before you change
+or delete it. If it says the span may run further, a day at one end says the
+same thing twice or says more than the dialog can write, and that day is left
+alone.
+
 **Importing a bank statement.** Export the period from your bank, open the
 Ledger and choose `Auszug importieren`. Nothing is written until you press the
 button: every row is shown first, with the account it would be booked to, and

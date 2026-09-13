@@ -100,6 +100,7 @@ second heading beside the first.
 | `dayMeetingDeclinedMarker` | `'🚫'` |
 | `dayNoteMarker` | `'📝'` |
 | `dayIdeaMarker` | `'💡'` |
+| `daySpanMarker` | `'🏖️'` |
 | `weekWorkdaysOnly` | `false` |
 | `weekLunchStart` | `'12:00'` |
 | `weekLunchEnd` | `'13:00'` |

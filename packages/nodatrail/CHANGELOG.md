@@ -16,6 +16,22 @@ note carries is not an error. See
 
 ## [Unreleased]
 
+### Added
+
+- **A day entry can run over several days.** A fifth kind in the capture
+  dialog, `Mehrere Tage`, with a last-day field; note and idea take one too.
+  The same line is written into every day note in the range, the missing notes
+  are created, and a day that already says it is left alone.
+- `daySpanMarker`, default `🏖️`. Its own marker rather than the meeting's,
+  because a fortnight of `👥` reads as fourteen appointments. It files under the
+  schedule with the meetings all the same: a fortnight away is the reason
+  nothing else is in those days.
+- Editing or deleting one of those lines offers this day or the whole span. The
+  span is worked out by reading the neighbouring notes -- nothing marks these
+  lines as belonging together, which is what keeps a typed line and an imported
+  one the same thing -- and the dialog names the range in full before it acts.
+  Where the walk stopped for a reason other than the span ending, it says so.
+
 ### Changed
 
 - **A kept import file now lives in `_imports`, not in `_documents`.** Both the

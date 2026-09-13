@@ -172,6 +172,7 @@ export const enTranslations = {
     kinds: {
       task: 'Task',
       meeting: 'Meeting',
+      span: 'Several days',
       note: 'Note',
       idea: 'Idea',
     },
@@ -179,6 +180,20 @@ export const enTranslations = {
     context: 'Project or area',
     from: 'From',
     until: 'Until',
+    lastDay: 'Last day',
+    lastDayHint:
+      'Leave blank for one day. With a last day, the same line is written into every day note from the date above to that one, and the notes that do not exist yet are created.',
+    spanWrote: 'Written into {count} day notes.',
+    spanNothing: 'Every one of those days already says this. Nothing written.',
+    spanScope: 'Applies to',
+    spanScopeDay: 'This day only',
+    spanScopeAll: 'The whole span, {from} to {to} ({count} days)',
+    spanBroken:
+      'Not the whole span: {count} of those days say this twice, or say it differently. Those days are left alone.',
+    spanChanged: 'Changed on {count} days.',
+    spanDeleted: 'Removed from {count} days.',
+    spanRefused: 'Left as they were, because those notes changed since this was opened: {days}',
+    lastDayBefore: 'The last day is before the first.',
     attendance: {
       label: 'Attending',
       going: 'Yes',
@@ -882,6 +897,7 @@ export const enTranslations = {
         'An imported invitation is written with the marker for what you answered. Clear one to write those like any other meeting.',
       noteMarker: 'Marker for a note',
       ideaMarker: 'Marker for an idea',
+      spanMarker: 'Marker for several days',
       markerDesc:
         'A task needs no marker: it is a checkbox in the Tasks plugin format. Blank writes a plain bullet.',
     },

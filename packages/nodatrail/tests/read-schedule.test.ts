@@ -22,7 +22,7 @@
 import { describe, expect, it } from 'vitest';
 import { parseScheduleLine } from '../src/plan/read-schedule';
 
-const MARKERS = { accepted: '👥', tentative: '❓', unanswered: '✉️', declined: '🚫' };
+const MARKERS = { accepted: '👥', tentative: '❓', unanswered: '✉️', declined: '🚫', span: '🏖️' };
 
 const parse = (line: string, marker = '👥') =>
   parseScheduleLine(line, { ...MARKERS, accepted: marker });
@@ -30,6 +30,7 @@ const parse = (line: string, marker = '👥') =>
 describe('a line the dialog wrote', () => {
   it('reads a span', () => {
     expect(parse('- 👥 11:00-12:00 PMQ')).toEqual({
+      kind: 'meeting',
       attendance: '',
       from: '11:00',
       to: '12:00',
@@ -52,6 +53,7 @@ describe('a line the dialog wrote', () => {
 
   it('takes the wikilink off the text and keeps it as a link', () => {
     expect(parse('- 👥 10:00 Sync [[Kampagne Herbst]]')).toEqual({
+      kind: 'meeting',
       attendance: '',
       from: '10:00',
       to: '',
@@ -138,7 +140,7 @@ describe('what was answered', () => {
     // Two markers can share a prefix -- an emoji and the same emoji with a
     // variation selector differ only in the tail -- and stripping the shorter
     // would leave the difference sitting at the front of the text.
-    const markers = { accepted: '👥', tentative: '👥❓', unanswered: '', declined: '' };
+    const markers = { accepted: '👥', tentative: '👥❓', unanswered: '', declined: '', span: '' };
     expect(parseScheduleLine('- 👥❓ 09:00 Standup', markers)).toMatchObject({
       attendance: 'tentative',
       text: 'Standup',
@@ -152,7 +154,7 @@ describe('what was answered', () => {
   it('ignores a marker a vault has cleared', () => {
     // Blank means "do not distinguish these", and a blank marker matching
     // every line would read the whole day as declined.
-    const markers = { accepted: '👥', tentative: '', unanswered: '', declined: '' };
+    const markers = { accepted: '👥', tentative: '', unanswered: '', declined: '', span: '' };
     expect(parseScheduleLine('- 👥 09:00 Standup', markers)?.attendance).toBe('');
     expect(parseScheduleLine('- 09:00 Standup', markers)?.attendance).toBe('');
   });

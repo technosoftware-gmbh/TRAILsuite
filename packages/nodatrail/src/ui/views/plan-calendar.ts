@@ -124,7 +124,7 @@ function summaryOf(counts: DayCounts | undefined): string {
  *
  * **Three ways it declines, and all three open the note instead.** The view has
  * no editor to open (a block embedded in a note); the line cannot be told apart
- * from another on the same day, or is not a meeting at all -- see
+ * from another on the same day, or is not a schedule entry at all -- see
  * `findDayEntry`; or the line says something the dialog has no field for, in
  * which case rewriting it would quietly drop what the dialog cannot hold. That
  * last rule is the day view's, and it does not get weaker for being reached
@@ -455,6 +455,7 @@ export function meetingRowOf(
 ): { entry: ScheduleEntry; note: string; band: Band | null } {
   return {
     entry: {
+      kind: record.kind === 'span' ? 'span' : 'meeting',
       attendance: record.draft.attendance,
       from: record.draft.startTime,
       to: record.draft.endTime,

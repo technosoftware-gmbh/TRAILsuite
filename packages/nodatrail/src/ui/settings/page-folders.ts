@@ -316,7 +316,8 @@ export function renderFolderPage(containerEl: HTMLElement, deps: FolderPageDeps)
       | 'dayMeetingUnansweredMarker'
       | 'dayMeetingDeclinedMarker'
       | 'dayNoteMarker'
-      | 'dayIdeaMarker',
+      | 'dayIdeaMarker'
+      | 'daySpanMarker',
     name: string
   ) => {
     textRow(
@@ -335,6 +336,7 @@ export function renderFolderPage(containerEl: HTMLElement, deps: FolderPageDeps)
   markerRow('dayMeetingDeclinedMarker', t('settings.day.declinedMarker'));
   markerRow('dayNoteMarker', t('settings.day.noteMarker'));
   markerRow('dayIdeaMarker', t('settings.day.ideaMarker'));
+  markerRow('daySpanMarker', t('settings.day.spanMarker'));
   noteLine(day, t('settings.day.markerDesc'));
   noteLine(day, t('settings.day.attendanceDesc'));
 

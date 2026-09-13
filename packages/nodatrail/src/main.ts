@@ -219,7 +219,7 @@ export default class NODAtrailPlugin extends Plugin {
       openAddToDay: (target) => this.openAddToDay(target),
       openImportCalendar: () => this.openImportCalendar(),
       openEditDayEntry: (file, entry, onDone) =>
-        new AddToDayModal(this.dayDeps(), { file, entry, onDone }).open(),
+        void new AddToDayModal(this.dayDeps(), { file, entry, onDone }).openLoaded(),
     };
   }
 
@@ -668,7 +668,7 @@ export default class NODAtrailPlugin extends Plugin {
 
   /** The capture dialog, over the period a view was showing or over today. */
   private openAddToDay(target?: CaptureTarget): void {
-    new AddToDayModal(this.dayDeps(), undefined, target).open();
+    void new AddToDayModal(this.dayDeps(), undefined, target).openLoaded();
   }
 
   /**

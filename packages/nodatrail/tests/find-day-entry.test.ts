@@ -76,6 +76,40 @@ describe('findDayEntry', () => {
     expect(found?.draft.startTime).toBe('16:00');
   });
 
+  it('does not hand back a span when a meeting was asked for', async () => {
+    // Both are untimed and they share the section, so a holiday and an all-day
+    // meeting of the same name are one line to a match on time and text alone.
+    // The importer passes no kind and must never be given the span it did not
+    // write.
+    const app = noteOf('- 🏖️ Ferien', '- 👥 Ferien');
+    const found = await findDayEntry(app, DEFAULT_SETTINGS, FILE, want('', '', 'Ferien'));
+    expect(found?.kind).toBe('meeting');
+  });
+
+  it('hands back the span when the span was asked for', async () => {
+    const app = noteOf('- 🏖️ Ferien', '- 👥 Ferien');
+    const found = await findDayEntry(app, DEFAULT_SETTINGS, FILE, {
+      ...want('', '', 'Ferien'),
+      kind: 'span',
+    });
+    expect(found?.kind).toBe('span');
+  });
+
+  it('does not give a span the lines indented under it', async () => {
+    // Those children belong to whatever comes next. Swallowing them into a
+    // span that happened to sit above would take them out of the note the
+    // moment the span was edited.
+    const app = noteOf('- 🏖️ Ferien', '- 👥 09:00 Standup', '    - 📝 Budget besprochen');
+    const found = await findDayEntry(app, DEFAULT_SETTINGS, FILE, {
+      ...want('', '', 'Ferien'),
+      kind: 'span',
+    });
+    expect(found?.to).toBe((found?.from ?? 0) + 1);
+    expect(
+      (await findDayEntry(app, DEFAULT_SETTINGS, FILE, want('09:00', '', 'Standup')))?.draft.notes
+    ).toBe('Budget besprochen');
+  });
+
   it('does not match a note indented under a meeting', async () => {
     // The week lists these as entries of their own; the editor does not have
     // them at all. Counting to the nth entry would be off by one from here on.

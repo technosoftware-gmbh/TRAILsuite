@@ -295,9 +295,9 @@ describe('what was answered', () => {
     const line = (held[path('2026-09-14')] ?? '').split('\n').find((one) => one.startsWith('- 🚫'));
     expect(line).toBe('- 🚫 09:00-09:30 Standup');
 
-    const { meetingMarkers } = await import('../src/plan/read-schedule');
+    const { scheduleMarkers } = await import('../src/plan/read-schedule');
     const { parseScheduleLine } = await import('../src/plan/read-schedule');
-    const parsed = parseScheduleLine(line ?? '', meetingMarkers(DEFAULT_SETTINGS));
+    const parsed = parseScheduleLine(line ?? '', scheduleMarkers(DEFAULT_SETTINGS));
     expect(parsed).toMatchObject({ attendance: 'declined', text: 'Standup', from: '09:00' });
   });
 });

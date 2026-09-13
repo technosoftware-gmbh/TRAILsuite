@@ -270,6 +270,16 @@ export interface NODAtrailSettings {
   dayMeetingDeclinedMarker: string;
   dayNoteMarker: string;
   dayIdeaMarker: string;
+  /**
+   * What marks a line that runs over several days: a holiday, a course, a
+   * fortnight away.
+   *
+   * Its own marker rather than the meeting's, because a fortnight of `👥` reads
+   * as fourteen appointments. Blank switches the distinction off and a span
+   * becomes an unmarked line under the schedule, which is the same degradation
+   * a blank `dayIdeaMarker` gives an idea.
+   */
+  daySpanMarker: string;
 
   // Display -------------------------------------------------------------
   homeCurrency: string;

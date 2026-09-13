@@ -19,8 +19,31 @@ import { tAll } from '../lang/I18nManager';
 import type { NODAtrailSettings } from '../settings/types';
 import type { Attendance } from './read-schedule';
 
-export const DAY_ENTRY_KINDS = ['task', 'meeting', 'note', 'idea'] as const;
+export const DAY_ENTRY_KINDS = ['task', 'meeting', 'span', 'note', 'idea'] as const;
 export type DayEntryKind = (typeof DAY_ENTRY_KINDS)[number];
+
+/**
+ * The kinds a dialog may write over a range of days rather than into one note.
+ *
+ * **A span is still one line in one day's note, N times over.** There is no
+ * multi-day entry in the format and this does not add one: §E.3 of
+ * `calendar-import.md` settled that, and the calendar import already expands a
+ * holiday into one untimed line per day for the only reason that matters -- it
+ * is the only shape under which the week view shows the holiday on the days it
+ * covers. What is new is that a person can write one without an `.ics`.
+ *
+ * **A task is not here, and neither is a meeting.** A task carries `due`, which
+ * is a day by construction; a meeting carries a clock, and a meeting that ran
+ * for a fortnight is not a meeting. The three that remain are the three whose
+ * line says nothing about time at all, which is what makes repeating it over a
+ * range honest rather than a claim about each day.
+ */
+export const SPANNING_KINDS: readonly DayEntryKind[] = ['span', 'note', 'idea'];
+
+/** Whether this kind may be written over a range of days. */
+export function spans(kind: DayEntryKind): boolean {
+  return SPANNING_KINDS.includes(kind);
+}
 
 /** What the dialog collected. Everything past `kind` and `text` is optional per kind. */
 export interface DayEntryDraft {
@@ -139,15 +162,19 @@ export function copyDraft(draft: DayEntryDraft): DayEntryDraft {
  * setting in also finds the notes written before it was filled in.
  */
 export function headingsFor(settings: NODAtrailSettings, kind: DayEntryKind): string[] {
+  // A span files under the schedule with the meetings, not with the thoughts.
+  // A fortnight away is the reason nothing else is in those days, which is the
+  // question the schedule answers and the notes section does not.
+  const scheduled = kind === 'meeting' || kind === 'span';
   const configured = (
     kind === 'task'
       ? settings.dayFocusHeading
-      : kind === 'meeting'
+      : scheduled
         ? settings.dayScheduleHeading
         : settings.dayNotesHeading
   ).trim();
 
-  const key = kind === 'task' ? 'focus' : kind === 'meeting' ? 'schedule' : 'notes';
+  const key = kind === 'task' ? 'focus' : scheduled ? 'schedule' : 'notes';
   const candidates = configured
     ? [configured, ...tAll(`day.headings.${key}`)]
     : tAll(`day.headings.${key}`);
@@ -325,7 +352,16 @@ export function entryLines(
     return lines;
   }
 
-  const marker = draft.kind === 'idea' ? settings.dayIdeaMarker : settings.dayNoteMarker;
+  // Three kinds, one shape, and the marker is the whole of the difference --
+  // the same arrangement `note` and `idea` have always had, with one more in
+  // it. A span carries no time: writing one would be claiming the holiday
+  // starts at nine.
+  const marker =
+    draft.kind === 'span'
+      ? settings.daySpanMarker
+      : draft.kind === 'idea'
+        ? settings.dayIdeaMarker
+        : settings.dayNoteMarker;
   return [markedLine(marker, [text, link])];
 }
 

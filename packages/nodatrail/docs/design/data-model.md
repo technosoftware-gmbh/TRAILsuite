@@ -211,7 +211,11 @@ between periods itself, so the block was obsolete; it was stripped from the 87
 notes that carried it, content untouched, and is no longer written.
 
 The body is the headings a day note is captured into -- Focus, Schedule,
-Thoughts -- plus whatever somebody types. Each is a setting, `dayFocusHeading`,
+Thoughts -- plus whatever somebody types. **A line that runs over several days
+is still one line in one day's note**, repeated: a holiday from the 13th to the
+26th is fourteen notes each carrying `- 🏖️ Ferien Sardinien`, and nothing in
+the format says they belong together. `day-notes.md` says why, and what
+recovers the span when one has to be changed or removed. Each is a setting, `dayFocusHeading`,
 `dayScheduleHeading` and `dayNotesHeading`, and each is blank as shipped: blank
 is not "no heading", it is "the heading this vault's language calls it". A
 heading is recognised in either language and written in the current one, so

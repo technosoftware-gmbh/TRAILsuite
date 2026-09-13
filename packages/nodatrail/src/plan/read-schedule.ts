@@ -28,25 +28,42 @@ import type { NODAtrailSettings } from '../settings/types';
  */
 export type Attendance = '' | 'tentative' | 'unanswered' | 'declined';
 
-/** The marker each answer is written with. Blank switches a distinction off. */
-export interface MeetingMarkers {
+/**
+ * The markers a line under the schedule heading may carry. Blank switches a
+ * distinction off.
+ *
+ * **Four say what was answered; the fifth says this is not an appointment at
+ * all.** A span runs over days rather than hours, so it has no answer to give
+ * and is not one of the four -- keeping it in the same object only because a
+ * reader has to know all five to strip whichever it finds.
+ */
+export interface ScheduleMarkers {
   accepted: string;
   tentative: string;
   unanswered: string;
   declined: string;
+  span: string;
 }
 
-export function meetingMarkers(settings: NODAtrailSettings): MeetingMarkers {
+export function scheduleMarkers(settings: NODAtrailSettings): ScheduleMarkers {
   return {
     accepted: settings.dayMeetingMarker,
     tentative: settings.dayMeetingTentativeMarker,
     unanswered: settings.dayMeetingUnansweredMarker,
     declined: settings.dayMeetingDeclinedMarker,
+    span: settings.daySpanMarker,
   };
 }
 
 export interface ScheduleEntry {
-  /** What was answered, from the marker the line carries. */
+  /**
+   * Which of the two shapes the line is: an appointment, or a stretch of days.
+   *
+   * Read off the marker, which is the only thing that distinguishes them -- a
+   * span is an untimed line and so is a meeting nobody gave a time.
+   */
+  kind: 'meeting' | 'span';
+  /** What was answered, from the marker the line carries. Always empty for a span. */
   attendance: Attendance;
   /** `11:00`, or empty for an entry with no time. */
   from: string;
@@ -74,7 +91,7 @@ const WIKILINK = /\[\[([^\]]+)\]\]/g;
  * tasks, and `readTasks` already finds them; picking them up here as well would
  * show each one twice in the same view.
  */
-export function parseScheduleLine(line: string, markers: MeetingMarkers): ScheduleEntry | null {
+export function parseScheduleLine(line: string, markers: ScheduleMarkers): ScheduleEntry | null {
   const bullet = /^\s*[-*+]\s+(.*)$/.exec(line);
   if (!bullet) return null;
 
@@ -84,16 +101,19 @@ export function parseScheduleLine(line: string, markers: MeetingMarkers): Schedu
   // Longest marker first, so a setting that is a prefix of another cannot
   // swallow it: two markers of one emoji plus a variation selector differ only
   // in their tail, and stripping the shorter would leave the difference
-  // sitting in the text.
-  const found = (['declined', 'unanswered', 'tentative', 'accepted'] as const)
+  // sitting in the text. The span marker is in the same sort for the same
+  // reason, and it wins on its own length rather than by being tried first.
+  const found = (['span', 'declined', 'unanswered', 'tentative', 'accepted'] as const)
     .map((key) => ({ key, mark: markers[key].trim() }))
     .filter((one) => one.mark !== '' && rest.startsWith(one.mark))
     .sort((a, b) => b.mark.length - a.mark.length)[0];
 
   let attendance: Attendance = '';
+  let kind: ScheduleEntry['kind'] = 'meeting';
   if (found) {
     rest = rest.slice(found.mark.length).trim();
-    if (found.key !== 'accepted') attendance = found.key;
+    if (found.key === 'span') kind = 'span';
+    else if (found.key !== 'accepted') attendance = found.key;
   }
 
   const span = SPAN.exec(rest);
@@ -105,7 +125,13 @@ export function parseScheduleLine(line: string, markers: MeetingMarkers): Schedu
   const text = rest.replace(WIKILINK, '').replace(/\s+/g, ' ').trim();
 
   if (!text && links.length === 0) return null;
-  return { attendance, from, to, text, links };
+  // A span keeps no time even if the line carries one. Nothing this plugin
+  // writes puts a clock on a span, so a line with both is one somebody typed,
+  // and the round-trip guard in `read-day.ts` will refuse to edit it rather
+  // than this reader quietly deciding which half to believe.
+  return kind === 'span'
+    ? { kind, attendance: '', from: '', to: '', text, links }
+    : { kind, attendance, from, to, text, links };
 }
 
 /**
@@ -150,7 +176,7 @@ export async function readSchedule(
 
   const found: ScheduleEntry[] = [];
   for (const line of sectionLines(body, headings)) {
-    const entry = parseScheduleLine(line, meetingMarkers(settings));
+    const entry = parseScheduleLine(line, scheduleMarkers(settings));
     if (entry) found.push(entry);
   }
   return found;

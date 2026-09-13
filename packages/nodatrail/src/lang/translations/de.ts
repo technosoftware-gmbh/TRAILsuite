@@ -173,6 +173,7 @@ export const deTranslations: Translations = {
     kinds: {
       task: 'Aufgabe',
       meeting: 'Termin',
+      span: 'Mehrere Tage',
       note: 'Notiz',
       idea: 'Idee',
     },
@@ -180,6 +181,21 @@ export const deTranslations: Translations = {
     context: 'Projekt oder Bereich',
     from: 'Von',
     until: 'Bis',
+    lastDay: 'Letzter Tag',
+    lastDayHint:
+      'Leer lassen fuer einen einzelnen Tag. Mit einem letzten Tag wird dieselbe Zeile in jede Tagesnotiz vom Datum oben bis dorthin geschrieben, und die noch fehlenden Notizen werden angelegt.',
+    spanWrote: 'In {count} Tagesnotizen geschrieben.',
+    spanNothing: 'An jedem dieser Tage steht das bereits. Nichts geschrieben.',
+    spanScope: 'Gilt fuer',
+    spanScopeDay: 'Nur diesen Tag',
+    spanScopeAll: 'Den ganzen Zeitraum, {from} bis {to} ({count} Tage)',
+    spanBroken:
+      'Nicht der ganze Zeitraum: an {count} dieser Tage steht das zweimal oder anders. Diese Tage bleiben unveraendert.',
+    spanChanged: 'An {count} Tagen geaendert.',
+    spanDeleted: 'An {count} Tagen entfernt.',
+    spanRefused:
+      'Unveraendert geblieben, weil sich diese Notizen seit dem Oeffnen geaendert haben: {days}',
+    lastDayBefore: 'Der letzte Tag liegt vor dem ersten.',
     attendance: {
       label: 'Teilnahme',
       going: 'Ja',
@@ -899,6 +915,7 @@ export const deTranslations: Translations = {
         'Ein importierter Termin wird mit dem Zeichen fuer die eigene Antwort geschrieben. Leer lassen, um ihn wie jeden anderen zu schreiben.',
       noteMarker: 'Zeichen für eine Notiz',
       ideaMarker: 'Zeichen für eine Idee',
+      spanMarker: 'Zeichen für mehrere Tage',
       markerDesc:
         'Aufgaben brauchen kein Zeichen: sie sind Kontrollkästchen im Format des Tasks-Plugins. Leer lassen schreibt einen einfachen Aufzählungspunkt.',
     },

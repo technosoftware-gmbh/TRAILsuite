@@ -238,6 +238,43 @@ describe('a note and an idea', () => {
   });
 });
 
+describe('a span', () => {
+  it('carries its own marker and no time', () => {
+    // A fortnight away is not fourteen appointments, which is why it is not
+    // the meeting marker; and writing a clock on it would be claiming the
+    // holiday starts at nine.
+    expect(lines(SETTINGS, { kind: 'span', text: 'Ferien Sardinien' })).toEqual([
+      '- 🏖️ Ferien Sardinien',
+    ]);
+  });
+
+  it('goes under the schedule, with the meetings, not with the thoughts', () => {
+    // A fortnight away is the reason nothing else is in those days, which is
+    // the question the schedule answers.
+    expect(headingsFor(SETTINGS, 'span')).toEqual(headingsFor(SETTINGS, 'meeting'));
+    expect(headingsFor(SETTINGS, 'span')).not.toEqual(headingsFor(SETTINGS, 'note'));
+  });
+
+  it('takes the project the same way a note does', () => {
+    expect(lines(SETTINGS, { kind: 'span', text: 'Kurs', context: 'Weiterbildung' })).toEqual([
+      '- 🏖️ Kurs [[Weiterbildung]]',
+    ]);
+  });
+
+  it('writes a plain bullet when the marker setting is blank', () => {
+    const plain = { ...SETTINGS, daySpanMarker: '' };
+    expect(lines(plain, { kind: 'span', text: 'Ferien' })).toEqual(['- Ferien']);
+  });
+
+  it('is not dated, even though the writer is handed the day', () => {
+    // Only a task gets a date marker. A span already says which day it is by
+    // being in that day's note, fourteen times over.
+    expect(lines(SETTINGS, { kind: 'span', text: 'Ferien' }, '2026-07-13')).toEqual([
+      '- 🏖️ Ferien',
+    ]);
+  });
+});
+
 describe('what it refuses to write', () => {
   it('writes nothing at all for an entry with no text', () => {
     // An empty bullet in somebody's records is worse than a dialog that did

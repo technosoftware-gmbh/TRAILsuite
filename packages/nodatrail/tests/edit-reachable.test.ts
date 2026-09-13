@@ -138,9 +138,15 @@ describe('a form that reads a field out of a note', () => {
    * exactly that -- it loads a task's existing comment, and opened with plain
    * `open()` its box would come up empty and saving would write the emptiness
    * over what was there.
+   *
+   * `AddToDayModal` is the fifth, and it arrived by the same route. It reads
+   * the neighbouring day notes to work out whether the entry being edited is
+   * one day of a span; opened with plain `open()` the form draws before that
+   * answer exists, offers no choice, and Save silently means this day only.
    */
   it('is the forms this test is about', () => {
     expect(formsThatLoad().sort()).toEqual([
+      'AddToDayModal',
       'CloseTaskModal',
       'EditAreaModal',
       'EditGoalModal',
