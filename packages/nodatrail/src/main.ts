@@ -32,6 +32,7 @@ import { openOrCreatePeriodNote, removeNavigation } from './plan/write-period';
 import { AddToDayModal, type AddToDayDeps, type CaptureTarget } from './plan/add-to-day-modal';
 import { ImportCalendarModal } from './plan/calendar-import-modal';
 import { RepairTimesModal } from './plan/ui/repair-times-modal';
+import { MigrateImportsModal } from './ui/modals/migrate-imports-modal';
 import { notePathFor } from './plan/paths';
 import { detectPeriodNote } from './plan/detect';
 import { readPurchases } from './finance/read-finance';
@@ -381,6 +382,11 @@ export default class NODAtrailPlugin extends Plugin {
       callback: () => this.openRepairTimes(),
     });
     this.addCommand({
+      id: 'migrate-imports',
+      name: t('commands.migrateImports'),
+      callback: () => this.openMigrateImports(),
+    });
+    this.addCommand({
       id: 'open-plan',
       name: t('commands.openPlan'),
       callback: () => void this.activate(PLAN_VIEW_TYPE),
@@ -695,6 +701,28 @@ export default class NODAtrailPlugin extends Plugin {
       app: this.app,
       getSettings: () => this.getSettings(),
       onRepaired: () => this.refreshViews(),
+    }).open();
+  }
+
+  /**
+   * The one-off move of archived imports out of the documents folder and into
+   * the imports folder.
+   *
+   * A command and not a startup migration, and the difference is the point:
+   * this renames files in somebody's vault, and a plugin that did that on the
+   * first launch after an update would be doing it before anybody had agreed
+   * to it. Every vault that never imported anything opens it once, reads that
+   * there is nothing to move, and never thinks about it again.
+   *
+   * Refreshes the views because the ledger's archive list and its unposted
+   * counts are read from these files, and they are read from the new folder
+   * from the moment this finishes.
+   */
+  private openMigrateImports(): void {
+    new MigrateImportsModal({
+      app: this.app,
+      getSettings: () => this.getSettings(),
+      onMigrated: () => this.refreshViews(),
     }).open();
   }
 

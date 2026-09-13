@@ -100,6 +100,21 @@ export interface NODAtrailSettings {
    * plugin moving files about.
    */
   documentSubfolder: string;
+  /**
+   * Where a file an importer read is kept, beside the notes it fed.
+   *
+   * `_imports` sits next to `_documents` and means something different: a
+   * document is a thing you filed, an import is the source a run worked from.
+   * Keeping them apart matters because the import files are machinery -- the
+   * calendar replay and the statement archive read them back by name -- and a
+   * folder somebody browses for an invoice should not be full of them.
+   *
+   * Blank keeps nothing at all, the same reading `documentSubfolder` has: there
+   * is nowhere to put the file that is not somebody else's folder. It costs the
+   * calendar import its "gone from the export" list and the ledger its unposted
+   * count, both of which are replayed from these files and from nothing else.
+   */
+  importSubfolder: string;
   /** Comma separated. Deliberately not the whole vault. */
   taskFolders: string;
 

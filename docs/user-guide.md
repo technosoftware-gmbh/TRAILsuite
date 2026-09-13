@@ -721,7 +721,14 @@ the rows the importer cannot decide are marked rather than guessed. Before that,
 it checks the statement's own closing balance against what the ledger will hold
 afterwards, so a period with a row missing says so on the way in.
 
-The file itself is copied into the vault beside that year's journal notes. The
+The file itself is copied into the vault beside that year's journal notes, in an
+`_imports` folder next to the `_documents` one the invoices go in. The two are
+kept apart on purpose: an invoice is a document you filed and look at, an import
+is the file a run worked from and one the plugin reads back by name. It also
+means the exports can be left alone -- renaming one is how a vault loses its
+import history. If you imported before September 2026 your files are in
+`_documents` under their old names; the command `Move imported files into the
+imports folder` shows you what it would move and moves it. The
 Ledger's accounts tab lists what it has kept, collapsed to one line while
 everything is posted. A statement with rows you left undecided stays listed with
 a `Fertig buchen` button that reopens the import on that file, with the account

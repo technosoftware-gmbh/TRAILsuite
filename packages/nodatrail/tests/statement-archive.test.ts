@@ -57,8 +57,10 @@ function dated(date: string): BankStatementRow {
   };
 }
 
+const STAMP = '20260913-142530';
+
 describe('the name an archived statement is filed under', () => {
-  it('carries the period it covers and the account it went into', () => {
+  it('carries the run, the account it went into, and the period it covers', () => {
     // `acceptedRows` hands them over oldest first whichever way the file was
     // written, so the name is built from the file's own order rather than from
     // the order the bank happened to print.
@@ -66,13 +68,15 @@ describe('the name an archived statement is filed under', () => {
       parseStatement(SWISS, SWISS_EBANKING_PROFILE),
       SWISS_EBANKING_PROFILE
     );
-    expect(statementFileName(1030, rows)).toBe('20260225-20260630_1030.csv');
+    expect(statementFileName(STAMP, 1030, rows)).toBe(`${STAMP}_1030_20260225-20260630.csv`);
   });
 
   it('reads back what it wrote', () => {
-    const name = statementFileName(1013, [dated('2026-04-01'), dated('2026-06-26')]);
-    expect(name).toBe('20260401-20260626_1013.csv');
+    const name = statementFileName(STAMP, 1013, [dated('2026-04-01'), dated('2026-06-26')]);
+    expect(name).toBe(`${STAMP}_1013_20260401-20260626.csv`);
     expect(readStatementFileName(name)).toEqual({
+      stamp: STAMP,
+      source: '1013',
       from: '2026-04-01',
       to: '2026-06-26',
       account: 1013,
@@ -81,7 +85,7 @@ describe('the name an archived statement is filed under', () => {
 
   it('survives a single-row file, where the period is one day', () => {
     const one = [dated('2026-05-04')];
-    expect(statementFileName(1005, one)).toBe('20260504-20260504_1005.csv');
+    expect(statementFileName(STAMP, 1005, one)).toBe(`${STAMP}_1005_20260504-20260504.csv`);
   });
 
   it('recognises nothing it did not write', () => {
@@ -91,12 +95,23 @@ describe('the name an archived statement is filed under', () => {
     for (const name of [
       'Kontoauszug_1011.csv',
       'accountstatement_1013.csv',
-      '20260401-20260626_1013 2.csv',
-      '20260401_1013.csv',
-      '20260401-20260626_1013.pdf',
+      `${STAMP}_1013_20260401-20260626 2.csv`,
+      `${STAMP}_1013_20260401.csv`,
+      `${STAMP}_1013_20260401-20260626.pdf`,
+      // The old shape, which is what the vault is full of until the migration
+      // has been run. Recognising it here would be reading a file whose name
+      // says nothing about when it was imported as though it did.
+      '20260401-20260626_1013.csv',
     ]) {
       expect(readStatementFileName(name), name).toBeNull();
     }
+  });
+
+  it('refuses a calendar name, whose source is not an account', () => {
+    // One folder, two kinds of file, one naming scheme. The account reader has
+    // to be the one that says which are its own, because the shape no longer
+    // does.
+    expect(readStatementFileName(`${STAMP}_business_20260401-20260626.csv`)).toBeNull();
   });
 });
 

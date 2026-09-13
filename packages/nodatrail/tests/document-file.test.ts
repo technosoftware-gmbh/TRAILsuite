@@ -10,6 +10,7 @@ import { describe, expect, it } from 'vitest';
 import {
   documentFolderFor,
   documentTarget,
+  importFolderFor,
   fileNameOf,
   freeName,
   splitExtension,
@@ -27,6 +28,21 @@ describe('where a document goes', () => {
 
   it('follows a note with no date into the module folder', () => {
     expect(documentFolderFor(S, 'bill', null)).toBe('Finance/Bills/_documents');
+  });
+
+  it('is not where a file an importer read is kept', () => {
+    // Two folders answering to two settings, and the reason they are two
+    // functions rather than one with a parameter: a call site that passed the
+    // wrong one would file an export where somebody looks for invoices and be
+    // found only by reading it.
+    expect(importFolderFor(S, 'journal', JANUARY)).toBe('Finance/Journal/2026/_imports');
+    expect(importFolderFor(S, 'journal', JANUARY)).not.toBe(
+      documentFolderFor(S, 'journal', JANUARY)
+    );
+  });
+
+  it('keeps nothing when the imports setting is blank', () => {
+    expect(importFolderFor({ ...S, importSubfolder: '' }, 'journal', JANUARY)).toBe('');
   });
 
   it('is nowhere when the setting is blank, which means leave things alone', () => {

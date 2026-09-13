@@ -147,6 +147,23 @@ export function renderFolderPage(containerEl: HTMLElement, deps: FolderPageDeps)
     }
   );
 
+  // Beside it, because the two are told apart by being seen together: one is
+  // where a document is filed, the other is where the file an importer read is
+  // kept. A vault that blanks the first usually does not want to blank the
+  // second, which is machinery rather than filing.
+  textRow(
+    finance,
+    {
+      name: t('settings.folders.importSubfolder'),
+      desc: t('settings.folders.importSubfolderDesc'),
+    },
+    () => settings.importSubfolder,
+    async (value) => {
+      settings.importSubfolder = value;
+      await save();
+    }
+  );
+
   // The four archive sub-folders, beside the folders they mirror. Named here
   // rather than left as literals because this vault archives a hundred
   // projects a year and browses them: see `entity-types.ts`.

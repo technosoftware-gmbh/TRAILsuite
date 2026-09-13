@@ -703,6 +703,23 @@ export const enTranslations = {
     count: { one: '{count} task', other: '{count} tasks' },
   },
 
+  // The one-off move of archived imports out of the documents folder. Only the
+  // dialog: the files themselves carry no translated text.
+  imports: {
+    migrate: {
+      title: 'Move imported files into the imports folder',
+      nothing: 'Nothing to move. Every kept import is already in its imports folder.',
+      intro:
+        '{count} files will be moved beside the notes they fed, into the imports folder, and renamed so the name leads with when they were imported. Nothing is written, nothing is deleted, and no note is touched.',
+      stamps:
+        'The old names carried no time of import, so the time each file was created in the vault is used instead. These files are all older than anything a new import will keep, so they stay in the right order whatever that time is off by.',
+      heading: '{count} files to move',
+      button: 'Move {count} files',
+      done: '{count} files moved.',
+      failed: 'Left where they were: {files}',
+    },
+  },
+
   commands: {
     openDashboard: 'Open the life dashboard',
     openPara: 'Open PARA',
@@ -721,6 +738,7 @@ export const enTranslations = {
     unarchiveNote: 'Move this note out of the archive',
     runHealthCheck: 'Check the vault',
     createSampleVault: 'Create the sample notes',
+    migrateImports: 'Move imported files into the imports folder',
   },
 
   // The sample vault. Only the command name, the modal's labels and its notices
@@ -926,6 +944,9 @@ export const enTranslations = {
       documentSubfolder: 'Documents beside a note',
       documentSubfolderDesc:
         'The folder an invoice or a statement is filed into, beside the note about it, the way an attachment folder works. Leave blank to keep documents wherever they already are. A document already in the vault is moved and its links follow; one chosen from this computer is copied in.',
+      importSubfolder: 'Imported files beside a note',
+      importSubfolderDesc:
+        'The folder a calendar export or a bank statement is kept in after it has been imported, beside the notes it fed. Not the same folder as documents: these files are read back by name, to work out what an earlier import offered and which rows are still unposted. Leave blank to keep nothing, which switches both of those off.',
       subfolder: 'file under',
       subfolderDesc:
         'Where a new note goes beneath its folder. Tokens: {YYYY} and {MM}, filled in from the date the note is about. Leave one blank to file that kind flat. Only new notes are affected; every reader looks through the whole folder whatever is in here.',

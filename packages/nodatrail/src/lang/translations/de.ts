@@ -711,6 +711,24 @@ export const deTranslations: Translations = {
     count: { one: '{count} Aufgabe', other: '{count} Aufgaben' },
   },
 
+  // Der einmalige Umzug archivierter Importe aus dem Belegordner. Nur der
+  // Dialog: die Dateien selbst enthalten keinen uebersetzten Text.
+  imports: {
+    migrate: {
+      title: 'Importierte Dateien in den Importordner verschieben',
+      nothing:
+        'Nichts zu verschieben. Jeder aufbewahrte Import liegt bereits in seinem Importordner.',
+      intro:
+        '{count} Dateien werden neben die Notizen verschoben, die sie gefuellt haben, in den Importordner, und so umbenannt, dass der Name mit dem Zeitpunkt des Imports beginnt. Es wird nichts geschrieben, nichts geloescht und keine Notiz veraendert.',
+      stamps:
+        'Die alten Namen enthielten keinen Importzeitpunkt, deshalb wird ersatzweise der Zeitpunkt verwendet, zu dem die Datei im Tresor angelegt wurde. Diese Dateien sind alle aelter als alles, was ein neuer Import aufbewahrt, und stehen daher in der richtigen Reihenfolge, wie weit dieser Zeitpunkt auch danebenliegt.',
+      heading: '{count} Dateien zu verschieben',
+      button: '{count} Dateien verschieben',
+      done: '{count} Dateien verschoben.',
+      failed: 'Unveraendert geblieben: {files}',
+    },
+  },
+
   commands: {
     openDashboard: 'Lebens-Dashboard öffnen',
     openPara: 'PARA öffnen',
@@ -729,6 +747,7 @@ export const deTranslations: Translations = {
     unarchiveNote: 'Diese Notiz aus dem Archiv holen',
     runHealthCheck: 'Vault prüfen',
     createSampleVault: 'Beispielnotizen anlegen',
+    migrateImports: 'Importierte Dateien in den Importordner verschieben',
   },
 
   // Der Beispiel-Vault. Übersetzt sind nur der Befehlsname, die Beschriftungen
@@ -942,6 +961,9 @@ export const deTranslations: Translations = {
       documentSubfolder: 'Belege neben der Notiz',
       documentSubfolderDesc:
         'Der Ordner, in den eine Rechnung oder ein Auszug neben der zugehoerigen Notiz abgelegt wird, wie ein Anhangordner. Leer lassen, um Belege dort zu lassen, wo sie schon sind. Ein Beleg im Tresor wird verschoben und seine Verweise folgen; einer von diesem Rechner wird hineinkopiert.',
+      importSubfolder: 'Importierte Dateien neben der Notiz',
+      importSubfolderDesc:
+        'Der Ordner, in dem ein Kalender-Export oder ein Kontoauszug nach dem Import aufbewahrt wird, neben den Notizen, die er gefuellt hat. Nicht derselbe Ordner wie fuer Belege: diese Dateien werden am Namen wiedererkannt und erneut gelesen, um zu ermitteln, was ein frueherer Import angeboten hat und welche Zeilen noch nicht gebucht sind. Leer lassen bewahrt nichts auf und schaltet beides ab.',
       subfolder: 'ablegen unter',
       subfolderDesc:
         'Wohin eine neue Notiz unterhalb ihres Ordners kommt. Platzhalter: {YYYY} und {MM}, gefüllt aus dem Datum, um das es in der Notiz geht. Leer lassen heisst flach ablegen. Betrifft nur neue Notizen; die Leser durchsuchen den ganzen Ordner, was immer hier steht.',

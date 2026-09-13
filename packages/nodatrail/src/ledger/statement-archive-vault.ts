@@ -12,7 +12,8 @@ import {
   planImport,
 } from '@technosoftware/trail-core';
 import type { Account, BankStatementRow, Posting } from '@technosoftware/trail-core';
-import { documentFolderFor } from '../finance/document-file';
+import { importFolderFor } from '../finance/document-file';
+import { freeImportName, importStamp } from '../shared/import-name';
 import type { NODAtrailSettings } from '../settings/types';
 import {
   profileFor,
@@ -29,14 +30,13 @@ import {
  * month it belongs to. A file spanning a new year therefore lands in the newer
  * one, beside the journal notes it most recently fed.
  *
- * Empty when `documentSubfolder` is blank, which means "leave documents where
- * they are" -- and here means keep nothing, because there is nowhere to put it
- * that is not somebody else's folder.
+ * Empty when `importSubfolder` is blank, which means keep nothing, because
+ * there is nowhere to put it that is not somebody else's folder.
  */
 function folderFor(settings: NODAtrailSettings, rows: readonly BankStatementRow[]): string {
   const last = rows[rows.length - 1];
   const day = last ? parseDayTitle(last.date) : null;
-  return day ? documentFolderFor(settings, 'journal', day) : '';
+  return day ? importFolderFor(settings, 'journal', day) : '';
 }
 
 export interface Archived {
@@ -47,12 +47,18 @@ export interface Archived {
 /**
  * Keeps the file the postings came from.
  *
- * **Never overwrites, and never stores the same bytes twice.** Re-importing a
- * file that is already archived is a normal thing to do -- it is how somebody
- * finishes the rows they left undecided -- and it must not leave a second copy
- * behind each time. A *different* file that happens to cover the same period
- * gets a numbered name instead, because two exports of one month are two
- * documents and the later one is not necessarily the better one.
+ * **Never stores the same bytes twice.** Re-importing a file that is already
+ * archived is a normal thing to do -- it is how somebody finishes the rows they
+ * left undecided -- and it must not leave a second copy behind each time. Since
+ * the name now carries the run's own stamp, sameness can no longer be a
+ * question about one name: every file already kept for this account and period
+ * is compared, and an identical one ends the matter. Stronger than the name
+ * check it replaces, which could not recognise a file kept under a stamp this
+ * run has no way to guess.
+ *
+ * **And never overwrites.** A *different* file covering the same period is a
+ * second file, because two exports of one month are two documents and the later
+ * one is not necessarily the better one. The stamp keeps them apart by itself.
  *
  * Returns the path it landed at, or null when nothing was written: no folder
  * configured, no dated rows, or the identical file already there.
@@ -62,7 +68,8 @@ export async function archiveStatement(
   settings: NODAtrailSettings,
   account: number,
   rows: readonly BankStatementRow[],
-  text: string
+  text: string,
+  now: Date
 ): Promise<string | null> {
   const folder = folderFor(settings, rows);
   if (!folder || rows.length === 0) return null;
@@ -70,29 +77,26 @@ export async function archiveStatement(
   const path = normalizePath(folder);
   if (!app.vault.getFolderByPath(path)) await app.vault.createFolder(path);
 
-  const wanted = statementFileName(account, rows);
+  const first = rows[0]?.date ?? '';
+  const last = rows[rows.length - 1]?.date ?? first;
   const existing = app.vault.getFolderByPath(path)?.children ?? [];
   const taken = new Set(existing.map((child) => child.name));
 
-  // The same bytes under the wanted name means this file is already kept.
-  const sameName = existing.find((child) => child.name === wanted);
-  if (sameName instanceof TFile) {
-    const held = await app.vault.cachedRead(sameName);
-    if (held === text) return sameName.path;
+  for (const child of existing) {
+    if (!(child instanceof TFile)) continue;
+    const name = readStatementFileName(child.name);
+    if (!name || name.account !== account || name.from !== first || name.to !== last) continue;
+    if ((await app.vault.cachedRead(child)) === text) return child.path;
   }
 
-  let name = wanted;
-  for (let index = 2; taken.has(name) && index < 100; index += 1) {
-    name = wanted.replace(/\.csv$/i, ` ${index}.csv`);
-  }
-
+  const name = freeImportName(statementFileName(importStamp(now), account, rows), taken);
   const written = await app.vault.create(`${path}/${name}`, text);
   return written.path;
 }
 
 /** Every statement this plugin has filed, newest period first. */
 export function readArchive(app: App, settings: NODAtrailSettings): Archived[] {
-  const subfolder = settings.documentSubfolder.trim();
+  const subfolder = settings.importSubfolder.trim();
   if (!subfolder) return [];
 
   const found: Archived[] = [];
@@ -104,7 +108,9 @@ export function readArchive(app: App, settings: NODAtrailSettings): Archived[] {
     if (name) found.push({ file, name });
   }
 
-  return found.sort((a, b) => b.name.to.localeCompare(a.name.to));
+  return found.sort(
+    (a, b) => b.name.to.localeCompare(a.name.to) || b.name.stamp.localeCompare(a.name.stamp)
+  );
 }
 
 export interface ArchiveStanding {

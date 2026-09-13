@@ -34,7 +34,14 @@ const {
   sourceSlug,
 } = await import('../src/plan/calendar-archive');
 
-const FOLDER = '0 Plan/1 Daily/2026/_documents';
+const FOLDER = '0 Plan/1 Daily/2026/_imports';
+const STAMP = '20260913-142530';
+const NOW = new Date(2026, 8, 13, 14, 25, 30);
+
+/** A kept file's name, with the stamp spelled once. */
+function kept(source: string, from: string, to: string, stamp = STAMP): string {
+  return `${stamp}_${source}_${from}-${to}.ics`;
+}
 
 function ics(...events: string[]): string {
   return ['BEGIN:VCALENDAR', 'VERSION:2.0', ...events, 'END:VCALENDAR'].join('\r\n');
@@ -96,7 +103,7 @@ describe('sourceSlug', () => {
     expect(sourceSlug('kalender.export.ics')).toBe('kalender-export');
   });
 
-  it('keeps no underscore, which is what separates the range from the source', () => {
+  it('keeps no underscore, which is what separates the three parts of a name', () => {
     expect(sourceSlug('work_calendar.ics')).toContain('-');
     expect(sourceSlug('work_calendar.ics')).not.toContain('_');
   });
@@ -107,15 +114,16 @@ describe('sourceSlug', () => {
 });
 
 describe('calendarFileName', () => {
-  it('puts the range first, then the source', () => {
-    expect(calendarFileName('business.ics', '2026-09-07', '2026-09-13')).toBe(
-      '20260907-20260913_business.ics'
+  it('puts the run first, then the source, then the range', () => {
+    expect(calendarFileName(STAMP, 'business.ics', '2026-09-07', '2026-09-13')).toBe(
+      kept('business', '20260907', '20260913')
     );
   });
 
   it('reads back what it wrote', () => {
-    const name = calendarFileName('Business.ics', '2026-09-07', '2026-09-13');
+    const name = calendarFileName(STAMP, 'Business.ics', '2026-09-07', '2026-09-13');
     expect(readCalendarFileName(name)).toEqual({
+      stamp: STAMP,
       source: 'business',
       from: '2026-09-07',
       to: '2026-09-13',
@@ -127,26 +135,41 @@ describe('calendarFileName', () => {
     // the file was never read for, which is exactly what §I.2 exists to stop.
     expect(readCalendarFileName('basic.ics')).toBeNull();
     expect(readCalendarFileName('Kalender 2026.ics')).toBeNull();
-    expect(readCalendarFileName('20260907_business.ics')).toBeNull();
+    expect(readCalendarFileName(`${STAMP}_business_20260907.ics`)).toBeNull();
+  });
+
+  it('does not recognise the shape it used to write', () => {
+    // Until the migration has moved them these are what a vault is full of,
+    // and they are in the documents folder rather than this one. Reading one
+    // here would be claiming a run happened at a time nothing recorded.
+    expect(readCalendarFileName('20260907-20260913_business.ics')).toBeNull();
   });
 });
 
 describe('calendarArchiveFolder', () => {
-  it('is the day notes document folder for the month the range starts in', () => {
+  it('is the day notes imports folder for the month the range starts in', () => {
     expect(calendarArchiveFolder(DEFAULT_SETTINGS, '2026-09-07')).toBe(FOLDER);
   });
 
-  it('is nothing when documents are left where they are', () => {
-    expect(
-      calendarArchiveFolder({ ...DEFAULT_SETTINGS, documentSubfolder: '' }, '2026-09-07')
-    ).toBe('');
+  it('is nothing when nothing is to be kept', () => {
+    expect(calendarArchiveFolder({ ...DEFAULT_SETTINGS, importSubfolder: '' }, '2026-09-07')).toBe(
+      ''
+    );
+  });
+
+  it('is not the documents folder, which is where invoices go', () => {
+    // The one assertion that would have caught the filing this replaces. An
+    // export is machinery read back by name, not a document somebody filed.
+    expect(calendarArchiveFolder(DEFAULT_SETTINGS, '2026-09-07')).not.toContain(
+      DEFAULT_SETTINGS.documentSubfolder
+    );
   });
 });
 
 describe('archiveCalendar', () => {
   const text = ics(event('UID:a@example.ch', 'DTSTART;VALUE=DATE:20260907', 'SUMMARY:Termin'));
 
-  it('files the export beside the notes it fed', async () => {
+  it('files the export beside the notes it fed, stamped with the run', async () => {
     const { app, written } = vaultOf({});
     const path = await archiveCalendar(
       app,
@@ -154,16 +177,21 @@ describe('archiveCalendar', () => {
       'business.ics',
       '2026-09-07',
       '2026-09-13',
-      text
+      text,
+      NOW
     );
-    expect(path).toBe(`${FOLDER}/20260907-20260913_business.ics`);
+    expect(path).toBe(`${FOLDER}/${kept('business', '20260907', '20260913')}`);
     expect(written[path ?? '']).toBe(text);
   });
 
-  it('does not store the same bytes twice', async () => {
+  it('does not store the same bytes twice, under whatever stamp they were kept', async () => {
     // Re-importing a range that is already archived is how somebody finishes a
-    // week they left half done. It must not leave a second copy each time.
-    const held = { [`${FOLDER}/20260907-20260913_business.ics`]: text };
+    // week they left half done. It must not leave a second copy each time, and
+    // the name can no longer be what says so: the earlier run's stamp is one
+    // this run has no way to guess, so the check is by source, range and bytes.
+    const held = {
+      [`${FOLDER}/${kept('business', '20260907', '20260913', '20260908-091500')}`]: text,
+    };
     const { app, written } = vaultOf(held);
     const path = await archiveCalendar(
       app,
@@ -171,23 +199,48 @@ describe('archiveCalendar', () => {
       'business.ics',
       '2026-09-07',
       '2026-09-13',
-      text
+      text,
+      NOW
     );
-    expect(path).toBe(`${FOLDER}/20260907-20260913_business.ics`);
+    expect(path).toBe(`${FOLDER}/${kept('business', '20260907', '20260913', '20260908-091500')}`);
     expect(Object.keys(written)).toHaveLength(1);
   });
 
-  it('numbers a different export of the same range rather than replacing it', async () => {
-    const { app, written } = vaultOf({ [`${FOLDER}/20260907-20260913_business.ics`]: text });
+  it('keeps a different export of the same range beside the first', async () => {
+    const earlier = kept('business', '20260907', '20260913', '20260908-091500');
+    const { app, written } = vaultOf({ [`${FOLDER}/${earlier}`]: text });
     const path = await archiveCalendar(
       app,
       DEFAULT_SETTINGS,
       'business.ics',
       '2026-09-07',
       '2026-09-13',
-      `${text}\r\n`
+      `${text}\r\n`,
+      NOW
     );
-    expect(path).toBe(`${FOLDER}/20260907-20260913_business 2.ics`);
+    // Two exports of one week are two documents and the later is not
+    // necessarily the better one. The stamp keeps them apart with no counter.
+    expect(path).toBe(`${FOLDER}/${kept('business', '20260907', '20260913')}`);
+    expect(Object.keys(written)).toHaveLength(2);
+  });
+
+  it('numbers a second run inside one second rather than throwing on the name', async () => {
+    // Only ever an impatient double-click, and `vault.create` on a taken path
+    // throws: an import that wrote its notes and then failed to keep its file
+    // is the one failure this feature can least afford.
+    const { app, written } = vaultOf({
+      [`${FOLDER}/${kept('business', '20260907', '20260913')}`]: text,
+    });
+    const path = await archiveCalendar(
+      app,
+      DEFAULT_SETTINGS,
+      'business.ics',
+      '2026-09-07',
+      '2026-09-13',
+      `${text}\r\n`,
+      NOW
+    );
+    expect(path).toBe(`${FOLDER}/${STAMP}_business_20260907-20260913 2.ics`);
     expect(Object.keys(written)).toHaveLength(2);
   });
 
@@ -195,11 +248,12 @@ describe('archiveCalendar', () => {
     const { app, written } = vaultOf({});
     const path = await archiveCalendar(
       app,
-      { ...DEFAULT_SETTINGS, documentSubfolder: '' },
+      { ...DEFAULT_SETTINGS, importSubfolder: '' },
       'business.ics',
       '2026-09-07',
       '2026-09-13',
-      text
+      text,
+      NOW
     );
     expect(path).toBeNull();
     expect(Object.keys(written)).toHaveLength(0);
@@ -209,9 +263,9 @@ describe('archiveCalendar', () => {
 describe('readCalendarArchive', () => {
   it('finds what this plugin filed, newest range first', () => {
     const { app } = vaultOf({
-      [`${FOLDER}/20260907-20260913_business.ics`]: ics(),
-      [`${FOLDER}/20260914-20260920_business.ics`]: ics(),
-      [`${FOLDER}/20260901-20260930_privat.ics`]: ics(),
+      [`${FOLDER}/${kept('business', '20260907', '20260913')}`]: ics(),
+      [`${FOLDER}/${kept('business', '20260914', '20260920')}`]: ics(),
+      [`${FOLDER}/${kept('privat', '20260901', '20260930')}`]: ics(),
     });
     expect(readCalendarArchive(app, DEFAULT_SETTINGS).map((one) => one.name.to)).toEqual([
       '2026-09-30',
@@ -223,13 +277,13 @@ describe('readCalendarArchive', () => {
   it('ignores a file this plugin did not name', () => {
     const { app } = vaultOf({
       [`${FOLDER}/basic.ics`]: ics(),
-      [`${FOLDER}/20260907-20260913_business.ics`]: ics(),
+      [`${FOLDER}/${kept('business', '20260907', '20260913')}`]: ics(),
     });
     expect(readCalendarArchive(app, DEFAULT_SETTINGS)).toHaveLength(1);
   });
 
-  it('ignores an ics that is not in the documents folder', () => {
-    const { app } = vaultOf({ '0 Plan/20260907-20260913_business.ics': ics() });
+  it('ignores an ics that is not in the imports folder', () => {
+    const { app } = vaultOf({ [`0 Plan/${kept('business', '20260907', '20260913')}`]: ics() });
     expect(readCalendarArchive(app, DEFAULT_SETTINGS)).toEqual([]);
   });
 });
@@ -249,7 +303,7 @@ describe('priorImportsOf', () => {
     // The file was read for one week. Expanding a weekly series over a month
     // would credit that import with three meetings nobody was ever offered,
     // and the next run would report them as having vanished.
-    const { app } = vaultOf({ [`${FOLDER}/20260907-20260913_business.ics`]: week });
+    const { app } = vaultOf({ [`${FOLDER}/${kept('business', '20260907', '20260913')}`]: week });
     const history = await priorImportsOf(app, DEFAULT_SETTINGS, 'business.ics');
     expect(history).toEqual([
       {
@@ -275,38 +329,54 @@ describe('priorImportsOf', () => {
         'SUMMARY:Ferien'
       )
     );
-    const { app } = vaultOf({ [`${FOLDER}/20260907-20260913_privat.ics`]: holiday });
+    const { app } = vaultOf({ [`${FOLDER}/${kept('privat', '20260907', '20260913')}`]: holiday });
     const [only] = await priorImportsOf(app, DEFAULT_SETTINGS, 'privat.ics');
     expect(only?.lines.map((one) => one.day)).toEqual(['2026-09-07', '2026-09-08', '2026-09-09']);
   });
 
   it('reads only the source it was asked about', async () => {
     const { app } = vaultOf({
-      [`${FOLDER}/20260907-20260913_business.ics`]: week,
-      [`${FOLDER}/20260907-20260913_privat.ics`]: week,
+      [`${FOLDER}/${kept('business', '20260907', '20260913')}`]: week,
+      [`${FOLDER}/${kept('privat', '20260907', '20260913')}`]: week,
     });
     expect(await priorImportsOf(app, DEFAULT_SETTINGS, 'Business.ics')).toHaveLength(1);
   });
 
-  it('hands them over oldest first, so a later run is read as the later one', async () => {
+  it('hands them over oldest run first, so a later run is read as the later one', async () => {
     const { app } = vaultOf({
-      [`${FOLDER}/20260914-20260920_business.ics`]: week,
-      [`${FOLDER}/20260907-20260913_business.ics`]: week,
+      [`${FOLDER}/${kept('business', '20260914', '20260920', '20260914-080000')}`]: week,
+      [`${FOLDER}/${kept('business', '20260907', '20260913', '20260907-080000')}`]: week,
     });
     expect(
       (await priorImportsOf(app, DEFAULT_SETTINGS, 'business.ics')).map((one) => one.from)
     ).toEqual(['2026-09-07', '2026-09-14']);
   });
 
+  it('reads a backfill as the later word, because it was imported later', async () => {
+    // The case the range order got wrong and the stamp gets right. August was
+    // re-imported this morning; September went in a fortnight ago. The plan
+    // takes the last word about an occurrence, and the last word about August
+    // is this morning's file, not the one whose range happens to end later.
+    const { app } = vaultOf({
+      [`${FOLDER}/${kept('business', '20260831', '20260906', '20260913-090000')}`]: week,
+      [`${FOLDER}/${kept('business', '20260907', '20260913', '20260901-090000')}`]: week,
+    });
+    expect(
+      (await priorImportsOf(app, DEFAULT_SETTINGS, 'business.ics')).map((one) => one.from)
+    ).toEqual(['2026-09-07', '2026-08-31']);
+  });
+
   it('contributes nothing for a file that no longer parses, rather than throwing', async () => {
-    const { app } = vaultOf({ [`${FOLDER}/20260907-20260913_business.ics`]: 'not a calendar' });
+    const { app } = vaultOf({
+      [`${FOLDER}/${kept('business', '20260907', '20260913')}`]: 'not a calendar',
+    });
     expect(await priorImportsOf(app, DEFAULT_SETTINGS, 'business.ics')).toEqual([
       { from: '2026-09-07', to: '2026-09-13', lines: [] },
     ]);
   });
 
   it('has nothing to say about a source never imported', async () => {
-    const { app } = vaultOf({ [`${FOLDER}/20260907-20260913_business.ics`]: week });
+    const { app } = vaultOf({ [`${FOLDER}/${kept('business', '20260907', '20260913')}`]: week });
     expect(await priorImportsOf(app, DEFAULT_SETTINGS, 'privat.ics')).toEqual([]);
   });
 });

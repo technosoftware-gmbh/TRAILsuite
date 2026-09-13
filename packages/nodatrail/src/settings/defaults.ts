@@ -70,6 +70,7 @@ export const DEFAULT_SETTINGS: NODAtrailSettings = {
   // level that could hold anything.
   journalSubfolder: '{YYYY}',
   documentSubfolder: '_documents',
+  importSubfolder: '_imports',
   taskFolders: '0 Plan, 1 Areas, 2 Goals, 3 Projects',
 
   crmFolder: 'CRM',
