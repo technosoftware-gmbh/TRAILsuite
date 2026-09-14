@@ -115,10 +115,29 @@ The short version:
    bundle, and `publish-core.yml` handles it instead.
 
 6. **For the core**, push a `core-v<version>` tag and `publish-core.yml`
-   publishes it. No token is involved: the workflow authenticates to npm over
+   **stages** it. No token is involved: the workflow authenticates to npm over
    OIDC as this repository and that file, registered as a trusted publisher on
    the package's npm settings page, and npm attaches a provenance attestation on
    its own.
+
+   **The tag no longer releases anything.** It uploads the tarball into npm's
+   staging queue, where it is not installable and `npm view` cannot see it.
+   Somebody then approves it from a machine that can answer a 2FA challenge:
+
+   ```sh
+   npm stage list @technosoftware/trail-core
+   npm stage approve @technosoftware/trail-core@<version>
+   ```
+
+   The same two steps are on npmjs.com for anybody who would rather click. A
+   staged version that turns out to be wrong is `npm stage reject`ed, which is
+   the point of the whole arrangement: the one step of a release that cannot be
+   undone now has a person in front of it, and a mistyped tag costs a rejection
+   rather than a version number.
+
+   **A staged version still holds the version.** It cannot be staged twice and
+   it cannot be published around, so a release that is sitting in the queue has
+   to be approved or rejected before that number can be used for anything else.
 
    **Check the trusted publisher exists before trusting this paragraph.** It
    described the arrangement for two releases during which the arrangement did
@@ -135,11 +154,28 @@ The short version:
    and an `attestations` key under `dist`. One published by hand has a person's
    name and no attestations. 1.1.0 is the worked example of the second.
 
-   **Tick "Allow `npm publish`" when registering it.** npm's form always allows
+   **Leave "Allow `npm publish`" unticked.** npm's form always allows
    `npm stage publish` and gates direct publishing behind that checkbox, and the
-   last step of `publish-core.yml` is a direct `npm publish`. Leave "Environment
-   name" empty, because the job declares no `environment:`; filling it in
-   requires the workflow to declare a matching one.
+   last step of `publish-core.yml` is now a stage rather than a publish. The two
+   settings are one decision written in two places: ticking the box without
+   changing the workflow buys nothing, and changing the workflow back without
+   ticking the box fails as an unauthorised publish, which reads as the 404
+   below. Leave "Environment name" empty, because the job declares no
+   `environment:`; filling it in requires the workflow to declare a matching
+   one.
+
+   **A trusted publisher does not survive its repository.** The connection is
+   bound to the repository rather than to its name, and npm's own form says the
+   fixed fields can only be changed by deleting the connection and making a new
+   one. So a repository that is deleted and re-imported under the same name --
+   which this one was, on 12 September 2026, to get some files out of its
+   history -- leaves a connection that still reads correctly on screen and
+   matches nothing. 2.0.0 went up that morning; every attempt after the
+   re-import failed, through a repository setting, a tag, and a workflow
+   permission that were all innocent, until the connection was deleted and
+   re-created with byte-identical values. **The npm metadata is where that is
+   visible**: `_npmUser.trustedPublisher.oidcConfigId` differs between 2.0.0 and
+   2.1.0, because they were published by two different connections.
 
    **The failure mode is the reason all of this is written down.** An
    unauthorised publish is answered `404 Not Found - PUT`, not `403`, because
@@ -147,12 +183,23 @@ The short version:
    publish it. So a missing or mismatched trusted publisher reads as though the
    package itself is gone, and the log says nothing about OIDC at all. Read that
    404 as "not authorised": the publisher, the workflow filename, the
-   environment, or the `npm publish` checkbox.
+   environment, the `npm publish` checkbox, or a connection left pointing at a
+   repository that no longer exists.
+
+   **The workflow now says which of those it can rule out.** Its `Say what this
+   job was given` step prints the npm version and whether the runner issued an
+   id-token request URL, and stops if it did not. Both were invisible for three
+   failed releases, and both turned out to be fine, which is worth as much as
+   finding one of them broken: it is how the search narrowed to the connection
+   itself. `GITHUB_TOKEN Permissions` in the `Set up job` log does **not** list
+   `IdToken`, and reading its absence as a missing token costs an afternoon.
 
    **Re-running a failed run is safe**, which is what the `Is this version
-   already published` step in the workflow is for. Fix the configuration, hit
-   re-run, and a version already on the registry is skipped rather than
-   attempted twice.
+   already published or staged` step in the workflow is for. Fix the
+   configuration, hit re-run, and a version already on the registry, or already
+   in the staging queue, is skipped rather than attempted twice. The staging
+   half of that check is best-effort and the step says so: reading the queue is
+   authenticated, so a silent no can mean "could not tell".
 
    **The very first publish of a package cannot work that way**, because a
    trusted publisher is configured on a settings page that does not exist until
