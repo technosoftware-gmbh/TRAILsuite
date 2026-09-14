@@ -14,6 +14,14 @@
 # not passed: it is implied here, and passing it would suggest it is what makes
 # it happen.
 #
+# **It stages rather than publishes.** A tag uploads the tarball into npm's
+# staging queue and stops; somebody then approves it with a 2FA challenge from
+# their own machine, and only then is it installable. So the worst a mistyped
+# tag can now do is put a version in a queue, which can be rejected, rather than
+# on the registry, which cannot be undone. That is the whole reason for the
+# change, and it is worth stating here because the file no longer does what its
+# name suggests on its own.
+#
 # **The first publish cannot come from here.** A trusted publisher is
 # configured on a package's settings page, and that page does not exist until
 # the package does. So 1.0.0 goes up by hand from a clean checkout, the trusted
@@ -98,32 +106,64 @@ jobs:
             exit 1
           fi
 
-      # Whether this version is already on the registry.
+      # Whether this version is already spoken for.
       #
-      # There is one case this exists for, and it is the first release. A
-      # trusted publisher is configured on a settings page that does not exist
-      # until the package does, so the first version goes up by hand before
-      # this workflow can authenticate at all. Its tag would otherwise arrive
-      # here and fail on a version that is already exactly right. It also makes
-      # re-running a run that died after publishing safe, which is the same
-      # situation approached from the other side.
+      # Two questions now rather than one, because a staged version is neither
+      # published nor nothing: it holds the version, `npm view` cannot see it,
+      # and staging the same version twice is refused. A guard that asked only
+      # the first question would send a re-run straight into a duplicate, which
+      # is the case the guard exists for.
+      #
+      # The original reason still stands. The first release of a package goes
+      # up by hand, before a trusted publisher can be configured against a
+      # settings page that does not exist yet, and its tag would otherwise
+      # arrive here and fail on a version that is already exactly right.
       #
       # This does not soften the guard above. A tag disagreeing with the
       # manifest is still refused, and that is the case where a version nobody
       # meant could go out.
-      - name: Is this version already published
+      - name: Is this version already published or staged
         id: published
         run: |
           version=$(node -p "require('./packages/core/package.json').version")
-          if npm view "@technosoftware/trail-core@$version" version > /dev/null 2>&1; then
+          spec="@technosoftware/trail-core@$version"
+
+          if npm view "$spec" version > /dev/null 2>&1; then
             echo "already=true" >> "$GITHUB_OUTPUT"
-            echo "@technosoftware/trail-core@$version is on the registry already; nothing to do."
-          else
-            echo "already=false" >> "$GITHUB_OUTPUT"
+            echo "$spec is on the registry already; nothing to do."
+            exit 0
           fi
 
+          # The staging queue, which `npm view` does not answer for. This half
+          # is best-effort and says so: reading the queue is authenticated, and
+          # this step runs before the OIDC exchange that the stage itself
+          # performs, so a silent no here means "could not tell" as often as it
+          # means "not staged". Worth asking for the times it does answer;
+          # never worth trusting a no.
+          if npm stage view "$spec" > /dev/null 2>&1; then
+            echo "already=true" >> "$GITHUB_OUTPUT"
+            echo "$spec is staged already, waiting for somebody to approve it."
+            exit 0
+          fi
+
+          echo "already=false" >> "$GITHUB_OUTPUT"
+
+      # **Staged, not published.** The tarball goes up and stops there: it is
+      # not installable, and it becomes a release only when a maintainer
+      # approves it from their own machine with a 2FA challenge. A tag can
+      # therefore no longer put a version in front of the world on its own,
+      # which is the one property this file could not offer while it ended in
+      # `npm publish`.
+      #
+      # The registry enforces the difference rather than this line doing it:
+      # with "Allow `npm publish`" unticked on the trusted publisher, a direct
+      # publish from here is refused. Changing this back means changing both.
+      #
       # `prepare` builds `dist/`, which `exports` points at, so what goes up is
       # what a clean checkout produces rather than whatever was on disk.
-      - run: npm publish
+      #
+      # Approving it is two commands on a machine that can answer 2FA, and
+      # `docs/releasing.md` step 6 spells them out.
+      - run: npm stage publish
         if: steps.published.outputs.already == 'false'
         working-directory: packages/core
