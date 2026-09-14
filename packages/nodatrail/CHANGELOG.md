@@ -29,6 +29,18 @@ note carries is not an error. See
 
 ### Added
 
+- **The day view keeps a task after it is ticked**, faint and struck through,
+  the way the week keeps a meeting you declined. An hour you spent is as much a
+  fact about the day as an hour you still owe, and a list that emptied itself
+  as the day went on left the evening with nothing to review. Cancelled tasks
+  keep their place for the same reason, marked with a cross rather than a tick.
+  The row carries no checkbox, no editor and no Move: it is a record rather
+  than a plan, and clicking it opens the note the line is written in.
+- `dayShowClosedTasks`, default on, under a new Day view card in the settings.
+  Off is for a vault that closes twenty things a day and wants the list to be
+  what is left. The day alone: the week and the month count tasks rather than
+  listing them, and a count swollen by finished work would answer "which days
+  are loaded" with the wrong number.
 - **A day entry can run over several days.** A fifth kind in the capture
   dialog, `Mehrere Tage`, with a last-day field; note and idea take one too.
   The same line is written into every day note in the range, the missing notes

@@ -880,6 +880,10 @@ export const deTranslations: Translations = {
       homeCurrencyDesc: 'Die Währung, in der ein Betrag gilt, wenn eine Notiz nichts sagt.',
       currencyOptions: 'Währungen zur Auswahl',
       currencyOptionsDesc: 'Die Codes, die die Editoren anbieten, mit Komma getrennt.',
+      dayHeading: 'Tagesansicht',
+      showClosedTasks: 'Erledigte Aufgaben weiter anzeigen',
+      showClosedTasksDesc:
+        'Erledigte und abgebrochene Aufgaben bleiben in der Tagesliste stehen, blass und durchgestrichen. Ändern lassen sie sich dort nicht; ein Klick öffnet die Notiz, in der sie stehen.',
       weekHeading: 'Wochenansicht',
       workdaysOnly: 'Nur Arbeitswoche',
       workdaysOnlyDesc:

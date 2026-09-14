@@ -855,6 +855,17 @@ every note for a property none of them carries, and your gallery, filters and
 plans would come up empty with nothing to say why. Unlock it only to match names
 a vault already uses, then lock it again.
 
+**Keep finished tasks.** NODAtrail's day view leaves a task in the list after
+you tick it, faint and struck through, the way the week leaves a meeting you
+declined in its time slot: the hour is still gone, and a day that empties itself
+as you work through it is a day you cannot look back at in the evening. A task
+you cancelled stays too, marked with a cross rather than a tick. These rows have
+no checkbox and no Move: they are a record rather than a plan, and clicking one
+opens the note the line is written in. It is on by default and sits under **Day
+view** in Display; turn it off if you close enough in a day that the list is
+better as what is left. The week and the month are unaffected, because their one
+muted line counts what is still to do.
+
 **The household tag filter.** CULItrail and APERtrail can narrow which people
 they offer. CULItrail calls it *Household tags* and APERtrail calls it *Eligible
 person tags*; both sit in the People section of that plugin's settings page. Type one

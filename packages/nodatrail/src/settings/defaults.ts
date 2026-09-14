@@ -92,6 +92,10 @@ export const DEFAULT_SETTINGS: NODAtrailSettings = {
   dayFocusHeading: '',
   dayScheduleHeading: '',
   dayNotesHeading: '',
+  // On. A day view is looked back at as much as it is planned from, and a task
+  // that vanishes when it is ticked takes the evidence of the afternoon with
+  // it.
+  dayShowClosedTasks: true,
   // Off, so the view keeps the seven days it already had. A working week is a
   // preference about somebody's job, not a default about calendars.
   weekWorkdaysOnly: false,

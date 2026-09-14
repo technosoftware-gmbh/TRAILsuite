@@ -31,6 +31,26 @@ function drawIcon(slot: HTMLElement, icon: string): void {
 }
 
 /**
+ * The mark in a row's lead slot, where a tickable row carries its checkbox.
+ *
+ * The same slot at the same width, so a row that cannot be ticked still lines
+ * its title up with the ones that can. That is the problem `nod-plan-entry-dot`
+ * solves for a meeting with no time on it, and a list mixing the two shapes
+ * without it reads as two lists.
+ *
+ * The label is the accessible name and the tooltip both, because the glyph is
+ * the only thing on the row saying what state it is in.
+ */
+export function rowLead(parent: HTMLElement, icon: string, label: string): HTMLElement {
+  const slot = parent.createDiv({
+    cls: 'nod-row-lead',
+    attr: { 'aria-label': label, title: label },
+  });
+  drawIcon(slot.createSpan({ cls: 'nod-icon' }), icon);
+  return slot;
+}
+
+/**
  * A titled block, with an optional action on the right of its header.
  *
  * `iconOnly` drops the word and keeps the meaning: the label becomes the

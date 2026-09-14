@@ -23,7 +23,7 @@
 import type { App, TFile } from 'obsidian';
 import {
   billStatus,
-  byUrgency,
+  isOpen,
   type BillRecord,
   type PurchaseRecord,
   type RecurringRecord,
@@ -33,14 +33,14 @@ import type { ParaBoard } from '../../para/board';
 import { goalIsAchieved, projectIsCompleted } from '../../para/types';
 import type { FinanceBoard } from '../../finance/read-finance';
 import { spendInPeriod, type SourcedSpendItem } from '../../finance/spend';
-import { goalsDueInPeriod, projectsDueInPeriod, tasksInPeriod } from '../../plan/rollup';
+import { goalsDueInPeriod, periodTaskRows, projectsDueInPeriod } from '../../plan/rollup';
 import { completeTask } from '../../tasks/write-tasks';
 import type { VaultTask } from '../../tasks/read-tasks';
 import { editableTaskFields } from '../modals/edit-task-modal';
 import type { DayEntryRecord } from '../../plan/read-day';
 import { categoryLabel } from '../../shared/categories';
 import type { NODAtrailSettings } from '../../settings/types';
-import { checkbox, chip, emptyState, row, rowIconAction, section } from '../kit/elements';
+import { checkbox, chip, emptyState, row, rowIconAction, rowLead, section } from '../kit/elements';
 import { day, money } from '../kit/format';
 import { noteIcon } from '../kit/note-icon';
 import { spendIcon } from '../kit/type-icons';
@@ -124,18 +124,73 @@ export function renderPeriodSections(
   return anything;
 }
 
+/** What a caller wants of the tasks section beyond the period itself. */
+export interface PeriodTaskOptions {
+  /**
+   * Also draw what is already done or cancelled, read-only.
+   *
+   * **A parameter rather than a settings lookup**, although the setting is one
+   * `deps.getSettings()` away. The setting is the day view's, and this function
+   * also draws the tasks section of a period block embedded in a note, where a
+   * list of finished things is not what the block was put there for. Reading
+   * the key here would quietly give that block the day view's answer.
+   */
+  includeClosed?: boolean;
+}
+
+/**
+ * A task already done or cancelled: what it said, and nothing to do to it.
+ *
+ * Drawn the way a declined meeting is drawn, and for the same reason. An hour
+ * you spent is as much a fact about the day as an hour you owe, and a list
+ * that drops a task the moment it is ticked makes a day somebody worked
+ * through read, by the evening, exactly like a day with nothing in it.
+ *
+ * **No checkbox, no editor, no defer.** Untick, reword and move are all ways
+ * of planning, and this row is a record rather than a plan; the note it came
+ * from is one click away and is where the line is actually changed. The mark
+ * says which kind of closed it is, because a cancelled task shown with a tick
+ * would be the view saying something the note does not.
+ */
+function closedTaskRow(body: HTMLElement, task: VaultTask, deps: PeriodSectionDeps): void {
+  const cancelled = task.status === 'cancelled';
+  const line = row(body, {
+    title: task.text,
+    subtitle: task.file.basename,
+    // The day that places it, as on every other row of the list, rather than
+    // the day it was closed. One column, one meaning.
+    trailing: day(task.due ?? task.scheduled),
+    trailingTone: 'muted',
+    onClick: () => deps.openNote(task.file),
+  });
+  line.addClass('nod-row--closed');
+  line.prepend(
+    rowLead(
+      line,
+      cancelled ? 'x' : 'check',
+      cancelled ? t('plan.closeCancelled') : t('plan.closeDone')
+    )
+  );
+}
+
 export function renderPeriodTasks(
   parent: HTMLElement,
   data: PeriodSectionData,
-  deps: PeriodSectionDeps
+  deps: PeriodSectionDeps,
+  options: PeriodTaskOptions = {}
 ): boolean {
-  const inPeriod = tasksInPeriod(data.tasks, data.range).sort(byUrgency);
+  const inPeriod = periodTaskRows(data.tasks, data.range, options.includeClosed === true);
   if (inPeriod.length === 0) return false;
 
   const settings = deps.getSettings();
   const body = section(parent, t('plan.tasksInPeriod'));
 
   for (const task of inPeriod) {
+    if (!isOpen(task)) {
+      closedTaskRow(body, task, deps);
+      continue;
+    }
+
     const line = row(body, {
       title: task.text,
       subtitle: task.file.basename,
