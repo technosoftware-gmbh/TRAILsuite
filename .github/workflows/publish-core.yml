@@ -49,6 +49,36 @@ jobs:
       # what a tag publishes without somebody editing this line first.
       - run: npm install -g npm@^11
 
+      # What the runner actually handed this job, said out loud.
+      #
+      # Two releases have now died on a 404 that explains nothing, and the
+      # whole log was silent about both of the things that decide whether
+      # trusted publishing can even be attempted. So they are printed, once,
+      # before anything expensive runs.
+      #
+      # **npm publishes unauthenticated rather than refusing to.** Without an
+      # id-token request URL in the environment there is no OIDC exchange, npm
+      # sends no credential at all, and the registry answers `404 Not Found -
+      # PUT` rather than 403, because it will not confirm that a package exists
+      # to somebody who cannot publish it. That 404 is the least informative
+      # true thing it could say, and it is why this step exists.
+      #
+      # The runner sets those variables only when `id-token: write` was
+      # actually granted, which is not the same question as whether the
+      # workflow asked for it.
+      - name: Say what this job was given
+        run: |
+          echo "npm $(npm --version), needs 11.5.1 or later for OIDC"
+          if [ -n "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" ]; then
+            echo "OIDC: the runner issued an id-token request URL"
+          else
+            echo "OIDC: no id-token request URL was issued to this job."
+            echo "Publishing from here would go up with no credential and be"
+            echo "refused as a 404. Stopping instead, because that 404 reads"
+            echo "as though the package does not exist."
+            exit 1
+          fi
+
       - run: npm ci
 
       # The whole suite rather than this package alone. The core is what the
