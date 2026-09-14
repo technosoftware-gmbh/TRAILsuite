@@ -362,7 +362,13 @@ export class PlanView extends NodaView {
     // belong in the top half and the other two below. The empty sentence is
     // this caller's job for the same reason renderPeriodSections() made it
     // its own: only all of them being silent is what it is about.
-    let anything = renderPeriodTasks(main, data, deps);
+    // The day is the one level that also shows what is already closed: a day
+    // is looked back at as well as planned, and the week and the month count
+    // tasks rather than listing them, where a count swollen by finished work
+    // would answer "how loaded is this day" with the wrong number.
+    let anything = renderPeriodTasks(main, data, deps, {
+      includeClosed: settings.dayShowClosedTasks,
+    });
     anything = renderPeriodDeadlines(rest, data, deps) || anything;
     anything = renderPeriodMoney(rest, data, deps) || anything;
     if (!anything && main.childElementCount === 0 && rest.childElementCount === 0) {

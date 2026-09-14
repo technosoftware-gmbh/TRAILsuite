@@ -20,6 +20,8 @@ what counts as a breaking change:
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-09-13
+
 ### Added
 
 - **`caseFold()`**, the one fold a name goes through before it is compared:

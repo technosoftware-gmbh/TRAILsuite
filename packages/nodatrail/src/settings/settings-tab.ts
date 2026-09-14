@@ -149,6 +149,23 @@ export class NODAtrailSettingTab extends PluginSettingTab {
       }
     );
 
+    // Its own card rather than a fourth row in the week's. The two views are
+    // the two halves of this section and a day setting filed under "Week view"
+    // is a setting nobody finds.
+    const dayCard = sectionCard(this.containerEl, t('settings.display.dayHeading'));
+    toggleRow(
+      dayCard,
+      {
+        name: t('settings.display.showClosedTasks'),
+        desc: t('settings.display.showClosedTasksDesc'),
+      },
+      () => settings.dayShowClosedTasks,
+      async (value) => {
+        settings.dayShowClosedTasks = value;
+        await this.save();
+      }
+    );
+
     const week = sectionCard(this.containerEl, t('settings.display.weekHeading'));
     toggleRow(
       week,

@@ -677,6 +677,22 @@
   text-decoration: line-through;
 }
 
+/* A task already done or cancelled, in the day's list. The same treatment the
+   declined meeting above gets, because it is the same claim: the thing is not
+   ahead of you any more, and the day is not freer for it having happened. The
+   subtitle and the date keep their own colours, so the row still says which
+   note it came from and which day it belonged to. */
+.nod-row--closed .nod-row-title {
+  color: var(--text-faint);
+  text-decoration: line-through;
+}
+
+/* The mark where a tickable row has its checkbox: faint, and the size of the
+   box it stands in for, so the titles of a mixed list start at one margin. */
+.nod-row--closed .nod-row-lead {
+  color: var(--text-faint);
+}
+
 /* What else falls on the day, as a count rather than as rows. Pushed to the
    foot of the cell so it reads as a footnote to the meetings above it, and
    muted because it is the one line here that is not a thing you can open. */

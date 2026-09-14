@@ -175,6 +175,19 @@ export interface NODAtrailSettings {
   dayFocusHeading: string;
   dayScheduleHeading: string;
   dayNotesHeading: string;
+  /**
+   * The day view keeps tasks that are done or cancelled, read-only.
+   *
+   * On by default, because the view it changes is the one a day is reviewed in
+   * and a list that empties itself as the day goes on cannot be reviewed. Off
+   * is for a vault that closes twenty things a day and wants the list to be
+   * what is left.
+   *
+   * The day alone. The week and the month count tasks rather than listing
+   * them, and a count that included finished work would answer the question
+   * those views are asked -- which days are loaded -- with the wrong number.
+   */
+  dayShowClosedTasks: boolean;
   /** The week view shows Monday to Friday, with the weekend summarised beneath it. */
   weekWorkdaysOnly: boolean;
   /** `HH:MM`. The lunch band of a week column runs from the first up to, not including, the second. Blank leaves the day split in two. */

@@ -863,6 +863,10 @@ export const enTranslations = {
       homeCurrencyDesc: 'The currency a figure is taken to be in when a note does not say.',
       currencyOptions: 'Currency options',
       currencyOptionsDesc: 'The codes the editors offer, comma separated.',
+      dayHeading: 'Day view',
+      showClosedTasks: 'Keep finished tasks',
+      showClosedTasksDesc:
+        'Tasks that are done or cancelled stay in the day\u2019s list, faint and struck through. They cannot be changed there; clicking one opens the note it is written in.',
       weekHeading: 'Week view',
       workdaysOnly: 'Work week only',
       workdaysOnlyDesc:

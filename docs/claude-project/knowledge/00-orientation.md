@@ -16,7 +16,7 @@ repository is lost at the next regeneration.**
 ## The shape of the repository
 
 ```
-packages/core        @technosoftware/trail-core 2.0.0, published to npm    MIT
+packages/core        @technosoftware/trail-core 2.1.0, published to npm    MIT
 packages/apertrail   trips, places, photo spots, bookings                  PolyForm Noncommercial 1.0.0
 packages/nodatrail   PARA, periodic notes, budgets, bills, ledger          PolyForm Noncommercial 1.0.0
 ```
@@ -74,8 +74,9 @@ The words *vehicle*, *excursion*, *variants*, *optional* and *extends* do not
 appear in it. Section 6.8 and section 7 both still list **ten** travel type
 values; there are **twelve**, and `vehicle` and `excursion` are the two missing.
 `11-apertrail-data-model.md` has all of it and is the file to answer from. The
-same document's section 12 item 7 says the core is at 1.1.0; it is at 2.0.0,
-whose breaking change is `MealDraft` dropping `prepTime` and `totalTime`.
+same document's section 12 item 7 says the core is at 1.1.0; it is at 2.1.0,
+which added `caseFold()`. The breaking change was 2.0.0's: `MealDraft` dropping
+`prepTime` and `totalTime`.
 
 **`03-architecture.md` section 6 covers the shared properties and APERtrail. It
 has no NODAtrail entries.** There is no PARA note, period note, budget, bill,
