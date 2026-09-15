@@ -284,8 +284,10 @@ Tests of its own:
     line naming a counter-account, planned transfers) is its own design after
     the sheet has been seen.
 
-## Still open
+## Decided after seeing the sheet
 
-C. **The budget tab over a quarter or a year.** Superseded by the rolling year
-   plan: the budget sheet is always the year. Whether the tab on screen should
-   show the same twelve-column table is decided after the sheet has been seen.
+C. **The budget tab over a quarter or a year.** Decided 15 September 2026,
+   after the printed sheet had been seen: the Budget tab shows the rolling year
+   too, drawn from the sheet's own model (`budgetSheetModel`), so screen and
+   paper cannot disagree. A selector offers "The year" (default) and "One
+   month", which is the month measure as it was.

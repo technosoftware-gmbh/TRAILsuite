@@ -775,6 +775,11 @@ The Budget tab of the Ledger compares planned against actual for the month, and
 lists separately the accounts with spending and no plan, which is usually the
 interesting list.
 
+**The year on screen.** The Budget tab opens on the same rolling year the
+printed sheet shows, both tables with their columns aligned; clicking an
+account opens its statement. "One month" in the selector beside the period is
+the month measured against its plan, as before.
+
 **Printing the year.** On the Budget tab, the printer button in the Ledger's
 toolbar writes the whole budget year as a landscape page into
 `Finance/_exports`: one column per month, what happened in the months you have

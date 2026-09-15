@@ -19,6 +19,8 @@ import { pageText as esc, printableDocument, sheetCreditHtml } from '@technosoft
 export interface BudgetSheetFlowRow {
   kind: 'section' | 'group' | 'account' | 'result';
   label: string;
+  /** The account's number on an account row, so a screen can open its statement. Paper ignores it. */
+  account: number | null;
   /** How far in the label sits: 0 for a section total, 1 for a top group, and so on. */
   depth: number;
   /** Said after the label in a muted word: "not budgeted", "no rate". */
@@ -36,6 +38,8 @@ export interface BudgetSheetFlowRow {
 export interface BudgetSheetBalanceRow {
   kind: 'section' | 'group' | 'account' | 'net';
   label: string;
+  /** As on a flow row. */
+  account: number | null;
   depth: number;
   marks: string[];
   opening: string;

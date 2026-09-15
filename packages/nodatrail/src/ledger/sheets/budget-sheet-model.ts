@@ -65,6 +65,7 @@ function flowRows(
     rows.push({
       kind: 'account',
       label: accountLabel(entry.account),
+      account: entry.account.number,
       depth,
       marks,
       months: months.map((value) => cell(value, true)),
@@ -95,6 +96,7 @@ function groupFlowRow(
   return {
     kind,
     label,
+    account: null,
     depth,
     marks: group.missing > 0 ? [t('sheets.budget.noRate')] : [],
     months: months.map((value) => cell(value, false)),
@@ -117,6 +119,7 @@ function balanceRows(
     rows.push({
       kind: 'account',
       label: accountLabel(entry.account),
+      account: entry.account.number,
       depth,
       marks: entry.inTotal ? [] : [t('sheets.budget.noRate')],
       opening: cell(opening, true),
@@ -143,6 +146,7 @@ function groupBalanceRow(
   return {
     kind,
     label,
+    account: null,
     depth,
     marks: [],
     opening: cell(opening, false),
@@ -187,6 +191,7 @@ export function budgetSheetModel(year: RollingYear, context: BudgetSheetContext)
   flows.push({
     kind: 'result',
     label: t('sheets.budget.result'),
+    account: null,
     depth: 0,
     marks: [],
     months: result.forecast.map((value) => cell(value, false)),
@@ -206,6 +211,7 @@ export function budgetSheetModel(year: RollingYear, context: BudgetSheetContext)
     balances.push({
       kind: 'net',
       label: t('sheets.budget.netWorth'),
+      account: null,
       depth: 0,
       marks: [],
       opening: cell(year.net.opening, false),
