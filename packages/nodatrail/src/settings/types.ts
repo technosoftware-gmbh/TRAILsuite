@@ -534,4 +534,6 @@ export interface NODAtrailSettings {
   budgetLineNoteField: string;
   /** Month number to amount, where reality departs from the rhythm. */
   budgetLineOverridesField: string;
+  /** How many months of the year are closed: shown as what happened rather than as planned. */
+  budgetClosedThroughProperty: string;
 }

@@ -328,3 +328,4 @@ than by importing a line of its code.
 | `budgetLineMonthField` | `'month'` |
 | `budgetLineNoteField` | `'note'` |
 | `budgetLineOverridesField` | `'months'` |
+| `budgetClosedThroughProperty` | `'closedThrough'` |

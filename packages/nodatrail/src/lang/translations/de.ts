@@ -508,6 +508,7 @@ export const deTranslations: Translations = {
     overrides: 'Pro Monat',
     yearPlan: 'Jahresplanung',
     yearTotal: 'Jahrestotal',
+    closedThrough: 'Abgeschlossene Monate',
     noBudgetForYear: 'Keine Budgetnotiz fuer {year}. Eine anlegen, um das Jahr zu planen.',
     postingCount: '{count} Buchungen',
     debit: 'Soll',

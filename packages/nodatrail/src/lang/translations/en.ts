@@ -501,6 +501,7 @@ export const enTranslations = {
     overrides: 'Per month',
     yearPlan: 'The year planned',
     yearTotal: 'Year total',
+    closedThrough: 'Months closed',
     noBudgetForYear: 'No budget note for {year}. Create one to plan the year.',
     postingCount: '{count} postings',
     debit: 'Debit',

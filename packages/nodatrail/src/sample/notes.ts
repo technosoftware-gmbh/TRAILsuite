@@ -697,6 +697,8 @@ function money(settings: NODAtrailSettings, now: Date): SampleNote[] {
             overrides: {},
           },
         ],
+        // Nothing closed: a sample budget is a plan somebody has just made.
+        closedThrough: 0,
       })
     ),
     body: '',

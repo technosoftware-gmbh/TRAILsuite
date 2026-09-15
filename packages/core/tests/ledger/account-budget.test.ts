@@ -199,7 +199,8 @@ describe('monthRange', () => {
 });
 
 describe('which year a budget note is for', () => {
-  const forPeriod = (period: string | null) => budgetYearOf({ period, currency: null, lines: [] });
+  const forPeriod = (period: string | null) =>
+    budgetYearOf({ period, currency: null, lines: [], closedThrough: 0 });
 
   it('reads a bare year', () => {
     expect(forPeriod('2026')).toBe(2026);
