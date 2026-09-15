@@ -954,7 +954,7 @@ export const deTranslations: Translations = {
         'Was eine Einheit einer Fremdwaehrung in der Hauptwaehrung wert ist, als EUR 0.93458, USD 1.14. Ein umgekehrt notierter Kurs kann als Division geschrieben werden: EUR 1/1.07 ergibt dasselbe. Es wird nichts abgerufen: ein Kurs, den niemand gewaehlt hat, ist ein Kurs, den niemand pruefen kann. Eine Waehrung ohne Kurs bleibt aus den Summen heraus und ihre Zeile sagt es.',
       exportAuthor: 'Name auf gedruckten Blättern',
       exportAuthorDesc:
-        'Wen ein gedrucktes Blatt als Ersteller nennt: "Erstellt von Thomas am ...". Leer lassen lässt den Namen weg.',
+        'Wen ein gedrucktes Blatt als Ersteller nennt: "Erstellt von Thomas am ...". Leer lassen lässt den Namen weg. APERtrail hat dieselbe Einstellung.',
       homeCurrency: 'Eigene Währung',
       homeCurrencyDesc: 'Die Währung, in der ein Betrag gilt, wenn eine Notiz nichts sagt.',
       currencyOptions: 'Währungen zur Auswahl',

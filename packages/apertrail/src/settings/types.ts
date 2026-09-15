@@ -466,6 +466,12 @@ export interface APERtrailSettings {
    * so one vault does not have to be told three times.
    */
   displayLocale: string;
+  /**
+   * The name a printed sheet's credit line gives: "erstellt von Thomas am ...".
+   * Blank leaves it out. Shared with NODAtrail through trail-core's
+   * `SHEET_CONTRACT`.
+   */
+  exportAuthor: string;
 
   /**
    * The currency a trip is assumed to be planned in when neither the booking

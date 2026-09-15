@@ -16,6 +16,7 @@
  */
 import { App } from 'obsidian';
 import { caseFold, parseDayTitle, proseBlocks, sanitizeTitle } from '@technosoftware/trail-core';
+import { sheetCredit } from '../../shared/sheet-credit';
 import { t } from '../../lang/I18nManager';
 import { APERtrailSettings } from '../../settings/types';
 import { TravelTrip, TravelVehicle } from '../../vault/types';
@@ -590,7 +591,11 @@ export async function buildTripDocument(
       fareChosen: t('tripDocument.variantChosen'),
     },
     caveat: t('tripDocument.caveat'),
-    footer: t('tripDocument.footer', { date: formatMediumDate(today) }),
+    footer: sheetCredit(
+      settings,
+      (author) => t('tripDocument.footer', { author, date: formatMediumDate(today) }),
+      () => t('tripDocument.footerAnonymous', { date: formatMediumDate(today) })
+    ),
   };
 }
 

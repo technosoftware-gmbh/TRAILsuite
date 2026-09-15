@@ -3,8 +3,10 @@
 **Written 15 September 2026, decisions taken the same day.** Built: all five
 sheets, the readings every tab and its sheet share (`ledger/readings.ts`),
 `rollingYear` and `closedThrough`, `exportsSubfolder`, `exportAuthor`, the
-Export action and command, and closing and reopening a month. Still to come:
-APERtrail carrying `exportAuthor` and the credit line.
+Export action and command, and closing and reopening a month. APERtrail's four
+sheets carry the same `exportAuthor` setting and credit line since 15 September
+2026, each keeping its own caveat and, where it had one, its "the notes are the
+record" line above the credit.
 
 The sheets are titled in the tab's own words rather than the ones first
 written here: Kontenplan, Kontoauszug, Gewinnermittlung (with "(Geldfluss)" on

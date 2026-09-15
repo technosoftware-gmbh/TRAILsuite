@@ -54,6 +54,7 @@ function sheet(over: Partial<Prospect> = {}): Prospect {
       trips: 'Aboard',
     },
     caveat: 'Everything here comes from this note.',
+    record: 'The notes are the record.',
     footer: 'Generated on 6 September 2026.',
     ...over,
   };

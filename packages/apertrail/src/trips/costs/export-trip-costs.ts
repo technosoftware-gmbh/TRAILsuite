@@ -10,7 +10,13 @@
  * already converted, and returns markup. Which is what keeps rounding,
  * currency and locale decisions in the one place that knows the domain.
  */
-import { pageText as esc, metaLine, printableDocument, section } from '@technosoftware/trail-core';
+import {
+  pageText as esc,
+  metaLine,
+  printableDocument,
+  section,
+  sheetCreditHtml,
+} from '@technosoftware/trail-core';
 
 export interface CostSheetRow {
   label: string;
@@ -72,6 +78,9 @@ export interface CostSheet {
     reference: string;
   };
   caveat: string;
+  /** That the notes are the record and this is a printout. */
+  record: string;
+  /** The credit line's words, before the link trail-core adds. */
   footer: string;
 }
 
@@ -221,7 +230,8 @@ ${optionalBlock(sheet)}
 ${settlementBlock(sheet)}
 <footer>
   <p>${esc(sheet.caveat)}</p>
-  <p>${esc(sheet.footer)}</p>
+  <p>${esc(sheet.record)}</p>
+  ${sheetCreditHtml(sheet.footer)}
 </footer>`,
   });
 }
