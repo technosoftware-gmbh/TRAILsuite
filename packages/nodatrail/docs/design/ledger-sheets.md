@@ -1,11 +1,16 @@
 # The ledger sheets
 
-**Written 15 September 2026, decisions taken the same day.** Built so far:
-steps 1 (the paper in trail-core) and the budget sheet with its plumbing
-(`rollingYear`, `closedThrough`, `exportsSubfolder`, `exportAuthor`, the
-Export action and command, closing and reopening a month). The readings
-refactor and the other four sheets are still to come, and APERtrail does not
-yet carry `exportAuthor` or the credit line.
+**Written 15 September 2026, decisions taken the same day.** Built: all five
+sheets, the readings every tab and its sheet share (`ledger/readings.ts`),
+`rollingYear` and `closedThrough`, `exportsSubfolder`, `exportAuthor`, the
+Export action and command, and closing and reopening a month. Still to come:
+APERtrail carrying `exportAuthor` and the credit line.
+
+The sheets are titled in the tab's own words rather than the ones first
+written here: Kontenplan, Kontoauszug, Gewinnermittlung (with "(Geldfluss)" on
+the cash basis) and Bestandeskonten. The statement tab gained the period bar
+with its sheet, bounded by the period as a bank statement is; it had listed
+every posting the account ever saw.
 
 APERtrail turns a trip into one HTML page that prints, mails and opens
 anywhere. NODAtrail's ledger view has five tabs that are just as much

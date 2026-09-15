@@ -759,13 +759,36 @@ export const deTranslations: Translations = {
     export: 'Als Blatt exportieren',
     written: 'Blatt gespeichert unter {path}',
     failed: 'Das Blatt konnte nicht gespeichert werden.',
-    notYet: 'Für diesen Tab gibt es noch kein gedrucktes Blatt.',
     credit: 'Erstellt von {author} am {date} mit NODAtrail',
     creditAnonymous: 'Erstellt am {date} mit NODAtrail',
     truth:
       'Diese Seite ist ein Ausdruck des Journals zum Zeitpunkt der Erstellung. Massgeblich sind die Notizen im Vault: jede Zahl wird aus den Buchungen berechnet.',
     currencyRule:
       'Konten in einer anderen Währung sind zu den Kursen aus den Einstellungen umgerechnet. Eines ohne Kurs bleibt aus allen Summen heraus.',
+    chart: {
+      title: 'Kontenplan {period}',
+    },
+    balance: {
+      title: 'Bestandeskonten am {day}',
+      fileName: 'Bestandeskonten {day}',
+    },
+    income: {
+      title: 'Gewinnermittlung {period}',
+      titleCash: 'Gewinnermittlung {period} (Geldfluss)',
+    },
+    statement: {
+      title: 'Kontoauszug {account}',
+      fileName: 'Kontoauszug {account} {period}',
+      text: 'Text',
+      inward: 'Eingang',
+      outward: 'Ausgang',
+      closing: 'Schlussbestand',
+    },
+    report: {
+      total: 'Total {section}',
+      asOf: 'Bestände per {day}',
+      period: 'Periode {period}',
+    },
     budget: {
       title: 'Jahresplanung {year}',
       fileName: 'Jahresplanung {year}',

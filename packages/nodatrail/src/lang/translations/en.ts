@@ -749,13 +749,36 @@ export const enTranslations = {
     export: 'Export sheet',
     written: 'Sheet written to {path}',
     failed: 'The sheet could not be written.',
-    notYet: 'This tab has no printed sheet yet.',
     credit: 'Created by {author} on {date} with NODAtrail',
     creditAnonymous: 'Created on {date} with NODAtrail',
     truth:
       'This page is a print of the ledger at the moment it was made. The notes in the vault are what counts: every figure is computed from the postings.',
     currencyRule:
       'Accounts in another currency are converted at the rates in the settings. One with no rate stays out of every total.',
+    chart: {
+      title: 'Chart of accounts {period}',
+    },
+    balance: {
+      title: 'Balance sheet on {day}',
+      fileName: 'Balance sheet {day}',
+    },
+    income: {
+      title: 'Profit {period}',
+      titleCash: 'Profit {period} (cash)',
+    },
+    statement: {
+      title: 'Statement {account}',
+      fileName: 'Statement {account} {period}',
+      text: 'Description',
+      inward: 'In',
+      outward: 'Out',
+      closing: 'Closing balance',
+    },
+    report: {
+      total: 'Total {section}',
+      asOf: 'Balances as of {day}',
+      period: 'Period {period}',
+    },
     budget: {
       title: 'Budget year {year}',
       fileName: 'Budget year {year}',
