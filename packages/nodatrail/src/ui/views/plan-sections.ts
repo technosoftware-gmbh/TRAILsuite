@@ -42,6 +42,7 @@ import { categoryLabel } from '../../shared/categories';
 import type { NODAtrailSettings } from '../../settings/types';
 import { checkbox, chip, emptyState, row, rowIconAction, rowLead, section } from '../kit/elements';
 import { day, money } from '../kit/format';
+import { taskPriorityChip, taskSourceLabel } from '../kit/task-row';
 import { noteIcon } from '../kit/note-icon';
 import { spendIcon } from '../kit/type-icons';
 
@@ -156,7 +157,7 @@ function closedTaskRow(body: HTMLElement, task: VaultTask, deps: PeriodSectionDe
   const cancelled = task.status === 'cancelled';
   const line = row(body, {
     title: task.text,
-    subtitle: task.file.basename,
+    subtitle: taskSourceLabel(task.file.basename, task.due ?? task.scheduled),
     // The day that places it, as on every other row of the list, rather than
     // the day it was closed. One column, one meaning.
     trailing: day(task.due ?? task.scheduled),
@@ -193,11 +194,13 @@ export function renderPeriodTasks(
 
     const line = row(body, {
       title: task.text,
-      subtitle: task.file.basename,
+      subtitle: taskSourceLabel(task.file.basename, task.due ?? task.scheduled),
       trailing: day(task.due ?? task.scheduled),
       trailingTone: 'muted',
       onClick: () => deps.openNote(task.file),
     });
+    const priority = taskPriorityChip(task.priority);
+    if (priority) chip(line, priority.text, priority.tone);
     // The checkbox goes before the text rather than after it, so the row reads
     // the way a task list does, and its click is stopped from reaching the row,
     // which would open the note instead of ticking the task.

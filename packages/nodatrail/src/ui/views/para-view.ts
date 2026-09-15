@@ -38,6 +38,7 @@ import { openTaskCounts, tasksAbout } from '../../para/project-tasks';
 import { readTasks, type VaultTask } from '../../tasks/read-tasks';
 import { completeTask } from '../../tasks/write-tasks';
 import { day } from '../kit/format';
+import { taskPriorityChip, taskSourceLabel } from '../kit/task-row';
 import { NodaView } from './base-view';
 import { PARA_VIEW_TYPE } from './view-types';
 
@@ -312,12 +313,14 @@ export class ParaView extends NodaView {
     for (const task of tasksAbout(this.tasks, title).sort(byUrgency)) {
       const line = row(parent, {
         title: task.text,
-        subtitle: task.file.basename,
+        subtitle: taskSourceLabel(task.file.basename, task.due ?? task.scheduled),
         trailing: day(task.due ?? task.scheduled),
         trailingTone: 'muted',
         onClick: () => void this.deps.openNote(task.file),
       });
       line.addClass('nod-row-task');
+      const priority = taskPriorityChip(task.priority);
+      if (priority) chip(line, priority.text, priority.tone);
       const box = checkbox(line.createDiv({ cls: 'nod-row-lead' }), false, () => {
         void completeTask(this.deps.app, settings, task, this.deps.today()).then(
           () => void this.render()

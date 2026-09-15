@@ -27,8 +27,9 @@ import { goalsDueInPeriod, projectsDueInPeriod, tasksInPeriod } from '../../plan
 import { readTasks } from '../../tasks/read-tasks';
 import { completeTask } from '../../tasks/write-tasks';
 import { categoryLabel } from '../../shared/categories';
-import { checkbox, emptyState, row } from '../kit/elements';
+import { checkbox, chip, emptyState, row } from '../kit/elements';
 import { day, money } from '../kit/format';
+import { taskPriorityChip, taskSourceLabel } from '../kit/task-row';
 import { blockArgs, hostNote, type BlockDeps } from './context';
 import { noteIcon } from '../kit/note-icon';
 import { spendIcon } from '../kit/type-icons';
@@ -93,11 +94,13 @@ export async function renderTasksBlock(
   for (const task of sorted) {
     const line = row(element, {
       title: task.text,
-      subtitle: task.file.basename,
+      subtitle: taskSourceLabel(task.file.basename, task.due),
       trailing: day(task.due),
       trailingTone: isOverdue(task, today) ? 'warn' : 'muted',
       onClick: () => void deps.openNote(task.file),
     });
+    const priority = taskPriorityChip(task.priority);
+    if (priority) chip(line, priority.text, priority.tone);
 
     const box = checkbox(line.createDiv({ cls: 'nod-row-lead' }), false, () => {
       void completeTask(deps.app, settings, task, today).then(() => {
@@ -149,14 +152,16 @@ export async function renderPeriodBlock(
   }
 
   for (const task of tasks) {
-    row(element, {
+    const line = row(element, {
       title: task.text,
-      subtitle: task.file.basename,
+      subtitle: taskSourceLabel(task.file.basename, task.due ?? task.scheduled),
       trailing: day(task.due ?? task.scheduled),
       trailingTone: 'muted',
       icon: 'check-square',
       onClick: () => void deps.openNote(task.file),
     });
+    const priority = taskPriorityChip(task.priority);
+    if (priority) chip(line, priority.text, priority.tone);
   }
 
   for (const goal of goals) {
