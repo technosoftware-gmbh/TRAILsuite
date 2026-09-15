@@ -780,6 +780,13 @@ printed sheet shows, both tables with their columns aligned; clicking an
 account opens its statement. "One month" in the selector beside the period is
 the month measured against its plan, as before.
 
+**Printing the ledger.** The printer button in the Ledger's toolbar writes the
+tab on screen as a page into `Finance/_exports`, with the period, basis and
+account the tab shows: the Kontenplan, one account's Kontoauszug with money in
+and out in columns of their own, the Gewinnermittlung, or the Bestandeskonten
+on the last day of the period. The statement tab has a period of its own now,
+so a statement is the month or quarter you compare with the bank's.
+
 **Printing the year.** On the Budget tab, the printer button in the Ledger's
 toolbar writes the whole budget year as a landscape page into
 `Finance/_exports`: one column per month, what happened in the months you have

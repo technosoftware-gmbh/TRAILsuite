@@ -15,20 +15,15 @@
  * and a total covers only the accounts that share the view's home currency; the
  * rest are listed beneath it. Nothing fetches a rate.
  */
-import { Notice, type TFile } from 'obsidian';
+import { type TFile } from 'obsidian';
 import {
   accountLabel,
-  balanceAt,
-  balanceSheet,
   budgetYear,
   budgetYearOf,
   clampClosedThrough,
   formatDayTitle,
   rollingYear,
   type AccountBudgetRecord,
-  cashOut,
-  incomeStatement,
-  statement,
   type Account,
   type BudgetMeasureRow,
   type ReportGroup,
@@ -59,6 +54,15 @@ import { documentAction } from '../kit/documents';
 import { readBills } from '../../finance/read-finance';
 import { day, money, monthName } from '../kit/format';
 import { NodaView } from './base-view';
+import {
+  balanceReading,
+  chartReading,
+  incomeReading,
+  statementAccount,
+  statementReading,
+} from '../../ledger/readings';
+import { exportReportSheet } from '../../ledger/sheets/export-report-sheets';
+import { displayRate } from '../../ledger/sheets/report-sheet-model';
 import { exportBudgetSheet, sheetLanguage } from '../../ledger/sheets/export-budget-sheet';
 import { budgetSheetModel } from '../../ledger/sheets/budget-sheet-model';
 import { renderRollingBalances, renderRollingFlows } from './rolling-year-table';
@@ -154,7 +158,14 @@ export class LedgerView extends NodaView {
       await exportBudgetSheet(this.deps.app, settings, this.periodDate().getFullYear(), today);
       return;
     }
-    new Notice(t('sheets.notYet'));
+    await exportReportSheet(this.deps.app, settings, {
+      tab: this.tab,
+      period: this.range(),
+      periodLabel: this.periodLabel(),
+      basis: this.basis,
+      account: this.account,
+      today,
+    });
   }
 
   protected async renderBody(): Promise<void> {
@@ -374,15 +385,7 @@ export class LedgerView extends NodaView {
   private renderChart(parent: HTMLElement, ledger: Ledger): void {
     this.renderPeriodBar(parent);
 
-    const convert = this.converter();
-    const { from, to } = this.range();
-    // Empty rows hidden here as everywhere else: a chart of eighty accounts of
-    // which thirty have never been touched is a page somebody scrolls past
-    // rather than reads, and the account still exists whether or not a report
-    // about a period mentions it.
-    const options = { convert, hideEmpty: true };
-    const sheet = balanceSheet(ledger.accounts, ledger.postings, to, options);
-    const result = incomeStatement(ledger.accounts, ledger.postings, from, to, options);
+    const { held: sheet, flows: result } = chartReading(ledger, this.range(), this.converter());
 
     const strip = statRow(parent);
     stat(strip, t('ledger.assets'), this.money(sheet.assetTotal));
@@ -485,26 +488,24 @@ export class LedgerView extends NodaView {
 
   private renderStatement(parent: HTMLElement, ledger: Ledger): void {
     const choices = ledger.accounts;
-    const chosen =
-      choices.find((account) => account.number === this.account) ??
-      choices.find((account) => account.kind === 'asset') ??
-      choices[0];
+    const chosen = statementAccount(choices, this.account);
     if (!chosen) return;
 
     this.renderAccountPicker(parent, choices, chosen);
+    // The period, as a bank statement has one: the tab used to list every
+    // posting the account had ever seen, which only grows and cannot be held
+    // up against the month's paper from the bank.
+    this.renderPeriodBar(parent);
 
-    const rows = statement(ledger.postings, chosen);
+    const reading = statementReading(ledger, chosen, this.range());
+    const rows = reading.rows;
     const strip = statRow(parent);
-    stat(strip, t('ledger.opening'), money(chosen.opening, chosen.currency));
-    stat(
-      strip,
-      t('ledger.balance'),
-      money(balanceAt(ledger.postings, chosen, null), chosen.currency)
-    );
+    stat(strip, t('ledger.opening'), money(reading.opening, chosen.currency));
+    stat(strip, t('ledger.balance'), money(reading.closing, chosen.currency));
     stat(strip, t('ledger.postings'), String(rows.length));
 
     if (rows.length === 0) {
-      emptyState(parent, t('ledger.noPostings'));
+      emptyState(parent, t('ledger.nothingInPeriod'));
       return;
     }
 
@@ -624,11 +625,9 @@ export class LedgerView extends NodaView {
       return;
     }
 
-    const { from, to } = this.range();
-    const report = incomeStatement(ledger.accounts, ledger.postings, from, to, {
-      hideEmpty: true,
-      convert: this.converter(),
-    });
+    const reading = incomeReading(ledger, this.range(), 'accrual', this.converter());
+    if (reading.basis !== 'accrual') return;
+    const report = reading.report;
 
     const strip = statRow(parent);
     stat(strip, t('ledger.income'), this.money(report.incomeTotal));
@@ -673,11 +672,9 @@ export class LedgerView extends NodaView {
    * hiding it under an expense account it never touched would be a fiction.
    */
   private renderCashOut(parent: HTMLElement, ledger: Ledger): void {
-    const { from, to } = this.range();
-    const report = cashOut(ledger.accounts, ledger.postings, from, to, {
-      hideEmpty: true,
-      convert: this.converter(),
-    });
+    const reading = incomeReading(ledger, this.range(), 'cash', this.converter());
+    if (reading.basis !== 'cash') return;
+    const report = reading.report;
 
     const strip = statRow(parent);
     stat(strip, t('ledger.expense'), this.money(report.expenseTotal));
@@ -709,11 +706,7 @@ export class LedgerView extends NodaView {
   private renderBalance(parent: HTMLElement, ledger: Ledger): void {
     this.renderPeriodBar(parent);
 
-    const sheet = balanceSheet(ledger.accounts, ledger.postings, this.range().to, {
-      convert: this.converter(),
-      // An account holding nothing on the day is not part of what is held.
-      hideEmpty: true,
-    });
+    const sheet = balanceReading(ledger, this.range(), this.converter());
 
     const strip = statRow(parent);
     stat(strip, t('ledger.assets'), this.money(sheet.assetTotal));
@@ -959,21 +952,6 @@ export class LedgerView extends NodaView {
   private money(amount: number): string {
     return money(amount, this.deps.getSettings().homeCurrency);
   }
-}
-
-/**
- * A rate as it reads, rather than as a float prints.
- *
- * `1/1.26` is stored as 0.7936507936507936, and the settings row shows that in
- * full on purpose: it is the number the arithmetic uses and rounding it there
- * would hide a wrong rate. Here it is a subtitle beside a balance, where the
- * last eight digits say nothing the first eight do not and a line of them
- * reads as a defect rather than as precision. Display only -- the figure in
- * the column beside it is computed from the stored rate.
- */
-function displayRate(rate: number | null): string {
-  if (rate === null) return '';
-  return String(Number(rate.toFixed(8)));
 }
 
 /**

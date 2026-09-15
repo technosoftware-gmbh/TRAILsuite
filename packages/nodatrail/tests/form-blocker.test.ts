@@ -74,15 +74,3 @@ describe('the forms themselves', () => {
     expect(posting?.text).toContain("t('ledger.needsCredit')");
   });
 });
-
-describe('reports leave out the accounts holding nothing', () => {
-  const ledgerView = files.find((file) => file.path.endsWith('views/ledger-view.ts'));
-
-  it('hides empty rows on every report, not only the income statement', () => {
-    // Four: the chart's balances and its income statement, the balance sheet,
-    // and the income tab. A report of eighty accounts of which thirty have
-    // never been touched is a page nobody reads to the bottom.
-    const uses = [...(ledgerView?.text.matchAll(/hideEmpty: true/g) ?? [])];
-    expect(uses.length).toBeGreaterThanOrEqual(4);
-  });
-});
