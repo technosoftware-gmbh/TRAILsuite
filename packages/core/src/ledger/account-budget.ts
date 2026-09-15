@@ -227,6 +227,12 @@ export function measureBudgetMonth(
   };
 }
 
+/** The months closed, clamped: a note saying 14 or -1 is read as 12 or 0 rather than refused. */
+export function clampClosedThrough(value: number | null | undefined): number {
+  if (value === null || value === undefined || !Number.isFinite(value)) return 0;
+  return Math.min(12, Math.max(0, Math.trunc(value)));
+}
+
 function clampMonth(month: number): number {
   if (!Number.isFinite(month)) return 1;
   return Math.min(12, Math.max(1, Math.round(month)));
@@ -248,6 +254,8 @@ export interface AccountBudgetProperties {
   lineNoteField: string;
   /** A map of month number to amount, for where reality departs from the rhythm. */
   lineOverridesField: string;
+  /** How many months of the year have been closed: replaced by what happened. See `rollingYear`. */
+  closedThroughProperty: string;
 }
 
 export interface ParsedAccountBudget {
@@ -255,6 +263,14 @@ export interface ParsedAccountBudget {
   period: string | null;
   currency: string | null;
   lines: AccountBudgetLine[];
+  /**
+   * 0 to 12: the months somebody has closed, January first.
+   *
+   * Written by hand or by an action, never derived from the calendar: a month
+   * is closed when its statements are in, which the date does not know. Absent
+   * means nothing closed, which is what every budget written before this was.
+   */
+  closedThrough: number;
 }
 
 /** A budget note paired with the file it came from. */
@@ -301,6 +317,7 @@ export function parseAccountBudget(
     period: readString(frontmatter[p.periodProperty]),
     currency: normalizeCurrency(readString(frontmatter[p.currencyProperty])),
     lines,
+    closedThrough: clampClosedThrough(readNumberLike(frontmatter[p.closedThroughProperty])),
   };
 }
 
@@ -342,6 +359,8 @@ export function buildAccountBudgetFrontmatter(
         ? { [p.lineOverridesField]: { ...line.overrides } }
         : {}),
     })),
+    // Omitted at nothing, like every other field that says nothing.
+    ...(budget.closedThrough > 0 ? { [p.closedThroughProperty]: budget.closedThrough } : {}),
   };
 }
 

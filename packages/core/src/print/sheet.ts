@@ -1,21 +1,22 @@
 /**
- * The parts every printable sheet this plugin writes has in common: the page
- * itself, and the rule that nothing reaches paper unescaped or with a link
- * still spelled the way the vault spells it.
+ * The paper every printable sheet the plugins write shares: the page itself,
+ * and the rule that nothing reaches paper unescaped or with a link still
+ * spelled the way the vault spells it.
  *
- * Extracted when the trip cost sheet became the second export. One print
- * stylesheet rather than two, because two would have drifted in margins
- * first and in typeface second, and a photo spot sheet and a cost sheet
- * printed on the same day should look like they came from the same plugin.
+ * Written in APERtrail when the trip cost sheet became its second export, and
+ * moved here when NODAtrail's ledger sheets became the second consumer. The
+ * reason it moved is the reason it was extracted in the first place: two
+ * print stylesheets drift in margins first and in typeface second, and a trip
+ * document and a balance sheet printed on the same day should look like they
+ * came from the same suite.
+ *
+ * Markup as strings, never elements: a sheet is a file written into the vault
+ * and opened anywhere, and building it needs no DOM.
  *
  * App-free.
  */
-import {
-  displayWikilinks,
-  listIsOrdered,
-  type ProseBlock,
-  type ProseListItem,
-} from '@technosoftware/trail-core';
+import { displayWikilinks } from '../links/wikilink.js';
+import { listIsOrdered, type ProseBlock, type ProseListItem } from '../markdown/prose.js';
 
 /**
  * Escaping alone, for a caller that has a reason to want exactly that.
@@ -128,7 +129,7 @@ export function pageText(value: string): string {
   return escapeHtml(displayWikilinks(value));
 }
 
-/** One label and value in the row under a heading. Used by both sheets. */
+/** One label and value in the row under a heading. Used by every sheet. */
 export function metaLine(parts: (string | null)[]): string {
   const kept = parts.filter((part): part is string => !!part && part.trim() !== '');
   if (kept.length === 0) return '';
@@ -232,11 +233,10 @@ export function section(label: string, blocks: string[]): string {
  * the spacing between them.
  */
 export function proseSections(blocks: readonly ProseBlock[]): string[] {
-  if (blocks.length === 0) return [];
-
   const box = (part: readonly ProseBlock[]): string =>
     `<div class="overview prose">${proseHtml(part)}</div>`;
   const [first, ...rest] = blocks;
+  if (first === undefined) return [];
 
   return rest.length === 0 ? [box([first])] : [box([first]), box(rest)];
 }
@@ -248,10 +248,22 @@ export function starsHtml(rating: number | null): string {
   return `<span class="stars">${'&#9733;'.repeat(filled)}${'&#9734;'.repeat(5 - filled)}</span>`;
 }
 
-/** The document around a sheet's own body and its own extra styles. */
-export function printableDocument(input: { title: string; style: string; body: string }): string {
+/**
+ * The document around a sheet's own body and its own extra styles.
+ *
+ * `lang` is the language the sheet's words are in, which is what a browser
+ * hyphenates and a screen reader pronounces by. It defaults to English because
+ * every sheet written before the ledger sheets said so, and the default keeps
+ * their output byte for byte what it was.
+ */
+export function printableDocument(input: {
+  title: string;
+  style: string;
+  body: string;
+  lang?: string;
+}): string {
   return `<!doctype html>
-<html lang="en">
+<html lang="${escapeHtml(input.lang?.trim() || 'en')}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -263,4 +275,22 @@ ${input.body}
 </body>
 </html>
 `;
+}
+
+/** Where the credit line points. Fixed rather than a setting: it names who makes the plugins. */
+export const SHEET_CREDIT_LINK = 'https://technosoftware.com';
+
+/**
+ * The credit line under a sheet: who made it, when, with what, and where the
+ * plugin comes from.
+ *
+ * The words arrive already localized and already carrying the author and the
+ * date, because wording is a plugin's business and this package has no
+ * language. What is decided here is the part that has to be the same on every
+ * sheet: the text is escaped, and the link's text *is* its address, so a
+ * printed page still says where to go when nothing on it can be clicked.
+ */
+export function sheetCreditHtml(text: string): string {
+  const label = SHEET_CREDIT_LINK.replace(/^https?:\/\//, '');
+  return `<p class="credit">${pageText(text)} - <a href="${SHEET_CREDIT_LINK}">${label}</a></p>`;
 }

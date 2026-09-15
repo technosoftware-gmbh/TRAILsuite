@@ -115,6 +115,12 @@ export interface NODAtrailSettings {
    * count, both of which are replayed from these files and from nothing else.
    */
   importSubfolder: string;
+  /**
+   * Where the ledger's printed sheets are written, under the finance folder.
+   * Shared with APERtrail through trail-core's `SHEET_CONTRACT`. Blank writes
+   * them into the finance folder itself.
+   */
+  exportsSubfolder: string;
   /** Comma separated. Deliberately not the whole vault. */
   taskFolders: string;
 
@@ -453,6 +459,8 @@ export interface NODAtrailSettings {
    * that answer keeps it.
    */
   displayLocale: string;
+  /** The name a printed sheet's credit line gives. Blank leaves it out. Shared through `SHEET_CONTRACT`. */
+  exportAuthor: string;
 
   /**
    * What one unit of a foreign currency is worth in the home one.
@@ -534,4 +542,6 @@ export interface NODAtrailSettings {
   budgetLineNoteField: string;
   /** Month number to amount, where reality departs from the rhythm. */
   budgetLineOverridesField: string;
+  /** How many months of the year are closed: shown as what happened rather than as planned. */
+  budgetClosedThroughProperty: string;
 }

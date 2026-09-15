@@ -7,14 +7,14 @@
  * brackets. Reported off a real Wikinger prospect.
  *
  * The core reads the callout into blocks and this turns blocks into markup,
- * and the split is the one `print-sheet.ts` exists for: everything that
+ * and the split is the one `print/sheet.ts` exists for: everything that
  * reaches paper is escaped here. A parser that returned markup would have
  * handed this function a string it could no longer escape, and a note is user
  * input.
  */
 import { describe, expect, it } from 'vitest';
-import { proseBlocks } from '@technosoftware/trail-core';
-import { pageText, proseHtml, proseSections } from '../src/shared/print-sheet';
+import { proseBlocks } from '../../src/markdown/prose';
+import { pageText, proseHtml, proseSections } from '../../src/print/sheet';
 
 /** What a sheet actually does: the callout's text in, markup out. */
 const printed = (summary: string): string => proseHtml(proseBlocks(summary));

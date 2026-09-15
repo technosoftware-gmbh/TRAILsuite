@@ -508,6 +508,16 @@ export const deTranslations: Translations = {
     overrides: 'Pro Monat',
     yearPlan: 'Jahresplanung',
     yearTotal: 'Jahrestotal',
+    closedThrough: 'Abgeschlossene Monate',
+    closeMonth: '{month} abschliessen',
+    budgetModeYear: 'Das Jahr',
+    budgetModeMonth: 'Ein Monat',
+    budgetModeYearHint: 'Was in den abgeschlossenen Monaten geschah, für den Rest der Plan.',
+    budgetModeMonthHint: 'Der angezeigte Monat, Plan gegen Ist.',
+    closedMonth: '{month} abgeschlossen: der Monat zeigt jetzt, was geschah.',
+    reopenedMonth: '{month} wieder geöffnet: der Monat zeigt wieder den Plan.',
+    nothingToReopen: 'Kein Monat von {year} ist abgeschlossen.',
+    allMonthsClosed: 'Alle Monate von {year} sind abgeschlossen.',
     noBudgetForYear: 'Keine Budgetnotiz fuer {year}. Eine anlegen, um das Jahr zu planen.',
     postingCount: '{count} Buchungen',
     debit: 'Soll',
@@ -745,11 +755,54 @@ export const deTranslations: Translations = {
     },
   },
 
+  sheets: {
+    export: 'Als Blatt exportieren',
+    written: 'Blatt gespeichert unter {path}',
+    failed: 'Das Blatt konnte nicht gespeichert werden.',
+    notYet: 'Für diesen Tab gibt es noch kein gedrucktes Blatt.',
+    credit: 'Erstellt von {author} am {date} mit NODAtrail',
+    creditAnonymous: 'Erstellt am {date} mit NODAtrail',
+    truth:
+      'Diese Seite ist ein Ausdruck des Journals zum Zeitpunkt der Erstellung. Massgeblich sind die Notizen im Vault: jede Zahl wird aus den Buchungen berechnet.',
+    currencyRule:
+      'Konten in einer anderen Währung sind zu den Kursen aus den Einstellungen umgerechnet. Eines ohne Kurs bleibt aus allen Summen heraus.',
+    budget: {
+      title: 'Jahresplanung {year}',
+      fileName: 'Jahresplanung {year}',
+      currency: 'Beträge in {currency}',
+      closedThrough: 'Ist bis {month}, danach Plan',
+      noneClosed: 'Noch kein Monat abgeschlossen: das ganze Jahr ist Plan',
+      allClosed: 'Alle zwölf Monate abgeschlossen',
+      flows: 'Einnahmen und Ausgaben',
+      income: 'Total Einnahmen',
+      expense: 'Total Ausgaben',
+      result: 'Einnahmen - Ausgaben',
+      balances: 'Vermögen',
+      netWorth: 'Vermögen',
+      opening: 'Vortrag',
+      total: 'Total',
+      plan: 'Plan',
+      variance: 'Abweichung',
+      actual: 'Ist',
+      planned: 'Plan',
+      unbudgeted: 'nicht budgetiert',
+      noRate: 'kein Kurs',
+      totalHint:
+        'Total ist, was in den abgeschlossenen Monaten geschah, plus der Plan für den Rest. Plan ist das Jahr, wie es geplant wurde; Abweichung ist Total weniger Plan.',
+      projectedHint:
+        'Nach dem letzten abgeschlossenen Monat wird nur das Vermögen fortgeschrieben, um das geplante Ergebnis. Einzelne Konten werden nicht geplant.',
+      strayLines:
+        'Budgetzeilen auf Konten, die weder Einnahmen noch Ausgaben sind, werden nicht gezeigt: {numbers}',
+    },
+  },
+
   commands: {
     openDashboard: 'Lebens-Dashboard öffnen',
     openPara: 'PARA öffnen',
     openPlan: 'Plan öffnen',
     openLedger: 'Buchhaltung oeffnen',
+    exportLedgerSheet: 'Angezeigten Buchhaltungs-Tab als Blatt exportieren',
+    reopenBudgetMonth: 'Letzten abgeschlossenen Budgetmonat wieder öffnen',
     openFinance: 'Finanzen öffnen',
     newArea: 'Neuer Bereich',
     newGoal: 'Neues Ziel',
@@ -876,6 +929,9 @@ export const deTranslations: Translations = {
       rates: 'Wechselkurse',
       ratesDesc:
         'Was eine Einheit einer Fremdwaehrung in der Hauptwaehrung wert ist, als EUR 0.93458, USD 1.14. Ein umgekehrt notierter Kurs kann als Division geschrieben werden: EUR 1/1.07 ergibt dasselbe. Es wird nichts abgerufen: ein Kurs, den niemand gewaehlt hat, ist ein Kurs, den niemand pruefen kann. Eine Waehrung ohne Kurs bleibt aus den Summen heraus und ihre Zeile sagt es.',
+      exportAuthor: 'Name auf gedruckten Blättern',
+      exportAuthorDesc:
+        'Wen ein gedrucktes Blatt als Ersteller nennt: "Erstellt von Thomas am ...". Leer lassen lässt den Namen weg.',
       homeCurrency: 'Eigene Währung',
       homeCurrencyDesc: 'Die Währung, in der ein Betrag gilt, wenn eine Notiz nichts sagt.',
       currencyOptions: 'Währungen zur Auswahl',
@@ -982,6 +1038,9 @@ export const deTranslations: Translations = {
       documentSubfolder: 'Belege neben der Notiz',
       documentSubfolderDesc:
         'Der Ordner, in den eine Rechnung oder ein Auszug neben der zugehoerigen Notiz abgelegt wird, wie ein Anhangordner. Leer lassen, um Belege dort zu lassen, wo sie schon sind. Ein Beleg im Tresor wird verschoben und seine Verweise folgen; einer von diesem Rechner wird hineinkopiert.',
+      exportsSubfolder: 'Gedruckte Blätter',
+      exportsSubfolderDesc:
+        'Der Ordner im Finanzordner, in den die gedruckten Blätter der Buchhaltung geschrieben werden. Ein Blatt wird bei jedem Export neu aus den Notizen erstellt, alles darin kann also gelöscht werden. Leer lassen schreibt sie direkt in den Finanzordner.',
       importSubfolder: 'Importierte Dateien neben der Notiz',
       importSubfolderDesc:
         'Der Ordner, in dem ein Kalender-Export oder ein Kontoauszug nach dem Import aufbewahrt wird, neben den Notizen, die er gefuellt hat. Nicht derselbe Ordner wie fuer Belege: diese Dateien werden am Namen wiedererkannt und erneut gelesen, um zu ermitteln, was ein frueherer Import angeboten hat und welche Zeilen noch nicht gebucht sind. Leer lassen bewahrt nichts auf und schaltet beides ab.',

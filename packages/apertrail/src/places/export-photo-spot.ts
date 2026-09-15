@@ -78,7 +78,7 @@ import {
   printableDocument,
   section,
   starsHtml as stars,
-} from '../shared/print-sheet';
+} from '@technosoftware/trail-core';
 
 function sampleFigure(sample: FieldSheetSample): string {
   // A sample whose image could not be inlined still prints its caption: the
@@ -144,7 +144,7 @@ function motifBlock(motif: FieldSheetMotif, labels: FieldSheetLabels): string {
   </section>`;
 }
 
-/** What only a field sheet needs. The page itself comes from shared/print-sheet.ts. */
+/** What only a field sheet needs. The page itself comes from trail-core's print/sheet.ts. */
 const STYLE = `
   .sun { display: flex; flex-wrap: wrap; gap: 2mm; }
   .sun div { border: 0.5pt solid #c9ccd2; border-radius: 1.5mm; padding: 1.5mm 2.5mm; min-width: 32mm; }

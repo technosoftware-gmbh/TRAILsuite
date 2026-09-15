@@ -1015,7 +1015,7 @@ export class NewBudgetModal extends FormModal {
     const file = await createBudget(
       this.deps.app,
       this.deps.getSettings(),
-      { period: this.period.trim(), currency: this.currency, lines: [] },
+      { period: this.period.trim(), currency: this.currency, lines: [], closedThrough: 0 },
       this.deps.now()
     );
     new Notice(t('notices.noteCreated', { title: file.basename }));

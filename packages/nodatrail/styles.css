@@ -1850,3 +1850,150 @@
   border-inline-start: 3px solid var(--text-error);
   padding-inline-start: 0.6em;
 }
+
+/* The rolling budget year: the printed sheet's two tables, on screen.
+   Seventeen columns scroll sideways in their own box, with the account names
+   held in place so a figure far to the right still says whose it is. */
+.nod-roll-scroll {
+  margin-block-end: 0.4em;
+  overflow-x: auto;
+}
+
+.nod-roll {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: var(--font-ui-smaller);
+  table-layout: fixed;
+  /* The label and sixteen figure columns, below. A fixed table takes its
+     widths from its columns only when it has a width of its own. */
+  width: 129em;
+}
+
+/* Every column the same fixed width in both tables, so the months of the net
+   worth table sit exactly under the months of the income and expense table:
+   the two are read against each other column by column. */
+.nod-roll-col {
+  width: 7em;
+}
+
+.nod-roll-col-label {
+  width: 17em;
+}
+
+.nod-roll th,
+.nod-roll td {
+  border-block-end: 1px solid var(--background-modifier-border);
+  padding-block: 0.15em;
+  padding-inline: 0.45em;
+  white-space: nowrap;
+}
+
+.nod-roll th {
+  color: var(--text-muted);
+  font-weight: var(--font-medium);
+  text-align: end;
+}
+
+.nod-roll-phase th {
+  border-block-end: none;
+  font-size: var(--font-ui-smaller);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.nod-roll-label {
+  background-color: var(--background-primary);
+  inset-inline-start: 0;
+  overflow: hidden;
+  position: sticky;
+  text-align: start;
+  text-overflow: ellipsis;
+  z-index: 1;
+}
+
+.nod-roll-num {
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+.nod-roll-closed {
+  background-color: var(--background-secondary);
+}
+
+.nod-roll-first-open {
+  border-inline-start: 2px solid var(--text-normal);
+}
+
+.nod-roll-sum {
+  border-inline-start: 1px solid var(--background-modifier-border);
+}
+
+.nod-roll-neg {
+  color: var(--text-error);
+}
+
+.nod-roll-projected {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.nod-roll-section td,
+.nod-roll-result td,
+.nod-roll-net td {
+  font-weight: var(--font-bold);
+}
+
+.nod-roll-group td {
+  font-weight: var(--font-semibold);
+}
+
+.nod-roll-account-row td {
+  font-weight: var(--font-normal);
+}
+
+.nod-roll-result td,
+.nod-roll-net td {
+  border-block-start: 1px solid var(--text-normal);
+}
+
+.nod-roll td.nod-roll-depth-0 {
+  padding-inline-start: 0.45em;
+}
+
+.nod-roll td.nod-roll-depth-1 {
+  padding-inline-start: 1.1em;
+}
+
+.nod-roll td.nod-roll-depth-2 {
+  padding-inline-start: 1.8em;
+}
+
+.nod-roll td.nod-roll-depth-3 {
+  padding-inline-start: 2.5em;
+}
+
+.nod-roll td.nod-roll-depth-4 {
+  padding-inline-start: 3.2em;
+}
+
+.nod-roll-account {
+  color: var(--text-normal);
+  cursor: pointer;
+}
+
+.nod-roll-account:hover {
+  color: var(--text-accent);
+}
+
+.nod-roll-mark {
+  color: var(--text-muted);
+  font-style: italic;
+  font-weight: var(--font-normal);
+  padding-inline-start: 0.5em;
+}
+
+.nod-roll-note {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  margin-block: 0.2em;
+}

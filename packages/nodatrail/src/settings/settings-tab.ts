@@ -237,6 +237,15 @@ export class NODAtrailSettingTab extends PluginSettingTab {
     );
     textRow(
       display,
+      { name: t('settings.display.exportAuthor'), desc: t('settings.display.exportAuthorDesc') },
+      () => settings.exportAuthor,
+      async (value) => {
+        settings.exportAuthor = value.trim();
+        await this.save();
+      }
+    );
+    textRow(
+      display,
       { name: t('settings.display.rates'), desc: t('settings.display.ratesDesc') },
       () => formatRates(settings.exchangeRates),
       async (value) => {

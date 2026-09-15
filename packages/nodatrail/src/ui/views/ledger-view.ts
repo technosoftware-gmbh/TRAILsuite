@@ -15,12 +15,17 @@
  * and a total covers only the accounts that share the view's home currency; the
  * rest are listed beneath it. Nothing fetches a rate.
  */
+import { Notice, type TFile } from 'obsidian';
 import {
   accountLabel,
   balanceAt,
   balanceSheet,
   budgetYear,
   budgetYearOf,
+  clampClosedThrough,
+  formatDayTitle,
+  rollingYear,
+  type AccountBudgetRecord,
   cashOut,
   incomeStatement,
   statement,
@@ -52,8 +57,12 @@ import {
 } from '../kit/elements';
 import { documentAction } from '../kit/documents';
 import { readBills } from '../../finance/read-finance';
-import { day, money } from '../kit/format';
+import { day, money, monthName } from '../kit/format';
 import { NodaView } from './base-view';
+import { exportBudgetSheet, sheetLanguage } from '../../ledger/sheets/export-budget-sheet';
+import { budgetSheetModel } from '../../ledger/sheets/budget-sheet-model';
+import { renderRollingBalances, renderRollingFlows } from './rolling-year-table';
+import { closeNextBudgetMonth } from '../../ledger/close-budget-month';
 import { LEDGER_VIEW_TYPE } from './view-types';
 
 const TABS = ['accounts', 'statement', 'income', 'balance', 'budget'] as const;
@@ -66,6 +75,11 @@ export class LedgerView extends NodaView {
    * the accounts. Both come from the same postings; see `cashOut`.
    */
   private basis: 'accrual' | 'cash' = 'accrual';
+  /**
+   * Which reading the budget tab shows: the rolling year, which is what the
+   * year is steered by and what prints, or one month measured against its plan.
+   */
+  private budgetMode: 'year' | 'month' = 'year';
   /** The month, quarter or year on screen. Shared with the finance view. */
   private readonly period = new PeriodPicker(() => this.deps.today());
   private account: number | null = null;
@@ -122,7 +136,25 @@ export class LedgerView extends NodaView {
         icon: 'settings-2',
         onClick: () => this.deps.openAccountSetup(),
       },
+      { label: t('sheets.export'), icon: 'printer', onClick: () => void this.exportSheet() },
     ];
+  }
+
+  /**
+   * The tab on screen as a printed sheet, with the period on screen.
+   *
+   * Public because the command reaches it through the open view: the view is
+   * what knows the tab and the period, and a command that guessed them would
+   * print something other than what somebody was looking at.
+   */
+  async exportSheet(): Promise<void> {
+    const settings = this.deps.getSettings();
+    const today = formatDayTitle(this.deps.today());
+    if (this.tab === 'budget') {
+      await exportBudgetSheet(this.deps.app, settings, this.periodDate().getFullYear(), today);
+      return;
+    }
+    new Notice(t('sheets.notYet'));
   }
 
   protected async renderBody(): Promise<void> {
@@ -733,6 +765,13 @@ export class LedgerView extends NodaView {
     }
 
     const currency = budget.currency ?? settings.homeCurrency;
+
+    this.renderBudgetModeBar(parent);
+    if (this.budgetMode === 'year') {
+      this.renderRollingYear(parent, ledger, budget, currency);
+      return;
+    }
+
     const plan = budgetYear(budget.lines);
 
     const measured = await measureMonth(this.deps.app, settings, this.periodDate());
@@ -764,7 +803,22 @@ export class LedgerView extends NodaView {
       }
     }
 
-    const overview = section(parent, `${t('ledger.yearPlan')}: ${budget.title}`);
+    // Closing a month lives on the year, beside the plan it turns into what
+    // happened. The month named is the only one there is to close: the one
+    // after the last closed.
+    const closed = clampClosedThrough(budget.closedThrough);
+    const overview = section(
+      parent,
+      `${t('ledger.yearPlan')}: ${budget.title}`,
+      closed < 12
+        ? {
+            label: t('ledger.closeMonth', { month: monthName(closed + 1) }),
+            icon: 'lock',
+            onClick: () =>
+              void closeNextBudgetMonth(this.deps.app, settings, budget).then(() => this.render()),
+          }
+        : undefined
+    );
     for (const entry of plan.rows) {
       const account = ledger.byNumber.get(entry.line.account);
       row(overview, {
@@ -777,6 +831,95 @@ export class LedgerView extends NodaView {
       title: t('ledger.yearTotal'),
       trailing: money(plan.total, currency),
     });
+  }
+
+  /** The two readings of a budget, side by side in one selector, as the income tab offers its two bases. */
+  private renderBudgetModeBar(parent: HTMLElement): void {
+    const bar = parent.createDiv({ cls: 'nod-ledger-picker' });
+    const select = bar.createEl('select');
+    for (const [value, label] of [
+      ['year', t('ledger.budgetModeYear')],
+      ['month', t('ledger.budgetModeMonth')],
+    ] as const) {
+      const option = select.createEl('option', { value, text: label });
+      if (value === this.budgetMode) option.selected = true;
+    }
+    select.addEventListener('change', () => {
+      this.budgetMode = select.value === 'month' ? 'month' : 'year';
+      void this.render();
+    });
+    bar.createSpan({
+      cls: 'nod-ledger-hint',
+      text:
+        this.budgetMode === 'year'
+          ? t('ledger.budgetModeYearHint')
+          : t('ledger.budgetModeMonthHint'),
+    });
+  }
+
+  /**
+   * The rolling year on screen: the printed sheet's two tables, from the
+   * sheet's own model, so what is checked here is what prints.
+   */
+  private renderRollingYear(
+    parent: HTMLElement,
+    ledger: Ledger,
+    budget: AccountBudgetRecord<TFile>,
+    currency: string
+  ): void {
+    const settings = this.deps.getSettings();
+    const year = rollingYear(
+      budget.lines,
+      ledger.accounts,
+      ledger.postings,
+      this.periodDate().getFullYear(),
+      budget.closedThrough,
+      { convert: this.converter() }
+    );
+    const sheet = budgetSheetModel(year, {
+      settings,
+      currency,
+      lang: sheetLanguage(),
+      today: formatDayTitle(this.deps.today()),
+    });
+
+    const strip = statRow(parent);
+    stat(strip, t('sheets.budget.total'), money(year.result.forecastTotal, currency));
+    stat(strip, t('sheets.budget.plan'), money(year.result.planTotal, currency));
+    stat(
+      strip,
+      t('sheets.budget.variance'),
+      money(year.result.variance, currency),
+      year.result.variance < 0 ? 'warn' : 'good'
+    );
+
+    const openAccount = (number: number): void => {
+      this.account = number;
+      this.tab = 'statement';
+      void this.render();
+    };
+
+    // Closing a month lives here, on the table it turns from plan into what
+    // happened. The month named is the only one there is to close.
+    const closed = clampClosedThrough(budget.closedThrough);
+    const flows = section(
+      parent,
+      `${t('sheets.budget.flows')} · ${sheet.meta.join(' · ')}`,
+      closed < 12
+        ? {
+            label: t('ledger.closeMonth', { month: monthName(closed + 1) }),
+            icon: 'lock',
+            onClick: () =>
+              void closeNextBudgetMonth(this.deps.app, settings, budget).then(() => this.render()),
+          }
+        : undefined
+    );
+    renderRollingFlows(flows, sheet, openAccount);
+
+    if (sheet.balances.length > 0) {
+      const balances = section(parent, t('sheets.budget.balances'));
+      renderRollingBalances(balances, sheet, openAccount);
+    }
   }
 
   private renderBudgetRow(

@@ -214,6 +214,7 @@ describe('the money checks', () => {
       period: '2026',
       currency: 'CHF',
       lines: [line(4001), line(4999)],
+      closedThrough: 0,
     };
     const findings = budgetFindings([budget], path, [{ number: 4001 }]);
 

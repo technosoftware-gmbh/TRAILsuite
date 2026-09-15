@@ -31,6 +31,7 @@ export * from './markdown/index.js';
 export * from './money/index.js';
 export * from './paths/index.js';
 export * from './period/index.js';
+export * from './print/index.js';
 export * from './priority/index.js';
 export * from './plan/index.js';
 export * from './meal/index.js';

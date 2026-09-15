@@ -364,6 +364,7 @@ the 31st in March: the step is always computed from the original day.
 | `period` | `budgetPeriodProperty` | `2026`, a bare year and nothing else | string |
 | `currency` | `budgetCurrencyProperty` | | string |
 | `lines` | `budgetLinesProperty` | The plan, one line per account | list of maps |
+| `closedThrough` | `budgetClosedThroughProperty` | 0 to 12: the months closed, shown as what happened rather than as planned. Absent is 0 | number |
 
 A line carries `account` (a number), `amount`, `rhythm`, `month`, `note` and
 `months`, under six `*Field` settings.

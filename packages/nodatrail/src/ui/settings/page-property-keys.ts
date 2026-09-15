@@ -242,6 +242,7 @@ function sections(): Section[] {
         { key: 'budgetLineRhythmField', label: t('cadence.monthly') },
         { key: 'budgetLineMonthField', label: t('period.month') },
         { key: 'budgetLineOverridesField', label: t('ledger.overrides') },
+        { key: 'budgetClosedThroughProperty', label: t('ledger.closedThrough') },
         { key: 'budgetLineAmountField', label: t('finance.amount') },
         { key: 'budgetLineNoteField', label: t('common.edit') },
       ],

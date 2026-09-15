@@ -163,6 +163,18 @@ export function renderFolderPage(containerEl: HTMLElement, deps: FolderPageDeps)
       await save();
     }
   );
+  textRow(
+    finance,
+    {
+      name: t('settings.folders.exportsSubfolder'),
+      desc: t('settings.folders.exportsSubfolderDesc'),
+    },
+    () => settings.exportsSubfolder,
+    async (value) => {
+      settings.exportsSubfolder = value.trim();
+      await save();
+    }
+  );
 
   // The four archive sub-folders, beside the folders they mirror. Named here
   // rather than left as literals because this vault archives a hundred
