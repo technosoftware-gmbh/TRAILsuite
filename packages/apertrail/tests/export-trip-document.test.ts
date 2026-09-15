@@ -54,6 +54,7 @@ function sheet(overrides: Partial<TripDocument> = {}): TripDocument {
             about: null,
             note: 'Boarding at Capital Park',
             optional: null,
+            persons: null,
             fares: [],
           },
           {
@@ -63,6 +64,7 @@ function sheet(overrides: Partial<TripDocument> = {}): TripDocument {
             about: null,
             note: null,
             optional: null,
+            persons: null,
             fares: [],
           },
         ],
@@ -74,12 +76,15 @@ function sheet(overrides: Partial<TripDocument> = {}): TripDocument {
     ],
     costTotal: { label: 'Budget', amount: 'CHF 5,000.00' },
     costOptional: null,
+    costPerPerson: null,
     gallery: [{ src: 'data:image/jpeg;base64,BBBB', caption: 'Die Dune 45' }],
     transport: [
       {
         about: null,
         fares: [],
         optional: null,
+        persons: null,
+        rooms: [],
         time: '20:40 - 06:10',
         label: 'Zürich to Pretoria',
         detail: 'Outward journey · LX288',
@@ -95,6 +100,8 @@ function sheet(overrides: Partial<TripDocument> = {}): TripDocument {
         when: 'Day 1 → Day 12',
         fares: [],
         optional: null,
+        persons: null,
+        rooms: [],
       },
     ],
     transportHint: 'Day 0 is the day before the trip starts.',
@@ -462,6 +469,8 @@ describe('getting there and back', () => {
             when: null,
             fares: [],
             optional: null,
+            persons: null,
+            rooms: [],
           },
         ],
       })
@@ -505,6 +514,7 @@ describe('a note written as two paragraphs', () => {
                 about: null,
                 note: 'Erster Absatz.\n\nZweiter Absatz.',
                 optional: null,
+                persons: null,
                 fares: [],
               },
             ],
@@ -736,6 +746,8 @@ describe('the ship on a leg', () => {
             when: null,
             fares: [],
             optional: null,
+            persons: null,
+            rooms: [],
           },
         ],
       })
@@ -757,6 +769,8 @@ describe('the ship on a leg', () => {
             when: null,
             fares: [],
             optional: null,
+            persons: null,
+            rooms: [],
           },
         ],
       })
@@ -777,6 +791,8 @@ describe('the ship on a leg', () => {
             when: null,
             fares: [],
             optional: null,
+            persons: null,
+            rooms: [],
           },
         ],
       })
@@ -1064,6 +1080,7 @@ describe('the excursion on a stop', () => {
               about: 'Viking House, the Swords in the Rock, and the Domsteinene.',
               note: null,
               optional: 'Optional - CHF 119.00 per person',
+              persons: null,
               fares: [],
               ...over,
             },
@@ -1290,5 +1307,127 @@ describe('what the extras cost', () => {
       )?.[1] ?? '';
 
     expect(table).not.toContain('optional-');
+  });
+});
+
+/**
+ * Who is travelling, and who does what.
+ *
+ * Asked for on 15 September 2026: participants and per-person costs were in
+ * the note and none of it reached the page. The names go once into the
+ * header, beside a line only where that line is not for everybody, rooms are
+ * printed under the one stay they belong to, and each person gets their share.
+ */
+describe('the people on a trip', () => {
+  const party = { personTitles: ['Thomas', 'Anna', 'Sven'] };
+
+  it('names a line only where it is not for the whole party', async () => {
+    const { linePersons } = await import('../src/trips/ui/export-trip-document');
+    const { aTrip } = await import('./fixtures');
+    const trip = aTrip('Nordkap', party);
+
+    expect(linePersons([], trip)).toBeNull();
+    expect(linePersons(['Sven', 'Anna', 'Thomas'], trip)).toBeNull();
+    expect(linePersons(['Anna'], trip)).toBe('Only Anna');
+  });
+
+  it('prints two rooms at the same place over the same days as one stay with two rooms', async () => {
+    const { documentStays } = await import('../src/trips/ui/export-trip-document');
+    const { DEFAULT_SETTINGS } = await import('../src/settings/defaults');
+    const { aNight, aTrip } = await import('./fixtures');
+    const room = { accommodationTitle: 'Hotel Dreieich', checkInDay: 1, checkOutDay: 3 };
+    const trip = aTrip('Nordkap', {
+      ...party,
+      nights: [
+        aNight({ ...room, persons: ['Thomas', 'Anna'] }),
+        aNight({ ...room, persons: ['Sven'] }),
+        aNight({ accommodationTitle: 'Hotel Bergen', checkInDay: 3, checkOutDay: 4 }),
+      ],
+    });
+
+    const stays = documentStays(trip, DEFAULT_SETTINGS);
+    expect(stays.map((stay) => stay.label)).toEqual(['Hotel Dreieich', 'Hotel Bergen']);
+    expect(stays[0].rooms.map((r) => r.persons)).toEqual(['Thomas, Anna', 'Sven']);
+    expect(stays[1].rooms).toEqual([]);
+    expect(stays[1].persons).toBeNull();
+  });
+
+  it('gives each person a share, and none for a trip with one traveller', async () => {
+    const { documentPerPerson } = await import('../src/trips/ui/export-trip-document');
+    const { DEFAULT_SETTINGS } = await import('../src/settings/defaults');
+    const { aNight, aStop, aTrip } = await import('./fixtures');
+    const lines = {
+      nights: [aNight({ accommodationTitle: 'Hotel', cost: 300, costUnit: 'total' as const })],
+      stops: [
+        aStop({
+          placeTitle: 'Stavanger',
+          cost: 119,
+          costUnit: 'person' as const,
+          persons: ['Anna'],
+        }),
+      ],
+    };
+
+    const perPerson = documentPerPerson(
+      aTrip('Nordkap', { ...party, ...lines, currency: 'CHF' }),
+      DEFAULT_SETTINGS
+    );
+    expect(perPerson?.people.map((p) => p.person)).toEqual(['Thomas', 'Anna', 'Sven']);
+    expect(perPerson?.people[1].lines).toHaveLength(2);
+    expect(perPerson?.people[0].lines[0].detail).toContain('1/3');
+    expect(perPerson?.people[1].lines[1].detail).toBeNull();
+
+    expect(
+      documentPerPerson(
+        aTrip('Solo', { personTitles: ['Thomas'], nights: lines.nights }),
+        DEFAULT_SETTINGS
+      )
+    ).toBeNull();
+  });
+
+  it('prints the rooms, the names beside a line, and one block per person', () => {
+    const html = buildTripDocumentHtml(
+      sheet({
+        stays: [
+          {
+            about: null,
+            time: null,
+            label: 'Hotel Dreieich',
+            detail: null,
+            when: 'Day 1 → Day 3',
+            fares: [],
+            optional: null,
+            persons: null,
+            rooms: [
+              { persons: 'Thomas, Anna', optional: null, fares: [] },
+              { persons: 'Sven', optional: null, fares: [] },
+            ],
+          },
+        ],
+        costPerPerson: {
+          label: 'Per person',
+          hint: null,
+          people: [
+            {
+              person: 'Anna & <Co>',
+              lines: [
+                { label: 'Hotel Dreieich', detail: '(1/2 of CHF 400.00)', amount: 'CHF 200.00' },
+              ],
+              total: { label: 'Planned', amount: 'CHF 200.00' },
+            },
+          ],
+        },
+      })
+    );
+
+    expect(html).toContain('<ul class="rooms">');
+    expect(html).toContain('Thomas, Anna');
+    expect(html).toContain('<h2>Per person</h2>');
+    expect(html).toContain('Anna &amp; &lt;Co&gt;');
+    expect(html).toContain('(1/2 of CHF 400.00)');
+  });
+
+  it('prints no per-person section when there is none', () => {
+    expect(buildTripDocumentHtml(sheet())).not.toContain('class="person"');
   });
 });

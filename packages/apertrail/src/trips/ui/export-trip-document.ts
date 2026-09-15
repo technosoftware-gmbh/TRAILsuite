@@ -15,7 +15,7 @@
  * folder of "Shongololo 2.html" would be worse than a stale copy replaced.
  */
 import { App } from 'obsidian';
-import { parseDayTitle, proseBlocks, sanitizeTitle } from '@technosoftware/trail-core';
+import { caseFold, parseDayTitle, proseBlocks, sanitizeTitle } from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import { APERtrailSettings } from '../../settings/types';
 import { TravelTrip, TravelVehicle } from '../../vault/types';
@@ -42,10 +42,13 @@ import {
   TripDocumentFare,
   TripDocumentJourney,
   TripDocumentOptional,
+  TripDocumentPerPerson,
   TripDocumentPicture,
+  TripDocumentRoom,
 } from '../export-trip-document';
 import { formatMediumDate, formatMoney } from '../../shared/display';
 import { lineFigure, VariedLine } from '../costs/line-variants';
+import { namesSomebodyElse, perPersonShares } from '../costs/per-person';
 
 async function picture(
   app: App,
@@ -151,6 +154,23 @@ export function optionalLabel(
   return `${said} \u00b7 ${money} ${t(`costs.unit.${figure.costUnit}`)}`;
 }
 
+/** Names as one line of text, in the order the note gives them. */
+function joinNames(names: readonly string[]): string {
+  return names.join(', ');
+}
+
+/**
+ * Who a line is for, where that is not the whole party: "Only Anna".
+ *
+ * Nothing for a line that names nobody or names exactly the participants,
+ * because those are the lines everybody is on, and printing every name on
+ * every row would hide the few rows that differ.
+ */
+export function linePersons(persons: readonly string[], trip: TravelTrip): string | null {
+  if (!namesSomebodyElse(persons, trip.personTitles)) return null;
+  return t('tripDocument.onlyFor', { names: joinNames(persons) });
+}
+
 /**
  * The itinerary, as numbered days.
  *
@@ -186,6 +206,7 @@ export function documentDays(trip: TravelTrip, settings: APERtrailSettings): Tri
       about: stop.excursion?.description ?? null,
       note: stop.note,
       optional: optionalLabel(stop, trip, settings),
+      persons: linePersons(stop.persons, trip),
       fares: documentFares(stop, trip, settings),
     })),
   }));
@@ -270,25 +291,66 @@ export function documentTransport(
     about: leg.vehicle?.description ?? null,
     fares: documentFares(leg, trip, settings, leg.vehicle),
     optional: optionalLabel(leg, trip, settings),
+    persons: linePersons(leg.persons, trip),
+    rooms: [],
   }));
 }
 
-function documentStays(trip: TravelTrip, settings: APERtrailSettings): TripDocumentJourney[] {
-  return trip.nights.map((night) => ({
-    time: null,
-    label: night.accommodationTitle ?? t('itinerary.unnamedNight'),
-    detail: null,
-    when: journeyWhen(
-      { day: night.checkInDay, value: night.checkIn },
-      { day: night.checkOutDay, value: night.checkOut },
-      trip.departure
-    ),
-    // A stay is at a place, and a place's own words belong on the place's own
-    // prospect rather than under every night somebody spent there.
-    about: null,
-    fares: documentFares(night, trip, settings),
-    optional: optionalLabel(night, trip, settings),
-  }));
+/**
+ * Where the trip sleeps, one row per stay and the rooms under it.
+ *
+ * A party of three in two rooms is written as two night entries at the same
+ * place over the same days, each naming who is in it. Printed as two stays,
+ * that read as two hotels; so entries sharing the place and both ends are one
+ * stay here, in the order the first of them appears, with a room each.
+ *
+ * A stay with a single entry prints as it always has, plus who it is for when
+ * that is not everybody. Exported for its own suite.
+ */
+export function documentStays(
+  trip: TravelTrip,
+  settings: APERtrailSettings
+): TripDocumentJourney[] {
+  const groups = new Map<string, typeof trip.nights>();
+  for (const night of trip.nights) {
+    const key = [
+      caseFold(night.accommodationTitle),
+      night.checkInDay ?? night.checkIn ?? '',
+      night.checkOutDay ?? night.checkOut ?? '',
+    ].join('|');
+    const group = groups.get(key);
+    if (group) group.push(night);
+    else groups.set(key, [night]);
+  }
+
+  return [...groups.values()].map((nights) => {
+    const [first] = nights;
+    const single = nights.length === 1;
+    const rooms: TripDocumentRoom[] = single
+      ? []
+      : nights.map((night) => ({
+          persons: night.persons.length > 0 ? joinNames(night.persons) : null,
+          optional: optionalLabel(night, trip, settings),
+          fares: documentFares(night, trip, settings),
+        }));
+    return {
+      time: null,
+      label: first.accommodationTitle ?? t('itinerary.unnamedNight'),
+      detail: null,
+      when: journeyWhen(
+        { day: first.checkInDay, value: first.checkIn },
+        { day: first.checkOutDay, value: first.checkOut },
+        trip.departure
+      ),
+      // A stay is at a place, and a place's own words belong on the place's own
+      // prospect rather than under every night somebody spent there.
+      about: null,
+      fares: single ? documentFares(first, trip, settings) : [],
+      optional: single ? optionalLabel(first, trip, settings) : null,
+      persons: single ? linePersons(first.persons, trip) : null,
+      rooms,
+    };
+  });
 }
 
 /**
@@ -354,6 +416,56 @@ export function documentExtensions(
     about: extension.subtitle,
     total: extensionTotal(extension, settings),
   }));
+}
+
+/**
+ * Each person's part of the trip, as the document prints it.
+ *
+ * Null unless at least two people are named somewhere: one traveller's share
+ * is the whole plan again. The hint is set when the trip has a category
+ * budget, because then the planned total above counts that budget and these
+ * totals, built from the lines alone, need not add up to it.
+ */
+export function documentPerPerson(
+  trip: TravelTrip,
+  settings: APERtrailSettings
+): TripDocumentPerPerson | null {
+  const currency = trip.currency ?? settings.homeCurrency;
+  const shares = perPersonShares(
+    tripItemEstimates(trip, estimateLabels()),
+    trip.personTitles,
+    currency
+  ).filter((share) => share.items.length > 0);
+  if (shares.length < 2) return null;
+
+  return {
+    label: t('tripDocument.perPerson'),
+    hint: trip.budget.length > 0 ? t('tripDocument.perPersonHint') : null,
+    people: shares.map((share) => ({
+      person: share.person,
+      lines: share.items.map((item) => ({
+        label: item.label,
+        // What the figure is a part of, only where the line is something shared
+        // -- a room, a car -- rather than a price per head that is already each
+        // person's own.
+        detail:
+          item.sharedBy > 1 && (item.unit === 'total' || item.unit === 'night')
+            ? t('tripDocument.shareOf', {
+                count: item.sharedBy,
+                amount: formatMoney(item.lineAmount, item.currency ?? currency),
+              })
+            : null,
+        amount: formatMoney(item.amount, item.currency ?? currency),
+      })),
+      total:
+        share.total === null
+          ? null
+          : {
+              label: share.partial ? t('tripDocument.perPersonPartial') : t('costs.planned'),
+              amount: formatMoney(share.total, currency),
+            },
+    })),
+  };
 }
 
 /**
@@ -444,7 +556,14 @@ export async function buildTripDocument(
   return {
     title: trip.title,
     subtitle: trip.subtitle,
-    meta: [trip.country?.title ?? trip.countryTitle, dateRange(trip), lengthLine(trip)],
+    meta: [
+      trip.country?.title ?? trip.countryTitle,
+      dateRange(trip),
+      lengthLine(trip),
+      trip.personTitles.length > 0
+        ? t('tripDocument.travellers', { names: joinNames(trip.personTitles) })
+        : null,
+    ],
     hero: trip.image ? await picture(app, trip.image, null) : null,
     highlights: trip.highlights,
     overview: proseBlocks(overview),
@@ -453,6 +572,7 @@ export async function buildTripDocument(
     stays: documentStays(trip, settings),
     transportHint: transportHint(trip),
     ...documentCosts(trip, settings),
+    costPerPerson: documentPerPerson(trip, settings),
     extensions: documentExtensions(trip, settings),
     // Said only where there is something to say it about, so the sentence
     // appears where it explains a figure and nowhere else.

@@ -195,6 +195,13 @@ export const deTranslations: Translations = {
     optional: 'Optional',
     optionalTaken: 'Optional, gebucht',
     optionalTotal: 'Optional zusätzlich',
+    travellers: 'Reisende: {names}',
+    onlyFor: 'Nur {names}',
+    perPerson: 'Pro Person',
+    perPersonHint:
+      'Aus den Zeilen des Reiseverlaufs gerechnet: ein geteiltes Zimmer wird auf die Personen darin aufgeteilt, ein Ausflug der Person zugerechnet, die ihn macht. Ein Budget für eine ganze Kategorie wird nicht aufgeteilt, darum müssen diese Summen nicht die geplante Summe darüber ergeben.',
+    perPersonPartial: 'Geplant, nur in der Reisewährung',
+    shareOf: '(1/{count} von {amount})',
     fileSuffix: 'Reisedokument',
     written: 'Reisedokument geschrieben nach {path}.',
     failed: 'Das Reisedokument konnte nicht geschrieben werden.',
