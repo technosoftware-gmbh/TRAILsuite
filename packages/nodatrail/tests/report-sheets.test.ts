@@ -7,7 +7,7 @@
  * statement laid out as a bank's with debit and credit apart, and nothing a
  * note says reaching the page as markup.
  */
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterAll, describe, expect, it } from 'vitest';
 import { parseAccount, type AccountProperties } from '@technosoftware/trail-core';
 import {
   balanceReading,
@@ -28,7 +28,13 @@ import { toHome } from '../src/shared/rates';
 import { setDisplayLocale } from '../src/ui/kit/format';
 import { CHART, postings, settings } from './budget-sheet-fixture';
 
-afterEach(() => setDisplayLocale(''));
+// A named convention rather than the machine's own, which is what blank means:
+// on a Mac set to German the dates below read "30. Juni 2026" and the suite
+// passed only where it was written. Set at the top rather than in a hook,
+// because the models below are built while the suite is collected, before any
+// hook has run.
+setDisplayLocale('en-US');
+afterAll(() => setDisplayLocale(''));
 
 const s = settings();
 const convert = (amount: number, currency: string | null) => toHome(amount, currency, s);
