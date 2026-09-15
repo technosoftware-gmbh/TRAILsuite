@@ -937,7 +937,7 @@ export const enTranslations = {
         'What one unit of a foreign currency is worth in the home one, as EUR 0.93458, USD 1.14. A rate quoted the other way round can be written as a division: EUR 1/1.07 is the same thing. Nothing is fetched: a rate nobody chose is a rate nobody can check. A currency with no rate here stays out of the totals and its row says so.',
       exportAuthor: 'Name on printed sheets',
       exportAuthorDesc:
-        'Who a printed sheet says made it: "Created by Thomas on ...". Leave blank to leave the name out.',
+        'Who a printed sheet says made it: "Created by Thomas on ...". Leave blank to leave the name out. APERtrail has the same setting.',
       homeCurrency: 'Home currency',
       homeCurrencyDesc: 'The currency a figure is taken to be in when a note does not say.',
       currencyOptions: 'Currency options',

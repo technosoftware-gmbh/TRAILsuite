@@ -19,7 +19,12 @@
  * every path here is built with trail-core's `joinFolder()`, which drops a
  * blank segment instead of producing a leading slash.
  */
-import { CRM_CONTRACT, DISPLAY_CONTRACT, joinFolder } from '@technosoftware/trail-core';
+import {
+  CRM_CONTRACT,
+  DISPLAY_CONTRACT,
+  joinFolder,
+  SHEET_CONTRACT,
+} from '@technosoftware/trail-core';
 import { APERtrailSettings } from './types';
 import { I18nManager, t } from '../lang/I18nManager';
 
@@ -29,7 +34,7 @@ export const DEFAULT_SETTINGS: APERtrailSettings = {
   tripsFolder: 'Trips',
   bookingsFolder: 'Trips/Bookings',
   tripBookingsSubfolder: 'Bookings',
-  exportsSubfolder: '_exports',
+  exportsSubfolder: SHEET_CONTRACT.exportsSubfolder,
 
   placesFolder: 'Places',
   countriesFolder: 'Places/Countries',
@@ -236,6 +241,7 @@ export const DEFAULT_SETTINGS: APERtrailSettings = {
   rateValueField: 'rate',
 
   displayLocale: DISPLAY_CONTRACT.displayLocale,
+  exportAuthor: SHEET_CONTRACT.exportAuthor,
   homeCurrency: 'CHF',
   currencyOptions: 'CHF, EUR, USD',
   budgetEnabled: true,

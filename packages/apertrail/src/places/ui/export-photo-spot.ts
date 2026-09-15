@@ -23,6 +23,7 @@ import {
   sunPosition,
   sunTimes,
 } from '@technosoftware/trail-core';
+import { sheetCredit } from '../../shared/sheet-credit';
 import { t } from '../../lang/I18nManager';
 import { exportPath } from '../../shared/export-folder';
 import { writeSheet } from '../../shared/write-sheet';
@@ -229,7 +230,12 @@ export async function buildFieldSheet(
       value: row.value,
     })),
     caveat: t('photoSpot.sunCaveat'),
-    footer: t('photoSpot.export.footer', { date: formatMediumDate(new Date()) }),
+    record: t('photoSpot.export.record'),
+    footer: sheetCredit(
+      settings,
+      (author) => t('photoSpot.export.footer', { author, date: formatMediumDate(new Date()) }),
+      () => t('photoSpot.export.footerAnonymous', { date: formatMediumDate(new Date()) })
+    ),
     labels: {
       motifs: t('photoSpot.motifs'),
       light: t('photoSpot.export.light'),

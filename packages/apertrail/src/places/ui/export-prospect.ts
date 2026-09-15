@@ -22,6 +22,7 @@ import {
   proseBlocks,
   sanitizeTitle,
 } from '@technosoftware/trail-core';
+import { sheetCredit } from '../../shared/sheet-credit';
 import { t } from '../../lang/I18nManager';
 import { exportFolder, exportPath } from '../../shared/export-folder';
 import { writeSheet } from '../../shared/write-sheet';
@@ -449,7 +450,12 @@ export async function buildProspect(
       trips: subject.kind === 'vehicle' ? t('vehicleBrochure.trips') : t('prospect.trips'),
     },
     caveat: t('prospect.caveat'),
-    footer: t('vehicleBrochure.footer', { date: formatMediumDate(today) }),
+    record: t('vehicleBrochure.record'),
+    footer: sheetCredit(
+      settings,
+      (author) => t('vehicleBrochure.footer', { author, date: formatMediumDate(today) }),
+      () => t('vehicleBrochure.footerAnonymous', { date: formatMediumDate(today) })
+    ),
   };
 }
 

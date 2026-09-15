@@ -102,6 +102,21 @@ export function renderSectionConfiguration(
     }
   );
 
+  // Who the printed sheets name as their maker. NODAtrail has the same
+  // setting under the same key, defaulted through trail-core's SHEET_CONTRACT.
+  textRow(
+    display,
+    {
+      name: t('settings.display.exportAuthor.name'),
+      desc: t('settings.display.exportAuthor.desc'),
+    },
+    () => settings.exportAuthor,
+    async (value) => {
+      settings.exportAuthor = value.trim();
+      await save();
+    }
+  );
+
   const photoSpots = sectionCard(containerEl, t('settings.photoSpots.title'));
 
   toggleRow(

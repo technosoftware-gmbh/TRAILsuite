@@ -290,6 +290,7 @@ export function mergeSettings(raw: unknown): APERtrailSettings {
     // here could carry, and a tag it rejects falls back rather than throwing, so
     // a typo costs a convention and never costs a figure.
     displayLocale: str(r.displayLocale, d.displayLocale),
+    exportAuthor: str(r.exportAuthor, d.exportAuthor),
     homeCurrency: str(r.homeCurrency, d.homeCurrency),
     currencyOptions: str(r.currencyOptions, d.currencyOptions),
     budgetEnabled: bool(r.budgetEnabled, d.budgetEnabled),

@@ -38,25 +38,25 @@ CRM/
 
 On the sub-page the common parent comes first, and the rest are grouped under three module headings, Trips, Places and CRM, in that order. Every field has Obsidian's folder autocomplete. The German-locale defaults are in the locale table further down.
 
-| Setting | Default | What it holds |
-|---|---|---|
-| `rootFolder` | *(empty)* | Optional common parent above all three modules. Empty means the vault root |
-| `tripsFolder` | `Trips` | `type: trip` notes |
-| `bookingsFolder` | `Trips/Bookings` | Where a `type: booking` note goes when its trip has no folder of its own. Bookings are read from here **and** from every trip folder |
-| `tripBookingsSubfolder` | `Bookings` | The folder a trip keeps its bookings in, inside the trip's own folder. Blank puts every booking in `bookingsFolder` |
-| `exportsSubfolder` | `_exports` | The subfolder a note keeps its exported sheets in, beside the note itself. Notes in one folder share one. Blank writes sheets beside the note |
-| `placesFolder` | `Places` | The Places module root; the eight folders below derive from it |
-| `countriesFolder` | `Places/Countries` | `type: country` notes |
-| `statesFolder` | `Places/States` | `type: state` notes |
-| `citiesFolder` | `Places/Cities` | `type: city` notes |
-| `accommodationFolder` | `Places/Accommodation` | `type: accommodation` notes |
-| `fnbFolder` | `Places/Food & Beverages` | `type: fnb` notes |
-| `landmarksFolder` | `Places/Landmarks` | `type: landmark` notes |
-| `locationsFolder` | `Places/Locations` | `type: location` notes |
-| `photoSpotsFolder` | `Places/Photo Spots` | `type: photospot` notes |
-| `crmFolder` | `CRM` | The CRM module root |
-| `personsFolder` | `CRM/People` | The folder scanned for Person notes |
-| `companiesFolder` | `CRM/Companies` | The folder scanned for Company notes |
+| Setting                 | Default                   | What it holds                                                                                                                                 |
+| ----------------------- | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `rootFolder`            | _(empty)_                 | Optional common parent above all three modules. Empty means the vault root                                                                    |
+| `tripsFolder`           | `Trips`                   | `type: trip` notes                                                                                                                            |
+| `bookingsFolder`        | `Trips/Bookings`          | Where a `type: booking` note goes when its trip has no folder of its own. Bookings are read from here **and** from every trip folder          |
+| `tripBookingsSubfolder` | `Bookings`                | The folder a trip keeps its bookings in, inside the trip's own folder. Blank puts every booking in `bookingsFolder`                           |
+| `exportsSubfolder`      | `_exports`                | The subfolder a note keeps its exported sheets in, beside the note itself. Notes in one folder share one. Blank writes sheets beside the note |
+| `placesFolder`          | `Places`                  | The Places module root; the eight folders below derive from it                                                                                |
+| `countriesFolder`       | `Places/Countries`        | `type: country` notes                                                                                                                         |
+| `statesFolder`          | `Places/States`           | `type: state` notes                                                                                                                           |
+| `citiesFolder`          | `Places/Cities`           | `type: city` notes                                                                                                                            |
+| `accommodationFolder`   | `Places/Accommodation`    | `type: accommodation` notes                                                                                                                   |
+| `fnbFolder`             | `Places/Food & Beverages` | `type: fnb` notes                                                                                                                             |
+| `landmarksFolder`       | `Places/Landmarks`        | `type: landmark` notes                                                                                                                        |
+| `locationsFolder`       | `Places/Locations`        | `type: location` notes                                                                                                                        |
+| `photoSpotsFolder`      | `Places/Photo Spots`      | `type: photospot` notes                                                                                                                       |
+| `crmFolder`             | `CRM`                     | The CRM module root                                                                                                                           |
+| `personsFolder`         | `CRM/People`              | The folder scanned for Person notes                                                                                                           |
+| `companiesFolder`       | `CRM/Companies`           | The folder scanned for Company notes                                                                                                          |
 
 `rootFolder` is **optional and empty by default**, which is what makes the three modules sit at the vault root on a fresh install rather than under a tree nobody asked for. Set it to `4 Resources/Travel` and all three move underneath it in one step. `joinFolder()` (trail-core's `paths/folders.ts`) drops empty segments when composing a path, so an empty root produces `Trips` rather than `/Trips`.
 
@@ -64,24 +64,24 @@ Each of the three module roots is the anchor for its own sub-folders: repoint `p
 
 A sub-folder setting a saved `data.json` has never carried falls back under the **saved** module root rather than the pristine default one, so a vault that relocated its Places tree gets a newly added place type inside it. The saved root is the vault owner's answer to "where does this module live", and that answer has to apply to sub-folders that did not exist when they gave it. `tests/settings.test.ts` pins this.
 
-Only the folder *name* comes from the locale; the plugin cannot know which language a vault names its folders in, so the names come from the locale catalogue under `settings.folders.defaults.*`:
+Only the folder _name_ comes from the locale; the plugin cannot know which language a vault names its folders in, so the names come from the locale catalogue under `settings.folders.defaults.*`:
 
-| Key | English | German |
-|---|---|---|
-| `rootFolderPath` | *(empty)* | *(empty)* |
-| `tripsFolderName` | `Trips` | `Reisen` |
-| `placesFolderName` | `Places` | `Orte` |
-| `countriesFolderName` | `Countries` | `Länder` |
-| `statesFolderName` | `States` | `Bundesländer` |
-| `citiesFolderName` | `Cities` | `Städte` |
-| `accommodationFolderName` | `Accommodation` | `Unterkünfte` |
-| `fnbFolderName` | `Food & Beverages` | `Essen & Trinken` |
-| `landmarksFolderName` | `Landmarks` | `Sehenswürdigkeiten` |
-| `locationsFolderName` | `Locations` | `Sonstige Orte` |
-| `photoSpotsFolderName` | `Photo Spots` | `Fotospots` |
-| `crmFolderName` | `CRM` | `CRM` |
-| `personsFolderName` | `People` | `Personen` |
-| `companiesFolderName` | `Companies` | `Firmen` |
+| Key                       | English            | German               |
+| ------------------------- | ------------------ | -------------------- |
+| `rootFolderPath`          | _(empty)_          | _(empty)_            |
+| `tripsFolderName`         | `Trips`            | `Reisen`             |
+| `placesFolderName`        | `Places`           | `Orte`               |
+| `countriesFolderName`     | `Countries`        | `Länder`             |
+| `statesFolderName`        | `States`           | `Bundesländer`       |
+| `citiesFolderName`        | `Cities`           | `Städte`             |
+| `accommodationFolderName` | `Accommodation`    | `Unterkünfte`        |
+| `fnbFolderName`           | `Food & Beverages` | `Essen & Trinken`    |
+| `landmarksFolderName`     | `Landmarks`        | `Sehenswürdigkeiten` |
+| `locationsFolderName`     | `Locations`        | `Sonstige Orte`      |
+| `photoSpotsFolderName`    | `Photo Spots`      | `Fotospots`          |
+| `crmFolderName`           | `CRM`              | `CRM`                |
+| `personsFolderName`       | `People`           | `Personen`           |
+| `companiesFolderName`     | `Companies`        | `Firmen`             |
 
 A German install therefore starts at `Reisen/`, `Orte/Länder`, `CRM/Personen` and so on. `Sonstige Orte` reads as "other places" rather than the bare `Orte` an English `Locations` would translate to, because `Orte` is already the module root one level up and a folder cannot be its own parent's name without being confusing to read.
 
@@ -91,19 +91,19 @@ Once saved, each sub-folder is an independent path. Relocating a module root lat
 
 These live under **People and companies** on the Property keys sub-page, except `eligiblePersonTags`, which is a filter rather than a name and sits in the People section of the root page. APERtrail keeps no contact registry: a Person or a Company is a note in the configured folder carrying the configured type value (`src/crm/read-crm.ts`).
 
-| Setting | Default | What it does |
-|---|---|---|
-| `personTypeValue` | `person` | The value under `typePropertyName` that marks a Person note |
-| `companyTypeValue` | `company` | The value that marks a Company note |
-| `personTagProperty` | `tags` | Which frontmatter property a Person's tags live under |
-| `companyTagProperty` | `tags` | The same for a Company |
-| `personRolesProperty` | `roles` | Which property a Person's roles live under |
-| `companyRolesProperty` | `roles` | The same for a Company. One key each rather than one shared, the same split the tag properties take |
-| `eligiblePersonTags` | *(empty)* | Comma-separated tags narrowing the trip editor's participant list. **Empty means no filter**, so every Person is offered. Matched by trail-core's `crm/tags.ts`: case-insensitively, with a leading `#` ignored on both sides, and a parent tag admitting its nested children (`Familie` matches `Familie/Eltern`, not the reverse, and never `FamilienFirma`) |
-| `descriptionProperty` | `description` | One-line description shown on a person or company card |
-| `emailProperty` | `email` | Email address on either type |
-| `phoneProperty` | `phone` | A company's phone number |
-| `mobileProperty` | `mobile` | A person's mobile number |
+| Setting                | Default       | What it does                                                                                                                                                                                                                                                                                                                                                   |
+| ---------------------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `personTypeValue`      | `person`      | The value under `typePropertyName` that marks a Person note                                                                                                                                                                                                                                                                                                    |
+| `companyTypeValue`     | `company`     | The value that marks a Company note                                                                                                                                                                                                                                                                                                                            |
+| `personTagProperty`    | `tags`        | Which frontmatter property a Person's tags live under                                                                                                                                                                                                                                                                                                          |
+| `companyTagProperty`   | `tags`        | The same for a Company                                                                                                                                                                                                                                                                                                                                         |
+| `personRolesProperty`  | `roles`       | Which property a Person's roles live under                                                                                                                                                                                                                                                                                                                     |
+| `companyRolesProperty` | `roles`       | The same for a Company. One key each rather than one shared, the same split the tag properties take                                                                                                                                                                                                                                                            |
+| `eligiblePersonTags`   | _(empty)_     | Comma-separated tags narrowing the trip editor's participant list. **Empty means no filter**, so every Person is offered. Matched by trail-core's `crm/tags.ts`: case-insensitively, with a leading `#` ignored on both sides, and a parent tag admitting its nested children (`Familie` matches `Familie/Eltern`, not the reverse, and never `FamilienFirma`) |
+| `descriptionProperty`  | `description` | One-line description shown on a person or company card                                                                                                                                                                                                                                                                                                         |
+| `emailProperty`        | `email`       | Email address on either type                                                                                                                                                                                                                                                                                                                                   |
+| `phoneProperty`        | `phone`       | A company's phone number                                                                                                                                                                                                                                                                                                                                       |
+| `mobileProperty`       | `mobile`      | A person's mobile number                                                                                                                                                                                                                                                                                                                                       |
 
 Person and Company get a tag property each rather than sharing one. Collapsing them into a single `tagProperty` would be tidier, but it renames a shipped setting and needs a migration, and two symmetric settings cost nothing.
 
@@ -119,9 +119,9 @@ Both creators refuse rather than guess when their folder or type value is blank.
 
 The first group on the Property keys sub-page.
 
-| Setting | Default | What it does |
-|---|---|---|
-| `typePropertyName` | `type` | The frontmatter property every entity is identified by |
+| Setting               | Default | What it does                                                                                                                                                   |
+| --------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `typePropertyName`    | `type`  | The frontmatter property every entity is identified by                                                                                                         |
 | `unlockPropertyNames` | `false` | Whether the page will let a property name or a type value be typed into. Its row is the first thing on the Property keys sub-page, and it appears nowhere else |
 
 **Every property name and type value on that page is read-only until that switch
@@ -146,66 +146,67 @@ The nine recognized values are listed inline below the field: `trip`, `country`,
 
 The **Property keys** sub-page holds every top-level frontmatter name the plugin reads or writes, grouped by the note type that carries them: note identification, places and shared fields, trips, photo spots, people and companies. A vault with pre-existing naming conventions never has to rename its notes. Each falls back to its previous value if you clear it.
 
-The catalogue in `src/ui/settings/page-property-keys.ts` *is* the page: adding a property to `settings/types.ts` means adding a line there and a label to both locales, and nothing else. The only names it leaves out are the `*Field` settings that name a sub-key inside a list entry; those are the shape of a value rather than a property of a note, and the page says so in a line at the bottom.
+The catalogue in `src/ui/settings/page-property-keys.ts` _is_ the page: adding a property to `settings/types.ts` means adding a line there and a label to both locales, and nothing else. The only names it leaves out are the `*Field` settings that name a sub-key inside a list entry; those are the shape of a value rather than a property of a note, and the page says so in a line at the bottom.
 
 The shared and per-note-type names, and where each one appears:
 
-| Setting | Default | On |
-|---|---|---|
-| `countryProperty` | `country` | Trip, State, City, all five place types |
-| `stateProperty` | `state` | City |
-| `cityProperty` | `city` | All five place types |
-| `capitalProperty` | `capital` | Country, State |
-| `statesProperty` | `states` | Country |
-| `citiesProperty` | `cities` | State |
-| `geoLocationProperty` | `geoLocation` | City, all five place types |
-| `addressProperty` | `address` | All five place types |
-| `websiteProperty` | `website` | All five place types |
-| `ratingProperty` | `rating` | Trip, all five place types |
-| `visitedProperty` | `visited` | City, all five place types |
-| `lastVisitProperty` | `lastVisit` | City, all five place types |
-| `tagsProperty` | `tags` | City, all five place types |
-| `accommodationTypeProperty` | `accommodationType` | Accommodation |
-| `accommodationStatusProperty` | `accommodationStatus` | Accommodation |
-| `fnbTypeProperty` | `fnbType` | Food & Beverages |
-| `createdProperty` | `created` | Stamped once at creation, see below |
-| `modifiedProperty` | `modified` | Trip and Photo spot; stamped on every editor save, and by the health check's type fix |
-| `departureProperty` | `departure` | Trip |
-| `returnProperty` | `return` | Trip |
-| `travelTypeProperty` | `travelType` | Trip |
-| `travelStatusProperty` | `travelStatus` | Trip |
-| `reviewStatusProperty` | `reviewStatus` | Trip |
+| Setting                       | Default               | On                                                                                    |
+| ----------------------------- | --------------------- | ------------------------------------------------------------------------------------- |
+| `countryProperty`             | `country`             | Trip, State, City, all five place types                                               |
+| `stateProperty`               | `state`               | City                                                                                  |
+| `cityProperty`                | `city`                | All five place types                                                                  |
+| `capitalProperty`             | `capital`             | Country, State                                                                        |
+| `statesProperty`              | `states`              | Country                                                                               |
+| `citiesProperty`              | `cities`              | State                                                                                 |
+| `geoLocationProperty`         | `geoLocation`         | City, all five place types                                                            |
+| `addressProperty`             | `address`             | All five place types                                                                  |
+| `websiteProperty`             | `website`             | All five place types                                                                  |
+| `ratingProperty`              | `rating`              | Trip, all five place types                                                            |
+| `visitedProperty`             | `visited`             | City, all five place types                                                            |
+| `lastVisitProperty`           | `lastVisit`           | City, all five place types                                                            |
+| `tagsProperty`                | `tags`                | City, all five place types                                                            |
+| `accommodationTypeProperty`   | `accommodationType`   | Accommodation                                                                         |
+| `accommodationStatusProperty` | `accommodationStatus` | Accommodation                                                                         |
+| `fnbTypeProperty`             | `fnbType`             | Food & Beverages                                                                      |
+| `createdProperty`             | `created`             | Stamped once at creation, see below                                                   |
+| `modifiedProperty`            | `modified`            | Trip and Photo spot; stamped on every editor save, and by the health check's type fix |
+| `departureProperty`           | `departure`           | Trip                                                                                  |
+| `returnProperty`              | `return`              | Trip                                                                                  |
+| `travelTypeProperty`          | `travelType`          | Trip                                                                                  |
+| `travelStatusProperty`        | `travelStatus`        | Trip                                                                                  |
+| `reviewStatusProperty`        | `reviewStatus`        | Trip                                                                                  |
 
 `createdProperty` names the creation stamp: every creation path writes it once, directly after the type value, no edit ever rewrites it, and nothing reads it back. Clearing the name skips the stamp entirely.
 
 ### Money
 
-| Setting | Section | Default | What it does |
-|---|---|---|---|
-| `budgetEnabled` | Money | `true` | Master switch for the trip costs block, the dashboard budget tile and the itinerary cost chips. Off leaves booking notes as ordinary notes |
-| `homeCurrency` | Money | `CHF` | What a trip is assumed to plan in when neither the booking nor the trip says. The one figure in the money feature that starts as a guess |
-| `displayLocale` | Money | *(empty)* | The convention figures and dates are drawn in, as a BCP 47 tag. Empty follows this computer. Separate from the interface language, which answers a different question: every German locale writes `100.120,20` where Switzerland writes `100'120.20`. Shared with the other two plugins through trail-core's `DISPLAY_CONTRACT` |
-| `currencyOptions` | Money | `CHF, EUR, USD` | The codes the money dropdowns offer, in that order. Comma separated. The home currency, and whatever a note already holds, are always offered on top of this, so a cleared list still leaves every field usable |
+| Setting           | Section | Default         | What it does                                                                                                                                                                                                                                                                                                                    |
+| ----------------- | ------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `budgetEnabled`   | Money   | `true`          | Master switch for the trip costs block, the dashboard budget tile and the itinerary cost chips. Off leaves booking notes as ordinary notes                                                                                                                                                                                      |
+| `homeCurrency`    | Money   | `CHF`           | What a trip is assumed to plan in when neither the booking nor the trip says. The one figure in the money feature that starts as a guess                                                                                                                                                                                        |
+| `displayLocale`   | Money   | _(empty)_       | The convention figures and dates are drawn in, as a BCP 47 tag. Empty follows this computer. Separate from the interface language, which answers a different question: every German locale writes `100.120,20` where Switzerland writes `100'120.20`. Shared with the other two plugins through trail-core's `DISPLAY_CONTRACT` |
+| `currencyOptions` | Money   | `CHF, EUR, USD` | The codes the money dropdowns offer, in that order. Comma separated. The home currency, and whatever a note already holds, are always offered on top of this, so a cleared list still leaves every field usable                                                                                                                 |
 
 ### Display
 
-Whose conventions the plugin writes in. Three rows, above the switches, because the first of them decides what the rest of the page reads like.
+Whose conventions the plugin writes in, and whose name its printed sheets carry. Four rows, above the switches, because the first of them decides what the rest of the page reads like.
 
-| Setting | Default | What it does |
-|---|---|---|
-| `language` | `auto` | The UI language. `auto` follows Obsidian's own. It is read before anything else at load, because the folder defaults a first run seeds are localized, and a vault cannot rename them afterwards by itself |
-| `clockFormat` | `auto` | `auto`, `24h` or `12h`. `auto` lets the locale decide, which is what an English-base plugin should do rather than pinning 24-hour times for every reader. Sun times stay in the spot's own zone whichever is chosen |
-| `units` | `metric` | `metric` or `imperial`. Distances only: how far a motif sits from its anchor, and how far apart two conflicting stops are. Nothing stored changes |
+| Setting        | Default   | What it does                                                                                                                                                                                                                     |
+| -------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `language`     | `auto`    | The UI language. `auto` follows Obsidian's own. It is read before anything else at load, because the folder defaults a first run seeds are localized, and a vault cannot rename them afterwards by itself                        |
+| `clockFormat`  | `auto`    | `auto`, `24h` or `12h`. `auto` lets the locale decide, which is what an English-base plugin should do rather than pinning 24-hour times for every reader. Sun times stay in the spot's own zone whichever is chosen              |
+| `exportAuthor` | _(empty)_ | The name the credit line under every printed sheet gives: "Reisedokument, erstellt von Thomas am ... mit APERtrail - technosoftware.com". Empty leaves the name out. Shared with NODAtrail through trail-core's `SHEET_CONTRACT` |
+| `units`        | `metric`  | `metric` or `imperial`. Distances only: how far a motif sits from its anchor, and how far apart two conflicting stops are. Nothing stored changes                                                                                |
 
 ### Dashboard, Photo spots, People
 
 Three small cards on the root page rather than one, because these settings have nothing to do with each other beyond being switches.
 
-| Setting | Section | Default | What it does |
-|---|---|---|---|
-| `showRibbonIcon` | Dashboard | `true` | Shows or hides the ribbon's map icon. The icon is built once at load and toggled by a CSS class, so this takes effect immediately |
-| `sunTimesEnabled` | Photo spots | `true` | Master switch for the light panel, the clock times on a motif's light chips, the front/side/back-lit badges and the itinerary's sun band. Off leaves photo spots as plain place notes |
-| `eligiblePersonTags` | People | *(empty)* | The participant filter described above |
+| Setting              | Section     | Default   | What it does                                                                                                                                                                          |
+| -------------------- | ----------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `showRibbonIcon`     | Dashboard   | `true`    | Shows or hides the ribbon's map icon. The icon is built once at load and toggled by a CSS class, so this takes effect immediately                                                     |
+| `sunTimesEnabled`    | Photo spots | `true`    | Master switch for the light panel, the clock times on a motif's light chips, the front/side/back-lit badges and the itinerary's sun band. Off leaves photo spots as plain place notes |
+| `eligiblePersonTags` | People      | _(empty)_ | The participant filter described above                                                                                                                                                |
 
 **Open dashboard** sits in the Dashboard card; **Run check** for the [entity type health check](../features/travel.md#entity-type-health-check) sits at the bottom of Vault setup, with the folders it scans.
 
@@ -215,64 +216,64 @@ The golden-hour and blue-hour elevation thresholds behind `sunTimesEnabled` are 
 
 The Trip schema's own property names are real settings, honored by both the reader and the writer. The **top-level** ones -- `tripCitiesProperty`, `personsProperty`, `tripDaysProperty`, `stopsProperty`, `nightsProperty`, `transportProperty`, the four presentation ones, `tripSubtitleProperty`, `imageProperty`, `tripHighlightsProperty` and `tripGalleryProperty`, and the money three, `tripCurrencyProperty`, `budgetProperty` and `ratesProperty` -- have rows in the Trips group of the Property keys sub-page. The `*Field` sub-keys do not: they name a key **inside a list entry** rather than a property of a note, and forty more rows would have cost the page its readability without answering a question anybody asks. Change those by editing `data.json`; `mergeSettings()` validates them on load like everything else.
 
-| Setting | Default | What it names |
-|---|---|---|
-| `tripCitiesProperty` | `cities` | The Cities a Trip touches |
-| `personsProperty` | `persons` | The Trip's participants |
-| `tripExtendsProperty` | `extends` | The trip this one follows on from, written on the trip that comes second. What follows a trip is derived when the vault is read and never written back, so adding an extension never edits the trip it extends |
-| `tripDaysProperty` | `days` | A **sparse** list: only a day that has a name or a paragraph of its own has an entry, and no stop belongs to a day object |
-| `dayNumberField` | `day` | Sub-key: which day the entry is about. The key, not a position in the list |
-| `dayTitleField` | `title` | Sub-key: what the day is called, shown after the day number in the header |
-| `dayNoteField` | `note` | Sub-key: the day's own paragraph, printed above its lines |
-| `stopsProperty` | `stops` | The itinerary list |
-| `stopPlaceField` | `place` | Sub-key: the stop's target |
-| `stopDayField` | `day` | Sub-key: which day of the trip, for an itinerary written before the dates are known. When set, `from`/`to` carry a bare `HH:mm`. See [Relative days](relative-days.md) |
-| `stopFromField` | `from` | Sub-key: start time |
-| `stopToField` | `to` | Sub-key: end time |
-| `stopNoteField` | `note` | Sub-key: per-visit note |
-| `stopRatingField` | `rating` | Sub-key: per-visit rating |
-| `stopMotifField` | `motif` | Sub-key: which motif at a photo spot the stop is for. Matched against the spot's motif names, trimmed and case-insensitively; an unmatched name is kept and shown rather than dropped |
-| `stopExcursionField` | `excursion` | Sub-key: which excursion the stop is, as against the place it happens at. A name the vault has no note for is kept and shown, the way a leg's vehicle is |
-| `stopCostField` / `stopCurrencyField` | `cost` / `currency` | Sub-key: what an entry, guide or cable car costs |
-| `stopCostUnitField` | `costUnit` | Sub-key: what that figure is per |
-| `stopPersonsField` | `persons` | Sub-key: who is on this stop; empty means everybody |
-| `tripCurrencyProperty` | `currency` | What the trip plans its budget in |
-| `budgetProperty` | `budget` | The plan: a list of `{category, amount}` |
-| `budgetCategoryField` / `budgetAmountField` | `category` / `amount` | Sub-keys of a budget line |
-| `ratesProperty` | `rates` | Conversion rates: a list of `{currency, rate}` |
-| `tripSubtitleProperty` | `subtitle` | What the trip is, under what it is called |
-| `imageProperty` | `image` | The picture a card shows, on every entity type. Was a hardcoded key |
-| `tripHighlightsProperty` | `highlights` | A list of lines, in the order they should read |
-| `tripGalleryProperty` | `gallery` | A list of `{image, caption}` |
-| `galleryImageField` | `image` | Sub-key: the picture |
-| `galleryCaptionField` | `caption` | Sub-key: what to say about it |
-| `rateCurrencyField` / `rateValueField` | `currency` / `rate` | Sub-keys of a rate |
-| `nightsProperty` | `nights` | The accommodation-stays list |
-| `nightAccommodationField` | `accommodation` | Sub-key: which Accommodation note |
-| `nightCheckInField` | `checkIn` | Sub-key: check-in date |
-| `nightCheckOutField` | `checkOut` | Sub-key: check-out date |
-| `nightCheckInDayField` | `checkInDay` | Sub-key: which day of the trip the stay starts on. See [Relative days](relative-days.md) |
-| `nightCheckOutDayField` | `checkOutDay` | Sub-key: which day it ends on. The nights between the two are what a per-night cost multiplies |
-| `nightCostField` | `cost` | Sub-key: what the stay is expected to cost |
-| `nightCurrencyField` | `currency` | Sub-key: the currency that figure is in |
-| `nightCostUnitField` | `costUnit` | Sub-key: per night, in total, or per person |
-| `nightPersonsField` | `persons` | Sub-key: who the stay is for; empty means everybody |
-| `vehiclesFolder` | `Places/Vehicles` | The ships and named trains you travel on. Not a place, and filed under the Places root all the same: every folder here hangs off one of the three module roots, which is what keeps a module relocatable as a unit |
-| `vehicleModeProperty` | `mode` | What kind of thing it is, from the vocabulary a leg's `mode` uses |
-| `vehicleOperatorProperty` | `operator` | Who runs it, as a link to a Company note. A fact about the ship; no code joins a trip to a company through it |
-| `vehicleBuiltProperty` | `built` | The year it entered service |
-| `vehicleRefurbishedProperty` | `refurbished` | The year it was last rebuilt |
-| `vehicleCapacityProperty` | `capacity` | How many passengers it carries |
-| `vehicleLengthProperty` | `length` | As written: "135 m", "20 coaches" |
-| `vehicleTonnageProperty` | `tonnage` | Gross tonnage, for a ship that states one |
-| `vehicleDeckPlanProperty` | `deckPlan` | A deck plan or a train layout: one document, as a vault path or a wikilink. Linked rather than shown, because it is usually a PDF |
-| `vehicleCabinsProperty` | `cabins` | The cabin categories it is sold in |
-| `cabinNameField` | `name` | Sub-key of a cabin: what the category is called, and what a leg's variant matches on |
-| `cabinDescriptionField` | `description` | Sub-key of a cabin: what it includes |
-| `cabinImageField` | `image` | Sub-key of a cabin: a picture of it, printed beside it on the brochure |
-| `excursionsFolder` | `Places/Excursions` | The outings you are sold a day of. Not a place either, and filed under the Places root for the vehicle's reason |
-| `excursionOperatorProperty` | `operator` | Who runs the tour, as a link to a Company note. A fact about the excursion; no code joins a trip to a company through it |
-| `excursionDurationProperty` | `duration` | How long it takes, in the operator's own words. Free text rather than a number of hours: "half day" and "ca. 4 Stunden" mean the same kind of thing, and nothing computes with it |
+| Setting                                     | Default               | What it names                                                                                                                                                                                                      |
+| ------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `tripCitiesProperty`                        | `cities`              | The Cities a Trip touches                                                                                                                                                                                          |
+| `personsProperty`                           | `persons`             | The Trip's participants                                                                                                                                                                                            |
+| `tripExtendsProperty`                       | `extends`             | The trip this one follows on from, written on the trip that comes second. What follows a trip is derived when the vault is read and never written back, so adding an extension never edits the trip it extends     |
+| `tripDaysProperty`                          | `days`                | A **sparse** list: only a day that has a name or a paragraph of its own has an entry, and no stop belongs to a day object                                                                                          |
+| `dayNumberField`                            | `day`                 | Sub-key: which day the entry is about. The key, not a position in the list                                                                                                                                         |
+| `dayTitleField`                             | `title`               | Sub-key: what the day is called, shown after the day number in the header                                                                                                                                          |
+| `dayNoteField`                              | `note`                | Sub-key: the day's own paragraph, printed above its lines                                                                                                                                                          |
+| `stopsProperty`                             | `stops`               | The itinerary list                                                                                                                                                                                                 |
+| `stopPlaceField`                            | `place`               | Sub-key: the stop's target                                                                                                                                                                                         |
+| `stopDayField`                              | `day`                 | Sub-key: which day of the trip, for an itinerary written before the dates are known. When set, `from`/`to` carry a bare `HH:mm`. See [Relative days](relative-days.md)                                             |
+| `stopFromField`                             | `from`                | Sub-key: start time                                                                                                                                                                                                |
+| `stopToField`                               | `to`                  | Sub-key: end time                                                                                                                                                                                                  |
+| `stopNoteField`                             | `note`                | Sub-key: per-visit note                                                                                                                                                                                            |
+| `stopRatingField`                           | `rating`              | Sub-key: per-visit rating                                                                                                                                                                                          |
+| `stopMotifField`                            | `motif`               | Sub-key: which motif at a photo spot the stop is for. Matched against the spot's motif names, trimmed and case-insensitively; an unmatched name is kept and shown rather than dropped                              |
+| `stopExcursionField`                        | `excursion`           | Sub-key: which excursion the stop is, as against the place it happens at. A name the vault has no note for is kept and shown, the way a leg's vehicle is                                                           |
+| `stopCostField` / `stopCurrencyField`       | `cost` / `currency`   | Sub-key: what an entry, guide or cable car costs                                                                                                                                                                   |
+| `stopCostUnitField`                         | `costUnit`            | Sub-key: what that figure is per                                                                                                                                                                                   |
+| `stopPersonsField`                          | `persons`             | Sub-key: who is on this stop; empty means everybody                                                                                                                                                                |
+| `tripCurrencyProperty`                      | `currency`            | What the trip plans its budget in                                                                                                                                                                                  |
+| `budgetProperty`                            | `budget`              | The plan: a list of `{category, amount}`                                                                                                                                                                           |
+| `budgetCategoryField` / `budgetAmountField` | `category` / `amount` | Sub-keys of a budget line                                                                                                                                                                                          |
+| `ratesProperty`                             | `rates`               | Conversion rates: a list of `{currency, rate}`                                                                                                                                                                     |
+| `tripSubtitleProperty`                      | `subtitle`            | What the trip is, under what it is called                                                                                                                                                                          |
+| `imageProperty`                             | `image`               | The picture a card shows, on every entity type. Was a hardcoded key                                                                                                                                                |
+| `tripHighlightsProperty`                    | `highlights`          | A list of lines, in the order they should read                                                                                                                                                                     |
+| `tripGalleryProperty`                       | `gallery`             | A list of `{image, caption}`                                                                                                                                                                                       |
+| `galleryImageField`                         | `image`               | Sub-key: the picture                                                                                                                                                                                               |
+| `galleryCaptionField`                       | `caption`             | Sub-key: what to say about it                                                                                                                                                                                      |
+| `rateCurrencyField` / `rateValueField`      | `currency` / `rate`   | Sub-keys of a rate                                                                                                                                                                                                 |
+| `nightsProperty`                            | `nights`              | The accommodation-stays list                                                                                                                                                                                       |
+| `nightAccommodationField`                   | `accommodation`       | Sub-key: which Accommodation note                                                                                                                                                                                  |
+| `nightCheckInField`                         | `checkIn`             | Sub-key: check-in date                                                                                                                                                                                             |
+| `nightCheckOutField`                        | `checkOut`            | Sub-key: check-out date                                                                                                                                                                                            |
+| `nightCheckInDayField`                      | `checkInDay`          | Sub-key: which day of the trip the stay starts on. See [Relative days](relative-days.md)                                                                                                                           |
+| `nightCheckOutDayField`                     | `checkOutDay`         | Sub-key: which day it ends on. The nights between the two are what a per-night cost multiplies                                                                                                                     |
+| `nightCostField`                            | `cost`                | Sub-key: what the stay is expected to cost                                                                                                                                                                         |
+| `nightCurrencyField`                        | `currency`            | Sub-key: the currency that figure is in                                                                                                                                                                            |
+| `nightCostUnitField`                        | `costUnit`            | Sub-key: per night, in total, or per person                                                                                                                                                                        |
+| `nightPersonsField`                         | `persons`             | Sub-key: who the stay is for; empty means everybody                                                                                                                                                                |
+| `vehiclesFolder`                            | `Places/Vehicles`     | The ships and named trains you travel on. Not a place, and filed under the Places root all the same: every folder here hangs off one of the three module roots, which is what keeps a module relocatable as a unit |
+| `vehicleModeProperty`                       | `mode`                | What kind of thing it is, from the vocabulary a leg's `mode` uses                                                                                                                                                  |
+| `vehicleOperatorProperty`                   | `operator`            | Who runs it, as a link to a Company note. A fact about the ship; no code joins a trip to a company through it                                                                                                      |
+| `vehicleBuiltProperty`                      | `built`               | The year it entered service                                                                                                                                                                                        |
+| `vehicleRefurbishedProperty`                | `refurbished`         | The year it was last rebuilt                                                                                                                                                                                       |
+| `vehicleCapacityProperty`                   | `capacity`            | How many passengers it carries                                                                                                                                                                                     |
+| `vehicleLengthProperty`                     | `length`              | As written: "135 m", "20 coaches"                                                                                                                                                                                  |
+| `vehicleTonnageProperty`                    | `tonnage`             | Gross tonnage, for a ship that states one                                                                                                                                                                          |
+| `vehicleDeckPlanProperty`                   | `deckPlan`            | A deck plan or a train layout: one document, as a vault path or a wikilink. Linked rather than shown, because it is usually a PDF                                                                                  |
+| `vehicleCabinsProperty`                     | `cabins`              | The cabin categories it is sold in                                                                                                                                                                                 |
+| `cabinNameField`                            | `name`                | Sub-key of a cabin: what the category is called, and what a leg's variant matches on                                                                                                                               |
+| `cabinDescriptionField`                     | `description`         | Sub-key of a cabin: what it includes                                                                                                                                                                               |
+| `cabinImageField`                           | `image`               | Sub-key of a cabin: a picture of it, printed beside it on the brochure                                                                                                                                             |
+| `excursionsFolder`                          | `Places/Excursions`   | The outings you are sold a day of. Not a place either, and filed under the Places root for the vehicle's reason                                                                                                    |
+| `excursionOperatorProperty`                 | `operator`            | Who runs the tour, as a link to a Company note. A fact about the excursion; no code joins a trip to a company through it                                                                                           |
+| `excursionDurationProperty`                 | `duration`            | How long it takes, in the operator's own words. Free text rather than a number of hours: "half day" and "ca. 4 Stunden" mean the same kind of thing, and nothing computes with it                                  |
 
 An excursion also reads `descriptionProperty`, `websiteProperty`,
 `countryProperty`, `cityProperty`, `imageProperty` and `tripGalleryProperty`:
@@ -375,20 +376,20 @@ sub-key settings here, and that is the point of the shape: everything on a
 booking is a top-level scalar or a list of links, which is what lets Obsidian's
 own property editor be the editor and what saved this feature a whole block.
 
-| Setting | Default | What it names |
-|---|---|---|
-| `bookingTripProperty` | `trip` | Which trip the booking belongs to |
-| `bookingCategoryProperty` | `category` | Fixed vocabulary; only the name is a setting |
-| `bookingStatusProperty` | `status` | Fixed vocabulary; decides which total the figure counts in |
-| `bookingSupplierProperty` | `supplier` | The Company note behind it |
-| `bookingPlaceProperty` | `place` | What puts the cost on an itinerary row |
-| `bookingDateProperty` | `date` | The day the cost belongs to |
-| `bookingAmountProperty` | `amount` | What it costs. Absent is not zero |
-| `bookingCurrencyProperty` | `currency` | Absent inherits the trip's, then `homeCurrency` |
-| `bookingReferenceProperty` | `reference` | Also what matches a booking to a transport leg |
-| `bookingPayerProperty` | `payer` | Who actually paid |
-| `bookingForProperty` | `for` | Who the cost is for. Absent means every participant |
-| `bookingDocumentProperty` | `document` | The confirmation file in the vault |
+| Setting                    | Default     | What it names                                              |
+| -------------------------- | ----------- | ---------------------------------------------------------- |
+| `bookingTripProperty`      | `trip`      | Which trip the booking belongs to                          |
+| `bookingCategoryProperty`  | `category`  | Fixed vocabulary; only the name is a setting               |
+| `bookingStatusProperty`    | `status`    | Fixed vocabulary; decides which total the figure counts in |
+| `bookingSupplierProperty`  | `supplier`  | The Company note behind it                                 |
+| `bookingPlaceProperty`     | `place`     | What puts the cost on an itinerary row                     |
+| `bookingDateProperty`      | `date`      | The day the cost belongs to                                |
+| `bookingAmountProperty`    | `amount`    | What it costs. Absent is not zero                          |
+| `bookingCurrencyProperty`  | `currency`  | Absent inherits the trip's, then `homeCurrency`            |
+| `bookingReferenceProperty` | `reference` | Also what matches a booking to a transport leg             |
+| `bookingPayerProperty`     | `payer`     | Who actually paid                                          |
+| `bookingForProperty`       | `for`       | Who the cost is for. Absent means every participant        |
+| `bookingDocumentProperty`  | `document`  | The confirmation file in the vault                         |
 
 ### Photo spot structure
 
@@ -399,29 +400,29 @@ sub-keys under one `access:` map, because Obsidian's property editor renders
 top-level scalars and refuses nested maps, and each of these is a value
 someone will want to edit in the sidebar.
 
-| Setting | Default | What it does |
-|---|---|---|
-| `timezoneProperty` | `timezone` | IANA zone the spot's sun times are rendered in |
-| `openingHoursProperty` | `openingHours` | Free text; `24h` renders as the round-the-clock badge |
-| `entryFeeProperty` | `entryFee` | Free text; empty or `none` renders as "no entry fee" |
-| `accessibilityProperty` | `accessibility` | `full` / `partial` / `none` / `unknown` |
-| `parkingProperty` | `parking` | Free text, one line |
-| `transitProperty` | `transit` | List of `{mode, detail}` rows |
-| `transitModeField` / `transitDetailField` | `mode` / `detail` | Sub-keys of a transit row |
-| `motifsProperty` | `motifs` | The list of motifs |
-| `motifNameField` | `name` | Sub-key: what a sample's `motif` points back at |
-| `motifRoleField` | `role` | Sub-key: `main` or `secondary` |
-| `motifGeoField` | `geoLocation` | Sub-key: the motif's own coordinates, if it has any |
-| `motifDirectionField` | `direction` | Sub-key: the bearing you shoot toward |
-| `motifLightField` | `light` | Sub-key: light windows, ordered best-first |
-| `motifSeasonField` | `season` | Sub-key: months, 1 to 12 |
-| `motifLensField` / `motifGearField` | `lens` / `gear` | Sub-keys, both free text |
-| `motifTechniqueField` / `motifNoteField` | `technique` / `note` | Sub-keys, both free text |
-| `motifCapturedField` / `motifCapturedOnField` | `captured` / `capturedOn` | Sub-keys: whether you got the shot, and when |
-| `samplesProperty` | `samples` | The list of sample frames |
-| `sampleImageField` | `image` | Sub-key: vault path, wikilink or URL |
-| `sampleMotifField` | `motif` | Sub-key: which motif this frame is of |
-| `sampleLightField` / `sampleExposureField` / `sampleCreditField` | `light` / `exposure` / `credit` | Sub-keys |
+| Setting                                                          | Default                         | What it does                                          |
+| ---------------------------------------------------------------- | ------------------------------- | ----------------------------------------------------- |
+| `timezoneProperty`                                               | `timezone`                      | IANA zone the spot's sun times are rendered in        |
+| `openingHoursProperty`                                           | `openingHours`                  | Free text; `24h` renders as the round-the-clock badge |
+| `entryFeeProperty`                                               | `entryFee`                      | Free text; empty or `none` renders as "no entry fee"  |
+| `accessibilityProperty`                                          | `accessibility`                 | `full` / `partial` / `none` / `unknown`               |
+| `parkingProperty`                                                | `parking`                       | Free text, one line                                   |
+| `transitProperty`                                                | `transit`                       | List of `{mode, detail}` rows                         |
+| `transitModeField` / `transitDetailField`                        | `mode` / `detail`               | Sub-keys of a transit row                             |
+| `motifsProperty`                                                 | `motifs`                        | The list of motifs                                    |
+| `motifNameField`                                                 | `name`                          | Sub-key: what a sample's `motif` points back at       |
+| `motifRoleField`                                                 | `role`                          | Sub-key: `main` or `secondary`                        |
+| `motifGeoField`                                                  | `geoLocation`                   | Sub-key: the motif's own coordinates, if it has any   |
+| `motifDirectionField`                                            | `direction`                     | Sub-key: the bearing you shoot toward                 |
+| `motifLightField`                                                | `light`                         | Sub-key: light windows, ordered best-first            |
+| `motifSeasonField`                                               | `season`                        | Sub-key: months, 1 to 12                              |
+| `motifLensField` / `motifGearField`                              | `lens` / `gear`                 | Sub-keys, both free text                              |
+| `motifTechniqueField` / `motifNoteField`                         | `technique` / `note`            | Sub-keys, both free text                              |
+| `motifCapturedField` / `motifCapturedOnField`                    | `captured` / `capturedOn`       | Sub-keys: whether you got the shot, and when          |
+| `samplesProperty`                                                | `samples`                       | The list of sample frames                             |
+| `sampleImageField`                                               | `image`                         | Sub-key: vault path, wikilink or URL                  |
+| `sampleMotifField`                                               | `motif`                         | Sub-key: which motif this frame is of                 |
+| `sampleLightField` / `sampleExposureField` / `sampleCreditField` | `light` / `exposure` / `credit` | Sub-keys                                              |
 
 The `*Field` settings name sub-keys **within a list entry**, not top-level frontmatter properties.
 
@@ -437,7 +438,7 @@ About, at the bottom of the page, says how the plugin works (`settings.about.ori
 
 ## Deliberately not settings
 
-- **`TRAVEL_STATUS_VALUES`** (`Planned`/`Booked`/`Over`/`Cancelled`). Property *names* are configurable throughout; these are property *values*, and the dashboard's status counts, trip ordering and next-trip countdown key off the exact strings.
+- **`TRAVEL_STATUS_VALUES`** (`Planned`/`Booked`/`Over`/`Cancelled`). Property _names_ are configurable throughout; these are property _values_, and the dashboard's status counts, trip ordering and next-trip countdown key off the exact strings.
 - **The three code-block languages**, `travel-itinerary`, `travel-related-trips` and `apt-photo-spot`, for the reasons in [Data model](data-model.md#code-block-languages-and-their-prefixes). The first two keep the `travel-` prefix because those strings already sit in users' notes; every block added since takes `apt-`.
 - **A photo spot's fixed vocabularies**: light windows, motif roles and accessibility values. See [Photo spots](photo-spots.md#26-fixed-vocabularies).
 - **A booking's category and status.** `transport`/`accommodation`/`activity`/`food`/`fees`/`other` and `estimate`/`booked`/`paid`/`cancelled`/`refunded`. A budget line, a total and a warning all key off these exact strings, so a vault that renamed one would have silently unbudgeted a category. See [Trip budget and bookings](trip-budget-and-bookings.md#44-fixed-vocabularies).

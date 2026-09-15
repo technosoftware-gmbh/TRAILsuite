@@ -46,6 +46,7 @@ function sheet(overrides: Partial<FieldSheet> = {}): FieldSheet {
     looseSamples: [],
     logistics: [{ label: 'Parking', value: 'Parking du Seyon' }],
     caveat: 'Geometry, not weather.',
+    record: 'The notes are the record.',
     footer: 'Generated on 21 August 2026.',
     labels: { motifs: 'Motifs', light: 'Light', samples: 'Samples', onSite: 'On site' },
     ...overrides,

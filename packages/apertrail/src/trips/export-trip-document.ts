@@ -29,6 +29,7 @@ import {
   printableDocument,
   proseSections,
   section,
+  sheetCreditHtml,
   type ProseBlock,
 } from '@technosoftware/trail-core';
 
@@ -675,7 +676,7 @@ ${extensions}
 ${gallery}
 <footer>
   <p>${esc(sheet.caveat)}</p>
-  <p>${esc(sheet.footer)}</p>
+  ${sheetCreditHtml(sheet.footer)}
 </footer>`,
   });
 }

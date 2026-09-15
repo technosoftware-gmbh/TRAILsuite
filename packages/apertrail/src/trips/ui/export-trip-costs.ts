@@ -10,6 +10,7 @@
  */
 import { App } from 'obsidian';
 import { parseDayTitle, sanitizeTitle } from '@technosoftware/trail-core';
+import { sheetCredit } from '../../shared/sheet-credit';
 import { t } from '../../lang/I18nManager';
 import { APERtrailSettings } from '../../settings/types';
 import { TravelBooking, TravelTrip } from '../../vault/types';
@@ -202,7 +203,12 @@ export function buildCostSheet(
       reference: t('costs.reference'),
     },
     caveat: t('costs.sheetCaveat'),
-    footer: t('costs.sheetFooter', { date: formatMediumDate(today) }),
+    record: t('costs.sheetRecord'),
+    footer: sheetCredit(
+      settings,
+      (author) => t('costs.sheetFooter', { author, date: formatMediumDate(today) }),
+      () => t('costs.sheetFooterAnonymous', { date: formatMediumDate(today) })
+    ),
   };
 }
 

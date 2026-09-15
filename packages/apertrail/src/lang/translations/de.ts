@@ -90,8 +90,9 @@ export const deTranslations: Translations = {
     sheetFailed: 'Das Kostenblatt konnte nicht geschrieben werden.',
     sheetCaveat:
       'Beträge so, wie die Notizen sie nennen. Umgerechnete Beträge nutzen die Kurse dieser Reise, also deine eigenen. Die Abrechnung teilt jede Buchung gleichmässig auf die genannten Personen auf.',
-    sheetFooter:
-      'Kostenblatt, erstellt von APERtrail am {date}. Massgeblich sind die Notizen; dies ist ein Ausdruck.',
+    sheetFooter: 'Kostenblatt, erstellt von {author} am {date} mit APERtrail',
+    sheetFooterAnonymous: 'Kostenblatt, erstellt am {date} mit APERtrail',
+    sheetRecord: 'Massgeblich sind die Notizen; dies ist ein Ausdruck.',
     document: 'Beleg',
     stillEstimated: 'Noch Schätzungen',
     settlement: 'Abrechnung',
@@ -170,7 +171,9 @@ export const deTranslations: Translations = {
     failed: 'Das Prospekt konnte nicht geschrieben werden.',
     caveat:
       'Diese Seite ist ein Ausdruck der aktuellen Reisenotizen. Die Kabinen sind die Kategorien, in denen sie verkauft wird; was eine kostet, gehört zur Reise, die sie bucht.',
-    footer: 'Prospekt, erstellt von APERtrail am {date}.',
+    footer: 'Prospekt, erstellt von {author} am {date} mit APERtrail',
+    footerAnonymous: 'Prospekt, erstellt am {date} mit APERtrail',
+    record: 'Massgeblich sind die Notizen; dies ist ein Ausdruck.',
   },
   tripDocument: {
     exportButton: 'Reisedokument',
@@ -207,7 +210,8 @@ export const deTranslations: Translations = {
     failed: 'Das Reisedokument konnte nicht geschrieben werden.',
     caveat:
       'Diese Seite ist ein Ausdruck der aktuellen Reisenotizen. Bitte beachten Sie, dass die hier aufgef\u00fchrten Preise nur die geplanten Kosten sind. Die tats\u00e4chlichen Ausgaben finden Sie auf dem separaten Kostenblatt daneben.',
-    footer: 'Reisedokument, erstellt von APERtrail am {date}',
+    footer: 'Reisedokument, erstellt von {author} am {date} mit APERtrail',
+    footerAnonymous: 'Reisedokument, erstellt am {date} mit APERtrail',
   },
 
   photoSpot: {
@@ -227,8 +231,9 @@ export const deTranslations: Translations = {
       button: 'Spickzettel',
       light: 'Licht',
       fileSuffix: 'Spickzettel',
-      footer:
-        'Spickzettel, erstellt von APERtrail am {date}. Massgeblich ist die Notiz; dies ist ein Ausdruck.',
+      footer: 'Spickzettel, erstellt von {author} am {date} mit APERtrail',
+      footerAnonymous: 'Spickzettel, erstellt am {date} mit APERtrail',
+      record: 'Massgeblich ist die Notiz; dies ist ein Ausdruck.',
       written: 'Spickzettel geschrieben nach {path}.',
       failed: 'Der Spickzettel konnte nicht geschrieben werden.',
     },
@@ -1388,6 +1393,10 @@ export const deTranslations: Translations = {
     },
     display: {
       title: 'Darstellung',
+      exportAuthor: {
+        name: 'Name auf gedruckten Blättern',
+        desc: 'Wen Reisedokument, Prospekt, Spickzettel und Kostenblatt als Ersteller nennen: "erstellt von Thomas am ...". Leer lassen lässt den Namen weg. NODAtrail hat dieselbe Einstellung.',
+      },
       language: {
         name: 'Sprache',
         desc: 'Folgt Obsidian, sofern hier nichts gewählt ist. Ordnernamen eines neuen Vaults entstehen in dieser Sprache.',
