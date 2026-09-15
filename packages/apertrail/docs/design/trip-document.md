@@ -409,6 +409,38 @@ carry the pictures; that reason is gone. What is left is that **everything in
 it can be deleted and made again from the note, and nothing else in a trip's
 folder can** -- which is worth a folder boundary on its own.
 
+## Who is travelling, and who does what
+
+**15 September 2026.** A trip already named its participants, and a stop, a
+night or a leg already named who it is for, and the per-person arithmetic
+already used both. None of it reached the page: a trip for three, with two in
+one room, the third in another, and an excursion only one of them takes,
+printed as if one anonymous party did everything.
+
+Three decisions, Thomas's own:
+
+**Names once, and then only where a line differs.** The header says who is
+travelling. A line says "Only Anna" when it names somebody other than exactly
+the participants, and nothing when it names nobody or everybody. Every name on
+every row would bury the one row that differs, and an empty `persons` already
+means the whole trip everywhere else in the plugin.
+
+**Rooms under their stay.** Rooms stay in the note format as it is: several
+night entries at the same place over the same days, each naming who sleeps in
+it. The document groups those into one stay and lists the rooms under it, with
+each room's variants. No new property, because the format could already say
+it.
+
+**A share per person, from the lines alone.** A section after the cost table
+gives each person their lines and their total: a shared room divided between
+the people in it, a per-head price as it is, an excursion charged to whoever
+takes it, an untaken extra to nobody. A category budget names nobody and is not
+split; where a trip has one, a hint says why the per-person totals need not add
+up to the planned total. A share in another currency is listed and left out of
+the total, the rule every total on this sheet follows. The section is omitted
+when fewer than two people are named. `trips/costs/per-person.ts` does the
+arithmetic.
+
 ## Open: the same for places
 
 Answered yes, and deliberately not in the same change. Photo spots already

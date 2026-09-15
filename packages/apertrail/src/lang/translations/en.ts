@@ -205,6 +205,13 @@ export const enTranslations = {
     optional: 'Optional',
     optionalTaken: 'Optional, taken',
     optionalTotal: 'Optional on top',
+    travellers: 'Travellers: {names}',
+    onlyFor: 'Only {names}',
+    perPerson: 'Per person',
+    perPersonHint:
+      'Worked out from the lines of the itinerary: a shared room is split between the people in it, an excursion is charged to whoever takes it. A budget set for a whole category is not split, so these totals need not add up to the planned total above.',
+    perPersonPartial: 'Planned, in the trip currency only',
+    shareOf: '(1/{count} of {amount})',
     fileSuffix: 'document',
     written: 'Trip document written to {path}.',
     failed: 'Could not write the trip document.',

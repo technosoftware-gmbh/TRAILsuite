@@ -72,6 +72,13 @@ export interface TripDocumentEntry {
    * a schedule of things that are all going to happen.
    */
   optional: string | null;
+  /**
+   * Who the line is for, already joined and localized ("Only Anna"), where it
+   * is not everybody on the trip. Null for the line the whole party is on,
+   * which is most of them: repeating every name on every row would bury the
+   * one row that differs.
+   */
+  persons: string | null;
   /** The prices this line can be bought at, where there is more than one. */
   fares: TripDocumentFare[];
 }
@@ -142,6 +149,41 @@ export interface TripDocumentJourney {
   fares: TripDocumentFare[];
   /** Said on a line that may not happen: "Optional" or "Optional, taken", already localized. Null for an ordinary line. */
   optional: string | null;
+  /** Who the line is for where it is not everybody, already localized. Null otherwise. */
+  persons: string | null;
+  /**
+   * The rooms of one stay, where the party sleeps in more than one.
+   *
+   * Several nights at the same place over the same days are one stay with
+   * several rooms, not several stays: the hotel is printed once and who
+   * sleeps where underneath it. Empty for a stay in one room, and always for
+   * a leg.
+   */
+  rooms: TripDocumentRoom[];
+}
+
+/** One room of a stay: who is in it, and the prices it was offered at. */
+export interface TripDocumentRoom {
+  /** The names, already joined. Null for a room whose line names nobody. */
+  persons: string | null;
+  optional: string | null;
+  fares: TripDocumentFare[];
+}
+
+/** One person's part of the trip, as the document prints it. */
+export interface TripDocumentPersonShare {
+  person: string;
+  /** The line and what this person's part of it is, already formatted; `detail` says what it is a part of. */
+  lines: { label: string; detail: string | null; amount: string }[];
+  /** The person's total, already formatted. Null when nothing is in the trip's currency. */
+  total: TripDocumentCostRow | null;
+}
+
+export interface TripDocumentPerPerson {
+  label: string;
+  /** Why these totals need not add up to the planned one. Null when they do. */
+  hint: string | null;
+  people: TripDocumentPersonShare[];
 }
 
 /**
@@ -263,6 +305,8 @@ export interface TripDocument {
    * same cruise with six excursions on it. Null when the trip offers none.
    */
   costOptional: TripDocumentOptional | null;
+  /** Each person's share of the itinerary's lines. Null when nobody is named, or only one person is. */
+  costPerPerson: TripDocumentPerPerson | null;
   /**
    * The trips that name this one as what they follow, earliest first.
    *
@@ -356,6 +400,18 @@ const STYLE = `
                                     letter-spacing: 0.7pt; color: #6b7079; }
   table.costs tr.optional-line td { border-top: none; color: #565c66; }
   table.costs tr.optional-total td { border-top: none; font-weight: 400; color: #565c66; }
+  /* Who a line is for, where it is not everybody: quiet, beside the line. */
+  .persons { font-size: 9pt; color: #565c66; }
+  .stop .what .persons::before { content: "\\00b7  "; }
+  /* The rooms of one stay, indented like its fares. */
+  .journey ul.rooms { list-style: none; margin: 1mm 0 0; padding: 0 0 0 4mm;
+                      border-left: 0.5pt solid #e2e4e8; }
+  .journey ul.rooms li { padding: 0.6mm 0; font-size: 9.5pt; color: #2a2f37; }
+  .journey ul.rooms ul.fares { border-left: none; padding-left: 2mm; }
+  /* A person's share, one block each, kept whole across a fold. */
+  .person { break-inside: avoid; page-break-inside: avoid; margin-bottom: 3mm; }
+  .person h3 { font-size: 11pt; margin: 0 0 1mm; }
+  table.costs .share { font-size: 8.5pt; color: #6b7079; }
   .hint { font-size: 9pt; color: #6b7079; margin: 0 0 2mm; }
   table.costs { width: 100%; border-collapse: collapse; font-size: 10pt; }
   table.costs td { padding: 1.2mm 0; border-bottom: 0.3pt solid #e2e4e8; }
@@ -418,6 +474,7 @@ function dayBlock(day: TripDocumentDay): string {
           ? `${entry.place ? ' ' : ''}<span class="excursion">${esc(entry.excursion)}</span>`
           : '',
         entry.optional ? ` <span class="optional">${esc(entry.optional)}</span>` : '',
+        entry.persons ? ` <span class="persons">${esc(entry.persons)}</span>` : '',
         entry.about ? `<div class="about">${esc(entry.about)}</div>` : '',
         entry.note ? `<div>${esc(entry.note)}</div>` : '',
         fareList(entry.fares, ''),
@@ -448,6 +505,21 @@ function fareList(fares: TripDocumentFare[], chosenWord: string): string {
   return `<ul class="fares">${items}</ul>`;
 }
 
+/** The rooms under a stay: who, then what it can be had for. */
+function roomList(rooms: TripDocumentRoom[], chosenWord: string): string {
+  if (rooms.length === 0) return '';
+  const items = rooms
+    .map(
+      (room) => `<li>
+        <b>${esc(room.persons ?? '')}</b>
+        ${room.optional ? ` <span class="optional">${esc(room.optional)}</span>` : ''}
+        ${fareList(room.fares, chosenWord)}
+      </li>`
+    )
+    .join('');
+  return `<ul class="rooms">${items}</ul>`;
+}
+
 function journeyBlocks(rows: TripDocumentJourney[], chosenWord: string): string[] {
   return rows.map((row) => {
     // The day and the clock on one line, the way a boarding pass prints
@@ -458,8 +530,10 @@ function journeyBlocks(rows: TripDocumentJourney[], chosenWord: string): string[
         ${clock ? `<div class="clock">${esc(clock)}</div>` : ''}
         ${row.detail ? `<div>${esc(row.detail)}</div>` : ''}
         ${row.about ? `<div class="about">${esc(row.about)}</div>` : ''}
+        ${row.persons ? `<div class="persons">${esc(row.persons)}</div>` : ''}
         ${row.optional ? `<div><span class="optional">${esc(row.optional)}</span></div>` : ''}
         ${fareList(row.fares, chosenWord)}
+        ${roomList(row.rooms, chosenWord)}
       </div>`;
   });
 }
@@ -506,6 +580,30 @@ function costsTable(sheet: TripDocument): string {
   return `<table class="costs">${lines}${total}${optional}</table>`;
 }
 
+/** One block per person: their lines, and what they come to. */
+function perPersonBlocks(perPerson: TripDocumentPerPerson | null): string[] {
+  if (!perPerson) return [];
+  const hint = perPerson.hint ? `<p class="hint">${esc(perPerson.hint)}</p>` : '';
+  return perPerson.people.map((share, index) => {
+    const lines = share.lines
+      .map(
+        (line) =>
+          `<tr><td>${esc(line.label)}${
+            line.detail ? ` <span class="share">${esc(line.detail)}</span>` : ''
+          }</td><td class="num">${esc(line.amount)}</td></tr>`
+      )
+      .join('');
+    const total = share.total
+      ? `<tr class="total"><td>${esc(share.total.label)}</td>
+         <td class="num">${esc(share.total.amount)}</td></tr>`
+      : '';
+    // The hint rides with the first person, for the reason every hint on this
+    // sheet rides with the first row it qualifies.
+    return `<div class="person">${index === 0 ? hint : ''}<h3>${esc(share.person)}</h3>
+      <table class="costs">${lines}${total}</table></div>`;
+  });
+}
+
 export function buildTripDocumentHtml(sheet: TripDocument): string {
   const header = `<header>
     <h1>${esc(sheet.title)}</h1>
@@ -538,6 +636,7 @@ export function buildTripDocumentHtml(sheet: TripDocument): string {
 
   const table = costsTable(sheet);
   const costs = section(sheet.labels.costs, table === '' ? [] : [table]);
+  const perPerson = section(sheet.costPerPerson?.label ?? '', perPersonBlocks(sheet.costPerPerson));
 
   // The hint rides with the first extension, for the reason the transport
   // hint rides with the first leg: the sentence and the row it qualifies are
@@ -571,6 +670,7 @@ ${itinerary}
 ${transport}
 ${stays}
 ${costs}
+${perPerson}
 ${extensions}
 ${gallery}
 <footer>
