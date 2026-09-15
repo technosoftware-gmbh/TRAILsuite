@@ -15,12 +15,15 @@
  * and a total covers only the accounts that share the view's home currency; the
  * rest are listed beneath it. Nothing fetches a rate.
  */
+import { Notice } from 'obsidian';
 import {
   accountLabel,
   balanceAt,
   balanceSheet,
   budgetYear,
   budgetYearOf,
+  clampClosedThrough,
+  formatDayTitle,
   cashOut,
   incomeStatement,
   statement,
@@ -52,8 +55,10 @@ import {
 } from '../kit/elements';
 import { documentAction } from '../kit/documents';
 import { readBills } from '../../finance/read-finance';
-import { day, money } from '../kit/format';
+import { day, money, monthName } from '../kit/format';
 import { NodaView } from './base-view';
+import { exportBudgetSheet } from '../../ledger/sheets/export-budget-sheet';
+import { closeNextBudgetMonth } from '../../ledger/close-budget-month';
 import { LEDGER_VIEW_TYPE } from './view-types';
 
 const TABS = ['accounts', 'statement', 'income', 'balance', 'budget'] as const;
@@ -122,7 +127,25 @@ export class LedgerView extends NodaView {
         icon: 'settings-2',
         onClick: () => this.deps.openAccountSetup(),
       },
+      { label: t('sheets.export'), icon: 'printer', onClick: () => void this.exportSheet() },
     ];
+  }
+
+  /**
+   * The tab on screen as a printed sheet, with the period on screen.
+   *
+   * Public because the command reaches it through the open view: the view is
+   * what knows the tab and the period, and a command that guessed them would
+   * print something other than what somebody was looking at.
+   */
+  async exportSheet(): Promise<void> {
+    const settings = this.deps.getSettings();
+    const today = formatDayTitle(this.deps.today());
+    if (this.tab === 'budget') {
+      await exportBudgetSheet(this.deps.app, settings, this.periodDate().getFullYear(), today);
+      return;
+    }
+    new Notice(t('sheets.notYet'));
   }
 
   protected async renderBody(): Promise<void> {
@@ -764,7 +787,22 @@ export class LedgerView extends NodaView {
       }
     }
 
-    const overview = section(parent, `${t('ledger.yearPlan')}: ${budget.title}`);
+    // Closing a month lives on the year, beside the plan it turns into what
+    // happened. The month named is the only one there is to close: the one
+    // after the last closed.
+    const closed = clampClosedThrough(budget.closedThrough);
+    const overview = section(
+      parent,
+      `${t('ledger.yearPlan')}: ${budget.title}`,
+      closed < 12
+        ? {
+            label: t('ledger.closeMonth', { month: monthName(closed + 1) }),
+            icon: 'lock',
+            onClick: () =>
+              void closeNextBudgetMonth(this.deps.app, settings, budget).then(() => this.render()),
+          }
+        : undefined
+    );
     for (const entry of plan.rows) {
       const account = ledger.byNumber.get(entry.line.account);
       row(overview, {

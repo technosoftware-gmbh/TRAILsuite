@@ -10,6 +10,7 @@ import {
   displayLocale,
   formatMediumDate,
   formatMoneyOrNull,
+  formatMonthName,
   parseDayTitle,
 } from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
@@ -70,4 +71,22 @@ export function relativeDay(iso: string | null, today: Date): string {
 /** A count with its noun, in the plural form the language actually has. */
 export function count(key: string, value: number): string {
   return t(key, { count: value });
+}
+
+/**
+ * A figure with no currency, grouped the reader's way: `1'309.98`.
+ *
+ * For a table whose currency is said once in its header. Sixteen columns of
+ * `CHF` would be a sixth of the page saying one thing.
+ */
+export function figure(amount: number): string {
+  return new Intl.NumberFormat(locale, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
+}
+
+/** A month's short name, 1 to 12, in the reader's conventions. */
+export function monthName(month: number): string {
+  return formatMonthName(month, locale);
 }

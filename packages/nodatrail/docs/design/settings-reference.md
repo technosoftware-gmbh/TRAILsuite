@@ -63,6 +63,7 @@ already has. See [`architecture.md`](architecture.md) section 1.1.
 | `journalSubfolder` | `'{YYYY}'` |
 | `documentSubfolder` | `'_documents'` |
 | `importSubfolder` | `'_imports'` |
+| `exportsSubfolder` | `'_exports'` |
 | `taskFolders` | `'0 Plan, 1 Areas, 2 Goals, 3 Projects'` |
 
 ## CRM, shared with the sibling plugins
@@ -258,6 +259,7 @@ edited on a page of their own rather than in a text row.
 | `accountPersonProperty` | `'person'` |
 | `importRules` | `[]` |
 | `displayLocale` | `''` |
+| `exportAuthor` | `''` |
 
 `displayLocale` was `numberLocale` and defaulted to `'de-CH'`. It covers dates
 as well now and is shared with the other two plugins through trail-core's

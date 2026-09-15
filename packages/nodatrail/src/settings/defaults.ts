@@ -23,6 +23,7 @@
 import {
   CRM_CONTRACT,
   DISPLAY_CONTRACT,
+  SHEET_CONTRACT,
   ORDER_CONTRACT,
   joinFolder,
 } from '@technosoftware/trail-core';
@@ -71,6 +72,7 @@ export const DEFAULT_SETTINGS: NODAtrailSettings = {
   journalSubfolder: '{YYYY}',
   documentSubfolder: '_documents',
   importSubfolder: '_imports',
+  exportsSubfolder: SHEET_CONTRACT.exportsSubfolder,
   taskFolders: '0 Plan, 1 Areas, 2 Goals, 3 Projects',
 
   crmFolder: 'CRM',
@@ -168,6 +170,7 @@ export const DEFAULT_SETTINGS: NODAtrailSettings = {
   accountPersonProperty: 'person',
   importRules: [],
   displayLocale: DISPLAY_CONTRACT.displayLocale,
+  exportAuthor: SHEET_CONTRACT.exportAuthor,
   exchangeRates: [],
   ledgerAccountProperty: 'account',
   paidFromProperty: 'paidFrom',

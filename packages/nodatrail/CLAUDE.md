@@ -140,7 +140,9 @@ src/finance/      properties, read-finance, write-finance, edit-finance,
 src/ledger/       the double-entry half: properties, read-ledger, write-ledger,
                   journal-text, account-field, budget-month, seed-chart, the
                   statement import (import-modal, import-write) and the posting,
-                  split and opening-balance dialogs
+                  split and opening-balance dialogs, close-budget-month, and
+                  sheets/ (the printed ledger sheets: a pure builder, a worded
+                  model and an App-bound exporter per sheet)
 src/crm/          company-defaults, read-persons, read-crm-board, and the
                   new/edit Person and Company modals
 src/tasks/        read-tasks, write-tasks

@@ -197,6 +197,15 @@ starting point: accounts down, months across, with the yearly total. The
 **month view** is what gets checked: budget against actual, per account, for one
 month, with what no line claimed shown rather than hidden.
 
+**The rolling year** is the third reading, and the one the year is steered by.
+Every closed month shows what the ledger says happened and every open month the
+plan, with the plan as made and the difference beside the total. A month is
+closed by somebody saying so, which is `closedThrough` on the budget note,
+written by the close action on the year plan and taken back by a command; the
+calendar never closes one, because a month whose statements are not imported
+yet is not reality. It is printed rather than drawn, as the landscape budget
+sheet: see `ledger-sheets.md`.
+
 ## How the existing notes feed it
 
 Nothing that exists is replaced. The bill, purchase and recurring notes stay

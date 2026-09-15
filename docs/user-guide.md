@@ -775,6 +775,15 @@ The Budget tab of the Ledger compares planned against actual for the month, and
 lists separately the accounts with spending and no plan, which is usually the
 interesting list.
 
+**Printing the year.** On the Budget tab, the printer button in the Ledger's
+toolbar writes the whole budget year as a landscape page into
+`Finance/_exports`: one column per month, what happened in the months you have
+closed and the plan for the rest, then the total, the plan as made and the
+difference, and below that your net worth at each month end. Close a month once
+its statements are in, with the button on the year plan; the command "Reopen the
+last closed budget month" takes it back. The name the page's credit line gives
+is set under Display in the settings.
+
 ---
 
 ## 6. Finding things

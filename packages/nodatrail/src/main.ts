@@ -12,7 +12,7 @@
  * docs/design/architecture.md.
  */
 import { Notice, Plugin, TFile } from 'obsidian';
-import { PERIOD_LEVELS, type PeriodLevel } from '@technosoftware/trail-core';
+import { budgetYearOf, PERIOD_LEVELS, type PeriodLevel } from '@technosoftware/trail-core';
 import { whenIndexed } from '@technosoftware/trail-core/obsidian';
 import { I18nManager, t } from './lang/I18nManager';
 import { NODAtrailSettings } from './settings/types';
@@ -37,6 +37,7 @@ import { notePathFor } from './plan/paths';
 import { detectPeriodNote } from './plan/detect';
 import { readPurchases } from './finance/read-finance';
 import { readBudgets } from './ledger/read-ledger';
+import { reopenLastBudgetMonth } from './ledger/close-budget-month';
 import { registerBlocks } from './ui/blocks/register';
 import { WhatsNewModal } from './ui/settings/whats-new-modal';
 import { HealthCheckModal } from './ui/modals/health-modal';
@@ -348,6 +349,30 @@ export default class NODAtrailPlugin extends Plugin {
     await findOrOpenLeaf(this.app, viewType);
   }
 
+  /**
+   * The ledger tab on screen as a sheet. Through the view, because the view
+   * holds the tab and the period, and a sheet of anything else would not be
+   * what somebody was looking at. With no ledger open, it opens one first.
+   */
+  private async exportLedgerSheet(): Promise<void> {
+    await this.activate(LEDGER_VIEW_TYPE);
+    const view = this.app.workspace.getLeavesOfType(LEDGER_VIEW_TYPE)[0]?.view;
+    if (view instanceof LedgerView) await view.exportSheet();
+  }
+
+  /** Takes back the last closed month of this year's budget, for a statement that arrived late. */
+  private async reopenBudgetMonth(): Promise<void> {
+    const settings = this.getSettings();
+    const year = new Date().getFullYear();
+    const budget = readBudgets(this.app, settings).find((note) => budgetYearOf(note) === year);
+    if (!budget) {
+      new Notice(t('ledger.noBudgetForYear', { year: String(year) }));
+      return;
+    }
+    await reopenLastBudgetMonth(this.app, settings, budget);
+    this.refreshViews();
+  }
+
   // Commands -------------------------------------------------------------
 
   private registerCommands(): void {
@@ -407,6 +432,16 @@ export default class NODAtrailPlugin extends Plugin {
       id: 'open-ledger',
       name: t('commands.openLedger'),
       callback: () => void this.activate(LEDGER_VIEW_TYPE),
+    });
+    this.addCommand({
+      id: 'export-ledger-sheet',
+      name: t('commands.exportLedgerSheet'),
+      callback: () => void this.exportLedgerSheet(),
+    });
+    this.addCommand({
+      id: 'reopen-budget-month',
+      name: t('commands.reopenBudgetMonth'),
+      callback: () => void this.reopenBudgetMonth(),
     });
 
     // One command per level, because "open today" and "open this quarter" are

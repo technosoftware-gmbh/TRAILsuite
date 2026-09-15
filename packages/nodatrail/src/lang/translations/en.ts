@@ -502,6 +502,11 @@ export const enTranslations = {
     yearPlan: 'The year planned',
     yearTotal: 'Year total',
     closedThrough: 'Months closed',
+    closeMonth: 'Close {month}',
+    closedMonth: '{month} closed: it now shows what happened.',
+    reopenedMonth: '{month} reopened: it shows the plan again.',
+    nothingToReopen: 'No month of {year} is closed.',
+    allMonthsClosed: 'Every month of {year} is closed.',
     noBudgetForYear: 'No budget note for {year}. Create one to plan the year.',
     postingCount: '{count} postings',
     debit: 'Debit',
@@ -736,12 +741,55 @@ export const enTranslations = {
     },
   },
 
+  sheets: {
+    export: 'Export sheet',
+    written: 'Sheet written to {path}',
+    failed: 'The sheet could not be written.',
+    notYet: 'This tab has no printed sheet yet.',
+    credit: 'Created by {author} on {date} with NODAtrail',
+    creditAnonymous: 'Created on {date} with NODAtrail',
+    truth:
+      'This page is a print of the ledger at the moment it was made. The notes in the vault are what counts: every figure is computed from the postings.',
+    currencyRule:
+      'Accounts in another currency are converted at the rates in the settings. One with no rate stays out of every total.',
+    budget: {
+      title: 'Budget year {year}',
+      fileName: 'Budget year {year}',
+      currency: 'Figures in {currency}',
+      closedThrough: 'Actual through {month}, plan from then on',
+      noneClosed: 'No month closed yet: the whole year is plan',
+      allClosed: 'All twelve months closed',
+      flows: 'Income and expenses',
+      income: 'Total income',
+      expense: 'Total expenses',
+      result: 'Income less expenses',
+      balances: 'Net worth',
+      netWorth: 'Net worth',
+      opening: 'Brought forward',
+      total: 'Total',
+      plan: 'Plan',
+      variance: 'Variance',
+      actual: 'Actual',
+      planned: 'Plan',
+      unbudgeted: 'not budgeted',
+      noRate: 'no rate',
+      totalHint:
+        'Total is what happened in the closed months plus the plan for the rest. Plan is the year as it was planned; Variance is Total less Plan.',
+      projectedHint:
+        'After the last closed month only net worth is carried forward, by the planned result. Single accounts are not planned.',
+      strayLines:
+        'Budget lines on accounts that are not income or expense are not shown: {numbers}',
+    },
+  },
+
   commands: {
     openDashboard: 'Open the life dashboard',
     openPara: 'Open PARA',
     openPlan: 'Open the plan',
     openFinance: 'Open finance',
     openLedger: 'Open ledger',
+    exportLedgerSheet: 'Export the ledger tab on screen as a sheet',
+    reopenBudgetMonth: 'Reopen the last closed budget month',
     newArea: 'New area',
     newGoal: 'New goal',
     newProject: 'New project',
@@ -860,6 +908,9 @@ export const enTranslations = {
       rates: 'Exchange rates',
       ratesDesc:
         'What one unit of a foreign currency is worth in the home one, as EUR 0.93458, USD 1.14. A rate quoted the other way round can be written as a division: EUR 1/1.07 is the same thing. Nothing is fetched: a rate nobody chose is a rate nobody can check. A currency with no rate here stays out of the totals and its row says so.',
+      exportAuthor: 'Name on printed sheets',
+      exportAuthorDesc:
+        'Who a printed sheet says made it: "Created by Thomas on ...". Leave blank to leave the name out.',
       homeCurrency: 'Home currency',
       homeCurrencyDesc: 'The currency a figure is taken to be in when a note does not say.',
       currencyOptions: 'Currency options',
@@ -965,6 +1016,9 @@ export const enTranslations = {
       documentSubfolder: 'Documents beside a note',
       documentSubfolderDesc:
         'The folder an invoice or a statement is filed into, beside the note about it, the way an attachment folder works. Leave blank to keep documents wherever they already are. A document already in the vault is moved and its links follow; one chosen from this computer is copied in.',
+      exportsSubfolder: 'Printed sheets',
+      exportsSubfolderDesc:
+        'The folder inside the finance folder the ledger\u2019s printed sheets are written to. A sheet is made again from the notes whenever it is exported, so everything in it can be deleted. Leave blank to write them into the finance folder itself.',
       importSubfolder: 'Imported files beside a note',
       importSubfolderDesc:
         'The folder a calendar export or a bank statement is kept in after it has been imported, beside the notes it fed. Not the same folder as documents: these files are read back by name, to work out what an earlier import offered and which rows are still unposted. Leave blank to keep nothing, which switches both of those off.',
