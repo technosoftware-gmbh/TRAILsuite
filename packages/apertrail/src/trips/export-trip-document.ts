@@ -3,7 +3,7 @@
  *
  * The third sheet this plugin exports, after the photo spot field sheet and
  * the trip cost sheet, and deliberately on the same paper: all three go
- * through `shared/print-sheet.ts`, so two documents printed on the same day
+ * through `trail-core's print/sheet.ts`, so two documents printed on the same day
  * look like they came from the same plugin.
  *
  * The order is the one a tour operator's own document uses, and the one
@@ -22,7 +22,6 @@
  * formatted and already resolved, and returns markup. Which keeps "what does
  * this say" separate from "what is in the vault".
  */
-import { type ProseBlock } from '@technosoftware/trail-core';
 import {
   pageText as esc,
   highlightsHtml,
@@ -30,7 +29,8 @@ import {
   printableDocument,
   proseSections,
   section,
-} from '../shared/print-sheet';
+  type ProseBlock,
+} from '@technosoftware/trail-core';
 
 /** A picture on the page. `src` is null when it could not be read, and the caption still earns its place. */
 export interface TripDocumentPicture {
@@ -323,7 +323,7 @@ export interface TripDocument {
   footer: string;
 }
 
-/** What only a trip document needs. The page itself comes from shared/print-sheet.ts. */
+/** What only a trip document needs. The page itself comes from trail-core's print/sheet.ts. */
 const STYLE = `
   /* The hero sits under the title rather than above it: the name of the trip
      is what somebody is looking for when they open the file, and a picture

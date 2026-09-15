@@ -23,7 +23,6 @@
  * already formatted and already resolved, and returns markup. Which keeps
  * "what does this say" apart from "what is in the vault".
  */
-import { type ProseBlock } from '@technosoftware/trail-core';
 import {
   pageText as esc,
   highlightsHtml,
@@ -31,7 +30,8 @@ import {
   printableDocument,
   proseSections,
   section,
-} from '../shared/print-sheet';
+  type ProseBlock,
+} from '@technosoftware/trail-core';
 
 /** A picture on the page. `src` is null when it could not be read, and the caption still earns its place. */
 export interface ProspectPicture {
@@ -121,7 +121,7 @@ export interface Prospect {
   footer: string;
 }
 
-/** What only this sheet needs. The page itself comes from shared/print-sheet.ts. */
+/** What only this sheet needs. The page itself comes from trail-core's print/sheet.ts. */
 const STYLE = `
   /* The hero under the title, for the reason the trip document gives: the name
      is what somebody opens the file looking for. */

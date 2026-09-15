@@ -3,14 +3,14 @@
  * who went.
  *
  * The same shape the photo spot field sheet has, and deliberately the same
- * paper: both go through `shared/print-sheet.ts`, so two documents printed
+ * paper: both go through `trail-core's print/sheet.ts`, so two documents printed
  * on the same day look like they came from the same plugin.
  *
  * Pure. It takes strings that are already localized, already formatted and
  * already converted, and returns markup. Which is what keeps rounding,
  * currency and locale decisions in the one place that knows the domain.
  */
-import { pageText as esc, metaLine, printableDocument, section } from '../../shared/print-sheet';
+import { pageText as esc, metaLine, printableDocument, section } from '@technosoftware/trail-core';
 
 export interface CostSheetRow {
   label: string;
