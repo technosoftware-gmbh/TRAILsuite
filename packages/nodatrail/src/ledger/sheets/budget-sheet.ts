@@ -90,10 +90,10 @@ const STYLE = `
   body { max-width: none; padding: 0; font-size: 8pt; }
   h1 { font-size: 15pt; }
   .budget { width: 100%; border-collapse: collapse; table-layout: fixed;
-            font-size: 6.9pt; line-height: 1.25;
+            font-size: 6.6pt; line-height: 1.25;
             -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .budget col.label { width: 50mm; }
-  .budget col.sum { width: 17mm; }
+  .budget col.label { width: 42mm; }
+  .budget col.sum { width: 15.5mm; }
   .budget th, .budget td { padding: 0.55mm 0.7mm; border-bottom: 0.3pt solid #e2e4e8;
                            overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
   .budget thead th { font-weight: 600; color: #3d424b; border-bottom: 0.8pt solid #14161a;
@@ -101,7 +101,10 @@ const STYLE = `
   .budget thead th.label { text-align: left; }
   .budget thead tr.phase th { border-bottom: none; font-weight: 500; color: #6b7079; text-align: center;
                               font-size: 6.2pt; text-transform: uppercase; letter-spacing: 0.4pt; }
-  .budget td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  /* A figure is never cut short: a clipped "-320'000.00" reads as a different
+     number. Only the label column may end in an ellipsis. */
+  .budget td.num { text-align: right; font-variant-numeric: tabular-nums;
+                   overflow: visible; text-overflow: clip; }
   .budget .closed { background: #f1f2f4; }
   .budget .first-open { border-left: 0.9pt solid #14161a; }
   .budget .sum { border-left: 0.6pt solid #adb2ba; }
@@ -180,13 +183,15 @@ function flowTable(sheet: BudgetSheet): string {
       const sums = [row.total, row.plan, row.variance]
         .map((value, index) => figureCell(value, row.negative[12 + index] ?? false, 'num sum'))
         .join('');
-      return `<tr class="${row.kind}">${labelCell(row.label, row.depth, row.marks)}${months}${sums}</tr>`;
+      // An empty Vortrag, so this table's months sit under the balances'
+      // months: the two halves are read against each other column by column.
+      return `<tr class="${row.kind}">${labelCell(row.label, row.depth, row.marks)}<td class="num sum"></td>${months}${sums}</tr>`;
     })
     .join('');
 
   return (
-    `<table class="budget flows">${colgroup(0, 3)}` +
-    monthHeader(sheet, [], [labels.total, labels.plan, labels.variance]) +
+    `<table class="budget flows">${colgroup(1, 3)}` +
+    monthHeader(sheet, [labels.opening], [labels.total, labels.plan, labels.variance]) +
     `<tbody>${rows}</tbody></table>`
   );
 }
@@ -206,13 +211,20 @@ function balanceTable(sheet: BudgetSheet): string {
           );
         })
         .join('');
-      return `<tr class="${row.kind}">${labelCell(row.label, row.depth, row.marks)}${opening}${months}</tr>`;
+      // And empty Total, Plan and Variance for the same reason in the other
+      // direction: a balance on a day does not add up across a year.
+      const empty = '<td class="num sum"></td>'.repeat(3);
+      return `<tr class="${row.kind}">${labelCell(row.label, row.depth, row.marks)}${opening}${months}${empty}</tr>`;
     })
     .join('');
 
   return (
-    `<table class="budget">${colgroup(1, 0)}` +
-    monthHeader(sheet, [sheet.labels.opening], []) +
+    `<table class="budget">${colgroup(1, 3)}` +
+    monthHeader(
+      sheet,
+      [sheet.labels.opening],
+      [sheet.labels.total, sheet.labels.plan, sheet.labels.variance]
+    ) +
     `<tbody>${rows}</tbody></table>`
   );
 }

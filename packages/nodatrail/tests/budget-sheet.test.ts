@@ -100,6 +100,18 @@ describe('the page', () => {
     expect(html).toContain('<th colspan="4" class="first-open">Plan</th>');
   });
 
+  it('gives both tables the same columns, so the months line up', () => {
+    const { html } = sheetFor(8);
+    const tables = html.split('<table').slice(1);
+    expect(tables).toHaveLength(2);
+    const widths = tables.map((table) => table.split('<colgroup>')[1]?.split('</colgroup>')[0]);
+    expect(widths[0]).toBe(widths[1]);
+    const cellsPerRow = tables.map(
+      (table) => (table.split('<tbody>')[1]?.split('</tr>')[0]?.match(/<td/g) ?? []).length
+    );
+    expect(cellsPerRow).toEqual([17, 17]);
+  });
+
   it('prints landscape', () => {
     expect(sheetFor(0).html).toContain('size: A4 landscape');
   });
