@@ -28,6 +28,7 @@ import {
 import { t } from '../../lang/I18nManager';
 import type { NODAtrailSettings } from '../../settings/types';
 import { readAccounts } from '../../ledger/read-ledger';
+import { budgetLineMonths } from '../../ledger/budget-line-months';
 import { writeBudgetLines, writePurchaseItems } from '../../finance/edit-finance';
 import { listEditor } from '../kit/list-editor';
 import { money } from '../kit/format';
@@ -260,6 +261,10 @@ export class EditBudgetLinesModal extends Modal {
       renderRow: (line, cell) => {
         const setting = new Setting(cell);
         setting.settingEl.addClass('nod-list-setting');
+        // Which months the line falls in, under it, so a quarterly line that
+        // starts in January when the bills come in March is seen at once.
+        const fallsIn = () => setting.setDesc(budgetLineMonths(line));
+        fallsIn();
 
         setting.addDropdown((dropdown) => {
           for (const account of accounts) {
@@ -282,6 +287,7 @@ export class EditBudgetLinesModal extends Modal {
           dropdown.setValue(line.rhythm);
           dropdown.onChange((value) => {
             line.rhythm = value as AccountBudgetLine['rhythm'];
+            fallsIn();
             this.renderSummary();
           });
         });
@@ -290,7 +296,10 @@ export class EditBudgetLinesModal extends Modal {
           t('period.month'),
           () => line.startMonth,
           (v) => (line.startMonth = v),
-          () => this.renderSummary()
+          () => {
+            fallsIn();
+            this.renderSummary();
+          }
         );
         viaDropdown(setting, t('ledger.viaFromNote'), line.via, (value) => (line.via = value));
       },
