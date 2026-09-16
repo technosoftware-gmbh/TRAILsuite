@@ -22,6 +22,11 @@ what counts as a breaking change:
 
 ### Added
 
+- **`RollingYearOptions.previous`**: the previous year's budget. While it is not
+  closed through December, `rollingYear` opens every balance on its projected
+  December instead of the booked 31 December, carries what that plan left
+  unassigned into the new year, and says so in the new
+  `RollingYear.openingProjected`. One level only.
 - **`via` on a budget line and on the budget note**, under the new
   `AccountBudgetProperties.lineViaField` and `viaProperty`: the other account a
   line moves money through, which makes it a planned posting. A note without it

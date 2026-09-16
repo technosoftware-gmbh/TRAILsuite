@@ -20,6 +20,7 @@ import {
   accountLabel,
   budgetYear,
   budgetYearOf,
+  type PreviousBudgetYear,
   clampClosedThrough,
   formatDayTitle,
   isTransferLine,
@@ -53,7 +54,7 @@ import {
 } from '../kit/elements';
 import { documentAction } from '../kit/documents';
 import { readBills } from '../../finance/read-finance';
-import { day, money, monthName } from '../kit/format';
+import { day, money, monthName, signTone } from '../kit/format';
 import { NodaView } from './base-view';
 import {
   balanceReading,
@@ -68,6 +69,7 @@ import { exportBudgetSheet, sheetLanguage } from '../../ledger/sheets/export-bud
 import { budgetSheetModel } from '../../ledger/sheets/budget-sheet-model';
 import { renderRollingBalances, renderRollingFlows } from './rolling-year-table';
 import { closeNextBudgetMonth } from '../../ledger/close-budget-month';
+import { previousBudgetYear } from '../../ledger/previous-budget';
 import { LEDGER_VIEW_TYPE } from './view-types';
 
 const TABS = ['accounts', 'statement', 'income', 'balance', 'budget'] as const;
@@ -389,8 +391,13 @@ export class LedgerView extends NodaView {
     const { held: sheet, flows: result } = chartReading(ledger, this.range(), this.converter());
 
     const strip = statRow(parent);
-    stat(strip, t('ledger.assets'), this.money(sheet.assetTotal));
-    stat(strip, t('ledger.liabilities'), this.money(sheet.liabilityTotal));
+    stat(strip, t('ledger.assets'), this.money(sheet.assetTotal), signTone(sheet.assetTotal));
+    stat(
+      strip,
+      t('ledger.liabilities'),
+      this.money(sheet.liabilityTotal),
+      signTone(sheet.liabilityTotal)
+    );
     stat(strip, t('ledger.net'), this.money(sheet.net), sheet.net < 0 ? 'warn' : 'good');
 
     this.renderSection(parent, t('ledger.assets'), sheet.assets, ledger);
@@ -451,7 +458,7 @@ export class LedgerView extends NodaView {
         trailing: entry.inTotal
           ? money(entry.amount, home)
           : money(entry.stated, entry.account.currency),
-        trailingTone: entry.inTotal ? undefined : 'warn',
+        trailingTone: entry.inTotal ? signTone(entry.amount) : 'warn',
         onClick: () => this.openAccount(entry.account, ledger),
       });
       line.addClass(depth > 0 ? 'nod-ledger-nested' : 'nod-ledger-flat');
@@ -466,6 +473,7 @@ export class LedgerView extends NodaView {
       const wrapper = foldableGroup(parent, {
         name: child.name,
         trailing: this.money(child.total),
+        trailingTone: signTone(child.total),
         folded,
         onToggle: () => {
           if (folded) this.collapsed.delete(child.path);
@@ -501,8 +509,18 @@ export class LedgerView extends NodaView {
     const reading = statementReading(ledger, chosen, this.range());
     const rows = reading.rows;
     const strip = statRow(parent);
-    stat(strip, t('ledger.opening'), money(reading.opening, chosen.currency));
-    stat(strip, t('ledger.balance'), money(reading.closing, chosen.currency));
+    stat(
+      strip,
+      t('ledger.opening'),
+      money(reading.opening, chosen.currency),
+      signTone(reading.opening)
+    );
+    stat(
+      strip,
+      t('ledger.balance'),
+      money(reading.closing, chosen.currency),
+      signTone(reading.closing)
+    );
     stat(strip, t('ledger.postings'), String(rows.length));
 
     if (rows.length === 0) {
@@ -552,6 +570,7 @@ export class LedgerView extends NodaView {
             label: t('ledger.balance'),
             value: money(entry.balance, chosen.currency),
             icon: 'wallet',
+            tone: signTone(entry.balance),
           },
         ],
         actions: [
@@ -631,8 +650,13 @@ export class LedgerView extends NodaView {
     const report = reading.report;
 
     const strip = statRow(parent);
-    stat(strip, t('ledger.income'), this.money(report.incomeTotal));
-    stat(strip, t('ledger.expense'), this.money(report.expenseTotal));
+    stat(strip, t('ledger.income'), this.money(report.incomeTotal), signTone(report.incomeTotal));
+    stat(
+      strip,
+      t('ledger.expense'),
+      this.money(report.expenseTotal),
+      signTone(report.expenseTotal)
+    );
     stat(strip, t('ledger.result'), this.money(report.result), report.result < 0 ? 'warn' : 'good');
 
     if (report.incomeTotal === 0 && report.expenseTotal === 0) {
@@ -710,8 +734,13 @@ export class LedgerView extends NodaView {
     const sheet = balanceReading(ledger, this.range(), this.converter());
 
     const strip = statRow(parent);
-    stat(strip, t('ledger.assets'), this.money(sheet.assetTotal));
-    stat(strip, t('ledger.liabilities'), this.money(sheet.liabilityTotal));
+    stat(strip, t('ledger.assets'), this.money(sheet.assetTotal), signTone(sheet.assetTotal));
+    stat(
+      strip,
+      t('ledger.liabilities'),
+      this.money(sheet.liabilityTotal),
+      signTone(sheet.liabilityTotal)
+    );
     stat(strip, t('ledger.net'), this.money(sheet.net), sheet.net < 0 ? 'warn' : 'good');
 
     // The day is named, because a balance sheet that does not say which day it
@@ -762,7 +791,7 @@ export class LedgerView extends NodaView {
 
     this.renderBudgetModeBar(parent);
     if (this.budgetMode === 'year') {
-      this.renderRollingYear(parent, ledger, budget, currency);
+      this.renderRollingYear(parent, ledger, budget, previousBudgetYear(budgets, year), currency);
       return;
     }
 
@@ -861,6 +890,7 @@ export class LedgerView extends NodaView {
     parent: HTMLElement,
     ledger: Ledger,
     budget: AccountBudgetRecord<TFile>,
+    previous: PreviousBudgetYear | undefined,
     currency: string
   ): void {
     const settings = this.deps.getSettings();
@@ -870,7 +900,7 @@ export class LedgerView extends NodaView {
       ledger.postings,
       this.periodDate().getFullYear(),
       budget.closedThrough,
-      { convert: this.converter(), via: budget.via }
+      { convert: this.converter(), via: budget.via, previous }
     );
     const sheet = budgetSheetModel(year, {
       settings,

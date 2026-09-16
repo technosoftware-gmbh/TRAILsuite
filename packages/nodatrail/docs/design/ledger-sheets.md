@@ -165,7 +165,10 @@ Einnahmen - Ausgaben
 
 ### Half 2: Vermögen per month
 
-`Vortrag` (balance on 31 December of the previous year, `balanceAt`), then a
+`Vortrag` (balance on 31 December of the previous year, `balanceAt`; or, while
+the previous year's budget is not closed through December, that budget's
+projected December, in italics, so a year planned in November starts where the
+old plan ends), then a
 balance per account at each month end, grouped as the balance sheet groups
 (cash, each person's accounts, reserves, pillar 3a, investments, mortgages),
 with the Vermögen total on top.

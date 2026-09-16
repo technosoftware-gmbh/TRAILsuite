@@ -12,6 +12,7 @@ import { I18nManager, t } from '../../lang/I18nManager';
 import type { NODAtrailSettings } from '../../settings/types';
 import { toHome } from '../../shared/rates';
 import { writeSheet } from '../../shared/write-sheet';
+import { previousBudgetYear } from '../previous-budget';
 import { readBudgets, readLedger } from '../read-ledger';
 import { buildBudgetSheetHtml } from './budget-sheet';
 import { budgetSheetModel } from './budget-sheet-model';
@@ -32,7 +33,8 @@ export async function exportBudgetSheet(
   year: number,
   today: string
 ): Promise<void> {
-  const budget = readBudgets(app, settings).find((note) => budgetYearOf(note) === year);
+  const budgets = readBudgets(app, settings);
+  const budget = budgets.find((note) => budgetYearOf(note) === year);
   if (!budget) {
     new Notice(t('ledger.noBudgetForYear', { year: String(year) }));
     return;
@@ -49,6 +51,7 @@ export async function exportBudgetSheet(
     {
       convert: (amount, from) => toHome(amount, from, settings),
       via: budget.via,
+      previous: previousBudgetYear(budgets, year),
     }
   );
 

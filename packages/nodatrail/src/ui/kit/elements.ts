@@ -387,6 +387,8 @@ export interface FoldOptions {
    * still answers its question with everything under it put away.
    */
   trailing: string;
+  /** How the trailing figure is coloured; a negative total is `warn`. */
+  trailingTone?: 'warn' | 'good' | 'muted';
   folded: boolean;
   onToggle: () => void;
 }
@@ -413,7 +415,10 @@ export function foldableGroup(parent: HTMLElement, options: FoldOptions): HTMLEl
     options.folded ? 'chevron-right' : 'chevron-down'
   );
   header.createSpan({ cls: 'nod-fold-name', text: options.name });
-  header.createSpan({ cls: 'nod-fold-trailing', text: options.trailing });
+  const trailing = header.createSpan({ cls: 'nod-fold-trailing', text: options.trailing });
+  trailing.toggleClass('nod-tone-warn', options.trailingTone === 'warn');
+  trailing.toggleClass('nod-tone-good', options.trailingTone === 'good');
+  trailing.toggleClass('nod-tone-muted', options.trailingTone === 'muted');
   header.addEventListener('click', options.onToggle);
 
   return wrapper;

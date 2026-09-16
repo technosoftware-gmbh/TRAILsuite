@@ -258,6 +258,7 @@ export function budgetSheetModel(year: RollingYear, context: BudgetSheetContext)
     ],
     monthLabels: MONTHS.map((month) => monthName(month)),
     closedThrough: year.closedThrough,
+    openingProjected: year.openingProjected,
     labels: {
       flows: t('sheets.budget.flows'),
       balances: t('sheets.budget.balances'),
@@ -271,7 +272,12 @@ export function budgetSheetModel(year: RollingYear, context: BudgetSheetContext)
     flows,
     balances,
     flowNotes,
-    balanceNotes: year.closedThrough < 12 ? [t('sheets.budget.projectedHint')] : [],
+    balanceNotes: [
+      ...(year.openingProjected
+        ? [t('sheets.budget.openingProjectedHint', { previous: String(year.year - 1) })]
+        : []),
+      ...(year.closedThrough < 12 ? [t('sheets.budget.projectedHint')] : []),
+    ],
     footer: {
       truth: t('sheets.truth'),
       currency: foreign ? t('sheets.currencyRule') : null,

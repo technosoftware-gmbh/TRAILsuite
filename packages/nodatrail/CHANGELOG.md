@@ -29,6 +29,15 @@ note carries is not an error. See
 
 ### Added
 
+- **Next year's budget opens on this year's plan.** While the previous year's
+  budget is not closed through December, the Jahresplanung and its sheet carry
+  forward its projected December as the Vortrag, in italics with a note saying
+  so, instead of the balances booked so far.
+- **A negative balance or total is red** in the ledger view: the statement's
+  opening and closing balance and running balance, the account and group totals
+  on the balance sheet and income statement, and their summary figures. The
+  printed sheets already did this.
+
 - **The day view keeps a task after it is ticked**, faint and struck through,
   the way the week keeps a meeting you declined. An hour you spent is as much a
   fact about the day as an hour you still owe, and a list that emptied itself

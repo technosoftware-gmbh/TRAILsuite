@@ -123,12 +123,15 @@ function balanceRow(
   body: HTMLTableSectionElement,
   entry: BudgetSheetBalanceRow,
   closed: number,
+  projectedOpening: boolean,
   openAccount: (number: number) => void
 ): void {
   const row = body.insertRow();
   row.addClass(ROW_CLASSES[entry.kind]);
   labelCell(row, entry, openAccount);
-  figureCell(row, entry.opening, entry.negative[0] ?? false).addClass('nod-roll-sum');
+  const opening = figureCell(row, entry.opening, entry.negative[0] ?? false);
+  opening.addClass('nod-roll-sum');
+  if (projectedOpening) opening.addClass('nod-roll-projected');
   entry.months.forEach((value, index) => {
     const cell = figureCell(row, value, entry.negative[index + 1] ?? false);
     monthClasses(cell, index, closed);
@@ -173,6 +176,7 @@ export function renderRollingBalances(
 ): void {
   if (sheet.balances.length === 0) return;
   const body = table(parent, sheet);
-  for (const entry of sheet.balances) balanceRow(body, entry, sheet.closedThrough, openAccount);
+  for (const entry of sheet.balances)
+    balanceRow(body, entry, sheet.closedThrough, sheet.openingProjected, openAccount);
   notes(parent, sheet.balanceNotes);
 }

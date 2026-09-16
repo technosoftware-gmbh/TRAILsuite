@@ -809,6 +809,8 @@ export const enTranslations = {
         'Total is what happened in the closed months plus the plan for the rest. Plan is the year as it was planned; Variance is Total less Plan.',
       projectedHint:
         'After the last closed month every balance is carried forward by the planned postings, in italics. What the plan moves without naming an account is under Not assigned.',
+      openingProjectedHint:
+        '{previous} is not yet closed through December, so the carried-forward balance is its planned December, in italics. It becomes the booked balance once December is closed.',
       strayLines:
         'Budget lines on accounts that are not income or expense are not shown: {numbers}',
     },

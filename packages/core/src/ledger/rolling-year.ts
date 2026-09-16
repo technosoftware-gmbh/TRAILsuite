@@ -97,7 +97,10 @@ export interface RollingGroup {
  */
 export interface RollingBalanceAccount {
   account: Account;
-  /** The balance on the last day of the previous year. */
+  /**
+   * The balance on the last day of the previous year: booked, or projected
+   * when `RollingYear.openingProjected` says the previous year was still open.
+   */
   opening: number;
   months: number[];
   inTotal: boolean;
@@ -137,6 +140,12 @@ export interface RollingYear {
    */
   net: { opening: number; months: number[]; measured: boolean[] };
   /**
+   * True when the opening balances are the previous year's projected December
+   * rather than what is booked on 31 December, because that year's budget was
+   * given and not yet closed through December.
+   */
+  openingProjected: boolean;
+  /**
    * What the plan moves in net worth without saying which account: lines with
    * no `via`, or a `via` that is not an asset or liability. Zero in closed
    * months, cumulative after. Assets less liabilities plus this is `net`.
@@ -154,6 +163,30 @@ export interface RollingYearOptions {
   convert?: Converter;
   /** The budget note's own `via`: used by a line that names none. */
   via?: number | null;
+  /**
+   * The previous year's budget. While it is not closed through December, this
+   * year opens on its projected December instead of the booked balances, so a
+   * year planned in November starts from where the plan says the old one ends.
+   *
+   * **One level only.** The previous year opens on booked balances whatever
+   * came before it. Two open years in a row is a household that has stopped
+   * closing months, not one planning ahead.
+   */
+  previous?: PreviousBudgetYear;
+}
+
+export interface PreviousBudgetYear {
+  lines: readonly AccountBudgetLine[];
+  closedThrough: number;
+  via?: number | null;
+}
+
+function collectBalances(
+  group: RollingBalanceGroup,
+  into: Map<number, RollingBalanceAccount>
+): void {
+  for (const entry of group.accounts) into.set(entry.account.number, entry);
+  for (const child of group.children) collectBalances(child, into);
 }
 
 const isBalanceKind = (account: Account | undefined): boolean =>
@@ -282,6 +315,25 @@ export function rollingYear(
   };
 
   const yearEnd = `${year - 1}-12-31`;
+
+  // The previous year's projected December, when it is still open. A closed
+  // December is the booked balance, so there is nothing to project.
+  const previous = options.previous;
+  const carried =
+    previous && clampClosedThrough(previous.closedThrough) < 12
+      ? rollingYear(previous.lines, accounts, postings, year - 1, previous.closedThrough, {
+          convert,
+          via: previous.via ?? null,
+        })
+      : null;
+  const carriedBalances = new Map<number, RollingBalanceAccount>();
+  if (carried) {
+    collectBalances(carried.assets, carriedBalances);
+    collectBalances(carried.liabilities, carriedBalances);
+  }
+  // What the previous plan moved without naming an account is still net worth
+  // on 1 January, so it carries into this year's unassigned row.
+  const carriedAdrift = carried ? (carried.unassigned[11] ?? 0) : 0;
   const balanceAccount = (account: Account): RollingBalanceAccount | null => {
     // A balance of nothing is nothing in any currency, so only a real figure
     // with no rate counts as missing.
@@ -291,9 +343,16 @@ export function rollingYear(
     };
 
     let inTotal = true;
-    const openingFigure = figure(yearEnd);
-    if (openingFigure === null) inTotal = false;
-    const opening = openingFigure === null ? 0 : roundCents(openingFigure);
+    let opening: number;
+    if (carried) {
+      const before = carriedBalances.get(account.number);
+      opening = before ? (before.months[11] ?? 0) : 0;
+      if (before && !before.inTotal) inTotal = false;
+    } else {
+      const openingFigure = figure(yearEnd);
+      if (openingFigure === null) inTotal = false;
+      opening = openingFigure === null ? 0 : roundCents(openingFigure);
+    }
 
     const moves = planned.get(account.number) ?? zeros();
     const months: number[] = [];
@@ -316,15 +375,18 @@ export function rollingYear(
   const assets = foldBalance(accountTree(accounts, 'asset'), balanceAccount);
   const liabilities = foldBalance(accountTree(accounts, 'liability'), balanceAccount);
 
-  const netOpening = roundCents(assets.opening - liabilities.opening);
+  const netOpening = roundCents(assets.opening - liabilities.opening + carriedAdrift);
   const netMonths: number[] = [];
   const measured: boolean[] = [];
   const unassigned: number[] = [];
   let running = netOpening;
-  let adrift = 0;
+  let adrift = carriedAdrift;
   for (let index = 0; index < 12; index += 1) {
     if (index < closed) {
       running = roundCents((assets.months[index] ?? 0) - (liabilities.months[index] ?? 0));
+      // A measured month is all accounts: whatever the old plan left
+      // unattributed has been replaced by what was booked.
+      adrift = 0;
       measured.push(true);
     } else {
       // Projected as it always was, by the planned result, which needs no
@@ -347,6 +409,7 @@ export function rollingYear(
     assets,
     liabilities,
     net: { opening: netOpening, months: netMonths, measured },
+    openingProjected: carried !== null,
     unassigned,
     strayLines,
   };
