@@ -275,6 +275,8 @@ export const DEFAULT_SETTINGS: NODAtrailSettings = {
   budgetLineNoteField: 'note',
   budgetLineOverridesField: 'months',
   budgetClosedThroughProperty: 'closedThrough',
+  budgetLineViaField: 'via',
+  budgetViaProperty: 'via',
 };
 
 export type FolderDefaultKey =

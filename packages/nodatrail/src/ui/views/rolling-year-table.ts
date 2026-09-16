@@ -132,7 +132,7 @@ function balanceRow(
   entry.months.forEach((value, index) => {
     const cell = figureCell(row, value, entry.negative[index + 1] ?? false);
     monthClasses(cell, index, closed);
-    if (entry.kind === 'net' && index >= closed) cell.addClass('nod-roll-projected');
+    if (index >= closed) cell.addClass('nod-roll-projected');
   });
   for (let index = 0; index < 3; index += 1)
     row.createEl('td', { cls: 'nod-roll-num nod-roll-sum' });

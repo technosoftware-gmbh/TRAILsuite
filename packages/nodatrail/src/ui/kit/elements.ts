@@ -60,16 +60,29 @@ export function rowLead(parent: HTMLElement, icon: string, label: string): HTMLE
  * section that appears once in a view keeps its word, which is why this is a
  * flag rather than the new behaviour.
  */
+export interface SectionAction {
+  label: string;
+  icon?: string;
+  iconOnly?: boolean;
+  onClick: () => void;
+}
+
+/**
+ * A titled block with its body. One action or several, drawn in the header in
+ * the order given: the budget year has both "edit" and "close a month", and
+ * two sections for one table would split what belongs together.
+ */
 export function section(
   parent: HTMLElement,
   title: string,
-  action?: { label: string; icon?: string; iconOnly?: boolean; onClick: () => void }
+  actions?: SectionAction | readonly SectionAction[]
 ): HTMLElement {
   const wrapper = parent.createDiv({ cls: 'nod-section' });
   const header = wrapper.createDiv({ cls: 'nod-section-header' });
   header.createEl('h3', { cls: 'nod-section-title', text: title });
 
-  if (action) {
+  const list = actions === undefined ? [] : Array.isArray(actions) ? actions : [actions];
+  for (const action of list as readonly SectionAction[]) {
     // Only when there is an icon to stand in for it: a button with neither a
     // word nor a picture would be an invisible target.
     const bare = action.iconOnly === true && action.icon !== undefined;

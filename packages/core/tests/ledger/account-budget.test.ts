@@ -44,6 +44,7 @@ function line(partial: Partial<AccountBudgetLine> & { account: number }): Accoun
     startMonth: null,
     note: '',
     overrides: {},
+    via: null,
     ...partial,
   };
 }
@@ -200,7 +201,7 @@ describe('monthRange', () => {
 
 describe('which year a budget note is for', () => {
   const forPeriod = (period: string | null) =>
-    budgetYearOf({ period, currency: null, lines: [], closedThrough: 0 });
+    budgetYearOf({ period, currency: null, lines: [], closedThrough: 0, via: null });
 
   it('reads a bare year', () => {
     expect(forPeriod('2026')).toBe(2026);
@@ -218,5 +219,24 @@ describe('which year a budget note is for', () => {
   it('refuses what it cannot read', () => {
     expect(forPeriod(null)).toBeNull();
     expect(forPeriod('next year')).toBeNull();
+  });
+});
+
+describe('a transfer in a month measured against its plan', () => {
+  it('is left out, so a bank balance is never measured as spending', () => {
+    const chart = [
+      { ...account(1011, 'Bank'), kind: 'asset' as const },
+      { ...account(1030, 'Reserve'), kind: 'asset' as const },
+      account(6110, 'Haushalt'),
+    ];
+    const measure = measureBudgetMonth(
+      [line({ account: 6110, amount: 100 }), line({ account: 1030, amount: 600, via: 1011 })],
+      chart,
+      [],
+      2026,
+      1
+    );
+    expect(measure.rows.map((row) => row.number)).toEqual([6110]);
+    expect(measure.plannedTotal).toBe(100);
   });
 });

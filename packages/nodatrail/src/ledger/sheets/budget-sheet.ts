@@ -34,7 +34,7 @@ export interface BudgetSheetFlowRow {
   negative: boolean[];
 }
 
-/** One row of the balances table. Months after the last closed one are '' except on the net worth row. */
+/** One row of the balances table. Months after the last closed one are projected. */
 export interface BudgetSheetBalanceRow {
   kind: 'section' | 'group' | 'account' | 'net';
   label: string;
@@ -119,6 +119,8 @@ const STYLE = `
   .budget tbody tr { break-inside: avoid; page-break-inside: avoid; }
   .budget .neg { color: #b3261e; }
   .budget .projected { font-style: italic; color: #565c66; }
+  /* A planned figure below zero is still a warning. */
+  .budget .projected.neg { color: #b3261e; }
   .budget .mark { font-weight: 400; font-style: italic; color: #6b7079; padding-left: 1.2mm; }
   .notes { font-size: 7.5pt; color: #565c66; margin: 1.5mm 0 0; }
   .notes p { margin: 0 0 0.8mm; }
@@ -207,7 +209,8 @@ function balanceTable(sheet: BudgetSheet): string {
       const months = row.months
         .map((value, index) => {
           const classes = cellClass(index, sheet.closedThrough);
-          const projected = row.kind === 'net' && index >= sheet.closedThrough;
+          // Every balance after the last closed month is a projection.
+          const projected = index >= sheet.closedThrough;
           return figureCell(
             value,
             row.negative[index + 1] ?? false,

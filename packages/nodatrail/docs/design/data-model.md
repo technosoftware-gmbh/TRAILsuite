@@ -365,9 +365,18 @@ the 31st in March: the step is always computed from the original day.
 | `currency` | `budgetCurrencyProperty` | | string |
 | `lines` | `budgetLinesProperty` | The plan, one line per account | list of maps |
 | `closedThrough` | `budgetClosedThroughProperty` | 0 to 12: the months closed, shown as what happened rather than as planned. Absent is 0 | number |
+| `via` | `budgetViaProperty` | The account a line without its own `via` moves money through | number |
 
-A line carries `account` (a number), `amount`, `rhythm`, `month`, `note` and
-`months`, under six `*Field` settings.
+A line carries `account` (a number), `amount`, `rhythm`, `month`, `note`,
+`months` and `via`, under seven `*Field` settings.
+
+**A line is a planned posting.** `via` is the other account: the one an expense
+is paid from, an income received into, a transfer into a reserve taken out of, a
+debt paid off from. A line on an asset or liability account is a transfer, left
+out of what the year earns and spends. With `via` the rolling year carries every
+account's balance past the last closed month; a line with neither its own `via`
+nor the note's moves net worth under "Nicht zugeordnet". See
+`budget-accounts.md`.
 
 **A budget is keyed to accounts and planned by rhythm.** A budget that is yearly
 only cannot be checked, because nobody lives a year at a time; a budget asking

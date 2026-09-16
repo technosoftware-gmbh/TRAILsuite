@@ -20,6 +20,25 @@ what counts as a breaking change:
 
 ## [Unreleased]
 
+### Added
+
+- **`via` on a budget line and on the budget note**, under the new
+  `AccountBudgetProperties.lineViaField` and `viaProperty`: the other account a
+  line moves money through, which makes it a planned posting. A note without it
+  reads as before.
+- **`rollingYear()` carries every balance account past the last closed month**
+  by the planned postings, takes the note's default as `options.via`, treats a
+  line on an asset or liability account as a transfer rather than as stray, and
+  reports what the plan moves without an account as `unassigned`. The projected
+  accounts plus `unassigned` always equal the projected net worth.
+  `RollingBalanceAccount.months` and `RollingBalanceGroup.months` are therefore
+  numbers in every month rather than null after the last closed one.
+- **`isTransferLine()`**, and **`measureBudgetMonth()` leaves transfer lines
+  out**, so a move into a reserve is never measured as spending.
+
+  For code rather than for a vault, `AccountBudgetLine.via` and
+  `ParsedAccountBudget.via` are new required fields.
+
 ## [2.2.0] - 2026-09-16
 
 ### Added

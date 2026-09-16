@@ -676,6 +676,7 @@ function money(settings: NODAtrailSettings, now: Date): SampleNote[] {
             startMonth: null,
             note: 'Twelve equal instalments, trued up in the spring',
             overrides: {},
+            via: null,
           },
           {
             // Once a year, in the month the seed lands in, so the budget page
@@ -687,6 +688,7 @@ function money(settings: NODAtrailSettings, now: Date): SampleNote[] {
             startMonth: now.getMonth() + 1,
             note: '',
             overrides: {},
+            via: null,
           },
           {
             account: TRAVEL,
@@ -695,10 +697,12 @@ function money(settings: NODAtrailSettings, now: Date): SampleNote[] {
             startMonth: now.getMonth() + 1,
             note: 'One trip a year, saved for over the whole of it',
             overrides: {},
+            via: null,
           },
         ],
         // Nothing closed: a sample budget is a plan somebody has just made.
         closedThrough: 0,
+        via: null,
       })
     ),
     body: '',

@@ -76,13 +76,34 @@ describe('the balances', () => {
     expect(mortgage?.negative[0]).toBe(true);
   });
 
-  it('carries only net worth past the last closed month', () => {
-    const { model } = sheetFor(8);
-    const net = model.balances[0];
+  it('carries every balance past the last closed month, and says which figures are planned', () => {
+    const { model, html } = sheetFor(8);
     const reserve = model.balances.find((row) => row.label === '1030 Renovationsreserve');
-    expect(net?.months[8]).not.toBe('');
-    expect(reserve?.months[7]).not.toBe('');
-    expect(reserve?.months[8]).toBe('');
+    // No fixture line names an account, so the reserve holds its August figure.
+    expect(reserve?.months[8]).toBe(reserve?.months[7]);
+    expect(html).toContain('projected');
+  });
+
+  it('shows what no account was named for, and only while there is some', () => {
+    const bare = sheetFor(8).model.balances.find((row) => row.label === 'Not assigned');
+    expect(bare?.months[7]).toBe('');
+    expect(bare?.months[8]).not.toBe('');
+
+    // Every line given the note's default: nothing is left unassigned.
+    const s = settings();
+    const year = rollingYear(LINES, CHART, postings(), 2026, 8, {
+      convert: (amount, currency) => toHome(amount, currency, s),
+      via: 1011,
+    });
+    const model = budgetSheetModel(year, {
+      settings: s,
+      currency: 'CHF',
+      lang: 'en',
+      today: '2026-09-15',
+    });
+    expect(model.balances.some((row) => row.label === 'Not assigned')).toBe(false);
+    const anna = model.balances.find((row) => row.label === '1011 Privatkonto Anna');
+    expect(anna?.months[8]).not.toBe(anna?.months[7]);
   });
 
   it('marks a foreign account with no rate, and says so under the page', () => {

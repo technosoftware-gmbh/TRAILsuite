@@ -1937,6 +1937,11 @@
   font-style: italic;
 }
 
+/* A planned figure below zero is still a warning. */
+.nod-roll-projected.nod-roll-neg {
+  color: var(--text-error);
+}
+
 .nod-roll-section td,
 .nod-roll-result td,
 .nod-roll-net td {

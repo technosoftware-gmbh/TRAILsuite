@@ -40,7 +40,15 @@ function account(number: number, kind: string, extra: Record<string, unknown> = 
 }
 
 function line(partial: Partial<AccountBudgetLine> & { account: number }): AccountBudgetLine {
-  return { amount: 0, rhythm: 'monthly', startMonth: null, note: '', overrides: {}, ...partial };
+  return {
+    amount: 0,
+    rhythm: 'monthly',
+    startMonth: null,
+    note: '',
+    overrides: {},
+    via: null,
+    ...partial,
+  };
 }
 
 const post = (date: string, debit: number, credit: number, amount: number): Posting => ({
@@ -122,7 +130,10 @@ describe('a year with nothing closed', () => {
     expect(year.net.months[0]).toBe(1500 + 5000 - 3200);
     expect(year.net.months[1]).toBe(1500 + 5000 - 3200 + 5000 - 800);
     expect(year.net.measured.every((flag) => !flag)).toBe(true);
-    expect(year.assets.months.every((value) => value === null)).toBe(true);
+    // No line names an account, so every account stays where it opened and
+    // the whole planned result is unassigned.
+    expect(year.assets.months.every((value) => value === 1500)).toBe(true);
+    expect(year.unassigned[0]).toBe(5000 - 3200);
   });
 });
 
@@ -157,7 +168,8 @@ describe('a year with January closed', () => {
     const bank = year.assets.children.find((group) => group.name === 'Konten')?.accounts[0];
     expect(bank?.opening).toBe(1000);
     expect(bank?.months[0]).toBe(1000 + 5100 - 2350 - 900 - 850 - 60);
-    expect(bank?.months[1]).toBeNull();
+    // Nothing planned names the bank, so February carries January forward.
+    expect(bank?.months[1]).toBe(bank?.months[0]);
     const reserve = year.assets.children.find((group) => group.name === 'Reserve')?.accounts[0];
     expect(reserve?.months[0]).toBe(1350);
   });
@@ -176,15 +188,20 @@ describe('a year with January closed', () => {
 });
 
 describe('what a budget note says', () => {
-  it('reports a line on an account that is not income or expense', () => {
+  it('reports an account or a via the chart does not have, and not a transfer', () => {
     const year = rollingYear(
-      [line({ account: RESERVE, amount: 850 }), line({ account: 9999 })],
+      [
+        line({ account: RESERVE, amount: 850, via: BANK }),
+        line({ account: 9999 }),
+        line({ account: FOOD, via: 8888 }),
+        line({ account: FOOD, via: GIFTS }),
+      ],
       chart,
       [],
       2026,
       0
     );
-    expect(year.strayLines).toEqual([RESERVE, 9999]);
+    expect(year.strayLines).toEqual([GIFTS, 8888, 9999]);
   });
 
   it('adds two lines on one account', () => {
@@ -218,6 +235,8 @@ describe('what a budget note says', () => {
     lineNoteField: 'note',
     lineOverridesField: 'months',
     closedThroughProperty: 'closedThrough',
+    lineViaField: 'via',
+    viaProperty: 'via',
   };
 
   it('reads and writes the months closed, and writes nothing when none are', () => {
@@ -225,8 +244,99 @@ describe('what a budget note says', () => {
     expect(read.closedThrough).toBe(3);
     expect(buildAccountBudgetFrontmatter(BP, read).closedThrough).toBe(3);
 
+    const withVia = parseAccountBudget(
+      {
+        period: '2026',
+        via: 1011,
+        lines: [{ account: 6110, amount: 5, via: 1005 }, { account: 6120 }],
+      },
+      BP
+    );
+    expect(withVia.via).toBe(1011);
+    expect(withVia.lines.map((entry) => entry.via)).toEqual([1005, null]);
+    const written = buildAccountBudgetFrontmatter(BP, withVia);
+    expect(written.via).toBe(1011);
+    expect((written.lines as Record<string, unknown>[]).map((entry) => entry.via)).toEqual([
+      1005,
+      undefined,
+    ]);
+
     const open = parseAccountBudget({ period: '2026', lines: [] }, BP);
     expect(open.closedThrough).toBe(0);
     expect('closedThrough' in buildAccountBudgetFrontmatter(BP, open)).toBe(false);
+    expect('via' in buildAccountBudgetFrontmatter(BP, open)).toBe(false);
+  });
+});
+
+describe('a budget line as a planned posting', () => {
+  // Nothing booked and nothing closed: every figure below is the plan.
+  const planned = [
+    line({ account: SALARY, amount: 5000, via: BANK }),
+    line({ account: FOOD, amount: 800 }), // the note's via
+    line({ account: RESERVE, amount: 600, via: BANK }), // a transfer
+    line({ account: INSURANCE, amount: 1200, rhythm: 'quarterly', startMonth: 3, via: RESERVE }),
+    line({ account: MORTGAGE, amount: 2000, rhythm: 'annual', startMonth: 6, via: BANK }),
+    line({ account: GIFTS, amount: 50 }), // with the note's via taken away below
+  ];
+  const chartWithDebt = chart.map((entry) =>
+    entry.number === MORTGAGE ? { ...entry, opening: 100000 } : entry
+  );
+  const year = rollingYear(planned, chartWithDebt, [], 2026, 0, { via: BANK });
+  const find = (group: typeof year.assets, number: number) =>
+    [group, ...group.children].flatMap((g) => g.accounts).find((a) => a.account.number === number);
+
+  it('moves the bank by income in, spending and transfers out', () => {
+    // January: +5000 salary, -800 food (the note's via), -600 to the reserve,
+    // -50 gifts (also the note's via).
+    expect(find(year.assets, BANK)?.months[0]).toBe(1000 + 5000 - 800 - 600 - 50);
+  });
+
+  it('moves the reserve in by the transfer and out by what it pays', () => {
+    expect(find(year.assets, RESERVE)?.months[0]).toBe(500 + 600);
+    expect(find(year.assets, RESERVE)?.months[2]).toBe(500 + 3 * 600 - 1200);
+  });
+
+  it('pays a debt down by an amortisation', () => {
+    expect(find(year.liabilities, MORTGAGE)?.months[4]).toBe(100000);
+    expect(find(year.liabilities, MORTGAGE)?.months[5]).toBe(98000);
+  });
+
+  it('leaves a transfer out of income and expenses', () => {
+    expect(year.expense.forecast[0]).toBe(800 + 50);
+    // June has the quarterly insurance and the amortisation; only the first is an expense.
+    expect(year.result.plan[5]).toBe(5000 - 800 - 50 - 1200);
+  });
+
+  it('attributes everything when every line has an account, so nothing is unassigned', () => {
+    expect(year.unassigned.every((value) => value === 0)).toBe(true);
+  });
+
+  it('sends a line with no via and no default to unassigned', () => {
+    const bare = rollingYear(planned, chartWithDebt, [], 2026, 0);
+    // Food and gifts leave net worth by 850 a month and name no account.
+    expect(bare.unassigned[0]).toBe(-850);
+    expect(bare.unassigned[11]).toBe(-850 * 12);
+  });
+
+  /**
+   * The invariant the design rests on: however the plan is divided among the
+   * accounts, the accounts plus what is unassigned are the net worth, which is
+   * projected by the result alone. Checked with and without the default, and
+   * with months closed, because each changes the division and none may change
+   * the total.
+   */
+  it.each([
+    ['with the default', { via: BANK }, 0],
+    ['without it', {}, 0],
+    ['with January closed', { via: BANK }, 1],
+  ] as const)('keeps accounts plus unassigned equal to net worth, %s', (_, options, closed) => {
+    const check = rollingYear(planned, chartWithDebt, postings, 2026, closed, options);
+    for (let index = 0; index < 12; index += 1) {
+      const divided =
+        (check.assets.months[index] ?? 0) -
+        (check.liabilities.months[index] ?? 0) +
+        (check.unassigned[index] ?? 0);
+      expect(Math.round(divided * 100) / 100).toBe(check.net.months[index]);
+    }
   });
 });

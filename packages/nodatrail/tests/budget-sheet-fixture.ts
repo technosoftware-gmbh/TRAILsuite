@@ -70,7 +70,15 @@ export const CHART: Account[] = [
 ];
 
 function line(partial: Partial<AccountBudgetLine> & { account: number }): AccountBudgetLine {
-  return { amount: 0, rhythm: 'monthly', startMonth: null, note: '', overrides: {}, ...partial };
+  return {
+    amount: 0,
+    rhythm: 'monthly',
+    startMonth: null,
+    note: '',
+    overrides: {},
+    via: null,
+    ...partial,
+  };
 }
 
 export const LINES: AccountBudgetLine[] = [

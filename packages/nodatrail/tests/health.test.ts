@@ -207,6 +207,7 @@ describe('the money checks', () => {
       startMonth: null,
       note: '',
       overrides: {},
+      via: null,
     });
     const budget = {
       file: { path: 'Finance/Budgets/2026/2026.md' },
@@ -215,6 +216,7 @@ describe('the money checks', () => {
       currency: 'CHF',
       lines: [line(4001), line(4999)],
       closedThrough: 0,
+      via: null,
     };
     const findings = budgetFindings([budget], path, [{ number: 4001 }]);
 
