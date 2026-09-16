@@ -263,8 +263,11 @@ export class EditBudgetLinesModal extends Modal {
         setting.settingEl.addClass('nod-list-setting');
         // Which months the line falls in, under it, so a quarterly line that
         // starts in January when the bills come in March is seen at once.
-        const fallsIn = () => setting.setDesc(budgetLineMonths(line));
-        fallsIn();
+        // **Its own line, not the setting's description**: a list row hides
+        // `.setting-item-info` to give the controls the width, so a
+        // description set there is written and never seen.
+        const months = cell.createDiv({ cls: 'nod-list-months' });
+        const fallsIn = () => months.setText(budgetLineMonths(line));
 
         setting.addDropdown((dropdown) => {
           for (const account of accounts) {
@@ -302,6 +305,9 @@ export class EditBudgetLinesModal extends Modal {
           }
         );
         viaDropdown(setting, t('ledger.viaFromNote'), line.via, (value) => (line.via = value));
+        // After the controls, so the months read under the line they describe.
+        cell.appendChild(months);
+        fallsIn();
       },
     });
 
