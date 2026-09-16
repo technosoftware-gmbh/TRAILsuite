@@ -792,7 +792,8 @@ the Haushaltskonto a household cost is paid from, the account a salary arrives
 in. The budget itself names a default for the lines that do not. A line on a bank
 or reserve account is a transfer, and one on a mortgage an amortisation. With
 those, every account's balance in the year view runs on to December, and what no
-line names an account for is shown as "Nicht zugeordnet".
+line names an account for is shown as "Nicht zugeordnet". The pencil on the year
+view's income and expense table opens the budget's lines.
 
 **Printing the year.** On the Budget tab, the printer button in the Ledger's
 toolbar writes the whole budget year as a landscape page into

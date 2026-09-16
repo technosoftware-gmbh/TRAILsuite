@@ -895,21 +895,29 @@ export class LedgerView extends NodaView {
       void this.render();
     };
 
-    // Closing a month lives here, on the table it turns from plan into what
-    // happened. The month named is the only one there is to close.
+    // Editing the plan and closing a month both live on the table they
+    // change. The editor holds the whole year's lines, so there is no month to
+    // pick: what a line plans for any month is its rhythm and its overrides.
     const closed = clampClosedThrough(budget.closedThrough);
-    const flows = section(
-      parent,
-      `${t('sheets.budget.flows')} · ${sheet.meta.join(' · ')}`,
-      closed < 12
-        ? {
-            label: t('ledger.closeMonth', { month: monthName(closed + 1) }),
-            icon: 'lock',
-            onClick: () =>
-              void closeNextBudgetMonth(this.deps.app, settings, budget).then(() => this.render()),
-          }
-        : undefined
-    );
+    const flows = section(parent, `${t('sheets.budget.flows')} · ${sheet.meta.join(' · ')}`, [
+      {
+        label: t('common.edit'),
+        icon: 'pencil',
+        onClick: () => this.deps.openEditBudgetLines(budget),
+      },
+      ...(closed < 12
+        ? [
+            {
+              label: t('ledger.closeMonth', { month: monthName(closed + 1) }),
+              icon: 'lock',
+              onClick: () =>
+                void closeNextBudgetMonth(this.deps.app, settings, budget).then(() =>
+                  this.render()
+                ),
+            },
+          ]
+        : []),
+    ]);
     renderRollingFlows(flows, sheet, openAccount);
 
     if (sheet.balances.length > 0) {
