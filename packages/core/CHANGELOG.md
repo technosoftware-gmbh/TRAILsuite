@@ -20,6 +20,44 @@ what counts as a breaking change:
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-09-16
+
+### Added
+
+- **`print/sheet.ts`**, the paper every printed sheet is written on: the A4
+  stylesheet, `escapeHtml` and `pageText`, `section()` gluing a heading to the
+  block under it, `proseHtml` and `proseSections`, and `printableDocument()`.
+  Moved verbatim from APERtrail when NODAtrail's ledger sheets became the second
+  consumer, because two print stylesheets drift. `printableDocument` takes an
+  optional `lang`, which defaults to `en` so every sheet written before it is
+  unchanged to the byte.
+- **`sheetCreditHtml()`**, the credit line under a sheet: the words the plugin
+  hands it, escaped, then technosoftware.com as a link whose text is its
+  address, so a printed page still says where to go.
+- **`writeSheet()`** over the vault port: create or replace, every folder above,
+  say where, open, and a failed open that is not reported as a failed write.
+  The Obsidian half (a `Notice`, a new tab) stays in each plugin.
+- **`SHEET_CONTRACT`**, the defaults the sheet-writing plugins agree on:
+  `exportAuthor` blank and `exportsSubfolder` `_exports`, the folder APERtrail
+  has always written to.
+- **`rollingYear()`**, a budget year as it is steered: every closed month as
+  what the ledger says happened, every open month as planned, with the plan as
+  made and the difference beside it, and the net worth at every month end,
+  projected past the last closed month by the planned result.
+  **`clampClosedThrough()`** reads the months closed, 0 to 12.
+- **`closedThrough` on a budget note**, under a new
+  `AccountBudgetProperties.closedThroughProperty`: the months somebody has
+  closed. A note without it reads as nothing closed, and the builder omits it
+  at 0, so every budget note already in a vault reads and writes exactly as it
+  did.
+
+  **For code rather than for a vault**, two fields are new and required:
+  `ParsedAccountBudget.closedThrough` and
+  `AccountBudgetProperties.closedThroughProperty`. A caller that builds either
+  object itself has to supply them. NODAtrail does and has; CULItrail reads no
+  budget. This is a minor release by this package's rule, which judges what
+  happens to a note.
+
 ## [2.1.0] - 2026-09-13
 
 ### Added
