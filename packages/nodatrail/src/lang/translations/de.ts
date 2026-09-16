@@ -819,6 +819,8 @@ export const deTranslations: Translations = {
         'Total ist, was in den abgeschlossenen Monaten geschah, plus der Plan für den Rest. Plan ist das Jahr, wie es geplant wurde; Abweichung ist Total weniger Plan.',
       projectedHint:
         'Nach dem letzten abgeschlossenen Monat wird jeder Bestand um die geplanten Buchungen fortgeschrieben, kursiv. Was der Plan bewegt, ohne ein Konto zu nennen, steht unter Nicht zugeordnet.',
+      openingProjectedHint:
+        'Das Jahr {previous} ist noch nicht bis Dezember abgeschlossen. Der Vortrag ist deshalb sein geplanter Dezember, kursiv, und wird zum gebuchten Bestand, sobald Dezember abgeschlossen ist.',
       strayLines:
         'Budgetzeilen auf Konten, die weder Einnahmen noch Ausgaben sind, werden nicht gezeigt: {numbers}',
     },

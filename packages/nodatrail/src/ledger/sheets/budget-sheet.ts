@@ -58,6 +58,8 @@ export interface BudgetSheet {
   monthLabels: string[];
   /** 0 to 12. */
   closedThrough: number;
+  /** The opening balances are the previous year's plan, not its bookings. */
+  openingProjected: boolean;
   labels: {
     flows: string;
     balances: string;
@@ -205,7 +207,11 @@ function flowTable(sheet: BudgetSheet): string {
 function balanceTable(sheet: BudgetSheet): string {
   const rows = sheet.balances
     .map((row) => {
-      const opening = figureCell(row.opening, row.negative[0] ?? false, 'num sum');
+      const opening = figureCell(
+        row.opening,
+        row.negative[0] ?? false,
+        sheet.openingProjected ? 'num sum projected' : 'num sum'
+      );
       const months = row.months
         .map((value, index) => {
           const classes = cellClass(index, sheet.closedThrough);

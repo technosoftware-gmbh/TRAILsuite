@@ -17,7 +17,7 @@ import {
   type AccountBudgetProperties,
 } from '../../src/ledger/account-budget.js';
 import { parseAccount, type AccountProperties } from '../../src/ledger/account.js';
-import { rollingYear } from '../../src/ledger/rolling-year.js';
+import { rollingYear, type RollingBalanceGroup } from '../../src/ledger/rolling-year.js';
 import type { Account, Posting } from '../../src/ledger/types.js';
 
 const P: AccountProperties = {
@@ -331,6 +331,76 @@ describe('a budget line as a planned posting', () => {
     ['with January closed', { via: BANK }, 1],
   ] as const)('keeps accounts plus unassigned equal to net worth, %s', (_, options, closed) => {
     const check = rollingYear(planned, chartWithDebt, postings, 2026, closed, options);
+    for (let index = 0; index < 12; index += 1) {
+      const divided =
+        (check.assets.months[index] ?? 0) -
+        (check.liabilities.months[index] ?? 0) +
+        (check.unassigned[index] ?? 0);
+      expect(Math.round(divided * 100) / 100).toBe(check.net.months[index]);
+    }
+  });
+});
+
+/**
+ * Planning next year before this one is closed: in November the new year
+ * should start where the plan says December ends, not where the bookings
+ * stopped. The same household as above, planning 2027 with 2026 still open.
+ */
+describe('a year after one still open', () => {
+  const planned = [
+    line({ account: SALARY, amount: 5000, via: BANK }),
+    line({ account: FOOD, amount: 800 }),
+    line({ account: RESERVE, amount: 600, via: BANK }),
+    line({ account: MORTGAGE, amount: 2000, rhythm: 'annual', startMonth: 6, via: BANK }),
+  ];
+  const chartWithDebt = chart.map((entry) =>
+    entry.number === MORTGAGE ? { ...entry, opening: 100000 } : entry
+  );
+  const find = (group: RollingBalanceGroup, number: number) =>
+    [group, ...group.children].flatMap((g) => g.accounts).find((a) => a.account.number === number);
+
+  const before = rollingYear(planned, chartWithDebt, [], 2026, 0, { via: BANK });
+  const after = rollingYear(planned, chartWithDebt, [], 2027, 0, {
+    via: BANK,
+    previous: { lines: planned, closedThrough: 0, via: BANK },
+  });
+
+  it("opens every account on the previous year's projected December", () => {
+    expect(after.openingProjected).toBe(true);
+    expect(find(after.assets, BANK)?.opening).toBe(find(before.assets, BANK)?.months[11]);
+    expect(find(after.assets, RESERVE)?.opening).toBe(500 + 12 * 600);
+    expect(find(after.liabilities, MORTGAGE)?.opening).toBe(98000);
+  });
+
+  it('opens net worth where the previous year ends', () => {
+    expect(after.net.opening).toBe(before.net.months[11]);
+  });
+
+  it('opens on the booked balances once the previous year is closed through December', () => {
+    const closed = rollingYear(planned, chartWithDebt, [], 2027, 0, {
+      via: BANK,
+      previous: { lines: planned, closedThrough: 12, via: BANK },
+    });
+    expect(closed.openingProjected).toBe(false);
+    expect(find(closed.assets, BANK)?.opening).toBe(1000);
+  });
+
+  it('carries what the previous plan left unassigned into the new year', () => {
+    const bare = rollingYear(planned, chartWithDebt, [], 2027, 0, {
+      previous: { lines: planned, closedThrough: 0 },
+    });
+    expect(bare.unassigned[0]).toBe(-800 * 13);
+  });
+
+  it.each([
+    ['with the previous default', { via: BANK }, 0],
+    ['without any via', {}, 0],
+    ['with January closed', {}, 1],
+  ] as const)('keeps accounts plus unassigned equal to net worth, %s', (_, via, closed) => {
+    const check = rollingYear(planned, chartWithDebt, postings, 2027, closed, {
+      ...via,
+      previous: { lines: planned, closedThrough: 0, ...via },
+    });
     for (let index = 0; index < 12; index += 1) {
       const divided =
         (check.assets.months[index] ?? 0) -

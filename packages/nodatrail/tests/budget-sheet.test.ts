@@ -12,6 +12,7 @@ import { rollingYear } from '@technosoftware/trail-core';
 import { buildBudgetSheetHtml } from '../src/ledger/sheets/budget-sheet';
 import { budgetSheetModel } from '../src/ledger/sheets/budget-sheet-model';
 import { ledgerSheetPath } from '../src/ledger/sheets/sheet-path';
+import { previousBudgetYear } from '../src/ledger/previous-budget';
 import { toHome } from '../src/shared/rates';
 import { setDisplayLocale } from '../src/ui/kit/format';
 import { CHART, LINES, postings, settings } from './budget-sheet-fixture';
@@ -177,5 +178,45 @@ describe('where it goes', () => {
 
   it('writes into the finance folder itself when the subfolder is blank', () => {
     expect(ledgerSheetPath(settings({ exportsSubfolder: '' }), 'B')).toBe('Finance/B.html');
+  });
+});
+
+describe('a year planned before the one before it is closed', () => {
+  function nextYear(previousClosed: number) {
+    const s = settings();
+    const year = rollingYear(LINES, CHART, postings(), 2027, 0, {
+      convert: (amount, currency) => toHome(amount, currency, s),
+      previous: previousBudgetYear(
+        [
+          { period: '2026', lines: LINES, closedThrough: previousClosed, via: null } as never,
+          { period: '2025', lines: [], closedThrough: 12, via: null } as never,
+        ],
+        2027
+      ),
+    });
+    const model = budgetSheetModel(year, {
+      settings: s,
+      currency: 'CHF',
+      lang: 'en',
+      today: '2026-11-15',
+    });
+    return { model, html: buildBudgetSheetHtml(model) };
+  }
+
+  it('sets the carried-forward balances in italics and says why', () => {
+    const { model, html } = nextYear(8);
+    expect(model.openingProjected).toBe(true);
+    expect(model.balanceNotes[0]).toContain('2026 is not yet closed through December');
+    expect(html).toContain('class="num sum projected');
+  });
+
+  it('carries the booked balances, upright, once December is closed', () => {
+    const { model, html } = nextYear(12);
+    expect(model.openingProjected).toBe(false);
+    expect(html).not.toContain('class="num sum projected');
+  });
+
+  it('finds no previous budget where there is none', () => {
+    expect(previousBudgetYear([], 2027)).toBeUndefined();
   });
 });

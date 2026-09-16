@@ -90,3 +90,17 @@ export function figure(amount: number): string {
 export function monthName(month: number): string {
   return formatMonthName(month, locale);
 }
+
+/**
+ * The tone of an amount that carries its own sign: red below zero, plain
+ * otherwise.
+ *
+ * Used where a figure is a balance or a total rather than a verdict. A verdict
+ * (a variance, a result) is already green or red by what it means; a balance
+ * is only red when it has gone below zero, and plain rather than green when it
+ * has not, because a positive bank balance is not an achievement to colour.
+ * Cents that round to zero are not negative.
+ */
+export function signTone(amount: number): 'warn' | undefined {
+  return Math.round(amount * 100) < 0 ? 'warn' : undefined;
+}
