@@ -1,7 +1,6 @@
 # Planning per account
 
-**Design, written 16 September 2026. Nothing here is built, and nothing is
-decided until the questions at the end are answered.** It changes the budget
+**Design, written 16 September 2026, decided and built the same day (see the end).** It changes the budget
 note format, which this repository treats as expensive: a vault is somebody's
 records, and a wrong write is found months later.
 
@@ -39,25 +38,25 @@ lines:
   - account: 6110          # Haushalt
     amount: 1650
     rhythm: monthly
-    from: 1005             # paid from the Haushaltskonto
+    via: 1005             # paid from the Haushaltskonto
   - account: 3010          # Lohn netto Anna
     amount: 7800
     rhythm: monthly
-    from: 1011             # received into Anna's Privatkonto
+    via: 1011             # received into Anna's Privatkonto
   - account: 1030          # Renovationsreserve
     amount: 600
     rhythm: monthly
-    from: 1011             # a transfer: no income, no expense
+    via: 1011             # a transfer: no income, no expense
   - account: 6130          # Hypothekarzins
     amount: 1900
     rhythm: quarterly
     month: 3
-    from: 1030             # paid out of the reserve
+    via: 1030             # paid out of the reserve
   - account: 2050          # Festhypothek
     amount: 2000
     rhythm: annual
     month: 6
-    from: 1011             # an amortisation: the debt goes down
+    via: 1011             # an amortisation: the debt goes down
 ```
 
 (Invented accounts and figures, the same household as the sheet tests' fixture.)
@@ -67,10 +66,10 @@ needs a sign or a second amount:
 
 | `account` is | The line means | Posted as |
 |---|---|---|
-| expense | spent, paid from `from` | debit `account`, credit `from` |
-| income | earned, received into `from` | debit `from`, credit `account` |
-| asset | moved into `account` out of `from` | debit `account`, credit `from` |
-| liability | paid off out of `from` | debit `account`, credit `from` |
+| expense | spent, paid from `via` | debit `account`, credit `via` |
+| income | earned, received into `via` | debit `via`, credit `account` |
+| asset | moved into `account` out of `via` | debit `account`, credit `via` |
+| liability | paid off out of `via` | debit `account`, credit `via` |
 
 That is the rule the ledger already applies to every posting
 (`increasesOnDebit`), read from the named account's side. A negative amount
@@ -91,10 +90,10 @@ spreadsheet's, projected figures in italics as the net worth row already is.
 
 **The invariant that keeps it honest:** the sum of every projected account is
 the projected net worth that exists today. An income or expense line with no
-`from` still moves net worth and moves no account, so its amount goes to one
+`via` still moves net worth and moves no account, so its amount goes to one
 row, **Nicht zugeordnet**, under the balances. The total therefore never
 changes because of this design; only how much of it is attributed to real
-accounts. A budget with no `from` anywhere looks exactly as it does now plus
+accounts. A budget with no `via` anywhere looks exactly as it does now plus
 that one row, and the row shrinks as lines are given accounts.
 
 **The budget editor** gains a "paid from / received into" account picker per
@@ -111,7 +110,7 @@ movement. Nothing else reads a budget note.
 
 ## Not in this design
 
-- **Deriving `from` from recurring cost or bill notes.** A recurring note
+- **Deriving `via` from recurring cost or bill notes.** A recurring note
   carries an `account` and a bill a `paidFrom`, so a plan could be suggested
   from them. It is a convenience on top of this format and can come later.
 - **Checking a plan against a closed month per account.** The flows half
@@ -125,9 +124,10 @@ movement. Nothing else reads a budget note.
 
 | Where | What | Absent means |
 |---|---|---|
-| a budget line | `from`, under a new `budgetLineFromField`: the other account's number | the line moves net worth but no account |
+| a budget line | `via`, under a new `budgetLineViaField`: the other account's number | the note's `via`, else no account |
+| the budget note | `via`, under a new `budgetViaProperty`: the account a line without its own uses | lines without `via` move no account |
 | the budget editor | asset and liability accounts offered as `account` | |
-| trail-core | `AccountBudgetLine.from: number \| null`; `rollingYear` projects balances per account and adds an unassigned row | |
+| trail-core | `AccountBudgetLine.via: number \| null`; `rollingYear` projects balances per account and adds an unassigned row | |
 
 A vault written before this reads unchanged, so by this repository's rule it is
 a minor release of the core and of NODAtrail. As with `closedThrough`, the new
@@ -136,7 +136,7 @@ change for anybody constructing a line by hand.
 
 ## Order of work
 
-1. Core: parse and write `from`; `rollingYear` projects per account, reports
+1. Core: parse and write `via`; `rollingYear` projects per account, reports
    transfers as transfers, adds the unassigned row; `measureBudgetMonth` skips
    transfer lines. Tests, including the
    invariant (per-account sum equals the projected net worth) broken on purpose
@@ -145,22 +145,16 @@ change for anybody constructing a line by hand.
    list, the unassigned row and italic projections on the sheet and the view.
 3. Docs: data model, settings reference, `ledger-sheets.md`, user guide.
 
-## Questions
+## Decisions, 16 September 2026
 
-1. **The field's name.** `from` reads right for an expense and a transfer and
-   wrong for income ("Lohn, from Privatkonto" means received into it).
-   Alternatives: `via`, `counter` or `with`. The note's own
-   words are preferred; which word would you write by hand?
-2. **One list or two.** Transfers as ordinary lines whose `account` is an asset
-   or liability (this design: one list, one editor, one rhythm engine), or a
-   separate `transfers:` list with `from` and `to` (clearer to read in the note,
-   a second editor and a second list to keep in step)?
-3. **A default account.** Most spending leaves from one or two accounts. Should
-   the budget note carry a `defaultFrom` that a line without its own `from`
-   uses, so fifty lines do not each repeat the same account? Without it, the unassigned row
-   is large until every line is filled in.
-4. **The unassigned row.** Shown only while it is not zero (proposed), or always?
-5. **Liabilities.** A mortgage can be planned here as a debt that goes down by
-   an amortisation line. Is an amortisation something to plan, or does a debt
-   only change when the bank says so, so that liability accounts need no lines
-   at all?
+1. **The field is `via`.** It reads for all four kinds: Haushalt via the
+   Haushaltskonto, Lohn via the Privatkonto, the reserve via the account it is
+   paid from.
+2. **One list, one editor.** A transfer is a line whose `account` is an asset or
+   liability.
+3. **A default account.** The budget note carries `via` itself; a line without
+   its own uses it. The same word at both levels, because it means the same
+   thing at both: the line's setting wins, the note's fills the gap.
+4. **"Nicht zugeordnet" is shown only while it is not zero.**
+5. **Liabilities are planned.** Amortisations are already planned for 2027 and
+   2028, so a line on a liability account is an ordinary case, not an edge one.

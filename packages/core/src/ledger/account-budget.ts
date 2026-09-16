@@ -51,6 +51,16 @@ export interface AccountBudgetLine {
    * none behaves exactly as its rhythm says.
    */
   overrides: Readonly<Record<number, number>>;
+  /**
+   * The other account the money moves through: the account an expense is paid
+   * from, an income received into, a transfer taken out of, a debt paid off
+   * from. Null when the line names none, in which case the budget note's own
+   * `via` is used, and failing that the line moves net worth but no account.
+   *
+   * With it a line is a planned posting, which is what lets `rollingYear`
+   * carry every account's balance past the last closed month.
+   */
+  via: number | null;
 }
 
 /** How many months apart a rhythm falls, or null for the ones that do not repeat. */
@@ -158,6 +168,20 @@ export interface BudgetMeasure {
   actualTotal: number;
 }
 
+/**
+ * Whether a line plans a move between two balance accounts rather than an
+ * income or an expense: its `account` is an asset or a liability. A line on an
+ * account the chart does not have is not a transfer; it is reported where it
+ * is measured, as before.
+ */
+export function isTransferLine(
+  line: Pick<AccountBudgetLine, 'account'>,
+  byNumber: ReadonlyMap<number, Account>
+): boolean {
+  const kind = byNumber.get(line.account)?.kind;
+  return kind === 'asset' || kind === 'liability';
+}
+
 /** The first and last day of a month, as the ISO days everything here compares. */
 export function monthRange(year: number, month: number): { from: string; to: string } {
   const lastDay = new Date(year, month, 0).getDate();
@@ -185,19 +209,25 @@ export function measureBudgetMonth(
   const byNumber = new Map(accounts.map((account) => [account.number, account]));
   const index = clampMonth(month) - 1;
 
-  const rows: BudgetMeasureRow[] = lines.map((line) => {
-    const account = byNumber.get(line.account) ?? null;
-    const planned = expandBudgetLine(line)[index] ?? 0;
-    const actual = account ? movementBetween(postings, account, from, to) : 0;
-    return {
-      account,
-      number: line.account,
-      planned,
-      actual,
-      left: roundCents(planned - actual),
-      note: line.note,
-    };
-  });
+  // A line on an asset or liability account is a planned transfer, not
+  // something spent or earned. Measured here it would hold a bank balance's
+  // movement up against a plan for a move into it, which is no comparison at
+  // all, so it is left out as a transfer is left out of an income statement.
+  const rows: BudgetMeasureRow[] = lines
+    .filter((line) => !isTransferLine(line, byNumber))
+    .map((line) => {
+      const account = byNumber.get(line.account) ?? null;
+      const planned = expandBudgetLine(line)[index] ?? 0;
+      const actual = account ? movementBetween(postings, account, from, to) : 0;
+      return {
+        account,
+        number: line.account,
+        planned,
+        actual,
+        left: roundCents(planned - actual),
+        note: line.note,
+      };
+    });
 
   const claimed = new Set(lines.map((line) => line.account));
   const unbudgeted: BudgetMeasureRow[] = [];
@@ -254,6 +284,10 @@ export interface AccountBudgetProperties {
   lineNoteField: string;
   /** A map of month number to amount, for where reality departs from the rhythm. */
   lineOverridesField: string;
+  /** The other account a line moves money through. */
+  lineViaField: string;
+  /** The account a line without its own `via` uses. */
+  viaProperty: string;
   /** How many months of the year have been closed: replaced by what happened. See `rollingYear`. */
   closedThroughProperty: string;
 }
@@ -271,6 +305,8 @@ export interface ParsedAccountBudget {
    * means nothing closed, which is what every budget written before this was.
    */
   closedThrough: number;
+  /** The account a line without its own `via` moves money through. Null for none. */
+  via: number | null;
 }
 
 /** A budget note paired with the file it came from. */
@@ -310,6 +346,7 @@ export function parseAccountBudget(
       startMonth: readNumberLike(record[p.lineMonthField]),
       note: readString(record[p.lineNoteField]) ?? '',
       overrides: readOverrides(record[p.lineOverridesField]),
+      via: readNumberLike(record[p.lineViaField]),
     });
   }
 
@@ -318,6 +355,7 @@ export function parseAccountBudget(
     currency: normalizeCurrency(readString(frontmatter[p.currencyProperty])),
     lines,
     closedThrough: clampClosedThrough(readNumberLike(frontmatter[p.closedThroughProperty])),
+    via: readNumberLike(frontmatter[p.viaProperty]),
   };
 }
 
@@ -358,7 +396,9 @@ export function buildAccountBudgetFrontmatter(
       ...(Object.keys(line.overrides).length > 0
         ? { [p.lineOverridesField]: { ...line.overrides } }
         : {}),
+      ...(line.via === null ? {} : { [p.lineViaField]: line.via }),
     })),
+    ...(budget.via === null ? {} : { [p.viaProperty]: budget.via }),
     // Omitted at nothing, like every other field that says nothing.
     ...(budget.closedThrough > 0 ? { [p.closedThroughProperty]: budget.closedThrough } : {}),
   };

@@ -115,7 +115,7 @@ function balanceRows(
 ): void {
   for (const entry of group.accounts) {
     const opening = signed(entry.opening, sign);
-    const months = entry.months.map((value) => (value === null ? null : signed(value, sign)));
+    const months = entry.months.map((value) => signed(value, sign));
     rows.push({
       kind: 'account',
       label: accountLabel(entry.account),
@@ -142,7 +142,7 @@ function groupBalanceRow(
   label: string
 ): BudgetSheetBalanceRow {
   const opening = signed(group.opening, sign);
-  const months = group.months.map((value) => (value === null ? null : signed(value, sign)));
+  const months = group.months.map((value) => signed(value, sign));
   return {
     kind,
     label,
@@ -206,8 +206,7 @@ export function budgetSheetModel(year: RollingYear, context: BudgetSheetContext)
     year.assets.accounts.length + year.assets.children.length > 0 ||
     year.liabilities.accounts.length + year.liabilities.children.length > 0;
   if (hasBalances) {
-    // Net worth on top, as the spreadsheet has it: the one line of this table
-    // that carries on past the last closed month.
+    // Net worth on top, as the spreadsheet has it.
     balances.push({
       kind: 'net',
       label: t('sheets.budget.netWorth'),
@@ -222,6 +221,23 @@ export function budgetSheetModel(year: RollingYear, context: BudgetSheetContext)
     balanceRows(year.assets, 1, 1, balances);
     balances.push(groupBalanceRow(year.liabilities, -1, 0, 'section', t('ledger.liabilities')));
     balanceRows(year.liabilities, -1, 1, balances);
+
+    // What the plan moves without naming an account, shown only while there
+    // is some: a budget whose every line has a via has nothing to say here.
+    if (year.unassigned.some((value) => value !== 0)) {
+      balances.push({
+        kind: 'section',
+        label: t('sheets.budget.unassigned'),
+        account: null,
+        depth: 0,
+        marks: [],
+        opening: '',
+        months: year.unassigned.map((value, index) =>
+          index < year.closedThrough ? '' : cell(value, false)
+        ),
+        negative: [0, ...year.unassigned].map((value) => value < 0),
+      });
+    }
   }
 
   const flowNotes = [t('sheets.budget.totalHint')];

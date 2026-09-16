@@ -22,6 +22,7 @@ import {
   budgetYearOf,
   clampClosedThrough,
   formatDayTitle,
+  isTransferLine,
   rollingYear,
   type AccountBudgetRecord,
   type Account,
@@ -765,7 +766,9 @@ export class LedgerView extends NodaView {
       return;
     }
 
-    const plan = budgetYear(budget.lines);
+    // The year planned as spending and earning: a transfer into a reserve is
+    // not part of what the year costs.
+    const plan = budgetYear(budget.lines.filter((line) => !isTransferLine(line, ledger.byNumber)));
 
     const measured = await measureMonth(this.deps.app, settings, this.periodDate());
     if (measured) {
@@ -867,7 +870,7 @@ export class LedgerView extends NodaView {
       ledger.postings,
       this.periodDate().getFullYear(),
       budget.closedThrough,
-      { convert: this.converter() }
+      { convert: this.converter(), via: budget.via }
     );
     const sheet = budgetSheetModel(year, {
       settings,

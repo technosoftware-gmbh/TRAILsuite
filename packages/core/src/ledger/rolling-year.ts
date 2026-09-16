@@ -18,12 +18,17 @@
  *
  * **Two halves.** What came in and went out per month, by the chart's groups,
  * with the forecast (actual so far, plan for the rest), the untouched plan and
- * the difference. And what is held at each month end: exact for closed months,
- * and for open months only as a total. The total can be projected exactly,
- * because in double entry the net worth moves by the result and by nothing
- * else. A single account cannot: a budget line names what money is spent on,
- * not which account pays it, so per-account projection waits for a budget line
- * that can name its counter-account.
+ * the difference. And what is held at each month end: measured for a closed
+ * month, and for an open one carried forward from the last measured balance by
+ * the planned postings.
+ *
+ * **A budget line is a planned posting.** Its `via` names the other account:
+ * the account an expense is paid from, an income received into, a transfer
+ * taken out of. Which side is debited follows from the named account's kind,
+ * as in the journal. A line with no `via` (and a note with no default) still
+ * moves net worth, so its effect goes to `unassigned` rather than nowhere: the
+ * projected accounts plus `unassigned` always make the projected net worth,
+ * which is the result carried forward and needs no account at all.
  *
  * App-free, and clock-free.
  */
@@ -85,12 +90,16 @@ export interface RollingGroup {
   missing: number;
 }
 
-/** One asset or liability account's balances. Null in a month that is not closed. */
+/**
+ * One asset or liability account's balances: measured at a closed month's end,
+ * projected by the planned postings after it. `RollingYear.closedThrough` says
+ * which months are which.
+ */
 export interface RollingBalanceAccount {
   account: Account;
   /** The balance on the last day of the previous year. */
   opening: number;
-  months: (number | null)[];
+  months: number[];
   inTotal: boolean;
 }
 
@@ -100,7 +109,7 @@ export interface RollingBalanceGroup {
   accounts: RollingBalanceAccount[];
   children: RollingBalanceGroup[];
   opening: number;
-  months: (number | null)[];
+  months: number[];
 }
 
 /** Income less expense per month. */
@@ -127,14 +136,28 @@ export interface RollingYear {
    * for an open one; `measured` says which.
    */
   net: { opening: number; months: number[]; measured: boolean[] };
-  /** Account numbers a budget line names that are not an income or expense account in the chart. */
+  /**
+   * What the plan moves in net worth without saying which account: lines with
+   * no `via`, or a `via` that is not an asset or liability. Zero in closed
+   * months, cumulative after. Assets less liabilities plus this is `net`.
+   */
+  unassigned: number[];
+  /**
+   * Account numbers a budget line names, as `account` or `via`, that the chart
+   * does not have (or, for `via`, that is not an asset or liability).
+   */
   strayLines: number[];
 }
 
 export interface RollingYearOptions {
   /** Omit for a single-currency vault. Plans are taken to be in the reporting currency already. */
   convert?: Converter;
+  /** The budget note's own `via`: used by a line that names none. */
+  via?: number | null;
 }
+
+const isBalanceKind = (account: Account | undefined): boolean =>
+  account?.kind === 'asset' || account?.kind === 'liability';
 
 export function rollingYear(
   lines: readonly AccountBudgetLine[],
@@ -157,12 +180,56 @@ export function rollingYear(
   }
 
   const byNumber = new Map(accounts.map((account) => [account.number, account]));
-  const strayLines = [...planByAccount.keys()]
-    .filter((number) => {
-      const kind = byNumber.get(number)?.kind;
-      return kind !== 'income' && kind !== 'expense';
-    })
-    .sort((a, b) => a - b);
+  const defaultVia = options.via ?? null;
+
+  // Planned postings, as their effect on each balance account's balance per
+  // month, and on net worth where the other side names no balance account.
+  const planned = new Map<number, number[]>();
+  const unassignedMoves = zeros();
+  const stray = new Set<number>();
+  for (const line of lines) {
+    const account = byNumber.get(line.account);
+    if (!account) {
+      stray.add(line.account);
+      continue;
+    }
+    const via = line.via ?? defaultVia;
+    const viaAccount = via === null ? undefined : byNumber.get(via);
+    if (via !== null && !isBalanceKind(viaAccount)) stray.add(via);
+
+    const amounts = expandBudgetLine(line);
+    // The journal's rule read from the named account's side: an income is
+    // credited to it, everything else is debited to it. The `via` account
+    // takes the other side.
+    const accountDebited = account.kind !== 'income';
+
+    const move = (target: Account, debited: boolean) => {
+      // A balance as the ledger states it: an asset grows on a debit, a
+      // liability (a positive figure owed) shrinks on one.
+      const grows = (target.kind === 'asset') === debited;
+      const row = planned.get(target.number) ?? zeros();
+      addInto(
+        row,
+        amounts.map((amount) => (grows ? amount : -amount))
+      );
+      planned.set(target.number, row);
+    };
+
+    if (isBalanceKind(account)) move(account, accountDebited);
+    if (viaAccount && isBalanceKind(viaAccount)) {
+      move(viaAccount, !accountDebited);
+    } else {
+      // The side that names no account still moves net worth: a debit to a
+      // balance account adds to it, a credit takes from it, whether asset or
+      // liability.
+      const debited = !accountDebited;
+      addInto(
+        unassignedMoves,
+        amounts.map((amount) => (debited ? amount : -amount))
+      );
+    }
+  }
+  const strayLines = [...stray].sort((a, b) => a - b);
 
   const flowAccount = (account: Account): RollingAccount | null => {
     const planned = planByAccount.get(account.number) ?? zeros();
@@ -226,34 +293,49 @@ export function rollingYear(
     let inTotal = true;
     const openingFigure = figure(yearEnd);
     if (openingFigure === null) inTotal = false;
-    const months: (number | null)[] = new Array<number | null>(12).fill(null);
-    for (let month = 1; month <= closed; month += 1) {
-      const value = figure(monthRange(year, month).to);
-      if (value === null) inTotal = false;
-      months[month - 1] = value === null ? 0 : roundCents(value);
+    const opening = openingFigure === null ? 0 : roundCents(openingFigure);
+
+    const moves = planned.get(account.number) ?? zeros();
+    const months: number[] = [];
+    let last = opening;
+    for (let month = 1; month <= 12; month += 1) {
+      if (month <= closed) {
+        const value = figure(monthRange(year, month).to);
+        if (value === null) inTotal = false;
+        last = value === null ? 0 : roundCents(value);
+      } else {
+        last = roundCents(last + (moves[month - 1] ?? 0));
+      }
+      months.push(last);
     }
 
-    const opening = openingFigure === null ? 0 : roundCents(openingFigure);
-    const empty = opening === 0 && months.every((value) => value === null || value === 0);
+    const empty = opening === 0 && months.every((value) => value === 0);
     return empty && inTotal ? null : { account, opening, months, inTotal };
   };
 
-  const assets = foldBalance(accountTree(accounts, 'asset'), balanceAccount, closed);
-  const liabilities = foldBalance(accountTree(accounts, 'liability'), balanceAccount, closed);
+  const assets = foldBalance(accountTree(accounts, 'asset'), balanceAccount);
+  const liabilities = foldBalance(accountTree(accounts, 'liability'), balanceAccount);
 
   const netOpening = roundCents(assets.opening - liabilities.opening);
   const netMonths: number[] = [];
   const measured: boolean[] = [];
+  const unassigned: number[] = [];
   let running = netOpening;
+  let adrift = 0;
   for (let index = 0; index < 12; index += 1) {
     if (index < closed) {
       running = roundCents((assets.months[index] ?? 0) - (liabilities.months[index] ?? 0));
       measured.push(true);
     } else {
+      // Projected as it always was, by the planned result, which needs no
+      // account. The accounts and `unassigned` are then two ways of dividing
+      // up this same figure, and the test suite holds them to it.
       running = roundCents(running + (resultPlan[index] ?? 0));
+      adrift = roundCents(adrift + (unassignedMoves[index] ?? 0));
       measured.push(false);
     }
     netMonths.push(running);
+    unassigned.push(index < closed ? 0 : adrift);
   }
 
   return {
@@ -265,6 +347,7 @@ export function rollingYear(
     assets,
     liabilities,
     net: { opening: netOpening, months: netMonths, measured },
+    unassigned,
     strayLines,
   };
 }
@@ -307,24 +390,19 @@ function foldFlow(
 
 function foldBalance(
   group: AccountGroup,
-  row: (account: Account) => RollingBalanceAccount | null,
-  closed: number
+  row: (account: Account) => RollingBalanceAccount | null
 ): RollingBalanceGroup {
   const accounts = group.accounts
     .map(row)
     .filter((entry): entry is RollingBalanceAccount => entry !== null);
   const children = group.children
-    .map((child) => foldBalance(child, row, closed))
+    .map((child) => foldBalance(child, row))
     .filter((child) => child.accounts.length > 0 || child.children.length > 0);
 
   const entries = [...accounts, ...children];
   const opening = roundCents(entries.reduce((total, entry) => total + entry.opening, 0));
-  const months: (number | null)[] = new Array<number | null>(12).fill(null);
-  for (let index = 0; index < closed; index += 1) {
-    months[index] = roundCents(
-      entries.reduce((total, entry) => total + (entry.months[index] ?? 0), 0)
-    );
-  }
+  const months = zeros();
+  for (const entry of entries) addInto(months, entry.months);
 
   return { name: group.name, path: group.path, accounts, children, opening, months };
 }

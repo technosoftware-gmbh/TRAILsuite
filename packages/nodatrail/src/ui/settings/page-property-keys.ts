@@ -243,6 +243,8 @@ function sections(): Section[] {
         { key: 'budgetLineMonthField', label: t('period.month') },
         { key: 'budgetLineOverridesField', label: t('ledger.overrides') },
         { key: 'budgetClosedThroughProperty', label: t('ledger.closedThrough') },
+        { key: 'budgetViaProperty', label: t('ledger.viaDefault') },
+        { key: 'budgetLineViaField', label: t('ledger.via') },
         { key: 'budgetLineAmountField', label: t('finance.amount') },
         { key: 'budgetLineNoteField', label: t('common.edit') },
       ],

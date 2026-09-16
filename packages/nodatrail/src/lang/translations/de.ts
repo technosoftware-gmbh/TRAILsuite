@@ -509,6 +509,10 @@ export const deTranslations: Translations = {
     yearPlan: 'Jahresplanung',
     yearTotal: 'Jahrestotal',
     closedThrough: 'Abgeschlossene Monate',
+    via: 'Über Konto',
+    viaDefault: 'Standardkonto (via)',
+    viaNone: 'Kein Konto',
+    viaFromNote: 'Standard des Budgets',
     closeMonth: '{month} abschliessen',
     budgetModeYear: 'Das Jahr',
     budgetModeMonth: 'Ein Monat',
@@ -802,6 +806,7 @@ export const deTranslations: Translations = {
       result: 'Einnahmen - Ausgaben',
       balances: 'Vermögen',
       netWorth: 'Vermögen',
+      unassigned: 'Nicht zugeordnet',
       opening: 'Vortrag',
       total: 'Total',
       plan: 'Plan',
@@ -813,7 +818,7 @@ export const deTranslations: Translations = {
       totalHint:
         'Total ist, was in den abgeschlossenen Monaten geschah, plus der Plan für den Rest. Plan ist das Jahr, wie es geplant wurde; Abweichung ist Total weniger Plan.',
       projectedHint:
-        'Nach dem letzten abgeschlossenen Monat wird nur das Vermögen fortgeschrieben, um das geplante Ergebnis. Einzelne Konten werden nicht geplant.',
+        'Nach dem letzten abgeschlossenen Monat wird jeder Bestand um die geplanten Buchungen fortgeschrieben, kursiv. Was der Plan bewegt, ohne ein Konto zu nennen, steht unter Nicht zugeordnet.',
       strayLines:
         'Budgetzeilen auf Konten, die weder Einnahmen noch Ausgaben sind, werden nicht gezeigt: {numbers}',
     },

@@ -544,4 +544,8 @@ export interface NODAtrailSettings {
   budgetLineOverridesField: string;
   /** How many months of the year are closed: shown as what happened rather than as planned. */
   budgetClosedThroughProperty: string;
+  /** The other account a budget line moves money through: paid from, received into. */
+  budgetLineViaField: string;
+  /** The account a budget line without its own `via` uses. */
+  budgetViaProperty: string;
 }

@@ -72,9 +72,14 @@ export async function writeBudgetLines(
   app: App,
   settings: NODAtrailSettings,
   file: TFile,
-  lines: readonly AccountBudgetLine[]
+  lines: readonly AccountBudgetLine[],
+  /** The budget's default via account. Removed from the note when null. */
+  via: number | null
 ): Promise<void> {
   await hostFor(app).frontmatter.process(file, (frontmatter) => {
+    if (via === null) delete frontmatter[settings.budgetViaProperty];
+    else frontmatter[settings.budgetViaProperty] = via;
+
     frontmatter[settings.budgetLinesProperty] = lines.map((line) => {
       const value: Record<string, unknown> = {
         [settings.budgetLineAccountField]: line.account,
@@ -89,6 +94,7 @@ export async function writeBudgetLines(
       if (Object.keys(line.overrides).length > 0) {
         value[settings.budgetLineOverridesField] = { ...line.overrides };
       }
+      if (line.via !== null) value[settings.budgetLineViaField] = line.via;
       return value;
     });
   });

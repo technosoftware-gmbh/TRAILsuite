@@ -108,5 +108,7 @@ export function budgetProperties(settings: NODAtrailSettings): AccountBudgetProp
     lineNoteField: settings.budgetLineNoteField,
     lineOverridesField: settings.budgetLineOverridesField,
     closedThroughProperty: settings.budgetClosedThroughProperty,
+    lineViaField: settings.budgetLineViaField,
+    viaProperty: settings.budgetViaProperty,
   };
 }

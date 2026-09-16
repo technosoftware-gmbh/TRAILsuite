@@ -502,6 +502,10 @@ export const enTranslations = {
     yearPlan: 'The year planned',
     yearTotal: 'Year total',
     closedThrough: 'Months closed',
+    via: 'Via account',
+    viaDefault: 'Default via account',
+    viaNone: 'No account',
+    viaFromNote: 'The budget\u2019s default',
     closeMonth: 'Close {month}',
     budgetModeYear: 'The year',
     budgetModeMonth: 'One month',
@@ -792,6 +796,7 @@ export const enTranslations = {
       result: 'Income less expenses',
       balances: 'Net worth',
       netWorth: 'Net worth',
+      unassigned: 'Not assigned',
       opening: 'Brought forward',
       total: 'Total',
       plan: 'Plan',
@@ -803,7 +808,7 @@ export const enTranslations = {
       totalHint:
         'Total is what happened in the closed months plus the plan for the rest. Plan is the year as it was planned; Variance is Total less Plan.',
       projectedHint:
-        'After the last closed month only net worth is carried forward, by the planned result. Single accounts are not planned.',
+        'After the last closed month every balance is carried forward by the planned postings, in italics. What the plan moves without naming an account is under Not assigned.',
       strayLines:
         'Budget lines on accounts that are not income or expense are not shown: {numbers}',
     },

@@ -787,6 +787,13 @@ and out in columns of their own, the Gewinnermittlung, or the Bestandeskonten
 on the last day of the period. The statement tab has a period of its own now,
 so a statement is the month or quarter you compare with the bank's.
 
+**Where the money moves.** Each budget line can name the account it moves via:
+the Haushaltskonto a household cost is paid from, the account a salary arrives
+in. The budget itself names a default for the lines that do not. A line on a bank
+or reserve account is a transfer, and one on a mortgage an amortisation. With
+those, every account's balance in the year view runs on to December, and what no
+line names an account for is shown as "Nicht zugeordnet".
+
 **Printing the year.** On the Budget tab, the printer button in the Ledger's
 toolbar writes the whole budget year as a landscape page into
 `Finance/_exports`: one column per month, what happened in the months you have

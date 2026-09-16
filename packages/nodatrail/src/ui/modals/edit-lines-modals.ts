@@ -22,6 +22,8 @@ import {
   type AccountBudgetRecord,
   type ExpenseLine,
   type PurchaseRecord,
+  isTransferLine,
+  type Account,
 } from '@technosoftware/trail-core';
 import { t } from '../../lang/I18nManager';
 import type { NODAtrailSettings } from '../../settings/types';
@@ -179,11 +181,19 @@ export class EditPurchaseItemsModal extends Modal {
  *
  * **The yearly total is shown as you type**, because that is the figure
  * somebody is actually deciding: a monthly amount and an annual one look alike
- * on the row and differ twelvefold in the year.
+ * on the row and differ twelvefold in the year. Transfers are not in it: moving
+ * money into a reserve is not spending it.
+ *
+ * **Each line names the account the money moves via**, and the budget names a
+ * default for the lines that do not. That is what makes a line a planned
+ * posting, and what lets the rolling year carry every account's balance to
+ * December (`docs/design/budget-accounts.md`).
  */
 export class EditBudgetLinesModal extends Modal {
   private readonly lines: AccountBudgetLine[];
+  private via: number | null;
   private summary!: HTMLElement;
+  private byNumber = new Map<number, Account>();
 
   constructor(
     private readonly deps: EditDeps,
@@ -191,6 +201,7 @@ export class EditBudgetLinesModal extends Modal {
   ) {
     super(deps.app);
     this.lines = budget.lines.map((line) => ({ ...line, overrides: { ...line.overrides } }));
+    this.via = budget.via;
   }
 
   onOpen(): void {
@@ -198,12 +209,36 @@ export class EditBudgetLinesModal extends Modal {
     this.setTitle(`${t('finance.budget')}: ${this.budget.title}`);
 
     const settings = this.deps.getSettings();
-    // Only the accounts a budget can be about. Budgeting a bank balance is not
-    // a thing anybody means, and offering it invites a line that can never be
-    // measured.
-    const accounts = readAccounts(this.deps.app, settings)
-      .map((record) => record.account)
-      .filter((account) => account.kind === 'expense' || account.kind === 'income');
+    // Every account. A line on an asset or liability account is a planned
+    // transfer (into a reserve, off a mortgage), which is something a budget
+    // does mean; it used to be left out when a line could name only one side.
+    const accounts = readAccounts(this.deps.app, settings).map((record) => record.account);
+    this.byNumber = new Map(accounts.map((account) => [account.number, account]));
+    // What money can move via: the accounts that hold a balance.
+    const holding = accounts.filter(
+      (account) => account.kind === 'asset' || account.kind === 'liability'
+    );
+    const viaDropdown = (
+      setting: Setting,
+      blankLabel: string,
+      current: number | null,
+      set: (value: number | null) => void
+    ) =>
+      setting.addDropdown((dropdown) => {
+        dropdown.addOption('', blankLabel);
+        for (const account of holding) {
+          dropdown.addOption(String(account.number), accountLabel(account));
+        }
+        dropdown.setValue(current === null ? '' : String(current));
+        dropdown.onChange((value) => set(value === '' ? null : Number(value)));
+      });
+
+    viaDropdown(
+      new Setting(this.contentEl).setName(t('ledger.viaDefault')),
+      t('ledger.viaNone'),
+      this.via,
+      (value) => (this.via = value)
+    );
 
     const list = this.contentEl.createDiv();
     this.summary = this.contentEl.createDiv({ cls: 'nod-settings-note' });
@@ -217,6 +252,7 @@ export class EditBudgetLinesModal extends Modal {
         startMonth: null,
         note: '',
         overrides: {},
+        via: null,
       }),
       addLabel: t('common.add'),
       emptyLabel: t('dashboard.noBudget'),
@@ -256,6 +292,7 @@ export class EditBudgetLinesModal extends Modal {
           (v) => (line.startMonth = v),
           () => this.renderSummary()
         );
+        viaDropdown(setting, t('ledger.viaFromNote'), line.via, (value) => (line.via = value));
       },
     });
 
@@ -276,7 +313,7 @@ export class EditBudgetLinesModal extends Modal {
   }
 
   private renderSummary(): void {
-    const year = budgetYear(this.lines);
+    const year = budgetYear(this.lines.filter((line) => !isTransferLine(line, this.byNumber)));
     this.summary.setText(
       `${t('finance.planned')} ${money(year.total, this.budget.currency)} / ${t('period.year')}`
     );
@@ -287,7 +324,13 @@ export class EditBudgetLinesModal extends Modal {
     // measured against anything and is only ever a row somebody abandoned.
     const meaningful = this.lines.filter((line) => line.account > 0);
 
-    await writeBudgetLines(this.deps.app, this.deps.getSettings(), this.budget.file, meaningful);
+    await writeBudgetLines(
+      this.deps.app,
+      this.deps.getSettings(),
+      this.budget.file,
+      meaningful,
+      this.via
+    );
     this.deps.onSaved();
     this.close();
   }

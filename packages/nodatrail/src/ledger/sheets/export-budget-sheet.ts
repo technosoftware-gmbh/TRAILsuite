@@ -48,6 +48,7 @@ export async function exportBudgetSheet(
     budget.closedThrough,
     {
       convert: (amount, from) => toHome(amount, from, settings),
+      via: budget.via,
     }
   );
 
