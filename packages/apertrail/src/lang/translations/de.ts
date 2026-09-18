@@ -157,7 +157,8 @@ export const deTranslations: Translations = {
     where: 'Wo',
     yes: 'Ja',
     notYet: 'Noch nicht',
-    caveat: 'Diese Seite ist ein Ausdruck der aktuellen Reisenotizen.',
+    caveat:
+      'Diese Seite ist ein Ausdruck der aktuellen Reisenotizen. Massgeblich sind die Notizen.',
   },
   vehicleBrochure: {
     exportButton: 'Prospekt',
@@ -170,7 +171,7 @@ export const deTranslations: Translations = {
     written: 'Prospekt geschrieben nach {path}.',
     failed: 'Das Prospekt konnte nicht geschrieben werden.',
     caveat:
-      'Diese Seite ist ein Ausdruck der aktuellen Reisenotizen. Die Kabinen sind die Kategorien, in denen sie verkauft wird; was eine kostet, gehört zur Reise, die sie bucht.',
+      'Reisenotizen, die Kabinen sind die Kategorien, in denen sie verkauft wird; was eine kostet, gehört zur Reise, die sie bucht. Massgeblich sind die Notizen.',
     footer: 'Prospekt, erstellt von {author} am {date} mit APERtrail',
     footerAnonymous: 'Prospekt, erstellt am {date} mit APERtrail',
     record: 'Massgeblich sind die Notizen; dies ist ein Ausdruck.',
@@ -208,8 +209,7 @@ export const deTranslations: Translations = {
     fileSuffix: 'Reisedokument',
     written: 'Reisedokument geschrieben nach {path}.',
     failed: 'Das Reisedokument konnte nicht geschrieben werden.',
-    caveat:
-      'Diese Seite ist ein Ausdruck der aktuellen Reisenotizen. Bitte beachten Sie, dass die hier aufgef\u00fchrten Preise nur die geplanten Kosten sind. Die tats\u00e4chlichen Ausgaben finden Sie auf dem separaten Kostenblatt daneben.',
+    caveat: 'Diese Seite ist ein Ausdruck der aktuellen Reisenotizen. Massgeblich sind die Notizen',
     footer: 'Reisedokument, erstellt von {author} am {date} mit APERtrail',
     footerAnonymous: 'Reisedokument, erstellt am {date} mit APERtrail',
   },
