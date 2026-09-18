@@ -68,8 +68,6 @@ export interface FieldSheet {
   looseSamples: FieldSheetSample[];
   logistics: { label: string; value: string }[];
   caveat: string;
-  /** That the notes are the record and this is a printout. */
-  record: string;
   /** The credit line's words, before the link trail-core adds. */
   footer: string;
   labels: FieldSheetLabels;
@@ -246,7 +244,6 @@ ${loose}
 ${logistics}
 <footer>
   <p>${esc(sheet.caveat)}</p>
-  <p>${esc(sheet.record)}</p>
   ${sheetCreditHtml(sheet.footer)}
 </footer>`,
   });

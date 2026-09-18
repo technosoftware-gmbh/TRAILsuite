@@ -78,8 +78,6 @@ export interface CostSheet {
     reference: string;
   };
   caveat: string;
-  /** That the notes are the record and this is a printout. */
-  record: string;
   /** The credit line's words, before the link trail-core adds. */
   footer: string;
 }
@@ -230,7 +228,6 @@ ${optionalBlock(sheet)}
 ${settlementBlock(sheet)}
 <footer>
   <p>${esc(sheet.caveat)}</p>
-  <p>${esc(sheet.record)}</p>
   ${sheetCreditHtml(sheet.footer)}
 </footer>`,
   });

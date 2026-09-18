@@ -54,7 +54,6 @@ function sheet(overrides: Partial<CostSheet> = {}): CostSheet {
       reference: 'Reference',
     },
     caveat: 'Figures as the notes state them.',
-    record: 'The notes are the record.',
     footer: 'Generated on 21 August 2026.',
     ...overrides,
   };

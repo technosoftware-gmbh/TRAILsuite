@@ -230,7 +230,6 @@ export async function buildFieldSheet(
       value: row.value,
     })),
     caveat: t('photoSpot.sunCaveat'),
-    record: t('photoSpot.export.record'),
     footer: sheetCredit(
       settings,
       (author) => t('photoSpot.export.footer', { author, date: formatMediumDate(new Date()) }),
