@@ -207,7 +207,7 @@ export const deTranslations: Translations = {
     fileSuffix: 'Reisedokument',
     written: 'Reisedokument geschrieben nach {path}.',
     failed: 'Das Reisedokument konnte nicht geschrieben werden.',
-    caveat: 'Diese Seite ist ein Ausdruck der aktuellen Reisenotizen. Massgeblich sind die Notizen',
+    caveat: 'Diese Seite ist ein Ausdruck der aktuellen Reisenotizen. Massgeblich sind die Notizen.',
     footer: 'Reisedokument, erstellt von {author} am {date} mit APERtrail',
     footerAnonymous: 'Reisedokument, erstellt am {date} mit APERtrail',
   },
