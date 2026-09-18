@@ -92,7 +92,6 @@ export const deTranslations: Translations = {
       'Beträge so, wie die Notizen sie nennen. Umgerechnete Beträge nutzen die Kurse dieser Reise, also deine eigenen. Die Abrechnung teilt jede Buchung gleichmässig auf die genannten Personen auf.',
     sheetFooter: 'Kostenblatt, erstellt von {author} am {date} mit APERtrail',
     sheetFooterAnonymous: 'Kostenblatt, erstellt am {date} mit APERtrail',
-    sheetRecord: 'Massgeblich sind die Notizen; dies ist ein Ausdruck.',
     document: 'Beleg',
     stillEstimated: 'Noch Schätzungen',
     settlement: 'Abrechnung',
@@ -174,7 +173,6 @@ export const deTranslations: Translations = {
       'Reisenotizen, die Kabinen sind die Kategorien, in denen sie verkauft wird; was eine kostet, gehört zur Reise, die sie bucht. Massgeblich sind die Notizen.',
     footer: 'Prospekt, erstellt von {author} am {date} mit APERtrail',
     footerAnonymous: 'Prospekt, erstellt am {date} mit APERtrail',
-    record: 'Massgeblich sind die Notizen; dies ist ein Ausdruck.',
   },
   tripDocument: {
     exportButton: 'Reisedokument',
@@ -233,7 +231,6 @@ export const deTranslations: Translations = {
       fileSuffix: 'Spickzettel',
       footer: 'Spickzettel, erstellt von {author} am {date} mit APERtrail',
       footerAnonymous: 'Spickzettel, erstellt am {date} mit APERtrail',
-      record: 'Massgeblich ist die Notiz; dies ist ein Ausdruck.',
       written: 'Spickzettel geschrieben nach {path}.',
       failed: 'Der Spickzettel konnte nicht geschrieben werden.',
     },

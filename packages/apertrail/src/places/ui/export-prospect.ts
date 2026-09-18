@@ -450,7 +450,6 @@ export async function buildProspect(
       trips: subject.kind === 'vehicle' ? t('vehicleBrochure.trips') : t('prospect.trips'),
     },
     caveat: t('prospect.caveat'),
-    record: t('vehicleBrochure.record'),
     footer: sheetCredit(
       settings,
       (author) => t('vehicleBrochure.footer', { author, date: formatMediumDate(today) }),

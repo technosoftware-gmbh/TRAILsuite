@@ -203,7 +203,6 @@ export function buildCostSheet(
       reference: t('costs.reference'),
     },
     caveat: t('costs.sheetCaveat'),
-    record: t('costs.sheetRecord'),
     footer: sheetCredit(
       settings,
       (author) => t('costs.sheetFooter', { author, date: formatMediumDate(today) }),

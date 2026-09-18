@@ -50,7 +50,6 @@ function sheet(facts: Prospect['facts']): Prospect {
       trips: 'Trips',
     },
     caveat: 'From the note.',
-    record: 'The notes are the record.',
     footer: 'Written today.',
   };
 }
