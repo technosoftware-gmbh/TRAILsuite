@@ -92,6 +92,97 @@ describe('readTravelBoard', () => {
     expect(board.trips[0].departure).toBe('2026-08-01');
   });
 
+  /**
+   * The downward half of the hierarchy is derived, not read.
+   *
+   * Both halves of that matter, and a vault whose two sides agree cannot
+   * tell them apart, which is why this fixture makes them disagree on
+   * purpose: Salzburg names Salzburg State and is in no list, Hallstatt is
+   * in the list and names Upper Austria. The old reading answered with
+   * Hallstatt; this one answers with Salzburg.
+   */
+  it('derives a state cities and a country states from the child links, ignoring the lists', () => {
+    const { app } = makeFakeVault([
+      {
+        path: `${settings.countriesFolder}/Austria.md`,
+        // Names Tyrol only. Salzburg State is not in it and belongs there anyway.
+        frontmatter: { type: 'country', states: ['[[Tyrol]]'] },
+      },
+      {
+        path: `${settings.statesFolder}/Tyrol.md`,
+        frontmatter: { type: 'state', country: '[[Austria]]' },
+      },
+      {
+        path: `${settings.statesFolder}/Salzburg State.md`,
+        frontmatter: { type: 'state', country: '[[Austria]]', cities: ['[[Hallstatt]]'] },
+      },
+      {
+        path: `${settings.citiesFolder}/Salzburg.md`,
+        frontmatter: { type: 'city', country: '[[Austria]]', state: '[[Salzburg State]]' },
+      },
+      {
+        path: `${settings.citiesFolder}/Hallstatt.md`,
+        frontmatter: { type: 'city', country: '[[Austria]]', state: '[[Upper Austria]]' },
+      },
+    ]);
+
+    const board = readTravelBoard(app, settings);
+
+    const austria = board.countries.find((c) => c.title === 'Austria');
+    // Alphabetical, and Salzburg State is there despite no `states:` entry.
+    expect(austria.states.map((s) => s.title)).toEqual(['Salzburg State', 'Tyrol']);
+
+    const salzburgState = board.states.find((s) => s.title === 'Salzburg State');
+    expect(salzburgState.cities.map((c) => c.title)).toEqual(['Salzburg']);
+
+    // Listed under Salzburg State, names Upper Austria, which is not a note
+    // here: it belongs to neither, rather than to the list that claims it.
+    const hallstatt = board.cities.find((c) => c.title === 'Hallstatt');
+    expect(hallstatt.state).toBeNull();
+
+    const tyrol = board.states.find((s) => s.title === 'Tyrol');
+    expect(tyrol.cities).toEqual([]);
+  });
+
+  /**
+   * The same vault, spelled the two ways macOS spells it.
+   *
+   * A province renamed in Finder carries a decomposed letter in its file
+   * name; the wikilink in a town note was pasted from somewhere else and
+   * carries the composed one. They are the same word, the same note to
+   * Obsidian, and two different strings to `===`. Every index in
+   * readTravelBoard() is keyed through `caseFold()` for that reason, and
+   * this is the case that bites hardest now that a province has no
+   * hand-kept list to fall back on.
+   */
+  it('resolves a link whose umlaut is normalized differently from the file name', () => {
+    const decomposed = 'A\u030Alesund Region';
+    const composed = '\u00C5lesund Region';
+    expect(decomposed).not.toBe(composed);
+
+    const { app } = makeFakeVault([
+      {
+        path: `${settings.statesFolder}/${decomposed}.md`,
+        frontmatter: { type: 'state', country: '[[Norway]]' },
+      },
+      {
+        path: `${settings.countriesFolder}/Norway.md`,
+        frontmatter: { type: 'country' },
+      },
+      {
+        path: `${settings.citiesFolder}/Alesund.md`,
+        frontmatter: { type: 'city', country: '[[Norway]]', state: `[[${composed}]]` },
+      },
+    ]);
+
+    const board = readTravelBoard(app, settings);
+
+    const region = board.states[0];
+    expect(region.cities.map((c) => c.title)).toEqual(['Alesund']);
+    expect(board.cities[0].state).toBe(region);
+    expect(board.countries[0].states).toEqual([region]);
+  });
+
   // Photo spot is the fifth member of the place family, so the only thing
   // worth asserting is that membership: it must come back in board.places
   // with the same resolved shape the other four get, without a line of

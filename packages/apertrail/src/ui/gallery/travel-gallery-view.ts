@@ -159,6 +159,15 @@ export class TravelGalleryView extends ItemView {
   private samplesFilter: 'all' | 'with' = 'all';
   private countryFilter = 'all';
   private visitedFilter: 'all' | 'visited' | 'unvisited' = 'all';
+  /**
+   * Retired trips are out of the grid until asked for.
+   *
+   * It defaults to 'live' and is applied whatever chip is on, so the archive
+   * stays out of the "everything" view too. The dropdown that changes it is a
+   * Trip facet, which is also where it is cleared on the way out: the archive
+   * is browsed from the Trips chip, the way it is in NODAtrail's PARA view.
+   */
+  private archiveFilter: 'live' | 'archived' | 'all' = 'live';
   private minRating = 0;
   private tagFilter = 'all';
   private sort: TravelGallerySort = 'default';
@@ -200,6 +209,7 @@ export class TravelGalleryView extends ItemView {
       this.statusFilter = 'all';
       this.reviewStatusFilter = 'all';
       this.personFilter = 'all';
+      this.archiveFilter = 'live';
     }
     if (type !== 'photospot') {
       this.lightFilter = 'all';
@@ -466,7 +476,11 @@ export class TravelGalleryView extends ItemView {
   ): { label: string; icon: string; onClick: (file: TFile) => void }[] | undefined {
     const items: { label: string; icon: string; onClick: (file: TFile) => void }[] = [];
     const { trip, editable } = entry;
-    const actions = cardActions({ isTrip: trip !== null, hasEditor: editable !== null });
+    const actions = cardActions({
+      isTrip: trip !== null,
+      hasEditor: editable !== null,
+      isArchived: trip?.archived ?? false,
+    });
 
     for (const action of actions) {
       if (action === 'editTrip' && trip) {
@@ -495,6 +509,20 @@ export class TravelGalleryView extends ItemView {
           label: t(CARD_ACTION_LABELS.prospect),
           icon: 'printer',
           onClick: () => this.deps.exportProspect(editable),
+        });
+      }
+      if (action === 'archiveTrip' && trip) {
+        items.push({
+          label: t(CARD_ACTION_LABELS.archiveTrip),
+          icon: 'archive',
+          onClick: () => this.deps.archiveTrip(trip, false),
+        });
+      }
+      if (action === 'unarchiveTrip' && trip) {
+        items.push({
+          label: t(CARD_ACTION_LABELS.unarchiveTrip),
+          icon: 'archive-restore',
+          onClick: () => this.deps.archiveTrip(trip, true),
         });
       }
     }
@@ -676,9 +704,38 @@ export class TravelGalleryView extends ItemView {
   }
 
   /** Distinct values actually present on the vault's trips -- an empty dropdown is worse than no dropdown, so a facet with nothing to offer isn't rendered. */
-  private renderTripFilters(container: HTMLElement, entries: TravelGalleryEntry[]): void {
+  private renderTripFilters(
+    container: HTMLElement,
+    entries: TravelGalleryEntry[],
+    /**
+     * Asked of the whole board, not of the rows in scope.
+     *
+     * Every other facet here is built from the values present in scope, which
+     * is the rule that keeps the row from offering a filter matching nothing.
+     * This one cannot be: the rows in scope have already had the archive
+     * filtered out of them, so reading it off them would hide the only control
+     * that brings it back.
+     */
+    hasArchivedTrips: boolean
+  ): void {
     const trips = entries.map((e) => e.trip).filter((t): t is TravelTrip => t !== null);
     const wrap = container.createDiv({ cls: 'apt-gallery-facets' });
+
+    if (hasArchivedTrips) {
+      const archiveSelect = wrap.createEl('select', { cls: 'apt-gallery-facet-select' });
+      for (const value of ['live', 'archived', 'all'] as const) {
+        archiveSelect.createEl('option', {
+          attr: { value },
+          text: t(`galleryView.facets.archive.${value}`),
+        });
+      }
+      archiveSelect.value = this.archiveFilter;
+      archiveSelect.addEventListener('change', () => {
+        const value = archiveSelect.value;
+        this.archiveFilter = value === 'archived' || value === 'all' ? value : 'live';
+        this.render();
+      });
+    }
 
     const statusSelect = wrap.createEl('select', { cls: 'apt-gallery-facet-select' });
     statusSelect.createEl('option', {
@@ -936,11 +993,22 @@ export class TravelGalleryView extends ItemView {
     if (this.typeFilter !== 'all') {
       entries = entries.filter((e) => e.type === this.typeFilter);
     }
+    // Before the facets rather than among the Trip ones, so the archive is out
+    // of the grid under every chip and not only under Trips. A row that is not
+    // a trip cannot be archived and passes untouched.
+    if (this.archiveFilter !== 'all') {
+      const wantArchived = this.archiveFilter === 'archived';
+      entries = entries.filter((e) => !e.trip || e.trip.archived === wantArchived);
+    }
     this.renderCommonFacets(content, entries);
     entries = this.applyCommonFacets(entries);
 
     if (this.typeFilter === 'trip') {
-      this.renderTripFilters(content, entries);
+      this.renderTripFilters(
+        content,
+        entries,
+        board.trips.some((trip) => trip.archived)
+      );
       if (this.statusFilter !== 'all') {
         entries = entries.filter((e) => e.trip?.effectiveStatus === this.statusFilter);
       }

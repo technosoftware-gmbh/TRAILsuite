@@ -11,11 +11,14 @@
  * - a **state** names its country and its capital;
  * - a **country** names its capital.
  *
- * **Only upwards.** A country's `states:` and a state's `cities:` are read
- * and never written here, and that is a decision rather than an omission: a
- * city already names its state, so maintaining the list on the other side
- * would make one fact writable from two places that can then disagree. A
- * vault that keeps those lists keeps them by hand.
+ * **Only upwards.** A country's `states:` and a state's `cities:` are
+ * neither written here nor read anywhere, and that is a decision rather than
+ * an omission: a city already names its state, so a list on the other side
+ * would make one fact writable from two places that can then disagree.
+ * read-entities.ts derives both lists from these upward links instead, so
+ * there is nothing on the other side to keep. An older vault may still carry
+ * the lists; health/child-list-issues.ts reports any entry the derivation
+ * does not reproduce, and they are otherwise ignored.
  *
  * `visited` and `lastVisit` are not written either, for the reason
  * `write-place.ts` gives: a finished trip that stops in a city contributes

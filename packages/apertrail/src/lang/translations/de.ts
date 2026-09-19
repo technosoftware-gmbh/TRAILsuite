@@ -882,6 +882,11 @@ export const deTranslations: Translations = {
       anyStatus: 'Beliebiger Status',
       anyReviewStatus: 'Beliebige Nachbereitung',
       anyPerson: 'Alle Personen',
+      archive: {
+        live: 'Aktive Reisen',
+        archived: 'Archivierte Reisen',
+        all: 'Aktive und archivierte',
+      },
     },
     displayName: 'Trips, Länder & Orte',
     searchPlaceholder: 'Trips, Länder & Orte durchsuchen…',
@@ -967,6 +972,7 @@ export const deTranslations: Translations = {
         photoSpotsFolderName: 'Fotospots',
         vehiclesFolderName: 'Verkehrsmittel',
         excursionsFolderName: 'Ausflüge',
+        archiveFolderName: '6 Archiv',
         crmFolderName: 'CRM',
         personsFolderName: 'Personen',
         companiesFolderName: 'Firmen',
@@ -1074,6 +1080,23 @@ export const deTranslations: Translations = {
         name: 'Firmen-Ordner',
         desc: 'Wo deine Firmen-Notizen liegen. Vorgesehen für das laufende CRM-Modul; aktuell wird von hier noch nichts gelesen.',
         placeholder: 'CRM/Firmen',
+      },
+      archiveHeading: 'Archiv',
+      archiveIntro:
+        'Wohin ein Trip wandert, wenn er vorbei ist und aus dem Weg soll, ohne verloren zu gehen. Ein archivierter Trip wird weiterhin gelesen: er bleibt in den zugehörigen Reisen einer Stadt stehen und zählt weiterhin als Besuch. NODAtrail legt seine erledigten Notizen im selben Ordner ab, ein Vault mit beiden Plugins hat also ein Archiv statt zwei.',
+      archive: {
+        name: 'Archiv-Ordner',
+        desc: 'Die Wurzel des Archivs, neben Trips, Plätzen und CRM statt in einem davon.',
+        placeholder: '6 Archiv',
+      },
+      tripsArchive: {
+        name: 'Unterordner für archivierte Trips',
+        desc: 'Der Ordner im Archiv, in den erledigte Trips wandern. Ein Name, kein Pfad: wer das Archiv verschiebt, nimmt ihn mit.',
+        placeholder: 'Trips',
+      },
+      archiveYearFolders: {
+        name: 'Archiv nach Jahren aufteilen',
+        desc: 'Jeden archivierten Trip unter dem Jahr der Archivierung ablegen. Standardmässig aus: für eine Handvoll Trips im Jahr lohnt die Aufteilung nicht.',
       },
     },
     properties: {
@@ -1190,6 +1213,10 @@ export const deTranslations: Translations = {
           desc: 'Der Erstellungszeitstempel der Notiz.',
         },
         modified: { name: 'Eigenschaft "Geändert"', desc: 'Der Änderungszeitstempel der Notiz.' },
+        archived: {
+          name: 'Eigenschaft "Archiviert"',
+          desc: 'Der Tag, an dem ein Trip archiviert wurde. Leer lassen, um ohne Stempel zu verschieben.',
+        },
         departure: { name: 'Eigenschaft "Abreise"', desc: 'Das Abreisedatum eines Trips.' },
         return: { name: 'Eigenschaft "Rückkehr"', desc: 'Das Rückkehrdatum eines Trips.' },
         travelType: {
@@ -1483,6 +1510,15 @@ export const deTranslations: Translations = {
       },
     },
   },
+  archive: {
+    archiveTrip: 'Trip archivieren',
+    unarchiveTrip: 'Trip aus dem Archiv holen',
+    archivedMarker: 'Archiviert',
+    archivedNotice: '{title} ins Archiv verschoben.',
+    unarchivedNotice: '{title} aus dem Archiv geholt.',
+    notConfigured: 'Es ist kein Archiv-Ordner gesetzt. Einstellungen \u2192 Ordner \u2192 Archiv.',
+    destinationExists: 'Unter {path} liegt bereits etwas. Es wurde nichts verschoben.',
+  },
   health: {
     entityTypeCheck: {
       command: 'Entitätstypen prüfen',
@@ -1514,6 +1550,7 @@ export const deTranslations: Translations = {
       },
       locationLabels: {
         trips: 'Trips',
+        archivedTrips: 'Archivierte Trips',
         bookings: 'Buchungen',
         countries: 'Länder',
         states: 'Bundesländer',
@@ -1548,6 +1585,15 @@ export const deTranslations: Translations = {
         'Ein Bild, ein Galerieeintrag, ein Kabinenfoto oder ein Deckplan nennt eine Datei, die es in diesem Vault nicht gibt. Jeder Leser behandelt einen Verweis, den er nicht findet, genau wie gar keinen, deshalb ist das einzige Symptom etwas, das stillschweigend nicht erscheint. Meist ein umbenannter Ordner oder ein verschobener Anhang; was der Pfad sagen sollte, weisst nur du.',
       plain: '{property} zeigt auf „{value}“, das es in diesem Vault nicht gibt.',
       inList: '{property} zeigt unter „{detail}“ auf „{value}“, das es in diesem Vault nicht gibt.',
+    },
+    childListCheck: {
+      heading: 'Untergeordnete Listen mit fremdem Eintrag ({count})',
+      explain:
+        'Die Liste states: auf einem Land und die Liste cities: auf einem Bundesland werden nicht mehr gelesen. Was unter einer Notiz steht, ergibt sich aus der Verknüpfung in der untergeordneten Notiz selbst, keine der beiden Listen muss also noch von Hand gepflegt werden. Die meisten Einträge einer bestehenden Liste wiederholen nur, was die untergeordnete Notiz ohnehin sagt, und kosten nichts. Diese nicht: sie nennen eine Notiz, die es in diesem Vault nicht gibt, oder eine, die woanders hinzeigt. Sie standen bisher trotzdem in der Liste und stehen jetzt nicht mehr darin.',
+      unknown: '{property} führt „{child}“ auf, was keine Notiz in diesem Vault ist.',
+      pointsElsewhere: '{property} führt „{child}“ auf, diese Notiz nennt aber „{actual}“.',
+      namesNobody:
+        '{property} führt „{child}“ auf, diese Notiz nennt aber keine übergeordnete Notiz.',
     },
     variantCabinCheck: {
       heading: 'Varianten mit unbekannter Kabine ({count})',

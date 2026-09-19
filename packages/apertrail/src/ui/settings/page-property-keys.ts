@@ -90,6 +90,7 @@ const PROPERTY_GROUPS: PropertyGroup[] = [
       { key: 'fnbTypeProperty', label: 'fnbType' },
       { key: 'createdProperty', label: 'created' },
       { key: 'modifiedProperty', label: 'modified' },
+      { key: 'archivedProperty', label: 'archived' },
     ],
   },
   {

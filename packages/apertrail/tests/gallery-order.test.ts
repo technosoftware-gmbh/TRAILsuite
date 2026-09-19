@@ -26,7 +26,6 @@ function country(title: string): TravelCountry {
     title,
     capitalTitle: null,
     capital: null,
-    stateTitles: [],
     description: null,
     image: null,
     gallery: [],

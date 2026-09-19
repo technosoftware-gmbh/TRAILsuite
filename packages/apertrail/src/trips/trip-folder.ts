@@ -75,9 +75,17 @@ export function bookingFolderFor(
  * moved that folder outside `Trips/` entirely, which the trips folder alone
  * would miss. Blank entries are dropped rather than matching everything, which
  * is the direction every unconfigured folder here fails in.
+ *
+ * **The archive is the third**, because a trip that owns its folder travels as
+ * that folder and its bookings go with it. Reading only the two live folders
+ * would leave a retired trip on the board with its costs quietly gone.
  */
 export function bookingReadFolders(settings: APERtrailSettings): string[] {
-  const folders = [settings.tripsFolder.trim(), settings.bookingsFolder.trim()];
+  const folders = [
+    settings.tripsFolder.trim(),
+    settings.bookingsFolder.trim(),
+    tripArchiveFolder(settings) ?? '',
+  ];
   return [...new Set(folders.filter((folder) => folder !== ''))];
 }
 
@@ -102,4 +110,62 @@ export function isInTripBookingsFolder(path: string, settings: APERtrailSettings
 
   const folder = path.slice(0, cut);
   return folder.slice(folder.lastIndexOf('/') + 1) === subfolder;
+}
+
+/**
+ * Where archived trips live, or null when the archive is switched off.
+ *
+ * Null rather than a blank string, which is the answer `archiveFolderFor()`
+ * gives in NODAtrail and for the same reason: a blank folder read as the vault
+ * root would claim every note there is, so an archive nobody configured has to
+ * be absent rather than empty.
+ */
+export function tripArchiveFolder(settings: APERtrailSettings): string | null {
+  const root = settings.archiveFolder.trim();
+  const category = settings.tripsArchiveFolder.trim();
+  if (!root || !category) return null;
+  return `${root}/${category}`;
+}
+
+/**
+ * Where a trip archived today goes: the category folder, then a year when the
+ * vault asked for one.
+ *
+ * **The year is when it was archived**, not when the trip ran. This is the
+ * shelf a thing is put on, and the day it was put there is the one fact the
+ * move itself knows. NODAtrail reached the same answer for projects.
+ */
+export function tripArchiveFolderOn(settings: APERtrailSettings, today: Date): string | null {
+  const base = tripArchiveFolder(settings);
+  if (!base || !settings.archiveYearFolders) return base;
+  return `${base}/${today.getFullYear()}`;
+}
+
+/**
+ * Every folder a trip might be in.
+ *
+ * **Both, in one read**, where NODAtrail keeps its live and archived queries
+ * apart and lets each view choose. The difference is deliberate and it is about
+ * visits: a city's `visited` and `lastVisit` are derived from the trips that
+ * stopped there, so an archived trip dropped from the board would take the
+ * evidence of a real journey with it and quietly un-visit the places it went
+ * to. A retired trip is still a trip that happened. It comes back marked, and
+ * the surfaces that should not show it filter on that mark.
+ */
+export function tripReadFolders(settings: APERtrailSettings): string[] {
+  const folders = [settings.tripsFolder.trim(), tripArchiveFolder(settings) ?? ''];
+  return [...new Set(folders.filter((folder) => folder !== ''))];
+}
+
+/**
+ * True when a path sits inside the trip archive.
+ *
+ * Asked of the category folder rather than of this year's, so a trip already
+ * filed under `6 Archive/Trips/2025` reads as archived instead of being dragged
+ * forward into the current year and restamped.
+ */
+export function isArchivedTripPath(path: string, settings: APERtrailSettings): boolean {
+  const archive = tripArchiveFolder(settings);
+  if (!archive) return false;
+  return path === archive || path.startsWith(`${archive}/`);
 }

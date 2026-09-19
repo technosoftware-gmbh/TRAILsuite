@@ -42,8 +42,7 @@ export interface TravelCountry {
   /** Raw wikilink target from `capital:`, or null if absent/unresolved. */
   capitalTitle: string | null;
   capital: TravelCity | null;
-  /** Raw wikilink targets from `states:`. */
-  stateTitles: string[];
+  /** Every State whose `country:` names this one, alphabetically. Derived at read time; a Country note's own `states:` list is not read. */
   states: TravelState[]; /** What it shows on a cover: a line, a picture, the rest of them, and its highlights. See vault/read-cover.ts. */
   description: string | null;
   image: string | null;
@@ -58,7 +57,7 @@ export interface TravelState {
   country: TravelCountry | null;
   capitalTitle: string | null;
   capital: TravelCity | null;
-  cityTitles: string[];
+  /** Every City whose `state:` names this one, alphabetically. Derived at read time; a State note's own `cities:` list is not read. */
   cities: TravelCity[]; /** What it shows on a cover: a line, a picture, the rest of them, and its highlights. See vault/read-cover.ts. */
   description: string | null;
   image: string | null;
@@ -195,6 +194,19 @@ export interface TravelTrip {
   travelStatus: TravelStatusValue | null;
   /** travelStatus when set, otherwise derived from the trip's dates -- see trip-note.ts's effectiveTravelStatus(). */
   effectiveStatus: TravelStatusValue;
+  /**
+   * Retired: the note sits in the trip archive folder.
+   *
+   * Read from the path and not from a property, because the move is what
+   * archives a trip. It stays on the board and keeps contributing its visits;
+   * the gallery and the plan are what filter on this. A trip somebody dragged
+   * into the archive by hand is archived on exactly the same terms as one the
+   * command moved, which is how five trips already sitting there were picked up
+   * without a migration.
+   */
+  archived: boolean;
+  /** The day it was archived, from the `archived:` stamp. Null for one moved by hand, which is archived all the same -- the folder says that, the stamp says when. */
+  archivedOn: string | null;
   reviewStatus: string | null;
   /** 1-5, or null if unrated. */
   rating: number | null;

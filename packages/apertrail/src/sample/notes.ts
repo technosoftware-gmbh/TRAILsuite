@@ -136,11 +136,12 @@ export function sampleNotes(settings: APERtrailSettings, now: Date): SampleNote[
 /**
  * The top of the hierarchy.
  *
- * Switzerland carries `states:` and no `capital:`; South Africa carries
- * `capital:` and no `states:`. Between them they show both halves of the shape
- * and neither one lies: Bern is not in this vault, so Switzerland names no
- * capital rather than naming a city it has, and South Africa uses no state
- * level here, which is why `state:` is optional on a City.
+ * Neither one carries a `states:` list, because nothing reads one: what sits
+ * under a country is derived from the `country:` link on each State note.
+ * Switzerland names no `capital:` either, since Bern is not in this vault and
+ * naming a city it does not have would be a lie; South Africa names
+ * `capital: [[Pretoria]]`, which it does have, and uses no state level at
+ * all, which is why `state:` is optional on a City.
  */
 function countries(settings: APERtrailSettings): SampleNote[] {
   return [
@@ -148,7 +149,7 @@ function countries(settings: APERtrailSettings): SampleNote[] {
       folder: settings.countriesFolder,
       title: 'Switzerland',
       typeValue: 'country',
-      properties: { [settings.statesProperty]: [link('Aargau')] },
+      properties: {},
       body: '',
     },
     {
@@ -161,7 +162,7 @@ function countries(settings: APERtrailSettings): SampleNote[] {
   ];
 }
 
-/** The middle level, pointing up at its country and down at its cities. No `capital:`, because Aarau is not a note here. */
+/** The middle level, pointing up at its country and, deliberately, nowhere down: Brugg names Aargau, and that link is the whole of the relationship. No `capital:`, because Aarau is not a note here. */
 function states(settings: APERtrailSettings): SampleNote[] {
   return [
     {
@@ -170,7 +171,6 @@ function states(settings: APERtrailSettings): SampleNote[] {
       typeValue: 'state',
       properties: {
         [settings.countryProperty]: link('Switzerland'),
-        [settings.citiesProperty]: [link('Brugg')],
       },
       body: '',
     },

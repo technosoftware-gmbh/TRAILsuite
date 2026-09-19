@@ -22,12 +22,41 @@ import { deTranslations } from '../src/lang/translations/de';
 
 describe('cardActions', () => {
   /** Edit, then the page this note prints. The related-trips block reads in the same order. */
-  it('gives a trip its editor and its document, in that order', () => {
-    expect(cardActions({ isTrip: true, hasEditor: false })).toEqual(['editTrip', 'tripDocument']);
+  it('gives a trip its editor, its document and the archive, in that order', () => {
+    expect(cardActions({ isTrip: true, hasEditor: false, isArchived: false })).toEqual([
+      'editTrip',
+      'tripDocument',
+      'archiveTrip',
+    ]);
+  });
+
+  /**
+   * The one entry that moves a file comes last, below the two that open
+   * something and the two that print something, where a mis-click is least
+   * likely -- and it reads the direction off the trip rather than toggling,
+   * so the menu says what it will do before it is clicked.
+   */
+  it('offers the way back on a trip already in the archive', () => {
+    expect(cardActions({ isTrip: true, hasEditor: false, isArchived: true })).toEqual([
+      'editTrip',
+      'tripDocument',
+      'unarchiveTrip',
+    ]);
+  });
+
+  /** A place is not archived, so the flag changes nothing for one. */
+  it('offers no archive entry to a note that is not a trip', () => {
+    expect(cardActions({ isTrip: false, hasEditor: true, isArchived: true })).toEqual([
+      'edit',
+      'prospect',
+    ]);
   });
 
   it('gives everything else its editor and its prospect, in that order', () => {
-    expect(cardActions({ isTrip: false, hasEditor: true })).toEqual(['edit', 'prospect']);
+    expect(cardActions({ isTrip: false, hasEditor: true, isArchived: false })).toEqual([
+      'edit',
+      'prospect',
+    ]);
   });
 
   /**
@@ -37,7 +66,7 @@ describe('cardActions', () => {
    * second entry of its own.
    */
   it('offers nothing at all to a note with no editor', () => {
-    expect(cardActions({ isTrip: false, hasEditor: false })).toEqual([]);
+    expect(cardActions({ isTrip: false, hasEditor: false, isArchived: false })).toEqual([]);
   });
 });
 
@@ -57,11 +86,12 @@ describe('CARD_ACTION_LABELS', () => {
    * tells them apart.
    */
   it('still keeps the two editors as two actions', () => {
-    expect(cardActions({ isTrip: true, hasEditor: true })).toEqual([
+    expect(cardActions({ isTrip: true, hasEditor: true, isArchived: false })).toEqual([
       'editTrip',
       'tripDocument',
       'edit',
       'prospect',
+      'archiveTrip',
     ]);
   });
 

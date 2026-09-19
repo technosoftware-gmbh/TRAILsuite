@@ -6,7 +6,7 @@
  * docs/design/dashboard-split-and-crm.md for the split into a dashboard per
  * module and for the later fold of both of them into the gallery.
  */
-import { Plugin } from 'obsidian';
+import { Notice, Plugin, TFile } from 'obsidian';
 import { whenIndexed } from '@technosoftware/trail-core/obsidian';
 import { I18nManager, t } from './lang/I18nManager';
 import { APERtrailSettings } from './settings/types';
@@ -14,6 +14,14 @@ import { APERtrailSettingsStore } from './settings/store';
 import { APERtrailSettingTab } from './settings/settings-tab';
 import { findOrOpenLeaf } from './shared/open-leaf';
 import { EntityTypeCheckModal } from './vault/health/entity-type-check-modal';
+import {
+  archiveTrip,
+  ArchiveNotConfiguredError,
+  DestinationExistsError,
+  isTripNote,
+  unarchiveTrip,
+} from './trips/archive-trip';
+import { isArchivedTripPath } from './trips/trip-folder';
 import {
   TravelGalleryView,
   TRAVEL_GALLERY_VIEW_TYPE,
@@ -128,6 +136,8 @@ export default class APERtrailPlugin extends Plugin {
           exportProspect: (subject) =>
             void exportProspect(this.app, this.getSettings(), prospectOf(subject)),
           exportTripDocument: (trip) => void exportTripDocument(this.app, this.getSettings(), trip),
+          archiveTrip: (trip, archived) =>
+            void this.runArchive(trip.file, archived ? 'unarchive' : 'archive'),
           openNewTripModal: () => this.openNewTripModal(),
           openNewCountryModal: () => this.openNewCountryModal(),
           openNewStateModal: () => this.openNewStateModal(),
@@ -302,6 +312,30 @@ export default class APERtrailPlugin extends Plugin {
       id: 'new-company',
       name: t('commands.newCompany'),
       callback: () => this.openNewCompanyModal(),
+    });
+    // `checkCallback` rather than a plain one, so the entry is absent from the
+    // palette on a note that is not a trip instead of being offered and then
+    // refusing. The pair reads the direction off the note, which is the only
+    // place that answer lives.
+    this.addCommand({
+      id: 'archive-trip',
+      name: t('archive.archiveTrip'),
+      checkCallback: (checking) => {
+        const file = this.activeTripNote();
+        if (!file || isArchivedTripPath(file.path, this.getSettings())) return false;
+        if (!checking) void this.runArchive(file, 'archive');
+        return true;
+      },
+    });
+    this.addCommand({
+      id: 'unarchive-trip',
+      name: t('archive.unarchiveTrip'),
+      checkCallback: (checking) => {
+        const file = this.activeTripNote();
+        if (!file || !isArchivedTripPath(file.path, this.getSettings())) return false;
+        if (!checking) void this.runArchive(file, 'unarchive');
+        return true;
+      },
     });
     this.addCommand({
       id: 'check-entity-types',
@@ -491,6 +525,50 @@ export default class APERtrailPlugin extends Plugin {
 
   openEntityTypeCheck(): void {
     new EntityTypeCheckModal(this.app, this.getSettings()).open();
+  }
+
+  /** The note in front of the person, when it is a trip. Null for anything else, which is what keeps the two archive commands out of the palette elsewhere. */
+  private activeTripNote(): TFile | null {
+    const file = this.app.workspace.getActiveFile();
+    if (!file || !isTripNote(this.app, this.getSettings(), file)) return null;
+    return file;
+  }
+
+  /**
+   * Both directions, and the only place either one's failures are worded.
+   *
+   * The move can fail for two reasons a person can act on -- nowhere configured
+   * to send it, and something already sitting at the destination -- and both
+   * say so rather than leaving a command that appeared to do nothing. Anything
+   * else is rethrown: a vault error this code did not anticipate is not
+   * improved by being turned into a notice.
+   */
+  private async runArchive(file: TFile, direction: 'archive' | 'unarchive'): Promise<void> {
+    const settings = this.getSettings();
+    try {
+      const outcome =
+        direction === 'archive'
+          ? await archiveTrip(this.app, settings, file)
+          : await unarchiveTrip(this.app, settings, file);
+      if (outcome.moved) {
+        new Notice(
+          t(direction === 'archive' ? 'archive.archivedNotice' : 'archive.unarchivedNotice', {
+            title: file.basename,
+          })
+        );
+      }
+      this.refreshAllViews();
+    } catch (error) {
+      if (error instanceof ArchiveNotConfiguredError) {
+        new Notice(t('archive.notConfigured'));
+        return;
+      }
+      if (error instanceof DestinationExistsError) {
+        new Notice(t('archive.destinationExists', { path: error.path }));
+        return;
+      }
+      throw error;
+    }
   }
 
   /** The sample notes, previewed before anything is written. Refreshes the views afterwards, like every other creation path. */

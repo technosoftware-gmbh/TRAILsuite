@@ -24,13 +24,15 @@ Everything on the dashboard is also a command, so nothing here requires the ribb
 
 ## 2. Build the geographic hierarchy
 
-Start with a **Country**. **New country** asks for a title only; `capital:` and `states:` are left to fill in later, once the notes they would point at exist.
+Start with a **Country**. **New country** asks for a title only; `capital:` is left to fill in later, once the note it would point at exists. There is no list of states to fill in: a country shows the provinces whose `country:` names it, and a province shows the towns whose `state:` names it, so the link on the child note is the only place the hierarchy is recorded.
 
 Then add **States** where the country uses that level (state, province, canton, Bundesland) and **Cities**. A State takes an optional Country; a City takes an optional Country and an optional State. Both are wikilinks, so a City in a country without a state level simply carries no `state:`.
 
 You do not have to build the whole hierarchy up front. Countries, states and cities are usually set up once and reused, but they also turn up mid-planning, which is why they are dashboard buttons and not just commands: a trip's `cities:` list cannot point at a City note that does not exist yet.
 
 New City notes are created with a `travel-related-trips` block already in the body, so they answer "when was I last here" from the moment they exist.
+
+When a trip is over and you want it out of the way, **Archive trip** moves it into the archive and stamps the day. It stays readable: it still shows in a city's related trips, marked as archived, and it still counts as a visit. Only the gallery hides it, until you ask for the archive in the Trips filter row. **Restore trip from archive** is the way back.
 
 ## 3. Add places
 

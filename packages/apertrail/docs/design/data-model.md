@@ -51,19 +51,19 @@ CRM differs from the travel types in one way worth knowing before reading `src/c
 
 A note counts as an APERtrail entity only when it is **under the configured folder** for that entity **and** carries the matching value under the configured type property (`typePropertyName`, default `type`). Both, always. There is no folder-based fallback for a missing type, and no vault-wide search for a type outside its folder.
 
-That strictness is what makes the [entity type health check](../features/travel.md#entity-type-health-check) worth running: a `type: fnb` note in the Landmarks folder is not a mis-filed FnB, it is invisible. Because each of the fourteen folders maps to exactly one type, the check always has a confident suggestion.
+That strictness is what makes the [entity type health check](../features/travel.md#entity-type-health-check) worth running: a `type: fnb` note in the Landmarks folder is not a mis-filed FnB, it is invisible. Because each of the fifteen folders maps to exactly one type, the check always has a confident suggestion. Two of them map to `trip`: the trips folder and the trip archive, which holds trips that are still trips.
 
 The twelve recognized values are fixed (`src/vault/entity-types.ts`): `trip`, `booking`, `country`, `state`, `city`, `accommodation`, `fnb`, `landmark`, `location`, `photospot`, `vehicle`, `excursion`. `vehicle` is the ship or named train a leg is taken on, and is not a place either: no coordinates, never an itinerary stop, and its cabins are a catalogue rather than prices (see [Vehicles](vehicles.md)). `excursion` is what a stop is sold as -- a guided tour, a safari, a bus to the Nordkap -- and is not a place for the vehicle's reason: it is run rather than gone to, and the place it happens at is the stop it hangs off. It carries no price at all, because the same tour is sold at a different figure on every trip that offers it (see [Excursions](excursions.md)). `booking` is the one that is not a place and not a container: it is a purchase belonging to one trip, with no coordinates and no standing as an itinerary stop (see [Trip budget and bookings](trip-budget-and-bookings.md)). `person` and `company` are not among them: they live in `src/crm/entity-types.ts` and are configurable rather than fixed, for the reason given above.
 
 ## Relationships are wikilinks, resolved by title
 
-A City's `country:` and `state:`, a Country's `capital:` and `states:`, a State's `cities:`, a place's `country:` and `city:`, a Trip's `cities:` and `persons:`, every `stops[].place`, and the `persons` on any itinerary line reference another note as a real `[[Wikilink]]`, resolved at read time. Obsidian's own backlink and graph features work on this data for free, and a broken reference is just an unresolved wikilink, visible and fixable the normal way.
+A City's `country:` and `state:`, a Country's `capital:`, a place's `country:` and `city:`, a Trip's `cities:` and `persons:`, every `stops[].place`, and the `persons` on any itinerary line reference another note as a real `[[Wikilink]]`, resolved at read time. Obsidian's own backlink and graph features work on this data for free, and a broken reference is just an unresolved wikilink, visible and fixable the normal way.
 
 **Wikilinks resolve by note title (basename), never by path.** Two notes with the same basename in different folders are indistinguishable to every resolver in the codebase, and a link that matches nothing resolves to `null` rather than raising: the referring card renders one fewer meta row and nothing else breaks. A value that is not wikilink-shaped at all is treated as absent rather than guessed at.
 
 ### Two-pass resolution for Country, State and City
 
-Those three form a genuine cycle. A Country lists its States, a State points back at its Country, each level's `capital:` points down at a City, and a City points up at both. There is no single ordering that resolves every reference the first time through, so `readTravelBoard()`:
+Those three form a genuine cycle. A State points up at its Country, a City up at both, and each level's `capital:` points back down at a City. (A Country's `states:` and a State's `cities:` are not part of it: the downward lists are derived from the upward links, never read from the note. See the child-list rule below.) There is no single ordering that resolves every reference the first time through, so `readTravelBoard()`:
 
 1. Builds skeleton objects for Countries, States and Cities with the cross-reference fields left `null`/`[]`, and indexes all three by title.
 2. Walks each list again and **mutates in** the resolved references, now that every skeleton exists to point at.
@@ -313,17 +313,34 @@ everything below is deliberately outside that boundary:
   writes it separately, and that write replaces the callout's quoted lines and
   nothing else in the note. It is what a prospect prints.
 - **`created`** is stamped once, when the note is made.
+- **`archived`** is the one derived-looking value this plugin writes. Archiving
+  a trip is a MOVE, into `<archiveFolder>/<tripsArchiveFolder>/`, and the folder
+  is what every reader matches on -- so no reader needs a special case and no
+  view can forget to apply one. The stamp is not derivable from the move, which
+  is why it is written: the folder says *that*, the stamp says *when*. A trip
+  dragged into the archive by hand is archived on exactly the same terms,
+  without one. The `type:` does not change, because an archived trip is still a
+  trip: `readTravelBoard()` reads both folders in one pass so a retired trip
+  keeps contributing the visits it is the evidence for.
 - **A subtype key belongs to its own kind and to nobody else.** A landmark
   carrying a hand-added `accommodationType:` keeps it: this plugin never reads
   that field for a landmark, so clearing it would delete a value on the
   strength of a question the note was not asked.
-- **A child list is nobody's to write.** A country's `states:` and a state's
-  `cities:` are read and never written by any editor. The child names the
-  parent -- a city names its state, a state names its country -- and
-  maintaining the list on the other side would make one fact writable from two
-  places that can then disagree. A vault that keeps those lists keeps them by
-  hand. The capital is not one of these: it is a single note rather than a
-  list, and it is the one link either of them points downwards.
+- **A child list is nobody's to write, and nobody's to read.** A country's
+  `states:` and a state's `cities:` are written by no editor and read for the
+  hierarchy by nothing. The child names the parent -- a city names its state, a
+  state names its country -- and that link is the whole relationship:
+  `readTravelBoard()` derives `state.cities` and `country.states` from it and
+  sorts them by title. Maintaining a list on the other side would make one fact
+  writable from two places that can then disagree, and reading one was the
+  other half of the same mistake: a town added to a vault stayed invisible in
+  its province until somebody typed it into a second note, and nothing said so.
+  An existing list is left alone rather than migrated or deleted;
+  `health/child-list-issues.ts` reports any entry the derivation does not
+  reproduce, which is the only thing either property is still read for and the
+  only reason `statesProperty` and `citiesProperty` still exist. The capital is
+  not one of these: it is a single note rather than a list, and it is the one
+  link either of them points downwards.
 
 `accommodationType`, `accommodationStatus` and `fnbType` were the three
 documented exceptions to the every-name-is-a-setting rule, and `tags` never had

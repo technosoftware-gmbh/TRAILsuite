@@ -889,6 +889,11 @@ export const enTranslations = {
       anyStatus: 'Any status',
       anyReviewStatus: 'Any review status',
       anyPerson: 'Anyone',
+      archive: {
+        live: 'Active trips',
+        archived: 'Archived trips',
+        all: 'Active and archived',
+      },
     },
     displayName: 'Trips, countries & places',
     searchPlaceholder: 'Search trips, countries & places…',
@@ -974,6 +979,7 @@ export const enTranslations = {
         photoSpotsFolderName: 'Photo Spots',
         vehiclesFolderName: 'Vehicles',
         excursionsFolderName: 'Excursions',
+        archiveFolderName: '6 Archive',
         crmFolderName: 'CRM',
         personsFolderName: 'People',
         companiesFolderName: 'Companies',
@@ -1082,6 +1088,23 @@ export const enTranslations = {
         desc: 'Where your Company notes live. Reserved for the CRM work in progress; nothing is read from here yet.',
         placeholder: 'CRM/Companies',
       },
+      archiveHeading: 'Archive',
+      archiveIntro:
+        'Where a trip goes when it is over and you want it out of the way without losing it. An archived trip is still read: it keeps its place in a city\u2019s related trips and it still counts as a visit. NODAtrail files its retired notes under the same folder, so a vault running both ends up with one archive rather than two.',
+      archive: {
+        name: 'Archive folder',
+        desc: 'The root of the archive, beside Trips, Places and CRM rather than inside one of them.',
+        placeholder: '6 Archive',
+      },
+      tripsArchive: {
+        name: 'Archived trips sub-folder',
+        desc: 'The folder inside the archive that retired trips go into. A name, not a path: moving the archive takes it along.',
+        placeholder: 'Trips',
+      },
+      archiveYearFolders: {
+        name: 'Split the archive by year',
+        desc: 'File each archived trip under the year it was archived. Off by default: a handful of trips a year does not need the split.',
+      },
     },
     properties: {
       intro:
@@ -1182,6 +1205,10 @@ export const enTranslations = {
         },
         created: { name: 'Created property', desc: 'The note-created timestamp.' },
         modified: { name: 'Modified property', desc: 'The note-modified timestamp.' },
+        archived: {
+          name: 'Archived property',
+          desc: 'The day a trip was archived. Leave empty to move without stamping.',
+        },
         departure: { name: 'Departure property', desc: "A Trip's departure date." },
         return: { name: 'Return property', desc: "A Trip's return date." },
         travelType: {
@@ -1450,6 +1477,15 @@ export const enTranslations = {
       },
     },
   },
+  archive: {
+    archiveTrip: 'Archive trip',
+    unarchiveTrip: 'Restore trip from archive',
+    archivedMarker: 'Archived',
+    archivedNotice: '{title} moved to the archive.',
+    unarchivedNotice: '{title} restored from the archive.',
+    notConfigured: 'No archive folder is set. Settings \u2192 Folders \u2192 Archive.',
+    destinationExists: 'Something is already at {path}. Nothing was moved.',
+  },
   health: {
     entityTypeCheck: {
       command: 'Check entity types',
@@ -1481,6 +1517,7 @@ export const enTranslations = {
       },
       locationLabels: {
         trips: 'Trips',
+        archivedTrips: 'Archived trips',
         bookings: 'Bookings',
         countries: 'Countries',
         states: 'States',
@@ -1514,6 +1551,14 @@ export const enTranslations = {
         'A picture, a gallery entry, a cabin photograph or a deck plan naming a file this vault does not have. Every reader treats one it cannot find exactly like none at all, so the only symptom is something that quietly does not appear. Usually a renamed folder or a moved attachment; what the path was meant to say is an answer only you have.',
       plain: '{property} points at "{value}", which this vault does not have.',
       inList: '{property}, under "{detail}", points at "{value}", which this vault does not have.',
+    },
+    childListCheck: {
+      heading: 'Child lists naming somebody else ({count})',
+      explain:
+        'The states: list on a Country and the cities: list on a State are no longer read. What sits under a note is derived from the link on the child note itself, so neither list has to be kept by hand any more. Most entries in an existing list only repeat what the child already says and cost nothing. These do not: they name a note this vault does not have, or one that points somewhere else, so they used to show up in the list and now they do not.',
+      unknown: '{property} lists "{child}", which is not a note in this vault.',
+      pointsElsewhere: '{property} lists "{child}", but that note names "{actual}" instead.',
+      namesNobody: '{property} lists "{child}", but that note names no parent of its own.',
     },
     variantCabinCheck: {
       heading: 'Variants naming an unknown cabin ({count})',

@@ -676,7 +676,8 @@ fact about a trip rather than a place -- no coordinates, never an itinerary stop
 | `state` | `stateProperty` | City | Link upwards |
 | `city` | `cityProperty` | All place types | Link upwards |
 | `capital` | `capitalProperty` | Country, State | Link to a City |
-| `states`, `cities` | `statesProperty`, `citiesProperty` | Country, State | Links downwards |
+| `archived` | `archivedProperty` | Trip | The day it was archived. Written, unlike the other derived-looking values: the folder says that, this says when |
+| `states`, `cities` | `statesProperty`, `citiesProperty` | Country, State | Legacy downward lists. Neither is read for the hierarchy and neither is written: what sits under a note is derived from the child's own upward link. Read once by the child-list health check, which reports an entry no child names back |
 | `geoLocation` | `geoLocationProperty` | City, all place types | `[lat, lon]`, written as quoted strings |
 | `address`, `website` | `addressProperty`, `websiteProperty` | All place types | Free text, read only |
 | `rating` | `ratingProperty` | All place types | One to five, read only |

@@ -24,7 +24,6 @@ import {
   readString,
   readStringList,
   wikilinkTarget,
-  wikilinkTargets,
   type VaultNote,
   caseFold,
 } from '@technosoftware/trail-core';
@@ -35,7 +34,7 @@ import {
   TravelPlaceType,
 } from './entity-types';
 import { applyDerivedVisits } from './visit-derivation';
-import { bookingReadFolders } from '../trips/trip-folder';
+import { bookingReadFolders, isArchivedTripPath, tripReadFolders } from '../trips/trip-folder';
 import {
   effectiveTravelStatus,
   ParsedTripRecord,
@@ -147,7 +146,6 @@ function readTravelCountriesUnresolved(
       file,
       title,
       capitalTitle: wikilinkTarget(findValue(fm, settings.capitalProperty)),
-      stateTitles: wikilinkTargets(findValue(fm, settings.statesProperty)),
       ...readNoteCover(fm, settings),
     })
   );
@@ -163,7 +161,6 @@ function readTravelStatesUnresolved(
       title,
       countryTitle: wikilinkTarget(findValue(fm, settings.countryProperty)),
       capitalTitle: wikilinkTarget(findValue(fm, settings.capitalProperty)),
-      cityTitles: wikilinkTargets(findValue(fm, settings.citiesProperty)),
       ...readNoteCover(fm, settings),
     })
   );
@@ -466,6 +463,8 @@ interface UnresolvedTrip {
   title: string;
   record: ParsedTripRecord;
   effectiveStatus: TravelTrip['effectiveStatus'];
+  archived: boolean;
+  archivedOn: string | null;
 }
 
 /**
@@ -482,10 +481,19 @@ function readTravelTripsUnresolved(
   today: string
 ): UnresolvedTrip[] {
   const properties = tripPropertyNames(settings);
-  return travelNotesOfType(app, settings, settings.tripsFolder, 'trip').map(
+  // Both folders, so a retired trip stays on the board and keeps contributing
+  // the visits it is the evidence for. See tripReadFolders().
+  return travelNotesInFolders(app, settings, tripReadFolders(settings), 'trip').map(
     ({ file, title, frontmatter }) => {
       const record = parseTripRecord({ properties, frontmatter });
-      return { file, title, record, effectiveStatus: effectiveTravelStatus(record, today) };
+      return {
+        file,
+        title,
+        record,
+        effectiveStatus: effectiveTravelStatus(record, today),
+        archived: isArchivedTripPath(file.path, settings),
+        archivedOn: readString(findValue(frontmatter, settings.archivedProperty)),
+      };
     }
   );
 }
@@ -506,8 +514,8 @@ function resolveStop(
   placeByTitle: Map<string, TravelPlace>,
   excursionByTitle: Map<string, TravelExcursion>
 ): TravelTripStop {
-  const city = stop.placeTitle ? cityByTitle.get(stop.placeTitle) : undefined;
-  const place = stop.placeTitle ? placeByTitle.get(stop.placeTitle) : undefined;
+  const city = stop.placeTitle ? cityByTitle.get(caseFold(stop.placeTitle)) : undefined;
+  const place = stop.placeTitle ? placeByTitle.get(caseFold(stop.placeTitle)) : undefined;
   const target = city ?? place ?? null;
   const targetKind: TravelStopTargetKind | null = city ? 'city' : (place?.kind ?? null);
   // Its own lookup rather than a third candidate for `target`: an excursion
@@ -515,7 +523,7 @@ function resolveStop(
   // the Stavanger line choose between saying which town and saying which
   // tour when it means both.
   const excursion = stop.excursionTitle
-    ? (excursionByTitle.get(stop.excursionTitle) ?? null)
+    ? (excursionByTitle.get(caseFold(stop.excursionTitle)) ?? null)
     : null;
   return { ...stop, target, targetKind, excursion };
 }
@@ -524,8 +532,34 @@ function resolveNight(
   night: ParsedTripRecord['nights'][number],
   placeByTitle: Map<string, TravelPlace>
 ): TravelTripNight {
-  const place = night.accommodationTitle ? placeByTitle.get(night.accommodationTitle) : undefined;
+  const place = night.accommodationTitle
+    ? placeByTitle.get(caseFold(night.accommodationTitle))
+    : undefined;
   return { ...night, accommodation: place ?? null };
+}
+
+/**
+ * A note index keyed by folded title, which is the only key a frontmatter
+ * link can be looked up by.
+ *
+ * Every value that comes back out of a note's frontmatter was typed by a
+ * person somewhere else than the file name was, and on macOS those two
+ * spellings of an umlaut compare unequal (see trail-core's `caseFold()`).
+ * Keying on the raw basename is the exact shape of the bug that hid forty
+ * notes in a real vault: a link that resolves to nothing renders as one
+ * fewer meta row, which looks like a note nobody wrote.
+ *
+ * It matters more here than it did: a State's cities are derived from these
+ * lookups now, so a fold that misses is a town missing from its province
+ * with no hand-kept list left to cover for it.
+ */
+function indexByTitle<T extends { title: string }>(entities: T[]): Map<string, T> {
+  return new Map(entities.map((entity) => [caseFold(entity.title), entity]));
+}
+
+/** Alphabetical by title, for the two derived child lists. */
+function byTitle(a: { title: string }, b: { title: string }): number {
+  return a.title.localeCompare(b.title);
 }
 
 /**
@@ -563,56 +597,82 @@ export function readTravelBoard(
     state: null,
   }));
 
-  const countryByTitle = new Map(countries.map((c) => [c.title, c]));
-  const stateByTitle = new Map(states.map((s) => [s.title, s]));
-  const cityByTitle = new Map(cities.map((c) => [c.title, c]));
+  const countryByTitle = indexByTitle(countries);
+  const stateByTitle = indexByTitle(states);
+  const cityByTitle = indexByTitle(cities);
 
   for (const country of countries) {
-    country.capital = country.capitalTitle ? (cityByTitle.get(country.capitalTitle) ?? null) : null;
-    country.states = country.stateTitles
-      .map((title) => stateByTitle.get(title))
-      .filter((s): s is TravelState => s !== undefined);
+    country.capital = country.capitalTitle
+      ? (cityByTitle.get(caseFold(country.capitalTitle)) ?? null)
+      : null;
   }
   for (const state of states) {
-    state.country = state.countryTitle ? (countryByTitle.get(state.countryTitle) ?? null) : null;
-    state.capital = state.capitalTitle ? (cityByTitle.get(state.capitalTitle) ?? null) : null;
-    state.cities = state.cityTitles
-      .map((title) => cityByTitle.get(title))
-      .filter((c): c is TravelCity => c !== undefined);
+    state.country = state.countryTitle
+      ? (countryByTitle.get(caseFold(state.countryTitle)) ?? null)
+      : null;
+    state.capital = state.capitalTitle
+      ? (cityByTitle.get(caseFold(state.capitalTitle)) ?? null)
+      : null;
   }
   for (const city of cities) {
-    city.country = city.countryTitle ? (countryByTitle.get(city.countryTitle) ?? null) : null;
-    city.state = city.stateTitle ? (stateByTitle.get(city.stateTitle) ?? null) : null;
+    city.country = city.countryTitle
+      ? (countryByTitle.get(caseFold(city.countryTitle)) ?? null)
+      : null;
+    city.state = city.stateTitle ? (stateByTitle.get(caseFold(city.stateTitle)) ?? null) : null;
   }
+
+  // The two downward lists are derived from the upward links and read from
+  // nowhere else. A Country note's `states:` and a State note's `cities:`
+  // are not consulted here at all: the child already names its parent, and
+  // a list on the other side is the same fact written twice, which is the
+  // arrangement write-region.ts refuses to write into. Reading one was the
+  // remaining half of that mistake -- a town added to a vault stayed
+  // invisible in its province until somebody remembered to type it into a
+  // second note, and nothing said so.
+  //
+  // The legacy lists are still checked, once, by health/child-list-issues.ts,
+  // which reports an entry no child names back. That is the only case the
+  // old reading covered and this one does not.
+  for (const state of states) {
+    state.country?.states.push(state);
+  }
+  for (const city of cities) {
+    city.state?.cities.push(city);
+  }
+  // Sorted here rather than left in read order, because read order is
+  // folder order and a province listing its towns alphabetically is the
+  // only order a reader can predict.
+  for (const country of countries) country.states.sort(byTitle);
+  for (const state of states) state.cities.sort(byTitle);
 
   // Places and Trips only ever reference Country/City (never each other,
   // never State directly), so they resolve in a single pass against the
   // maps built above.
   const places: TravelPlace[] = readTravelPlacesUnresolved(app, settings).map((p) => ({
     ...p,
-    country: p.countryTitle ? (countryByTitle.get(p.countryTitle) ?? null) : null,
-    city: p.cityTitle ? (cityByTitle.get(p.cityTitle) ?? null) : null,
+    country: p.countryTitle ? (countryByTitle.get(caseFold(p.countryTitle)) ?? null) : null,
+    city: p.cityTitle ? (cityByTitle.get(caseFold(p.cityTitle)) ?? null) : null,
   }));
 
   // Trips resolve last: their itinerary stops point at Cities and places,
   // so both of those have to be fully built and indexed first. Still one
   // pass, since nothing points back UP at a Trip.
-  const placeByTitle = new Map(places.map((p) => [p.title, p]));
+  const placeByTitle = indexByTitle(places);
   // Excursions resolve against the same two maps a place does and are read
   // before trips for the vehicle's reason: a stop points at one and a tour
   // does not know which sailings took it.
   const excursions: TravelExcursion[] = readTravelExcursionsUnresolved(app, settings)
     .map((e) => ({
       ...e,
-      country: e.countryTitle ? (countryByTitle.get(e.countryTitle) ?? null) : null,
-      city: e.cityTitle ? (cityByTitle.get(e.cityTitle) ?? null) : null,
+      country: e.countryTitle ? (countryByTitle.get(caseFold(e.countryTitle)) ?? null) : null,
+      city: e.cityTitle ? (cityByTitle.get(caseFold(e.cityTitle)) ?? null) : null,
     }))
     .sort((a, b) => a.title.localeCompare(b.title));
-  const excursionByTitle = new Map(excursions.map((e) => [e.title, e]));
+  const excursionByTitle = indexByTitle(excursions);
   // Vehicles are read before trips and never point back at one, so they need
   // no second pass: a ship does not know which trips sailed on it.
   const vehicles = readTravelVehicles(app, settings);
-  const vehicleByTitle = new Map(vehicles.map((vehicle) => [vehicle.title, vehicle]));
+  const vehicleByTitle = indexByTitle(vehicles);
   const trips: TravelTrip[] = readTravelTripsUnresolved(app, settings, today).map((t) => ({
     file: t.file,
     title: t.title,
@@ -621,10 +681,12 @@ export function readTravelBoard(
     highlights: t.record.highlights,
     gallery: t.record.gallery,
     countryTitle: t.record.countryTitle,
-    country: t.record.countryTitle ? (countryByTitle.get(t.record.countryTitle) ?? null) : null,
+    country: t.record.countryTitle
+      ? (countryByTitle.get(caseFold(t.record.countryTitle)) ?? null)
+      : null,
     cityTitles: t.record.cityTitles,
     cities: t.record.cityTitles
-      .map((title) => cityByTitle.get(title))
+      .map((title) => cityByTitle.get(caseFold(title)))
       .filter((c): c is TravelCity => c !== undefined),
     departure: t.record.departure,
     return: t.record.return,
@@ -634,6 +696,8 @@ export function readTravelBoard(
     travelType: t.record.travelType,
     travelStatus: t.record.travelStatus,
     effectiveStatus: t.effectiveStatus,
+    archived: t.archived,
+    archivedOn: t.archivedOn,
     reviewStatus: t.record.reviewStatus,
     rating: t.record.rating,
     personTitles: t.record.personTitles,
@@ -650,7 +714,7 @@ export function readTravelBoard(
     nights: t.record.nights.map((night) => resolveNight(night, placeByTitle)),
     transport: t.record.transport.map((leg) => ({
       ...leg,
-      vehicle: leg.vehicleTitle ? (vehicleByTitle.get(leg.vehicleTitle) ?? null) : null,
+      vehicle: leg.vehicleTitle ? (vehicleByTitle.get(caseFold(leg.vehicleTitle)) ?? null) : null,
     })),
   }));
 
@@ -667,10 +731,10 @@ export function readTravelBoard(
   // `extensions` is filled one level deep, so A -> B -> C leaves B holding C
   // and A holding B, and a cycle of any length terminates by construction
   // rather than by a visited-set that has to be got right.
-  const tripByTitle = new Map(trips.map((trip) => [trip.title, trip]));
+  const tripByTitle = indexByTitle(trips);
   for (const trip of trips) {
     if (!trip.extendsTitle || trip.extendsTitle === trip.title) continue;
-    const parent = tripByTitle.get(trip.extendsTitle);
+    const parent = tripByTitle.get(caseFold(trip.extendsTitle));
     if (!parent) continue;
     trip.extendsTrip = parent;
     parent.extensions.push(trip);

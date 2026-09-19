@@ -540,8 +540,13 @@ from the note's own block: a city carries its country, its state, its coordinate
 and its tags, a state its country and its capital, a country its capital. What
 none of them edits is the list on the other side -- a country's `states:` and a
 state's `cities:` -- because a city already names its state, and a fact you can
-change in two places is a fact that ends up saying two things. If you keep
-those lists, they stay yours to keep.
+change in two places is a fact that ends up saying two things. Nothing reads
+those lists either: a province shows the towns whose `state:` names it, and a
+country shows the provinces whose `country:` names it, so adding a town is one
+edit in one note and the list on the other side is never yours to keep. An
+older vault that still carries them loses nothing by leaving them; the vault
+health check reports any entry the links do not back up, and nothing else looks
+at them.
 
 **Creating the parent from the form.** If the city or country you want does not
 exist yet, the dropdown offers to create one. That opens the ordinary New city
@@ -847,13 +852,15 @@ anything you use often can be given a hotkey there.
 | Open in order view / Open this order as Markdown | with an order note open |
 | Open this plan as a week / Open this plan as Markdown | with a meal plan note open |
 
-**APERtrail**, twenty-two commands: Open Trips dashboard, Open Places dashboard,
+**APERtrail**, twenty-four commands: Open Trips dashboard, Open Places dashboard,
 Open CRM dashboard, Browse trips, countries & places, then one "New ..." command
 for each of the fourteen types (trip, booking, country, state, city,
 accommodation, food & beverage, landmark, location, photo spot, ship or train,
 excursion, person, company), **Export photo spot sheet**, **Export this trip as
 a document**, **Export this note as a prospect**, **Edit this vehicle's
-cabins**, and **Check entity types**, the health check described in section 8.
+cabins**, **Archive trip** and **Restore trip from archive** (each offered only
+on the note the other one is not), and **Check entity types**, the health check
+described in section 8.
 
 **NODAtrail**, twenty-nine commands, more than the other two together: five
 views to open (a dashboard, PARA, Plan, Finance and the Ledger), one "New ..."

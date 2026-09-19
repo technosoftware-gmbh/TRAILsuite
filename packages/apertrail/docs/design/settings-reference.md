@@ -45,6 +45,9 @@ On the sub-page the common parent comes first, and the rest are grouped under th
 | `bookingsFolder`        | `Trips/Bookings`          | Where a `type: booking` note goes when its trip has no folder of its own. Bookings are read from here **and** from every trip folder          |
 | `tripBookingsSubfolder` | `Bookings`                | The folder a trip keeps its bookings in, inside the trip's own folder. Blank puts every booking in `bookingsFolder`                           |
 | `exportsSubfolder`      | `_exports`                | The subfolder a note keeps its exported sheets in, beside the note itself. Notes in one folder share one. Blank writes sheets beside the note |
+| `archiveFolder`         | `6 Archive`               | The archive root, beside the three module roots rather than inside one. Blank switches archiving off rather than pointing it at the vault root |
+| `tripsArchiveFolder`    | `Trips`                   | The sub-folder inside `archiveFolder` that retired trips go into. A name, not a path, so moving the archive takes it along |
+| `archiveYearFolders`    | `false`                   | File each archived trip under the year it was archived. Off where NODAtrail's is on: a handful of trips a year does not need the split |
 | `placesFolder`          | `Places`                  | The Places module root; the eight folders below derive from it                                                                                |
 | `countriesFolder`       | `Places/Countries`        | `type: country` notes                                                                                                                         |
 | `statesFolder`          | `Places/States`           | `type: state` notes                                                                                                                           |
@@ -170,6 +173,7 @@ The shared and per-note-type names, and where each one appears:
 | `fnbTypeProperty`             | `fnbType`             | Food & Beverages                                                                      |
 | `createdProperty`             | `created`             | Stamped once at creation, see below                                                   |
 | `modifiedProperty`            | `modified`            | Trip and Photo spot; stamped on every editor save, and by the health check's type fix |
+| `archivedProperty`            | `archived`            | The day a trip was archived. The one derived-looking value this plugin writes: the folder says that, this says when. Blank moves without stamping |
 | `departureProperty`           | `departure`           | Trip                                                                                  |
 | `returnProperty`              | `return`              | Trip                                                                                  |
 | `travelTypeProperty`          | `travelType`          | Trip                                                                                  |
@@ -425,6 +429,8 @@ someone will want to edit in the sidebar.
 | `sampleLightField` / `sampleExposureField` / `sampleCreditField` | `light` / `exposure` / `credit` | Sub-keys                                              |
 
 The `*Field` settings name sub-keys **within a list entry**, not top-level frontmatter properties.
+
+`statesProperty` and `citiesProperty` are legacy. Neither names a property the plugin reads for the hierarchy or writes at all: a Country's States and a State's Cities are derived from the `country:`/`state:` link on the child note. They survive as settings because the vault health check still reads those two properties, to report an entry no child names back, and it has to read them under whatever name the vault gave them.
 
 `tripCitiesProperty` is deliberately distinct from `citiesProperty`. The latter means "the Cities belonging to a State" and lives on State notes. Same word, different relationship, so they need separate settings even though both default to a `cities`-shaped name. It is the kind of pair that is one careless edit away from silently pointing two features at one property.
 

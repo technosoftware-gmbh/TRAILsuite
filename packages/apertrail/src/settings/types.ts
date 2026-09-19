@@ -24,6 +24,36 @@ export interface APERtrailSettings {
 
   tripsFolder: string;
 
+  /**
+   * Where a retired trip is kept.
+   *
+   * A fourth root beside Trips, Places and CRM, and the one that is not a
+   * module: it holds one kind of note today and sits at the top of the vault
+   * rather than under any module, because an archive is browsed as an archive.
+   * NODAtrail files its retired PARA notes the same way and under the same
+   * default name, so a vault that runs both ends up with one archive rather
+   * than two.
+   */
+  archiveFolder: string;
+  /**
+   * The sub-folder inside `archiveFolder` that archived trips go into.
+   *
+   * A name rather than a path, like `tripBookingsSubfolder`: moving
+   * `archiveFolder` takes it along, which is the whole reason the archive has a
+   * root of its own.
+   */
+  tripsArchiveFolder: string;
+  /**
+   * Split the archive into a folder per year.
+   *
+   * **Off, where NODAtrail's is on.** That setting exists there for a vault
+   * filing a hundred projects a year, which is a folder nobody can scroll.
+   * Trips arrive at a handful a year, and a year folder holding two of them is
+   * a click that buys nothing. A vault that travels professionally can turn it
+   * on; the year is the year the trip was archived, not the year it ran.
+   */
+  archiveYearFolders: boolean;
+
   placesFolder: string;
   countriesFolder: string;
   statesFolder: string;
@@ -138,6 +168,16 @@ export interface APERtrailSettings {
   fnbTypeProperty: string;
   createdProperty: string;
   modifiedProperty: string;
+  /**
+   * The day a note was archived.
+   *
+   * **Written, unlike every other derived value here.** It is not derived: the
+   * folder says *that* a trip was retired and this says *when*, and the when is
+   * recoverable from nowhere else once the move has happened. Blank skips the
+   * stamp, exactly as a blank `modifiedProperty` skips that one, and a trip in
+   * the archive folder still reads as archived without it.
+   */
+  archivedProperty: string;
 
   // Trip-only fields.
   departureProperty: string;

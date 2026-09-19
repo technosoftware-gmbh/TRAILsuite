@@ -31,7 +31,11 @@
  */
 import { App, TFile } from 'obsidian';
 import { APERtrailSettings } from '../../settings/types';
-import { isInTripBookingsFolder } from '../../trips/trip-folder';
+import {
+  isArchivedTripPath,
+  isInTripBookingsFolder,
+  tripArchiveFolder,
+} from '../../trips/trip-folder';
 import {
   isUnderFolder,
   matchesType,
@@ -43,6 +47,7 @@ import { frontmatterOf } from '../../shared/vault-host';
 
 export type EntityFolderLocation =
   | 'trips'
+  | 'archivedTrips'
   | 'bookings'
   | 'countries'
   | 'states'
@@ -76,6 +81,14 @@ interface LocationConfig {
 function locationConfigs(settings: APERtrailSettings): LocationConfig[] {
   const configs: LocationConfig[] = [
     { location: 'trips', folder: settings.tripsFolder, expectedType: 'trip' },
+    // The archive holds trips too, and they are still trips: without this every
+    // retired one would be reported as a note in no configured folder the first
+    // time somebody ran the check.
+    {
+      location: 'archivedTrips',
+      folder: tripArchiveFolder(settings) ?? '',
+      expectedType: 'trip',
+    },
     // Nested under the Trips folder by default, which the longest-match rule
     // below handles: a booking note is judged against the bookings folder
     // rather than against the trips folder it also sits under.
@@ -125,9 +138,13 @@ function bestMatch(
   configs: LocationConfig[],
   settings: APERtrailSettings
 ): LocationConfig | null {
+  // The archive counts as a trips folder here: an archived trip travels as its
+  // own folder, so its bookings end up at `<archive>/<Trip>/Bookings/`, and
+  // without the second half every one of them would be reported as a trip note
+  // carrying the wrong type.
   if (
     isInTripBookingsFolder(file.path, settings) &&
-    isUnderFolder(file.path, settings.tripsFolder)
+    (isUnderFolder(file.path, settings.tripsFolder) || isArchivedTripPath(file.path, settings))
   ) {
     return configs.find((config) => config.location === 'bookings') ?? null;
   }

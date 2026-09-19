@@ -26,6 +26,7 @@ import { PhotoSpotIssue, scanPhotoSpotIssues } from './photo-spot-issues';
 import { BookingIssue, scanBookingIssues } from './booking-issues';
 import { MissingFileIssue, scanMissingFileIssues } from './missing-file-issues';
 import { scanVariantCabinIssues, VariantCabinIssue } from './variant-cabin-issues';
+import { ChildListIssue, scanChildListIssues } from './child-list-issues';
 
 function locationLabel(location: EntityFolderLocation): string {
   return t(`health.entityTypeCheck.locationLabels.${location}`);
@@ -84,6 +85,28 @@ function describeMissingFile(issue: MissingFileIssue): string {
     : t('health.missingFileCheck.plain', { property: issue.property, value: issue.value });
 }
 
+/**
+ * Which of the three sentences an entry earns. `notLinkedBack` splits in
+ * two, because "points at the wrong parent" and "points at no parent" are
+ * different edits: one is a mistake in this list, the other is a gap in the
+ * child note.
+ */
+function describeChildList(issue: ChildListIssue): string {
+  if (issue.problem === 'unknown') {
+    return t('health.childListCheck.unknown', { property: issue.property, child: issue.child });
+  }
+  return issue.actualParent
+    ? t('health.childListCheck.pointsElsewhere', {
+        property: issue.property,
+        child: issue.child,
+        actual: issue.actualParent,
+      })
+    : t('health.childListCheck.namesNobody', {
+        property: issue.property,
+        child: issue.child,
+      });
+}
+
 function describeVariantCabin(issue: VariantCabinIssue): string {
   return t('health.variantCabinCheck.unknownCabin', {
     variant: issue.variantName,
@@ -107,6 +130,7 @@ export class EntityTypeCheckModal extends Modal {
   private bookingIssues: BookingIssue[] = [];
   private missingFileIssues: MissingFileIssue[] = [];
   private variantCabinIssues: VariantCabinIssue[] = [];
+  private childListIssues: ChildListIssue[] = [];
   private confirmingBulkApply = false;
   private confirmTimeoutId: number | undefined;
 
@@ -135,6 +159,7 @@ export class EntityTypeCheckModal extends Modal {
       : [];
     this.missingFileIssues = scanMissingFileIssues(this.app, this.settings);
     this.variantCabinIssues = scanVariantCabinIssues(this.app, this.settings);
+    this.childListIssues = scanChildListIssues(this.app, this.settings);
     this.confirmingBulkApply = false;
     this.render();
   }
@@ -185,6 +210,10 @@ export class EntityTypeCheckModal extends Modal {
       'missingFileCheck',
       describeMissingFile
     );
+    // Last of the lot, and about a property nothing reads any more rather
+    // than about something broken today: a vault with no legacy lists left
+    // never sees this section at all.
+    this.renderWarningList(contentEl, this.childListIssues, 'childListCheck', describeChildList);
 
     const footerEl = contentEl.createDiv();
 

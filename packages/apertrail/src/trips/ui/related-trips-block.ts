@@ -164,6 +164,13 @@ function renderVisitRow(
     cls: 'apt-related-trip-status',
     text: t(`dashboard.stats.status${trip.effectiveStatus}`),
   });
+  // A retired trip still belongs in this block: it is the history of a place,
+  // and the journey happened whether or not the trip is still in the gallery.
+  // It says so, though, because the alternative is a row here that cannot be
+  // found from the grid with nothing on screen explaining the difference.
+  if (trip.archived) {
+    body.createSpan({ cls: 'apt-related-trip-archived', text: t('archive.archivedMarker') });
+  }
 
   // One line per stop: a trip can stop at the same place twice (lunch and
   // then again on the way back), and collapsing those would lose the

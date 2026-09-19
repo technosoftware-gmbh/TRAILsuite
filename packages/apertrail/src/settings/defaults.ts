@@ -32,6 +32,9 @@ export const DEFAULT_SETTINGS: APERtrailSettings = {
   rootFolder: '',
 
   tripsFolder: 'Trips',
+  archiveFolder: '6 Archive',
+  tripsArchiveFolder: 'Trips',
+  archiveYearFolders: false,
   bookingsFolder: 'Trips/Bookings',
   tripBookingsSubfolder: 'Bookings',
   exportsSubfolder: SHEET_CONTRACT.exportsSubfolder,
@@ -94,6 +97,7 @@ export const DEFAULT_SETTINGS: APERtrailSettings = {
   fnbTypeProperty: 'fnbType',
   createdProperty: 'created',
   modifiedProperty: 'modified',
+  archivedProperty: 'archived',
 
   departureProperty: 'departure',
   returnProperty: 'return',
@@ -261,6 +265,7 @@ export const DEFAULT_SETTINGS: APERtrailSettings = {
 export type FolderDefaultKey =
   | 'rootFolder'
   | 'tripsFolder'
+  | 'archiveFolder'
   | 'bookingsFolder'
   | 'placesFolder'
   | 'countriesFolder'
@@ -283,6 +288,8 @@ export type FolderDefaults = Record<FolderDefaultKey, string>;
 export interface SavedFolderRoots {
   rootFolder?: string;
   tripsFolder?: string;
+  /** A root of its own, so a vault that moved its archive keeps it when a later release adds something under there. */
+  archiveFolder?: string;
   placesFolder?: string;
   crmFolder?: string;
 }
@@ -308,6 +315,7 @@ export function getLocalizedFolderDefaults(saved: SavedFolderRoots = {}): Folder
   const fallback: FolderDefaults = {
     rootFolder: DEFAULT_SETTINGS.rootFolder,
     tripsFolder: DEFAULT_SETTINGS.tripsFolder,
+    archiveFolder: DEFAULT_SETTINGS.archiveFolder,
     bookingsFolder: DEFAULT_SETTINGS.bookingsFolder,
     placesFolder: DEFAULT_SETTINGS.placesFolder,
     countriesFolder: DEFAULT_SETTINGS.countriesFolder,
@@ -342,6 +350,12 @@ export function getLocalizedFolderDefaults(saved: SavedFolderRoots = {}): Folder
     localized = {
       rootFolder,
       tripsFolder,
+      // At the vault root beside the three module roots rather than under one
+      // of them: an archive is not part of the module whose notes it holds,
+      // and NODAtrail puts its own at the same level under the same name.
+      archiveFolder:
+        saved.archiveFolder?.trim() ||
+        joinFolder(rootFolder, t('settings.folders.defaults.archiveFolderName')),
       // Under the Trips folder, so relocating the Trips module takes its
       // bookings with it. The same derivation the place sub-folders use.
       bookingsFolder: joinFolder(tripsFolder, t('settings.folders.defaults.bookingsFolderName')),
@@ -384,6 +398,7 @@ export function getLocalizedFolderDefaults(saved: SavedFolderRoots = {}): Folder
 function resolveFallback(fallback: FolderDefaults, saved: SavedFolderRoots): FolderDefaults {
   const rootFolder = (saved.rootFolder ?? '').trim();
   const tripsFolder = saved.tripsFolder?.trim() || joinFolder(rootFolder, 'Trips');
+  const archiveFolder = saved.archiveFolder?.trim() || joinFolder(rootFolder, '6 Archive');
   const placesFolder = saved.placesFolder?.trim() || joinFolder(rootFolder, 'Places');
   const crmFolder = saved.crmFolder?.trim() || joinFolder(rootFolder, 'CRM');
 
@@ -391,6 +406,7 @@ function resolveFallback(fallback: FolderDefaults, saved: SavedFolderRoots): Fol
     ...fallback,
     rootFolder,
     tripsFolder,
+    archiveFolder,
     placesFolder,
     countriesFolder: joinFolder(placesFolder, 'Countries'),
     statesFolder: joinFolder(placesFolder, 'States'),

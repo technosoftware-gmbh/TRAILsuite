@@ -69,6 +69,26 @@ CRM is the one module whose `type:` values are settings rather than fixed words,
 
 A note counts as an APERtrail entity only when it is **both** under the matching folder **and** carrying the matching `type:` value (`typePropertyName`, default `type`). A `type: fnb` note sitting in the Landmarks folder is read as nothing at all. There is no folder-based fallback and no cross-folder search, which is what makes the [entity type health check](#entity-type-health-check) worth running.
 
+## Archiving a trip
+
+A trip that is over and in the way goes into the archive: **Archive trip**, from
+the command palette or the card menu, moves the note into
+`<archiveFolder>/<tripsArchiveFolder>/` and stamps `archived:` with the day. Its
+`type:` does not change, and a trip that owns a folder of its own travels as that
+folder, so its bookings, its pictures and its exported sheets go with it.
+**Restore trip from archive** is the way back.
+
+**An archived trip is still read**, which is the difference between this and
+simply dragging a note somewhere the plugin does not look. It keeps its row in a
+city's related-trips block, marked *Archived*, and it still counts as the visit
+it was: the `visited` flag on a city or a place is derived from the trips that
+stopped there, and retiring a trip must not un-visit somewhere you have been.
+What changes is the gallery, which shows active trips until you ask it for the
+archive from the Trips filter row.
+
+Nothing is archived automatically. It is a command somebody runs, on one trip,
+having looked at it.
+
 ## Frontmatter the reader actually uses
 
 Every property name below is a setting (`src/settings/types.ts`), shown at its English default. Frontmatter is read defensively throughout: absent means unset, numeric-looking values are accepted as numbers or strings, and wikilink-shaped values are resolved to their link target.
@@ -79,8 +99,9 @@ Every property name below is a setting (`src/settings/types.ts`), shown at its E
 | `state` | City | Wikilink to a State note |
 | `city` | all five place types | Wikilink to a City note |
 | `capital` | Country, State | Wikilink to a City note |
-| `states` | Country | List of State wikilinks |
-| `cities` | State | List of City wikilinks |
+| `archived` | Trip | The day a trip was archived. Written by the Archive command and read for display; the folder is what makes a trip archived, this says when |
+| `states` | Country | Legacy. A list of State wikilinks that nothing reads or writes: a Country's States are derived from each State's own `country:`. Read only by the vault health check |
+| `cities` | State | Legacy. A list of City wikilinks that nothing reads or writes: a State's Cities are derived from each City's own `state:`. Read only by the vault health check |
 | `geoLocation` | City, all five place types | A two-element `[latitude, longitude]` list; anything else reads as unset |
 | `address` / `website` | all five place types | Free text, read-only; nothing writes them |
 | `visited` | City, all five place types | Boolean (`true`/`false`, or the strings) |
@@ -812,10 +833,12 @@ The review modal never writes without an explicit click. There is no silent bulk
 | New company | Title, tags, website, email, phone, address |
 | Browse trips, countries & places | Opens the combined gallery, unfiltered |
 | New trip | Opens the full Trip editor, see [Trips](#trips) |
-| New country | Title only; `capital:` and `states:` are left to fill in once those notes exist |
+| New country | Title only; `capital:` is left to fill in once that note exists. No `states:` list is written, because none is read |
 | New state | Title, optional Country |
 | New city | Title, optional Country, optional State |
 | New accommodation / New food & beverage / New landmark / New location / New photo spot | Title, optional Country, optional City; all five share one modal |
+| Archive trip | Moves the open trip into the archive and stamps the day. Offered only on a live trip |
+| Restore trip from archive | Moves it back and takes the stamp off. Offered only on an archived one |
 | Check entity types | Runs the [health check](#entity-type-health-check) |
 | Export this photo spot as a field sheet | Only offered inside a photo spot note. Writes the sheet described in [the photo spot block](#the-photo-spot-block) into the note's exports folder |
 | Export this trip as a document | Only offered inside a trip note. Writes [the trip document](#the-trip-document) into the trip's exports folder |

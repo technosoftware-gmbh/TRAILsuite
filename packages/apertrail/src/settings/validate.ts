@@ -68,6 +68,7 @@ export function mergeSettings(raw: unknown): APERtrailSettings {
   const f = getLocalizedFolderDefaults({
     rootFolder: typeof r.rootFolder === 'string' ? r.rootFolder : undefined,
     tripsFolder: typeof r.tripsFolder === 'string' ? r.tripsFolder : undefined,
+    archiveFolder: typeof r.archiveFolder === 'string' ? r.archiveFolder : undefined,
     placesFolder: typeof r.placesFolder === 'string' ? r.placesFolder : undefined,
     crmFolder: typeof r.crmFolder === 'string' ? r.crmFolder : undefined,
   });
@@ -76,6 +77,9 @@ export function mergeSettings(raw: unknown): APERtrailSettings {
     rootFolder: str(r.rootFolder, f.rootFolder),
 
     tripsFolder: str(r.tripsFolder, f.tripsFolder),
+    archiveFolder: str(r.archiveFolder, f.archiveFolder),
+    tripsArchiveFolder: str(r.tripsArchiveFolder, d.tripsArchiveFolder),
+    archiveYearFolders: bool(r.archiveYearFolders, d.archiveYearFolders),
     bookingsFolder: str(r.bookingsFolder, f.bookingsFolder),
     tripBookingsSubfolder: str(r.tripBookingsSubfolder, d.tripBookingsSubfolder),
     exportsSubfolder: exportsSubfolder(r, d.exportsSubfolder),
@@ -133,6 +137,7 @@ export function mergeSettings(raw: unknown): APERtrailSettings {
     fnbTypeProperty: str(r.fnbTypeProperty, d.fnbTypeProperty),
     createdProperty: str(r.createdProperty, d.createdProperty),
     modifiedProperty: str(r.modifiedProperty, d.modifiedProperty),
+    archivedProperty: str(r.archivedProperty, d.archivedProperty),
 
     departureProperty: str(r.departureProperty, d.departureProperty),
     returnProperty: str(r.returnProperty, d.returnProperty),

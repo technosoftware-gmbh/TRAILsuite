@@ -35,7 +35,6 @@ function fakeCountry(title: string): TravelCountry {
     title,
     capitalTitle: null,
     capital: null,
-    stateTitles: [],
     description: null,
     image: null,
     gallery: [],
@@ -51,7 +50,6 @@ function fakeState(title: string): TravelState {
     country: null,
     capitalTitle: null,
     capital: null,
-    cityTitles: [],
     description: null,
     image: null,
     gallery: [],
@@ -98,12 +96,14 @@ describe('createCountryNote', () => {
     expect(created[0].content).not.toContain(settings.capitalProperty);
   });
 
-  it('writes capital and states as wikilinks when given', async () => {
+  it('writes the capital as a wikilink, and never a states list', async () => {
     const { app, created } = makeFakeVault();
-    await createCountryNote(app, settings, 'Austria', fakeCity('Vienna'), [fakeState('Tyrol')]);
+    await createCountryNote(app, settings, 'Austria', fakeCity('Vienna'));
     const content = created[0].content;
     expect(content).toContain(`${settings.capitalProperty}: "[[Vienna]]"`);
-    expect(content).toContain(`${settings.statesProperty}: ["[[Tyrol]]"]`);
+    // Nothing reads a country's `states:`, so nothing seeds one either: a
+    // state names its country, and that link is the whole relationship.
+    expect(content).not.toContain(settings.statesProperty);
   });
 });
 
@@ -195,7 +195,7 @@ describe('the created stamp', () => {
   // Every creation path, so a type added later cannot quietly skip the
   // stamp: the four-argument wrappers all take `now` last.
   it.each([
-    ['country', () => createCountryNote(makeApp(), settings, 'Austria', null, [], NOW)],
+    ['country', () => createCountryNote(makeApp(), settings, 'Austria', null, NOW)],
     ['state', () => createStateNote(makeApp(), settings, 'Tyrol', null, null, NOW)],
     ['city', () => createCityNote(makeApp(), settings, 'Vienna', null, null, NOW)],
     ['accommodation', () => createAccommodationNote(makeApp(), settings, 'H', null, null, NOW)],
@@ -236,7 +236,7 @@ describe('the created stamp', () => {
   // written -- never a fallback to a hardcoded `created:`.
   it('writes nothing when the property name has been cleared', async () => {
     const { app, created } = makeFakeVault();
-    await createCountryNote(app, { ...settings, createdProperty: '' }, 'Austria', null, [], NOW);
+    await createCountryNote(app, { ...settings, createdProperty: '' }, 'Austria', null, NOW);
     expect(created[0].content).not.toContain('created');
   });
 });

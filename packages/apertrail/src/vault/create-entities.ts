@@ -32,17 +32,21 @@ function propertyName(settings: APERtrailSettings): string {
   return settings.typePropertyName.trim() || 'type';
 }
 
+/**
+ * No `states:` list is written, and none is taken: what sits under a country
+ * is derived from the `country:` link on each State note (read-entities.ts).
+ * A creator writing the list here would be seeding the second copy of a fact
+ * on the very first save.
+ */
 export async function createCountryNote(
   app: App,
   settings: APERtrailSettings,
   title: string,
   capital: TravelCity | null = null,
-  states: TravelState[] = [],
   now: Date = new Date()
 ): Promise<TFile> {
   const rest: Record<string, unknown> = {};
   if (capital) rest[settings.capitalProperty] = `[[${capital.title}]]`;
-  if (states.length > 0) rest[settings.statesProperty] = states.map((s) => `[[${s.title}]]`);
   const content =
     renderFrontmatterBlock(
       frontmatterObject(propertyName(settings), 'country', createdEntry(settings, now), rest)

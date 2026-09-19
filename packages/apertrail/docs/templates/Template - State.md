@@ -1,6 +1,6 @@
 # State
 
-Information about a state, province, or other first-level administrative division within a country -- optional in the geographic hierarchy, since not every Country note needs one (see Template - Country.md's `states:` field and Template - City.md's `state:` field).
+Information about a state, province, or other first-level administrative division within a country -- optional in the geographic hierarchy, since not every country uses that level (see Template - City.md's `state:` field, which is what puts a city in a state).
 
 ## Fields
 
@@ -24,9 +24,6 @@ type: state
 image: 
 country: "[[Austria]]"
 capital: "[[Innsbruck]]"
-cities:
-  - "[[Innsbruck]]"
-  - "[[Kitzbühel]]"
 icon: map
 color: "#25D0F7"
 tags:

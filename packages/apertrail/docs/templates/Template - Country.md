@@ -21,9 +21,6 @@ Information about a country. Destination-specific reference info that used to be
 type: country
 image: 
 capital: "[[Vienna]]"
-states:
-  - "[[Lower Austria]]"
-  - "[[Upper Austria]]"
 icon: earth
 color: "#25D0F7"
 tags:

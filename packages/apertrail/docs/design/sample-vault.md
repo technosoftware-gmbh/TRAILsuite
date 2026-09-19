@@ -69,8 +69,8 @@ one.
 | Folder | What it is there to show |
 |---|---|
 | `Trips/` | The range rather than two of a kind. `Rovos Rail 2026` is finished and reviewed and carries everything a trip can carry: named days, stops with times, a rating on one stop, a stop naming a photo spot's motif, accommodation nights, a leg in each direction, participants, its own currency, a budget and a conversion rate. `Aargau Weekend` carries dates, a city, one person and nothing else, not even a `travelStatus:`, so it is the trip that exercises the status every reader derives when the note has none |
-| `Places/Countries` | Both halves of the top level, and neither one lying. Switzerland points down with `states:` and names no `capital:`, because Bern is not a note here. South Africa names `capital: [[Pretoria]]`, which it does have, and no states at all |
-| `Places/States` | The middle level, pointing up at Switzerland and down at Brugg. Only one country here uses it, which is exactly why `state:` is optional on a City |
+| `Places/Countries` | Both halves of the top level, and neither one lying. Neither carries a `states:` list, because nothing reads one. Switzerland names no `capital:` either, because Bern is not a note here; South Africa names `capital: [[Pretoria]]`, which it does have, and uses no state level at all |
+| `Places/States` | The middle level, pointing up at Switzerland and, deliberately, nowhere down: Brugg names Aargau, and that link is the whole relationship. Only one country here uses this level, which is exactly why `state:` is optional on a City |
 | `Places/Cities` | Both extremes, because the reader has to be happy with both. Brugg and Cape Town are full notes with coordinates, a cover image and body text; Pretoria carries its type, its country and nothing else |
 | `Places/Accommodation` | `accommodationType` and `accommodationStatus`, on the note the Rovos trip's `nights:` block points at |
 | `Places/Food & Beverages` | `fnbType`, `rating`, `address` and `website` on one place |

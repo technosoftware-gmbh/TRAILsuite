@@ -1122,6 +1122,15 @@ body.is-mobile .apt-star {
   color: var(--text-faint);
 }
 
+.apt-related-trip-archived {
+  margin-inline-start: 0.4rem;
+  padding: 0 0.35rem;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
 .apt-related-trip-note {
   font-size: 0.8rem;
   color: var(--text-muted);

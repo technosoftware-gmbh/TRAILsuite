@@ -33,6 +33,14 @@ export interface TravelGalleryViewDeps {
    */
   exportProspect: (subject: EditableEntity) => void;
   exportTripDocument: (trip: TravelTrip) => void;
+  /**
+   * Retire a trip, or bring it back.
+   *
+   * One callback taking the direction rather than two, which is the shape
+   * NODAtrail's `archivePara` settled on: the view knows which way round it is
+   * asking, and two near-identical members would be two places to forget.
+   */
+  archiveTrip: (trip: TravelTrip, archived: boolean) => void;
   openNewTripModal: () => void;
   openNewCountryModal: () => void;
   openNewStateModal: () => void;

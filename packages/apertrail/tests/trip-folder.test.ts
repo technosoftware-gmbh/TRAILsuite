@@ -16,9 +16,13 @@ import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import {
   bookingFolderFor,
   bookingReadFolders,
+  isArchivedTripPath,
   isInTripBookingsFolder,
   newTripFolder,
   ownedTripFolder,
+  tripArchiveFolder,
+  tripArchiveFolderOn,
+  tripReadFolders,
 } from '../src/trips/trip-folder';
 
 const settings = { ...DEFAULT_SETTINGS };
@@ -84,16 +88,34 @@ describe('where bookings are read from', () => {
    * Both, or half of them vanish: one booking is inside its trip's folder and
    * an older one is in the flat folder.
    */
-  it('is the trips folder and the bookings folder', () => {
-    expect(bookingReadFolders(settings)).toEqual(['Trips', 'Trips/Bookings']);
+  it('is the trips folder, the bookings folder and the archive', () => {
+    expect(bookingReadFolders(settings)).toEqual(['Trips', 'Trips/Bookings', '6 Archive/Trips']);
   });
 
   it('drops a blank folder rather than matching everything', () => {
-    expect(bookingReadFolders({ ...settings, bookingsFolder: '   ' })).toEqual(['Trips']);
+    expect(bookingReadFolders({ ...settings, bookingsFolder: '   ' })).toEqual([
+      'Trips',
+      '6 Archive/Trips',
+    ]);
   });
 
   it('does not list the same folder twice', () => {
-    expect(bookingReadFolders({ ...settings, bookingsFolder: 'Trips' })).toEqual(['Trips']);
+    expect(bookingReadFolders({ ...settings, bookingsFolder: 'Trips' })).toEqual([
+      'Trips',
+      '6 Archive/Trips',
+    ]);
+  });
+
+  /**
+   * An archived trip travels as its own folder and its bookings go with it, so
+   * a reader that skipped the archive would leave a retired trip on the board
+   * with its costs quietly gone.
+   */
+  it('leaves the archive out when none is configured', () => {
+    expect(bookingReadFolders({ ...settings, archiveFolder: '  ' })).toEqual([
+      'Trips',
+      'Trips/Bookings',
+    ]);
   });
 });
 
@@ -120,5 +142,59 @@ describe('a booking nested inside a trip', () => {
     const off = { ...settings, tripBookingsSubfolder: '' };
 
     expect(isInTripBookingsFolder('Trips/Shongololo/Bookings/Rovos.md', off)).toBe(false);
+  });
+});
+
+/**
+ * Where a retired trip goes, and what still counts as being there.
+ *
+ * Null rather than a blank string throughout: a blank folder read as the vault
+ * root would claim every note there is, so an archive nobody configured has to
+ * be absent rather than empty. That is the direction every unconfigured folder
+ * in this file fails in.
+ */
+describe('the trip archive', () => {
+  it('is the archive root and its trips sub-folder', () => {
+    expect(tripArchiveFolder(settings)).toBe('6 Archive/Trips');
+  });
+
+  it('is absent when either half is blank', () => {
+    expect(tripArchiveFolder({ ...settings, archiveFolder: '  ' })).toBeNull();
+    expect(tripArchiveFolder({ ...settings, tripsArchiveFolder: '' })).toBeNull();
+  });
+
+  it('adds a year only when the vault asked for one', () => {
+    const day = new Date('2026-09-19T10:00:00Z');
+    expect(tripArchiveFolderOn(settings, day)).toBe('6 Archive/Trips');
+    expect(tripArchiveFolderOn({ ...settings, archiveYearFolders: true }, day)).toBe(
+      '6 Archive/Trips/2026'
+    );
+  });
+
+  /**
+   * Both folders in one read, where NODAtrail keeps its live and archived
+   * queries apart. A city's visit is derived from the trips that stopped there,
+   * so a retired trip dropped from the board would take the evidence of a real
+   * journey with it.
+   */
+  it('is read alongside the live trips folder', () => {
+    expect(tripReadFolders(settings)).toEqual(['Trips', '6 Archive/Trips']);
+    expect(tripReadFolders({ ...settings, archiveFolder: '' })).toEqual(['Trips']);
+  });
+
+  /** Asked of the category folder, so a trip already under a year folder reads as archived rather than being dragged forward. */
+  it('claims a path under it, year folder or not', () => {
+    expect(isArchivedTripPath('6 Archive/Trips/Basel.md', settings)).toBe(true);
+    expect(isArchivedTripPath('6 Archive/Trips/2025/Basel.md', settings)).toBe(true);
+    expect(isArchivedTripPath('Trips/Basel.md', settings)).toBe(false);
+    // Not a prefix match on the string: a sibling folder whose name starts the
+    // same way is a different folder.
+    expect(isArchivedTripPath('6 Archive/TripsOld/Basel.md', settings)).toBe(false);
+  });
+
+  it('claims nothing at all when no archive is configured', () => {
+    expect(isArchivedTripPath('6 Archive/Trips/Basel.md', { ...settings, archiveFolder: '' })).toBe(
+      false
+    );
   });
 });

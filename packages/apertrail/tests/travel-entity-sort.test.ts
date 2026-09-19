@@ -35,7 +35,6 @@ function makeCountry(title: string, overrides: Partial<TravelCountry> = {}): Tra
     title,
     capitalTitle: null,
     capital: null,
-    stateTitles: [],
     description: null,
     image: null,
     gallery: [],

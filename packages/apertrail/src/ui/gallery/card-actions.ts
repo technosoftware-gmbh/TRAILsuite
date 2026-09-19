@@ -15,7 +15,8 @@
  * picture and its gallery were a dialog of their own; they are a section
  * inside each editor now.
  */
-export type CardAction = 'editTrip' | 'edit' | 'tripDocument' | 'prospect';
+export type CardAction =
+  'editTrip' | 'edit' | 'tripDocument' | 'prospect' | 'archiveTrip' | 'unarchiveTrip';
 
 /**
  * What each entry is called.
@@ -38,6 +39,11 @@ export const CARD_ACTION_LABELS: Record<CardAction, string> = {
   edit: 'modals.common.edit',
   tripDocument: 'tripDocument.exportButton',
   prospect: 'vehicleBrochure.exportButton',
+  // Its own strings rather than the block's, because no other surface says
+  // either one: archiving is reached from the card and from the command
+  // palette, and both read the same words.
+  archiveTrip: 'archive.archiveTrip',
+  unarchiveTrip: 'archive.unarchiveTrip',
 };
 
 export interface CardActionSubject {
@@ -53,11 +59,23 @@ export interface CardActionSubject {
    * first would be inventing a case nothing has.
    */
   hasEditor: boolean;
+  /**
+   * The trip is already in the archive, so the entry reads the other way.
+   *
+   * One flag and two actions rather than one action that toggles, because the
+   * menu says what it will do before it is clicked, and "Archive" on a trip
+   * that is already archived is a sentence that has to be read twice.
+   */
+  isArchived: boolean;
 }
 
 export function cardActions(subject: CardActionSubject): CardAction[] {
   const actions: CardAction[] = [];
   if (subject.isTrip) actions.push('editTrip', 'tripDocument');
   if (subject.hasEditor) actions.push('edit', 'prospect');
+  // Last, and only on a trip. It is the one entry here that moves a file, so it
+  // sits below the two that open something and the two that print something,
+  // where a mis-click is least likely.
+  if (subject.isTrip) actions.push(subject.isArchived ? 'unarchiveTrip' : 'archiveTrip');
   return actions;
 }

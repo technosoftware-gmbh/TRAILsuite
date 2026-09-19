@@ -266,6 +266,8 @@ export function aTrip(title: string, over: Partial<TravelTrip> = {}): TravelTrip
     travelType: null,
     travelStatus: null,
     effectiveStatus: 'Over',
+    archived: false,
+    archivedOn: null,
     reviewStatus: null,
     rating: null,
     personTitles: [],

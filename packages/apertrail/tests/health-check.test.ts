@@ -1,5 +1,5 @@
 /**
- * The entity-type health check over the fourteen entity folders.
+ * The entity-type health check over the fifteen entity folders.
  *
  * Two rules carry the weight here. The folders are nested under shared
  * roots, so without the longest-match rule a note would be judged against
