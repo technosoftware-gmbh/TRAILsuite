@@ -43,6 +43,15 @@ export interface ScheduleMarkers {
   unanswered: string;
   declined: string;
   span: string;
+  /**
+   * The two child markers, here only so a line carrying one can be refused.
+   *
+   * They are not answers and not kinds: a place and a person belong to the
+   * entry above them, and a reader that took them for entries of their own
+   * would put two extra rows in the week for every lunch.
+   */
+  place: string;
+  person: string;
 }
 
 export function scheduleMarkers(settings: NODAtrailSettings): ScheduleMarkers {
@@ -52,6 +61,8 @@ export function scheduleMarkers(settings: NODAtrailSettings): ScheduleMarkers {
     unanswered: settings.dayMeetingUnansweredMarker,
     declined: settings.dayMeetingDeclinedMarker,
     span: settings.daySpanMarker,
+    place: settings.dayPlaceMarker,
+    person: settings.dayPersonMarker,
   };
 }
 
@@ -90,6 +101,15 @@ const WIKILINK = /\[\[([^\]]+)\]\]/g;
  * A checkbox is **not** an entry. The follow-ups written under a meeting are
  * tasks, and `readTasks` already finds them; picking them up here as well would
  * show each one twice in the same view.
+ *
+ * **Nor is a place or a person child.** Both belong to the entry above them,
+ * and the week reads a day through here: without this, a lunch with a
+ * restaurant and two people would draw four rows where the day draws one. They
+ * are refused by the marker they carry rather than by being indented, which is
+ * narrower on purpose -- the notes indented under a meeting have been read as
+ * entries of their own since this file was written, `findDayEntry` accounts for
+ * it, and changing what the week shows for those is a decision about an
+ * existing behaviour rather than part of adding two new children.
  */
 export function parseScheduleLine(line: string, markers: ScheduleMarkers): ScheduleEntry | null {
   const bullet = /^\s*[-*+]\s+(.*)$/.exec(line);
@@ -97,6 +117,11 @@ export function parseScheduleLine(line: string, markers: ScheduleMarkers): Sched
 
   let rest = (bullet[1] ?? '').trim();
   if (/^\[.\]/.test(rest)) return null;
+
+  for (const child of [markers.place, markers.person]) {
+    const mark = child.trim();
+    if (mark && rest.startsWith(mark)) return null;
+  }
 
   // Longest marker first, so a setting that is a prefix of another cannot
   // swallow it: two markers of one emoji plus a variation selector differ only

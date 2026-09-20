@@ -285,6 +285,12 @@ function thoughts(body: string, settings: NODAtrailSettings): DayEntryRecord[] {
       unanswered: '',
       declined: '',
       span: '',
+      // Blank for the same reason as the five above: this section's lines are
+      // thoughts, and a note that merely starts with the same emoji must not
+      // be refused for it. Nothing writes a child under a thought anyway, and
+      // an indented line is skipped before this is reached.
+      place: '',
+      person: '',
     });
     if (!parsed) continue;
 
