@@ -89,6 +89,12 @@ const DYNAMIC_KEYS = [
   ...['day', 'week', 'month', 'quarter', 'year'].map((level) => `plan.until.${level}`),
   ...['task', 'meeting', 'note', 'idea'].map((kind) => `day.kinds.${kind}`),
   ...['focus', 'schedule', 'notes'].map((key) => `day.headings.${key}`),
+  // ui/kit/link-chips.ts builds `day.linkKind.<kind>` from what the vault says
+  // a link points at. A fixed vocabulary, so every member is required in both
+  // tables whether or not a given vault has a note of that kind.
+  ...['area', 'goal', 'project', 'resource', 'person', 'company'].map(
+    (kind) => `day.linkKind.${kind}`
+  ),
   // The calendar preview names what you answered, from the same three values
   // `attendanceOf` produces. Accepted has no key: it says nothing special.
   ...['tentative', 'unanswered', 'declined'].map((key) => `calendar.answer.${key}`),

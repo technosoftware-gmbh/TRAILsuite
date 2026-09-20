@@ -119,6 +119,15 @@ export function statRow(parent: HTMLElement): HTMLElement {
 
 export interface RowOptions {
   title: string;
+  /**
+   * Small labelled pills under the title, for what the row's own text cannot
+   * hold: a day entry's links, each saying what kind of note it points at.
+   *
+   * Separate from `subtitle` rather than folded into it, because a subtitle is
+   * one muted sentence and these are several independent facts. A comma list
+   * of them reads as one.
+   */
+  chips?: readonly string[];
   /** The muted line under the title. */
   subtitle?: string;
   /** The right-hand figure or status. */
@@ -136,6 +145,12 @@ export function row(parent: HTMLElement, options: RowOptions): HTMLElement {
 
   const text = element.createDiv({ cls: 'nod-row-text' });
   text.createDiv({ cls: 'nod-row-title', text: options.title });
+
+  if (options.chips && options.chips.length > 0) {
+    const pills = text.createDiv({ cls: 'nod-row-chips' });
+    for (const label of options.chips) chip(pills, label);
+  }
+
   if (options.subtitle) text.createDiv({ cls: 'nod-row-subtitle', text: options.subtitle });
 
   if (options.trailing) {

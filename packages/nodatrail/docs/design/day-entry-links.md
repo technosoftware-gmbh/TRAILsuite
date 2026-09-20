@@ -416,9 +416,11 @@ and APERtrail reading plan folders is the same kind of read NODAtrail's
   none has any yet.
 - **Not a change to what the calendar import writes.** See J.11: attendees stay
   off the line.
-- **Not CULItrail's problem yet.** A meal eaten out is a meal, and CULItrail is
-  a separate repository consuming the core from npm. Out of scope by decision;
-  anything that would later let it in has to land in `trail-core` first.
+- **Not CULItrail's, and not "not yet".** CULItrail is for meals bought
+  ready-made from a company and reheated at home: an order, a delivery, a week
+  planned per person, a dish rated. A restaurant visit is none of those and
+  cannot be entered as one, and there is no plan to teach it. So what was eaten
+  out is prose in the day note, under the `📝` child, and stays prose.
 
 ---
 
@@ -436,7 +438,10 @@ the key never reads, so this holds by construction rather than by care.
 **J.4 Section F ships before section D.** Seeding days from a trip needs no
 format change and is useful on its own.
 
-**J.5 CULItrail is out of scope.**
+**J.5 CULItrail is out of scope, permanently rather than for now.** Its subject
+is ready-made meals bought from a company and reheated at home, a restaurant
+visit is not expressible in its notes, and it is not to be extended to make it
+so. Nothing in this plan should be shaped to leave room for it.
 
 **J.6 A link to a note that does not exist is written, drawn plainly, and is not
 an error.** So is a link whose `type:` no table recognises.

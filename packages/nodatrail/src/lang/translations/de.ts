@@ -165,6 +165,14 @@ export const deTranslations: Translations = {
       'Die Notiz wurde seit dem letzten Aktualisieren geändert. Bitte die Ansicht neu laden und es noch einmal versuchen.',
     readOnly:
       'Diese Zeile enthält mehr, als der Dialog schreiben kann. Sie wird in der Notiz bearbeitet.',
+    linkKind: {
+      area: 'Bereich',
+      goal: 'Ziel',
+      project: 'Projekt',
+      resource: 'Ressource',
+      person: 'Person',
+      company: 'Firma',
+    },
     thoughtsLabel: 'Notizen und Ideen',
     scheduleLabel: 'Termine',
     blankDay: 'Ohne Datum: {period}.',
