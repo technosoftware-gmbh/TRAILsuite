@@ -76,6 +76,25 @@ export interface DayEntryDraft {
    * you later want to edit.
    */
   attendance: Attendance;
+  /**
+   * Meetings and spans. Where it was: one note title, written as a child line.
+   *
+   * **On a child rather than on the headline**, which is the whole of section D
+   * of `day-entry-links.md`. The headline is what the derived import key is
+   * built from and what the editing dialog has to reproduce character for
+   * character; a second link on it would be a new rule in both. A child costs
+   * neither.
+   */
+  place: string;
+  /**
+   * Meetings and spans. Who was there: one note title each, one child line
+   * each.
+   *
+   * A line each rather than a list on one line, because that is what makes four
+   * at a table read as four things and what lets one of them be removed without
+   * re-parsing a comma list.
+   */
+  persons: string[];
   /** Meetings only. One entry per line, blank lines dropped. */
   notes: string;
   /**
@@ -120,6 +139,8 @@ export function emptyDraft(kind: DayEntryKind = 'task'): DayEntryDraft {
     startTime: '',
     endTime: '',
     attendance: '',
+    place: '',
+    persons: [],
     notes: '',
     followUps: [],
   };
@@ -140,7 +161,13 @@ export function emptyDraft(kind: DayEntryKind = 'task'): DayEntryDraft {
  * into something else on the next field somebody adds.
  */
 export function copyDraft(draft: DayEntryDraft): DayEntryDraft {
-  return { ...draft, followUps: draft.followUps.map((row) => ({ ...row })) };
+  // `persons` is an array the list editor splices in place, so it needs the
+  // same treatment `followUps` needed and for the same reason.
+  return {
+    ...draft,
+    persons: [...draft.persons],
+    followUps: draft.followUps.map((row) => ({ ...row })),
+  };
 }
 
 /**
@@ -266,6 +293,53 @@ function contextLink(context: string): string {
 }
 
 /**
+ * Whether this kind of entry may carry a place and the people who were there.
+ *
+ * **A meeting and a span, and not the other three.** A task is a thing to do
+ * rather than a thing that happened; a note and an idea are one line each and
+ * a child under them would be a second line saying something the line itself
+ * could have said.
+ *
+ * The span was ruled out once, on the note that a span "is a fortnight away and
+ * has no room". That was right about a holiday and wrong about a week in a
+ * hotel, which has a place and the people who came. See J.8 of
+ * `docs/design/day-entry-links.md`.
+ */
+export function carriesPlace(kind: DayEntryKind): boolean {
+  return kind === 'meeting' || kind === 'span';
+}
+
+/**
+ * The place and person lines under an entry, in that order.
+ *
+ * **The order is part of the format**, because the round-trip rule compares
+ * composed lines to the lines in the note one by one. Place first, then the
+ * people in the order they were named: what a reader wants first is where, and
+ * a person moved up or down in the list is a change somebody made on purpose.
+ *
+ * A blank marker writes nothing at all rather than an unmarked child, because
+ * an unmarked child cannot be told from a note. That is the same reading a
+ * blank `dayIdeaMarker` already gets.
+ */
+export function childLines(settings: NODAtrailSettings, draft: DayEntryDraft): string[] {
+  if (!carriesPlace(draft.kind)) return [];
+
+  const lines: string[] = [];
+  const place = draft.place.trim();
+  if (place && settings.dayPlaceMarker.trim()) {
+    lines.push(markedLine(settings.dayPlaceMarker, [contextLink(place)], '    '));
+  }
+
+  if (settings.dayPersonMarker.trim()) {
+    for (const person of draft.persons) {
+      const title = person.trim();
+      if (title) lines.push(markedLine(settings.dayPersonMarker, [contextLink(title)], '    '));
+    }
+  }
+  return lines;
+}
+
+/**
  * The lines this entry becomes, in the order they go into the note.
  *
  * A meeting is several lines and that is the point of capturing one as a unit:
@@ -320,6 +394,7 @@ export function entryLines(
   if (draft.kind === 'meeting') {
     const lines = [
       markedLine(markerFor(settings, draft.attendance), [timeSpan(draft), text, link]),
+      ...childLines(settings, draft),
     ];
     for (const note of splitLines(draft.notes)) {
       lines.push(markedLine(settings.dayNoteMarker, [collapseSpaces(note)], '    '));
@@ -362,7 +437,7 @@ export function entryLines(
       : draft.kind === 'idea'
         ? settings.dayIdeaMarker
         : settings.dayNoteMarker;
-  return [markedLine(marker, [text, link])];
+  return [markedLine(marker, [text, link]), ...childLines(settings, draft)];
 }
 
 /** A box of several lines as the entries it holds, blanks dropped. */

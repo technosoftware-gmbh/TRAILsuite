@@ -236,16 +236,29 @@ same reasoning: they were captured as one thing, and a child left under nothing
 is an orphan nobody can place.
 
 **The span walk keeps comparing headlines only.** `day-span.ts`'s `sameEntry()`
-compares `kind`, `draft.text` and `draft.context`, and **must not** grow to
-compare children: the whole point of children on a span is that the Tuesday and
-the Wednesday of one holiday say different things. Two further rules fall out of
-that:
+compares `kind`, `draft.text` and `draft.context`, and it did not have to grow.
 
-- **Editing a whole span rewrites the headline line on every day and leaves each
-  day's children alone.** Anything else would copy Tuesday's dinner onto
-  Wednesday.
-- **Editing a span's children is this day only**, always, with no span option
-  offered. The dialog says so rather than leaving it to be discovered.
+**Amended while building it, and the amendment made two of these rules
+unnecessary.** This section assumed a span's children would differ from day to
+day -- Tuesday's dinner against Wednesday's -- and worked out an elaborate
+answer: rewrite the headline across the span and leave each day's children
+alone, and edit a child for one day only. The answer was sound and the premise
+was wrong.
+
+**A span carries a place and the people, and both are true of every day of it.**
+A week in a hotel is one hotel and one set of people from Monday to Sunday. What
+differs per day is what you did, and that is a meeting or a note **on that day**,
+not a child of the span. So a span's children are span-wide facts, the whole
+entry is written into every day, and editing the span rewrites all of it. No
+per-day child rule is needed, and none was written.
+
+**What a span still does not take is what was said and what follows.** A
+fortnight has no room in that sense, so a `📝` or a checkbox indented under a
+span is a line the dialog cannot compose back: that day goes read-only and a
+span edit refuses it by name rather than rewriting it without what it said. That
+is the round-trip rule doing its job one level down, and it is also the signal
+to come back to this section if per-day children turn out to be wanted after
+all.
 
 The existing boundary rules are untouched: a day holding two identical entries
 still stops the walk, and a day whose line says more than the dialog can compose
@@ -558,7 +571,7 @@ format.
 4. **The chosen shape**: `place` and `persons` on the draft, the two markers and
    their settings, the dialog fields, the composer, the round-trip guard, the
    span rules of §D.5, the settings reference rows, both translation tables.
-   **This is the step that writes into somebody's notes.**
+   **This is the step that writes into somebody's notes. Done.**
 5. **The trip seeder fills in children** (§F.1's last bullet): the stop's place
    and persons, and never its note or rating.
 6. **The Person note block** (§H).

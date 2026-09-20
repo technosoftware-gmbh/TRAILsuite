@@ -228,6 +228,11 @@ export const enTranslations = {
     },
     text: 'Text',
     context: 'Project or area',
+    place: 'Where',
+    placeHint:
+      'A note title. It is written on its own line under the entry, so the entry itself is unchanged and a place typed before its note exists starts resolving the day it is written.',
+    persons: 'Who was there',
+    personsEmpty: 'Nobody named yet.',
     from: 'From',
     until: 'Until',
     lastDay: 'Last day',
@@ -1038,6 +1043,8 @@ export const enTranslations = {
       noteMarker: 'Marker for a note',
       ideaMarker: 'Marker for an idea',
       spanMarker: 'Marker for several days',
+      placeMarker: 'Marker for where it was',
+      personMarker: 'Marker for who was there',
       markerDesc:
         'A task needs no marker: it is a checkbox in the Tasks plugin format. Blank writes a plain bullet.',
     },

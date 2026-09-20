@@ -119,6 +119,8 @@ export const DEFAULT_SETTINGS: NODAtrailSettings = {
   dayMeetingDeclinedMarker: '🚫',
   dayNoteMarker: '📝',
   dayIdeaMarker: '💡',
+  dayPlaceMarker: '📍',
+  dayPersonMarker: '🧑',
   daySpanMarker: '🏖️',
   // Blank on purpose: see the note on these in `types.ts`. Narrowing an
   // unclassified vault's pickers to nothing would be worse than not narrowing.

@@ -229,6 +229,11 @@ export const deTranslations: Translations = {
     },
     text: 'Text',
     context: 'Projekt oder Bereich',
+    place: 'Wo',
+    placeHint:
+      'Ein Notiztitel. Er wird als eigene Zeile unter den Eintrag geschrieben, der Eintrag selbst bleibt also unveraendert, und ein Ort, den es noch nicht als Notiz gibt, loest sich auf, sobald sie geschrieben ist.',
+    persons: 'Wer dabei war',
+    personsEmpty: 'Noch niemand genannt.',
     from: 'Von',
     until: 'Bis',
     lastDay: 'Letzter Tag',
@@ -1056,6 +1061,8 @@ export const deTranslations: Translations = {
       noteMarker: 'Zeichen für eine Notiz',
       ideaMarker: 'Zeichen für eine Idee',
       spanMarker: 'Zeichen für mehrere Tage',
+      placeMarker: 'Zeichen für den Ort',
+      personMarker: 'Zeichen für die Beteiligten',
       markerDesc:
         'Aufgaben brauchen kein Zeichen: sie sind Kontrollkästchen im Format des Tasks-Plugins. Leer lassen schreibt einen einfachen Aufzählungspunkt.',
     },

@@ -290,6 +290,21 @@ export interface NODAtrailSettings {
   dayNoteMarker: string;
   dayIdeaMarker: string;
   /**
+   * The markers on an entry's child lines: where it was, and who was there.
+   *
+   * **The headline does not change and must not.** A place or a person on the
+   * line itself would be a fourth thing the derived import key has to ignore
+   * and a second link the editing dialog has to put back in the order it found
+   * it. On a child, the key never reads them at all. See
+   * `docs/design/day-entry-links.md` section D.
+   *
+   * Blank means "do not distinguish these", which is the rule the meeting
+   * markers already follow, not "write these unmarked": a child with no marker
+   * cannot be told from a note.
+   */
+  dayPlaceMarker: string;
+  dayPersonMarker: string;
+  /**
    * What marks a line that runs over several days: a holiday, a course, a
    * fortnight away.
    *

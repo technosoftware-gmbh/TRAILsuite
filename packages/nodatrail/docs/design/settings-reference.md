@@ -102,6 +102,8 @@ second heading beside the first.
 | `dayNoteMarker` | `'📝'` |
 | `dayIdeaMarker` | `'💡'` |
 | `daySpanMarker` | `'🏖️'` |
+| `dayPlaceMarker` | `'📍'` |
+| `dayPersonMarker` | `'🧑'` |
 | `dayShowClosedTasks` | `true` |
 | `weekWorkdaysOnly` | `false` |
 | `weekLunchStart` | `'12:00'` |
