@@ -15,7 +15,9 @@ import { describe, expect, it, vi } from 'vitest';
 import type { App } from 'obsidian';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import { itineraryOf, readTrips } from '../src/plan/read-trip-itinerary';
-import { planTripImport } from '../src/plan/trip-import-plan';
+import { planTripImport, type TripImportPlan } from '../src/plan/trip-import-plan';
+import { linesFor } from '../src/plan/write-trip-import';
+import { meetingsIn } from '../src/plan/read-day';
 
 vi.mock('obsidian', () => import('./obsidian-stub'));
 
@@ -137,10 +139,64 @@ describe('planTripImport', () => {
     expect(plan.toWrite).toBe(1);
   });
 
-  it("gives a stop the trip's travellers when it names nobody", () => {
+  it('carries who the stop names, and never fills in the trip travellers', () => {
+    // A stop naming nobody on a two-person trip does mean both went. That is a
+    // derived fact, and this codebase does not write derived facts into notes:
+    // the trip note says who is travelling and goes on saying it, where a day
+    // line repeating it would be a second copy to disagree with the first the
+    // moment somebody drops out.
     const plan = planTripImport({ trip, existing: [] });
-    expect(plan.proposals[0]?.persons).toEqual(['Thomas', 'Anna Muster']);
+    expect(plan.proposals[0]?.persons).toEqual([]);
     expect(plan.proposals[1]?.persons).toEqual(['Anna Muster']);
+  });
+});
+
+describe('the lines a seeded stop becomes', () => {
+  const trip = itineraryOf('Nordkap 2027', NORDKAP, S);
+
+  /** What the writer would hand the composer: the marked proposals and no others. */
+  const written = (plan: TripImportPlan) => plan.proposals.filter((one) => one.writes);
+
+  it('names the trip on the line and puts the place and the people underneath', () => {
+    const plan = planTripImport({ trip, existing: [] });
+    expect(linesFor(S, written(plan))).toEqual([
+      '- 👥 14:00-16:00 Bergen [[Nordkap 2027]]',
+      '    - 📍 [[Bergen]]',
+      '- 👥 09:00-12:30 Hundeschlittenfahrt [[Nordkap 2027]]',
+      '    - 📍 [[Tromso]]',
+      '    - 🧑 [[Anna Muster]]',
+      '- 👥 Schneehotel [[Nordkap 2027]]',
+      '    - 📍 [[Kirkenes]]',
+    ]);
+  });
+
+  it('writes the place even where the headline already reads like it', () => {
+    // The text is words and the child is a link, and only the link resolves to
+    // a note, draws a chip and appears in that place's backlinks.
+    const plan = planTripImport({ trip, existing: [] });
+    const lines = linesFor(S, plan.proposals.slice(0, 1));
+    expect(lines).toEqual(['- 👥 14:00-16:00 Bergen [[Nordkap 2027]]', '    - 📍 [[Bergen]]']);
+  });
+
+  it('composes whatever it is handed, because the writer holds the filter', () => {
+    // `linesFor` does not re-decide what writes. An offered excursion composes
+    // to a line here and never reaches a note, because `writeTripImport` skips
+    // it. One rule, one place -- the same split the calendar import makes.
+    const plan = planTripImport({ trip, existing: [] });
+    expect(linesFor(S, plan.proposals)).toHaveLength(11);
+    expect(written(plan)).toHaveLength(3);
+  });
+
+  it('composes the same line the dialog would, so a seeded stop is editable', () => {
+    // The derived key only works while a seeded line and a typed one are the
+    // same thing, and being editable is how that shows.
+    const plan = planTripImport({ trip, existing: [] });
+    const body = ['## 📅 Schedule', ...linesFor(S, plan.proposals.slice(1, 2)), ''].join('\n');
+    const [record] = meetingsIn(body, S);
+    expect(record?.editable).toBe(true);
+    expect(record?.draft.place).toBe('Tromso');
+    expect(record?.draft.persons).toEqual(['Anna Muster']);
+    expect(record?.draft.context).toBe('Nordkap 2027');
   });
 });
 

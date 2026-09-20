@@ -369,12 +369,23 @@ import performs, against a different source, and it should be built as one:
   spans days is the span shape, one untimed line per day, exactly as §E.3 of
   `calendar-import.md` settled for holidays. An `optional: true` stop that is
   not `chosen` produces nothing: it is not planned, it is offered.
-- **What it may fill in as children**, once §D.5 ships: the stop's `place` as a
-  `📍` child and the stop's `persons` as `🧑` children. Both come off the stop
-  and neither is invented. The stop's `note` and `rating` do **not** become a
-  `📝` child: they are the plan's own words about the plan, and copying them
-  into the diary would put the same sentence in two places with no way to tell
-  which was later.
+- **What it fills in as children**: the stop's `place` as a `📍` child and the
+  stop's `persons` as `🧑` children. Both come off the stop and neither is
+  invented. The stop's `note` and `rating` do **not** become a `📝` child: they
+  are the plan's own words about the plan, and copying them into the diary would
+  put the same sentence in two places with no way to tell which was later.
+- **The trip's own travellers are not filled in either**, and the plan stopped
+  carrying them when the writer started using them. A stop naming nobody on a
+  two-person trip does mean both went, and that is a *derived* fact: the trip
+  note says who is travelling and goes on saying it, where a line on every day
+  repeating it would be a second copy to disagree with the first the moment
+  somebody drops out. Nothing derived is written, which is visit derivation's
+  own rule one level up.
+- **The place is written even where the headline already reads like it.** A stop
+  with no excursion says the place as its text, so the line looks as though it
+  says the same thing twice. It does not: the text is words and the child is a
+  link, and only the link resolves to a note, draws a chip and appears in that
+  place's backlinks.
 
 ### F.2 What "it happened" means, and who may say so
 
@@ -573,7 +584,7 @@ format.
    span rules of §D.5, the settings reference rows, both translation tables.
    **This is the step that writes into somebody's notes. Done.**
 5. **The trip seeder fills in children** (§F.1's last bullet): the stop's place
-   and persons, and never its note or rating.
+   and persons, and never its note or rating. **Done.**
 6. **The Person note block** (§H).
 7. **The travel side reading the day notes back** (§F.3), last, because it needs
    step 4 to have something to match on.

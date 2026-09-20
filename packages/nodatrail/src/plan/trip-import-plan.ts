@@ -51,9 +51,19 @@ export interface TripProposal {
   from: string;
   to: string;
   text: string;
-  /** Carried for the preview, and for the child lines section D.5 will add. Not on the line yet. */
+  /** Where the stop is. Written as a child line, never on the headline. */
   place: string;
   excursion: string;
+  /**
+   * Who the stop says takes it, and nobody else.
+   *
+   * **The trip's own travellers are deliberately not filled in here.** A stop
+   * that names nobody on a trip with two people does mean both went, and that
+   * is a derived fact: this codebase does not write derived facts into notes,
+   * for the reason visit derivation states at length. The trip note says who is
+   * travelling and goes on saying it; a day line repeating it would be a second
+   * copy to disagree with the first the moment somebody drops out.
+   */
   persons: readonly string[];
   /** Empty for a proposal with no day, which has nothing to be identified by. */
   key: string;
@@ -130,9 +140,7 @@ export function planTripImport(options: TripImportOptions): TripImportPlan {
       text: stop.text,
       place: stop.place,
       excursion: stop.excursion,
-      // The trip's travellers where the stop names nobody, because a stop that
-      // says nothing about who goes is one everybody goes on.
-      persons: stop.persons.length > 0 ? stop.persons : options.trip.persons,
+      persons: stop.persons,
       key,
       status,
       writes: WRITES.has(status),

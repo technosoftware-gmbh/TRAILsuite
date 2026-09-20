@@ -12,11 +12,21 @@
  * thing to keep in step with the marker setting, the editing dialog and every
  * reader downstream.
  *
- * **The trip is the context link.** A seeded line names the trip it came from
- * and nothing else, which is what ties the day to the trip and what §F.3 will
- * later read back. The place and the people are carried on the proposal and are
- * not written yet: they belong on child lines, and the format does not have
- * them until section D.5 of the design ships.
+ * **The trip is the context link, and the place is a child.** A seeded line
+ * names the trip it came from, which is what ties the day to the trip and what
+ * §F.3 will later read back; where it was and who took it go on the child lines
+ * the format gained in step 4.
+ *
+ * **The place is written even when the headline already reads like it.** A stop
+ * with no excursion says the place as its text, so the line looks as though it
+ * says the same thing twice. It does not: the text is words and the child is a
+ * link, and the link is the half that resolves to a note, draws a chip and
+ * shows up in that place's backlinks.
+ *
+ * **The stop's `note` and `rating` are not copied**, and that is J.2 rather
+ * than an omission. They are the trip's own words about the plan; copying them
+ * into the diary would put one sentence in two places with no way to tell which
+ * was written later.
  *
  * Nothing is written for a proposal the plan did not mark `writes`. Deciding
  * that here as well would be two places holding one rule.
@@ -53,6 +63,8 @@ export function linesFor(
       context: proposal.trip,
       startTime: proposal.from,
       endTime: proposal.to,
+      place: proposal.place,
+      persons: [...proposal.persons],
     })
   );
 }
