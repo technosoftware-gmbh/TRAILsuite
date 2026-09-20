@@ -1,6 +1,6 @@
 {
   "name": "@technosoftware/trail-core",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "The shared, Obsidian-free core behind APERtrail, CULItrail and NODAtrail.",
   "type": "module",
   "license": "MIT",

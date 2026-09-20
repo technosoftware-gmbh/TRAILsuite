@@ -17,3 +17,10 @@ export {
   describeOrderContractMismatches,
 } from './order-contract.js';
 export type { OrderContract, OrderContractMismatch } from './order-contract.js';
+export {
+  TRIP_CONTRACT,
+  TRIP_CONTRACT_KEYS,
+  tripContractMismatches,
+  describeTripContractMismatches,
+} from './trip-contract.js';
+export type { TripContract, TripContractMismatch } from './trip-contract.js';

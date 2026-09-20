@@ -22,8 +22,10 @@ import { notePathFor } from '../../plan/paths';
 import { openDeferMenu } from '../../plan/defer-menu';
 import { readDayEntries, type DayEntryRecord } from '../../plan/read-day';
 import { readTasks } from '../../tasks/read-tasks';
+import { resolveLinks } from '../../vault/link-kind';
 import type { NODAtrailSettings } from '../../settings/types';
 import { emptyState, row, section, tabs, toolbarButton } from '../kit/elements';
+import { linkChipLabels } from '../kit/link-chips';
 import {
   renderPeriodDeadlines,
   renderPeriodMoney,
@@ -182,7 +184,7 @@ export class PlanView extends NodaView {
       });
     }
 
-    this.renderEntries(rest, t('day.thoughtsLabel'), thoughts, file);
+    this.renderEntries(rest, t('day.thoughtsLabel'), thoughts, file, settings);
   }
 
   /**
@@ -192,12 +194,19 @@ export class PlanView extends NodaView {
    * entry carrying something the dialog has no field for opens the note
    * instead, and says so: rewriting it would drop what the dialog cannot hold,
    * quietly, in somebody's records.
+   *
+   * **Every link is drawn, whether or not the entry can be edited.** What a
+   * view may show is everything the note says; what the dialog may rewrite is
+   * only what composes back. Those are two questions and this row answers both,
+   * which is why a read-only line still gets its chips and still says why it is
+   * read-only underneath them.
    */
   private renderEntries(
     body: HTMLElement,
     title: string,
     entries: readonly DayEntryRecord[],
-    file: TFile
+    file: TFile,
+    settings: NODAtrailSettings
   ): void {
     if (entries.length === 0) return;
 
@@ -205,7 +214,8 @@ export class PlanView extends NodaView {
     for (const entry of entries) {
       row(list, {
         title: entry.label || entry.links.join(', '),
-        subtitle: entry.editable ? entry.links.join(', ') : t('day.readOnly'),
+        chips: linkChipLabels(resolveLinks(this.deps.app, settings, entry.links)),
+        subtitle: entry.editable ? undefined : t('day.readOnly'),
         onClick: () =>
           entry.editable
             ? this.deps.openEditDayEntry(file, entry, () => void this.render())

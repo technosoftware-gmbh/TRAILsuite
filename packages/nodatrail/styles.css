@@ -265,6 +265,21 @@
 
 /* Chips, tones and empty states ---------------------------------------- */
 
+/* The chips under a row's title. They wrap, because a day entry can name a
+   place and three people and a row must not grow a horizontal scrollbar. The
+   first chip loses the shared inline start margin so the group lines up with
+   the title above it. */
+.nod-row-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25em;
+  margin-block-start: 0.2em;
+}
+
+.nod-row-chips > .nod-chip {
+  margin-inline-start: 0;
+}
+
 .nod-chip {
   background-color: var(--background-modifier-border);
   border-radius: var(--radius-s);

@@ -17,11 +17,32 @@ what counts as a breaking change:
   rather than an error. `ORDER_CONTRACT` is the same promise for the six
   settings NODAtrail uses to read an order note CULItrail wrote, where the
   failure mode is quieter still: an order read without its price.
+  `TRIP_CONTRACT` is the third, for the trip note NODAtrail reads to seed a
+  day's entries, and its quiet failure is an entry written without the place it
+  happened at.
 
-## [Unreleased]
+## [2.3.0] - 2026-09-20
 
 ### Added
 
+- **`travel/entity-types.ts`**: `TRAVEL_ENTITY_TYPES`, the twelve fixed `type:`
+  values a travel note carries, `TRAVEL_PLACE_TYPES`, the five of them that
+  share the place shape, and the two guards `isTravelEntityType()` and
+  `isTravelPlaceType()`. Moved from APERtrail, which now imports and re-exports
+  them, because a note saying `type: fnb` means the same thing whoever reads it
+  and there is a second reader: NODAtrail resolves the links on a day entry and
+  names what each one points at. **The values and nothing else** -- which folder
+  a place type lives in is a map onto APERtrail's own settings keys and stays
+  there, because a vault layout is a plugin's business and a type value is the
+  file's.
+- **`TRIP_CONTRACT`**, with `TRIP_CONTRACT_KEYS`, `tripContractMismatches()` and
+  `describeTripContractMismatches()`: the fourteen defaults NODAtrail has to
+  spell the way APERtrail does before it can read a trip note. The third
+  contract, for the same reason as the first two and with the same quiet failure
+  mode. It covers what a day-entry seeder reads and no more: the trips folder,
+  the status and dates, the persons, and the `stops` list with its `place`,
+  `from`, `to`, `excursion`, `persons`, `optional` and `chosen` sub-keys. The
+  `trip` type value is not in it, being one of the twelve fixed values above.
 - **`RollingYearOptions.previous`**: the previous year's budget. While it is not
   closed through December, `rollingYear` opens every balance on its projected
   December instead of the booked 31 December, carries what that plan left
