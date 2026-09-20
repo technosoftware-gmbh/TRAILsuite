@@ -19,7 +19,7 @@ import { NODAtrailSettings } from './settings/types';
 import { NODAtrailSettingsStore } from './settings/store';
 import { NODAtrailSettingTab } from './settings/settings-tab';
 import { DEFAULT_SETTINGS, getLocalizedFolderDefaults } from './settings/defaults';
-import { adoptOrderSettings, adoptSiblingSettings } from './settings/foreign-settings-import';
+import { adoptForeignNoteSettings, adoptSiblingSettings } from './settings/foreign-settings-import';
 import { now, today } from './shared/clock';
 import { findOrOpenLeaf } from './shared/open-leaf';
 import {
@@ -31,6 +31,7 @@ import {
 import { openOrCreatePeriodNote, removeNavigation } from './plan/write-period';
 import { AddToDayModal, type AddToDayDeps, type CaptureTarget } from './plan/add-to-day-modal';
 import { ImportCalendarModal } from './plan/calendar-import-modal';
+import { TripImportModal } from './plan/trip-import-modal';
 import { RepairTimesModal } from './plan/ui/repair-times-modal';
 import { MigrateImportsModal } from './ui/modals/migrate-imports-modal';
 import { notePathFor } from './plan/paths';
@@ -132,11 +133,11 @@ export default class NODAtrailPlugin extends Plugin {
     this.settingsStore = new NODAtrailSettingsStore(this);
     await this.settingsStore.load();
     if (this.settingsStore.isFreshInstall) await this.seedFreshInstall();
-    // Every load, not only the first. See `adoptOrderSettings`: these six are
-    // the one group whose shipped value is a guess about another plugin rather
-    // than an answer anybody gave, so a vault that has been running since
-    // before they existed can still learn them.
-    else if (await adoptOrderSettings(this.app, this.getSettings(), DEFAULT_SETTINGS)) {
+    // Every load, not only the first. See `adoptForeignNoteSettings`: the order
+    // and trip fields are the groups whose shipped value is a guess about
+    // another plugin rather than an answer anybody gave, so a vault that has
+    // been running since before they existed can still learn them.
+    else if (await adoptForeignNoteSettings(this.app, this.getSettings(), DEFAULT_SETTINGS)) {
       await this.settingsStore.save();
     }
 
@@ -400,6 +401,11 @@ export default class NODAtrailPlugin extends Plugin {
       id: 'import-calendar',
       name: t('calendar.import'),
       callback: () => this.openImportCalendar(),
+    });
+    this.addCommand({
+      id: 'seed-day-from-trip',
+      name: t('trip.seed'),
+      callback: () => this.openSeedFromTrip(),
     });
     this.addCommand({
       id: 'repair-calendar-times',
@@ -716,6 +722,20 @@ export default class NODAtrailPlugin extends Plugin {
    */
   private openImportCalendar(): void {
     new ImportCalendarModal({
+      ...this.dayDeps(),
+      onImported: () => this.refreshViews(),
+    }).open();
+  }
+
+  /**
+   * Seeding a day's entries from a trip's itinerary.
+   *
+   * Beside the calendar import and refreshing the views for its reason: a trip
+   * writes across as many notes as it has days with stops on them, and the view
+   * it was opened from would otherwise still be showing the week before it.
+   */
+  private openSeedFromTrip(): void {
+    new TripImportModal({
       ...this.dayDeps(),
       onImported: () => this.refreshViews(),
     }).open();

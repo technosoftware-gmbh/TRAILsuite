@@ -29,11 +29,34 @@ import { NODAtrailSettings } from './types';
 const SIBLINGS = ['apertrail', 'culitrail'] as const;
 
 /**
- * Where the sibling's order notes are, and what they call things.
+ * Where APERtrail's trip notes are, and what a trip note calls things.
  *
- * Separate from the rest because these are adopted on a different rule, below:
- * they are the one group where the shipped value is a guess rather than an
- * answer.
+ * One of the two groups adopted on a different rule, below: these are where the
+ * shipped value is a guess about somebody else's plugin rather than an answer
+ * anybody gave. `Trips` is the English name and a German vault keeps them in
+ * `Reisen`, so a seeder in that vault would quietly find nothing.
+ */
+const TRIP_FIELDS = [
+  'tripsFolder',
+  'travelStatusProperty',
+  'departureProperty',
+  'returnProperty',
+  'personsProperty',
+  'stopsProperty',
+  'stopPlaceField',
+  'stopDayField',
+  'stopFromField',
+  'stopToField',
+  'stopExcursionField',
+  'stopPersonsField',
+  'stopOptionalField',
+  'stopChosenField',
+] as const satisfies readonly (keyof NODAtrailSettings)[];
+
+/**
+ * Where CULItrail's order notes are, and what they call things.
+ *
+ * The other group where the shipped value is a guess rather than an answer.
  */
 const ORDER_FIELDS = [
   'ordersFolder',
@@ -71,6 +94,10 @@ const ADOPTED = [
   // that knew the folder but not the property names would read every order as
   // unpriced, which is worse than not looking.
   ...ORDER_FIELDS,
+  // And where its trips are. This is the one that most needs adopting: a German
+  // vault keeps them in `Reisen`, and the shipped default is the English name,
+  // so without this a seeder in that vault would quietly find no trips at all.
+  ...TRIP_FIELDS,
 ] as const satisfies readonly (keyof NODAtrailSettings)[];
 
 type AdoptedKey = (typeof ADOPTED)[number];
@@ -137,30 +164,39 @@ export async function adoptSiblingSettings(
 }
 
 /**
- * The order fields, adopted into a vault that has been running for a while.
+ * The fields describing somebody else's notes, adopted into a vault that has
+ * been running for a while.
  *
  * `adoptSiblingSettings` runs on a fresh install only, and that is right for
  * everything it covers: a vault that has answered a question should not be
  * asked again. But it leaves a gap that only appears when a field is added to
- * the list later, which is exactly what happened here -- every existing vault
- * would ship with a folder path pointing at nothing and no way to learn better
- * short of somebody noticing a settings row.
+ * the list later, which is exactly what happened with the order fields and has
+ * now happened again with the trip ones -- every existing vault would ship with
+ * a folder path pointing at nothing and no way to learn better short of
+ * somebody noticing a settings row.
  *
- * So these six are adopted **whenever they still hold the value this plugin
+ * So these are adopted **whenever they still hold the value this plugin
  * shipped**, which cannot overwrite a choice because no choice has been made.
- * The reason it is safe here and would not be for the CRM fields is that an
- * orders folder is not a NODAtrail concept at all: nobody sets it to say
- * something, and `Eating/Orders` is a guess about somebody else's plugin rather
- * than a default anybody meant. Replacing a guess with a fact loses nothing.
+ * The reason it is safe here and would not be for the CRM fields is that
+ * neither an orders folder nor a trips folder is a NODAtrail concept at all:
+ * nobody sets one to say something, and `Eating/Orders` and `Trips` are guesses
+ * about somebody else's plugin rather than defaults anybody meant. Replacing a
+ * guess with a fact loses nothing.
+ *
+ * **Both groups, one pass**, because they are one rule and a second function
+ * would be a second place to keep it right. A vault that has configured one
+ * group and not the other adopts only the other, which is what the per-field
+ * comparison already gives.
  *
  * Returns true when anything changed, so the caller knows to save.
  */
-export async function adoptOrderSettings(
+export async function adoptForeignNoteSettings(
   app: App,
   settings: NODAtrailSettings,
   shipped: Readonly<NODAtrailSettings>
 ): Promise<boolean> {
-  const untouched = ORDER_FIELDS.filter((key) => settings[key] === shipped[key]);
+  const fields = [...ORDER_FIELDS, ...TRIP_FIELDS];
+  const untouched = fields.filter((key) => settings[key] === shipped[key]);
   if (untouched.length === 0) return false;
 
   let changed = false;

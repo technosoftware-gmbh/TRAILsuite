@@ -44,6 +44,36 @@ export const enTranslations = {
     no: 'No',
   },
 
+  trip: {
+    departure: 'Departure',
+    return: 'Return',
+    persons: 'Travelling',
+    stops: 'Itinerary',
+    place: 'Place',
+    day: 'Day of the trip',
+    excursion: 'Excursion',
+    optional: 'Optional',
+    chosen: 'Taken',
+    seed: 'Seed a day from a trip',
+    trip: 'Trip',
+    noTrips:
+      'No trip notes in the trips folder. Check the folder on the Folders page, or leave it blank to switch this off.',
+    noStops: 'This trip has no itinerary yet.',
+    undated:
+      'A stop with neither a date nor a day number cannot be placed on a day. Give the trip a departure, or the stop a date.',
+    counts: '{write} to write, {present} already there, {skipped} skipped.',
+    daysTouched: 'Days it would touch: {days}',
+    write: 'Write the entries',
+    wrote: 'Wrote {count} entries into {days} day notes.',
+    nothing: 'Nothing to write. Every entry is already in its day note.',
+    status: {
+      new: 'Will be written',
+      alreadyPresent: 'Already in the note',
+      duplicate: 'Said twice by this trip',
+      notChosen: 'Optional, not taken',
+      undated: 'No date and no day number',
+    },
+  },
   types: {
     area: 'Area',
     goal: 'Goal',
@@ -1064,6 +1094,9 @@ export const enTranslations = {
       recurringFolder: 'Recurring costs',
       ordersNote:
         'Where a sibling plugin keeps its order notes. NODAtrail reads them so a card line naming an order number can fill itself in, and never writes one. Leave blank to switch it off.',
+      tripsFolder: 'Trips (read only)',
+      tripsNote:
+        "Where a sibling plugin keeps its trip notes. NODAtrail reads an itinerary so a day's entries can be seeded from it, and never writes a trip. Leave blank to switch it off.",
       budgetsFolder: 'Budgets',
       accountsFolder: 'Accounts',
       journalFolder: 'Journal',
@@ -1124,6 +1157,7 @@ export const enTranslations = {
       heading: 'Property keys',
       description: 'Every frontmatter name NODAtrail reads or writes.',
       ordersSection: "Orders (another plugin's notes)",
+      tripsSection: "Trips (another plugin's notes)",
       openPage: 'Property keys',
       unlock: 'Let me edit property names',
       unlockDesc:

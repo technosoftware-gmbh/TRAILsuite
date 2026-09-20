@@ -232,6 +232,24 @@ function sections(): Section[] {
       ],
     },
     {
+      heading: t('settings.properties.tripsSection'),
+      rows: [
+        { key: 'travelStatusProperty', label: t('common.status') },
+        { key: 'departureProperty', label: t('trip.departure') },
+        { key: 'returnProperty', label: t('trip.return') },
+        { key: 'personsProperty', label: t('trip.persons') },
+        { key: 'stopsProperty', label: t('trip.stops') },
+        { key: 'stopPlaceField', label: t('trip.place') },
+        { key: 'stopDayField', label: t('trip.day') },
+        { key: 'stopFromField', label: t('day.from') },
+        { key: 'stopToField', label: t('day.until') },
+        { key: 'stopExcursionField', label: t('trip.excursion') },
+        { key: 'stopPersonsField', label: t('trip.persons') },
+        { key: 'stopOptionalField', label: t('trip.optional') },
+        { key: 'stopChosenField', label: t('trip.chosen') },
+      ],
+    },
+    {
       heading: t('types.budget'),
       rows: [
         { key: 'budgetTypeValue', label: t('settings.properties.typePropertyName') },

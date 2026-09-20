@@ -36,13 +36,21 @@ what counts as a breaking change:
   there, because a vault layout is a plugin's business and a type value is the
   file's.
 - **`TRIP_CONTRACT`**, with `TRIP_CONTRACT_KEYS`, `tripContractMismatches()` and
-  `describeTripContractMismatches()`: the fourteen defaults NODAtrail has to
+  `describeTripContractMismatches()`: the fifteen defaults NODAtrail has to
   spell the way APERtrail does before it can read a trip note. The third
   contract, for the same reason as the first two and with the same quiet failure
   mode. It covers what a day-entry seeder reads and no more: the trips folder,
   the status and dates, the persons, and the `stops` list with its `place`,
-  `from`, `to`, `excursion`, `persons`, `optional` and `chosen` sub-keys. The
-  `trip` type value is not in it, being one of the twelve fixed values above.
+  `day`, `from`, `to`, `excursion`, `persons`, `optional` and `chosen` sub-keys.
+  The `trip` type value is not in it, being one of the twelve fixed values
+  above.
+- **`travel/relative-days.ts`**: `dateOfDay()`, `dayOfDate()`, `endpointDate()`,
+  `dayKey()`, `dayOffset()`, `tripDayCount()` and `clockTime()`, with
+  `RelativeEndpoint`. Moved from APERtrail, which re-exports them so none of its
+  ten call sites moved. A trip is a shape before it is a set of dates, and
+  `day: 3` on a stop means the third day of the trip whoever reads it; a second
+  reader that did not know the convention would skip every relative item rather
+  than mis-date it.
 - **`RollingYearOptions.previous`**: the previous year's budget. While it is not
   closed through December, `rollingYear` opens every balance on its projected
   December instead of the booked 31 December, carries what that plan left

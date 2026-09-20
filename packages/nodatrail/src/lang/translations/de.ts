@@ -49,6 +49,36 @@ export const deTranslations: Translations = {
     no: 'Nein',
   },
 
+  trip: {
+    departure: 'Abreise',
+    return: 'Rueckkehr',
+    persons: 'Mitreisende',
+    stops: 'Reiseverlauf',
+    place: 'Ort',
+    day: 'Reisetag',
+    excursion: 'Ausflug',
+    optional: 'Optional',
+    chosen: 'Gebucht',
+    seed: 'Tag aus einer Reise erzeugen',
+    trip: 'Reise',
+    noTrips:
+      'Keine Reisenotizen im Reisenordner. Bitte den Ordner auf der Ordnerseite pruefen oder leer lassen, um dies auszuschalten.',
+    noStops: 'Diese Reise hat noch keinen Reiseverlauf.',
+    undated:
+      'Ein Halt ohne Datum und ohne Reisetag kann keinem Tag zugeordnet werden. Bitte der Reise eine Abreise geben oder dem Halt ein Datum.',
+    counts: '{write} zu schreiben, {present} bereits vorhanden, {skipped} uebersprungen.',
+    daysTouched: 'Betroffene Tage: {days}',
+    write: 'Eintraege schreiben',
+    wrote: '{count} Eintraege in {days} Tagesnotizen geschrieben.',
+    nothing: 'Nichts zu schreiben. Jeder Eintrag steht bereits in seiner Tagesnotiz.',
+    status: {
+      new: 'Wird geschrieben',
+      alreadyPresent: 'Steht bereits in der Notiz',
+      duplicate: 'Von dieser Reise doppelt genannt',
+      notChosen: 'Optional, nicht gebucht',
+      undated: 'Kein Datum und kein Reisetag',
+    },
+  },
   types: {
     area: 'Bereich',
     goal: 'Ziel',
@@ -1082,6 +1112,9 @@ export const deTranslations: Translations = {
       recurringFolder: 'Wiederkehrende Kosten',
       ordersNote:
         'Wo ein Schwester-Plugin seine Bestellnotizen fuehrt. NODAtrail liest sie, damit eine Kartenzeile mit einer Bestellnummer sich selbst ausfuellen kann, und schreibt nie eine. Leer lassen schaltet es aus.',
+      tripsFolder: 'Reisen (nur lesend)',
+      tripsNote:
+        'Wo ein Schwester-Plugin seine Reisenotizen fuehrt. NODAtrail liest den Reiseverlauf, damit die Eintraege eines Tages daraus entstehen koennen, und schreibt nie eine Reise. Leer lassen schaltet es aus.',
       budgetsFolder: 'Budgets',
       accountsFolder: 'Konten',
       journalFolder: 'Journal',
@@ -1140,6 +1173,7 @@ export const deTranslations: Translations = {
     },
     properties: {
       ordersSection: 'Bestellungen (Notizen eines anderen Plugins)',
+      tripsSection: 'Reisen (Notizen eines anderen Plugins)',
       heading: 'Eigenschaftsnamen',
       description: 'Jeder Frontmatter-Name, den NODAtrail liest oder schreibt.',
       openPage: 'Eigenschaftsnamen',

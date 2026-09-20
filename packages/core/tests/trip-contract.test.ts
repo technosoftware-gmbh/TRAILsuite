@@ -26,6 +26,7 @@ describe('TRIP_CONTRACT', () => {
       personsProperty: 'persons',
       stopsProperty: 'stops',
       stopPlaceField: 'place',
+      stopDayField: 'day',
       stopFromField: 'from',
       stopToField: 'to',
       stopExcursionField: 'excursion',
