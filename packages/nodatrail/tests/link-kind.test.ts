@@ -96,6 +96,32 @@ describe('resolveLink', () => {
     expect(resolveLink(app, S, 'Altes Projekt').kind).toBe('project');
   });
 
+  it('names a travel note by its type value alone, wherever the vault keeps it', () => {
+    // The one place the folder rule does not apply, and deliberately: the
+    // twelve travel values are fixed in trail-core rather than configurable, so
+    // a note saying `type: fnb` is a restaurant wherever somebody files it.
+    // NODAtrail does not know APERtrail's nine place folders and should not
+    // learn them to decide the wording of a label.
+    const app = appWith({
+      'Plätze/Essen & Trinken/Gifthüttli.md': { type: 'fnb' },
+      'Irgendwo/Anders/Nordkap.md': { type: 'excursion' },
+      'Reisen/Nordkap 2027.md': { type: 'trip' },
+    });
+    expect(resolveLink(app, S, 'Gifthüttli').kind).toBe('fnb');
+    expect(resolveLink(app, S, 'Nordkap').kind).toBe('excursion');
+    expect(resolveLink(app, S, 'Nordkap 2027').kind).toBe('trip');
+  });
+
+  it('lets this vault win over the shared vocabulary', () => {
+    // A vault that renamed its own project type to a travel word gets its own
+    // answer: what the plugin is configured for beats what the suite agreed.
+    const app = appWith({
+      [`${S.projectsFolder}/Nordkap.md`]: { type: 'trip' },
+    });
+    const settings = { ...S, projectTypeValue: 'trip' };
+    expect(resolveLink(app, settings, 'Nordkap').kind).toBe('project');
+  });
+
   it('treats a link to a note nobody has written yet as ordinary', () => {
     // Writing a day note must never wait on writing the notes it mentions.
     expect(resolveLink(appWith({}), S, 'Gifthüttli')).toEqual({

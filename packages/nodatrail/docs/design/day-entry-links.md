@@ -285,16 +285,39 @@ it cannot see.
 **Three things this drags along, and each is real.**
 
 - **A core release.** 2.2.0 is what is on npm; this is additive, so 2.3.0.
-  APERtrail and NODAtrail move to `^2.3.0`; CULItrail takes it when it next
-  moves and neither notices nor uses it.
+  **Neither plugin needs a dependency bump**: both already depend on
+  `@technosoftware/trail-core` at `*`, which the workspace resolves to whatever
+  is beside it. This said `^2.3.0` before anybody looked, and getting that kind
+  of detail right is what the document is for.
 - **APERtrail re-exports rather than redefines.**
   `packages/apertrail/src/vault/entity-types.ts` imports the two lists from the
   core and keeps its own comments, its types and its folder map. Nothing in that
   package should import the list from two places.
-- **A contract test.** `crm-contract` and `order-contract` are the precedent: a
-  shared list that two packages assume is a list one test should pin. It belongs
-  in the core beside the list, checking the membership and the count, and it is
-  the fifth thing to remember from §K's test list.
+- **A test that asserts the values literally.** `crm-contract` and
+  `order-contract` are the precedent, and the point of both is that a list
+  compared against itself passes whatever is in it. The counts are asserted too:
+  every error the project bundle's own audit turned up was a number written in
+  prose beside a list the code owns, and twelve and five are quoted in five
+  documents.
+
+### E.4 The folder rule does not apply to a travel type, and that is deliberate
+
+Folder AND type protects readers that **act**: a list, an archive command, a
+health check must not claim a note that merely says `type: project`, because
+`project` is a word a vault may use for anything and `projectTypeValue` is a
+setting somebody may point anywhere.
+
+The twelve travel values are the opposite. They are fixed in `trail-core`,
+agreed between the packages, and not configurable. A note saying `type: fnb` is
+a restaurant wherever somebody keeps it. Matching those on folder as well would
+mean NODAtrail carrying a copy of APERtrail's nine place folders in order to
+decide the wording of a label that writes nothing.
+
+**So a configurable type value needs its folder, and a fixed one identifies
+itself.** PARA and CRM take the first rule, travel the second, and the
+difference is exactly which of them a vault is allowed to rename. The
+configured kinds are tried first, so a vault that has renamed its own project
+type to a travel word still gets its own answer.
 
 **Whatever the lists say, a link to a note that does not exist is not an error.**
 The dialog writes what was typed, the view draws a plain link, and the day the
@@ -379,7 +402,8 @@ and APERtrail reading plan folders is the same kind of read NODAtrail's
 
 | Candidate | Verdict |
 |---|---|
-| `TRAVEL_ENTITY_TYPES` and `TRAVEL_PLACE_TYPES` | **Promoted** (§E). Values only, with a contract test beside them |
+| `TRAVEL_ENTITY_TYPES` and `TRAVEL_PLACE_TYPES` | **Promoted** (§E). Values only, with a test beside them that asserts the values and the counts literally |
+| The trip note's folder and stop sub-key names | **Promoted as `TRIP_CONTRACT`** (J.12). Defaults only, on the `CRM_CONTRACT` pattern, with a mismatch helper and a test on each side |
 | `TRAVEL_PLACE_FOLDER_SETTING` | **No.** It names `APERtrailSettings` fields, which the core cannot see and should not learn |
 | `day-body.ts` and the entry line composer | **No.** `day-notes.md` already ruled: it moves on the two-consumer test, and one consumer reading a day note is not two writing one |
 | A "resolve a link and say what kind of note it is" helper | **No.** It needs an `App`, which is the core's own disqualification |
@@ -456,7 +480,8 @@ comparing headlines only, and a child is edited for one day with no span option
 offered.
 
 **J.9 The two travel type lists move to `trail-core`** (§E), values only, with a
-contract test and a 2.3.0 release.
+test that asserts them literally, on a 2.3.0 release. Neither plugin needs a
+dependency bump: both already depend on the core at `*`.
 
 **J.10 The place and the person are markers, and the markers are settings.**
 `dayPlaceMarker` defaults to `📍` and `dayPersonMarker` to `🧑`, beside the six
@@ -476,38 +501,62 @@ nobody asked for, and the `PARTSTAT` marker already carries the only part of
 that data anybody wanted. People get onto a day entry through the capture dialog
 and through a trip's `persons`, and through nothing else for now.
 
+**J.12 NODAtrail reads a trip note through a `TRIP_CONTRACT` in `trail-core`,
+not by importing APERtrail.** §F.1 said the seeder reads `itinerary-days.ts`; it
+cannot, because `package-boundary` forbids the import, and that was this plan's
+one real mistake. The contract is the third of its kind after `CRM_CONTRACT` and
+`ORDER_CONTRACT`, for the same reason and with the same quiet failure mode: a
+sub-key that does not match yields an entry written without the place it
+happened at, never an error.
+
+**It covers what the seeder reads and no more**: the trips folder, the status,
+the departure and return, the persons, and the `stops` list with `place`,
+`from`, `to`, `excursion`, `persons`, `optional` and `chosen`. Nights,
+transport, variants, costs and bookings stay APERtrail's alone, because a
+contract pinning the whole note would be revisited every time APERtrail grew a
+field and would make NODAtrail ship defaults for things it never looks at. The
+`trip` type value is not in it either: that is one of the fixed twelve.
+
+**It rides the 2.3.0 release**, which is why the order of work now puts the core
+step first. Two core releases three days apart, for one feature, would be an
+avoidable thing to ask somebody to publish twice.
+
 ---
 
 ## K. Order of work
 
-Each step is shippable. Steps 2 and 5 write into a vault, and step 5 changes the
+Each step is shippable. Steps 3 and 4 write into a vault, and step 4 changes the
 format.
 
-1. **Chips in the day tab** for the links an entry already carries. Needs step 4
-   for travel types, so it ships first in its NODAtrail-only form (PARA types
-   resolved, everything else a plain link) and gains the rest at step 4.
-2. **Seed a day from a trip** (§F.1): the itinerary reader, the plan, the
-   preview modal, the write through `appendUnderHeading`. Reuses the calendar
-   import's discipline and adds no archive. Children come later, at step 6.
-3. **`trail-core` 2.3.0**: the two lists, the contract test, the changelog and
-   the version bump on a branch. **Pushed, merged, tagged and released by
-   Thomas**, who approves the staged npm publish.
-4. **Both plugins to `^2.3.0`**, APERtrail re-exporting the lists rather than
-   redefining them, NODAtrail resolving a link's kind through them. Step 1's
-   chips become place and person chips here.
-5. **The chosen shape**: `place` and `persons` on the draft, the two markers and
+1. **Chips in the day tab** for the links an entry already carries, in a
+   NODAtrail-only form: PARA and CRM notes named, everything else a plain link.
+   **Done.**
+2. **`trail-core` 2.3.0**: the two type lists, `TRIP_CONTRACT`, their tests, the
+   changelog and the version bump; APERtrail re-exporting the lists and carrying
+   its half of the trip contract; NODAtrail naming travel notes, so step 1's
+   chips start saying `Restaurant: Gifthüttli`. **Pushed, merged, tagged and
+   released by Thomas**, who approves the staged npm publish.
+3. **Seed a day from a trip** (§F.1): NODAtrail's own trip settings and its half
+   of the contract, the itinerary reader, the plan, the preview modal, and the
+   write through `appendUnderHeading`. Reuses the calendar import's discipline
+   and adds no archive. Children come later, at step 5.
+4. **The chosen shape**: `place` and `persons` on the draft, the two markers and
    their settings, the dialog fields, the composer, the round-trip guard, the
    span rules of §D.5, the settings reference rows, both translation tables.
    **This is the step that writes into somebody's notes.**
-6. **The trip seeder fills in children** (§F.1's last bullet): the stop's place
+5. **The trip seeder fills in children** (§F.1's last bullet): the stop's place
    and persons, and never its note or rating.
-7. **The Person note block** (§H).
-8. **The travel side reading the day notes back** (§F.3), last, because it needs
-   step 5 to have something to match on.
+6. **The Person note block** (§H).
+7. **The travel side reading the day notes back** (§F.3), last, because it needs
+   step 4 to have something to match on.
+
+**The order changed once already** and the reason is worth keeping: the seeder
+turned out to need a core change of its own, so the core step moved in front of
+it rather than the release being cut twice.
 
 **Tests that will have to move**, listed because forgetting one is how this lands
 red: `translation-keys` (both tables, and `DYNAMIC_KEYS` if a marker key is
 built at runtime), `settings-reference` (a row per new setting, or the root test
 fails), `settings-coverage`, `property-name-lock` if a property name is added,
-the new travel-types contract test in the core, and `no-em-dash`, which reads
-this file too.
+the travel-types and trip-contract tests in the core with their halves in the
+plugins, and `no-em-dash`, which reads this file too.

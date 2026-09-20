@@ -1,64 +1,32 @@
 /**
- * The fixed set of Travel entity `type:` values this plugin understands out
- * of the box, read/written under the configurable `typePropertyName`
- * frontmatter property (default `type`) -- see
- * docs/design/travel-module-plan.md §3. Person is deliberately not one of
- * them: people are notes the vault already owns, discovered by folder plus
- * type value (see crm/persons.ts), not an entity type this plugin
- * creates.
+ * Which folder each kind of travel note lives in, and where the type values
+ * themselves now come from.
+ *
+ * **The twelve values moved into `trail-core`** and are re-exported here rather
+ * than redefined, so nothing in this package imports them from two places. They
+ * describe a file rather than a plugin, which is the promotion test a note
+ * format meets on its own terms, and there is a second reader now: NODAtrail
+ * resolves the links on a day entry and says what each one points at. See
+ * `packages/nodatrail/docs/design/day-entry-links.md` section E.
+ *
+ * **The folder map stayed.** It names `APERtrailSettings` keys, which the core
+ * cannot see and should not learn: where a vault keeps its restaurants is this
+ * plugin's business, and what a note calls itself is the file's.
+ *
+ * Person is deliberately not one of the twelve: people are notes the vault
+ * already owns, discovered by folder plus type value (see crm/persons.ts), and
+ * configurable rather than fixed, which is what `CRM_CONTRACT` is for.
  */
+import {
+  TRAVEL_ENTITY_TYPES,
+  TRAVEL_PLACE_TYPES,
+  type TravelEntityType,
+  type TravelPlaceType,
+} from '@technosoftware/trail-core';
 import type { APERtrailSettings } from '../settings/types';
 
-export const TRAVEL_ENTITY_TYPES = [
-  'trip',
-  // A booking is a fact about a trip rather than a place: no coordinates,
-  // never an itinerary stop, and deliberately NOT a member of
-  // TRAVEL_PLACE_TYPES below. See docs/design/trip-budget-and-bookings.md §3.
-  'booking',
-  'country',
-  'state',
-  'city',
-  'accommodation',
-  'fnb',
-  'landmark',
-  'location',
-  'photospot',
-  // The thing you travel ON, as against the places you travel to: a ship, a
-  // named train, a riverboat. Not a member of TRAVEL_PLACE_TYPES for the same
-  // reason a booking is not -- it has no coordinates, is never an itinerary
-  // stop, and is not somewhere you went. A leg names it; see
-  // docs/design/vehicles.md.
-  'vehicle',
-  // What you are sold a day of: a guided tour, a boat safari, a bus to the
-  // Nordkap. Not a place for the vehicle's reason -- it is something that is
-  // run rather than somewhere you went, and the place it happens at is the
-  // stop it hangs off. Not a trip either, which is the shape it was first
-  // asked for in: ten optional excursions per brochure would be ten more
-  // entries in a count of trips somebody is actually going on. A stop names
-  // it; see docs/design/excursions.md.
-  'excursion',
-] as const;
-
-export type TravelEntityType = (typeof TRAVEL_ENTITY_TYPES)[number];
-
-/**
- * The five entity types that share the same "place" shape (country/city
- * wikilinks, geoLocation, rating, visited/lastVisit) -- see
- * travel-module-plan.md §3's data model table. Photo spot joins them rather
- * than standing on its own: it needs every one of those fields, and being a
- * member here is what makes it readable, sortable, gallery-visible and valid
- * as an itinerary stop without a line of type-specific code. See
- * docs/design/photo-spots.md §1.
- */
-export const TRAVEL_PLACE_TYPES = [
-  'accommodation',
-  'fnb',
-  'landmark',
-  'location',
-  'photospot',
-] as const;
-
-export type TravelPlaceType = (typeof TRAVEL_PLACE_TYPES)[number];
+export { TRAVEL_ENTITY_TYPES, TRAVEL_PLACE_TYPES };
+export type { TravelEntityType, TravelPlaceType };
 
 /**
  * Which APERtrailSettings folder field each place-type reads/writes notes

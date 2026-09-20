@@ -23,21 +23,36 @@
  * restaurant note written next week starts resolving next week, and writing a
  * day note must never wait on writing the notes it mentions.
  *
- * **Travel types are deliberately absent.** `fnb`, `landmark` and the rest are
- * APERtrail literals that the package boundary forbids importing, and they move
- * into `trail-core` at step 3 of the same design's order of work. Until they
- * do, a place link resolves with a null kind and is drawn as a plain link,
- * which is the floor every other unrecognised note already lands on.
+ * **A travel note is named by its type value alone, and that is the one place
+ * the folder rule does not apply.** The rule protects readers that ACT: a list,
+ * an archive command, a health check must not claim a note that merely says
+ * `type: project`, because `project` is a word a vault may use for anything and
+ * `projectTypeValue` is a setting. The twelve travel values are the opposite:
+ * fixed in `trail-core`, agreed across the packages, and not configurable. A
+ * note saying `type: fnb` is a restaurant wherever somebody keeps it. Matching
+ * those on folder as well would mean NODAtrail carrying a copy of APERtrail's
+ * nine place folders, to decide the wording of a label that writes nothing.
+ *
+ * So: a configurable type value needs its folder, a fixed one identifies
+ * itself. PARA and CRM take the first rule, travel the second, and the
+ * difference is which of them a vault is allowed to rename.
  */
 import type { App, TFile } from 'obsidian';
-import { isNoteOfType, stripWikilink, type NoteKindQuery } from '@technosoftware/trail-core';
+import {
+  TRAVEL_ENTITY_TYPES,
+  isNoteOfType,
+  matchesType,
+  stripWikilink,
+  type NoteKindQuery,
+  type TravelEntityType,
+} from '@technosoftware/trail-core';
 import { hostFor } from '../shared/vault-host';
 import type { NODAtrailSettings } from '../settings/types';
 import { PARA_TYPES, anyQueryFor, type ParaType } from './entity-types';
 
-/** The kinds a link can be named as. The four PARA notes, and the two CRM ones. */
-export const LINK_KINDS = [...PARA_TYPES, 'person', 'company'] as const;
-export type LinkKind = ParaType | 'person' | 'company';
+/** The kinds a link can be named as: the four PARA notes, the two CRM ones, and the twelve travel ones. */
+export const LINK_KINDS = [...PARA_TYPES, 'person', 'company', ...TRAVEL_ENTITY_TYPES] as const;
+export type LinkKind = ParaType | 'person' | 'company' | TravelEntityType;
 
 /** One link on a day entry, as the vault answers for it. */
 export interface LinkedNote {
@@ -83,6 +98,15 @@ export function kindOfFile(app: App, settings: NODAtrailSettings, file: TFile): 
   const host = hostFor(app);
   for (const { kind, query } of queries(settings)) {
     if (isNoteOfType(host, file, query)) return kind;
+  }
+
+  // Then the fixed twelve, on the type value alone. Last, so a vault that has
+  // deliberately renamed one of its own kinds to a travel word still gets its
+  // own answer: what this plugin is configured for wins over what the suite
+  // agreed, every time.
+  const frontmatter = host.metadata.frontmatterOf(file) ?? {};
+  for (const type of TRAVEL_ENTITY_TYPES) {
+    if (matchesType(frontmatter, settings.typePropertyName, type)) return type;
   }
   return null;
 }

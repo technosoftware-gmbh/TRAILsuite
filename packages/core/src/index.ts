@@ -38,6 +38,7 @@ export * from './meal/index.js';
 export * from './order/index.js';
 export * from './reheating/index.js';
 export * from './sample/index.js';
+export * from './travel/index.js';
 export * from './settings/index.js';
 export * from './solar/index.js';
 export * from './tasks/index.js';
