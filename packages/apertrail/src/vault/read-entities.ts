@@ -34,6 +34,7 @@ import {
   TravelPlaceType,
 } from './entity-types';
 import { applyDerivedVisits } from './visit-derivation';
+import { readDayVisits } from './day-visits';
 import { bookingReadFolders, isArchivedTripPath, tripReadFolders } from '../trips/trip-folder';
 import {
   effectiveTravelStatus,
@@ -768,7 +769,7 @@ export function readTravelBoard(
   // objects in place (see visit-derivation.ts) -- every cross-reference
   // above already points at these exact instances, so replacing them
   // would leave the board pointing at stale copies.
-  applyDerivedVisits(cities, places, trips);
+  applyDerivedVisits(cities, places, trips, readDayVisits(app));
 
   return {
     trips: trips.sort((a, b) => a.title.localeCompare(b.title)),

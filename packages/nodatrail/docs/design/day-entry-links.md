@@ -434,6 +434,37 @@ ruled out, or a third child marker. **Deferred rather than decided**: it is
 worth knowing whether a trip note answering this is enough before adding another
 element to a format that is much easier to add to than to take back.
 
+### F.4 A place visited outside a trip
+
+**Found in use, after the rest had shipped.** The Prospekt said `nicht besucht`
+about a restaurant somebody had eaten at the day before. Visit derivation reads
+trips, and rightly -- a stop on a finished trip is evidence -- but a restaurant
+on an ordinary Tuesday is not a trip and never will be.
+
+**Decided: a day note that links to a place is a visit, on that day.** APERtrail
+asks `metadataCache.resolvedLinks` which notes link to the place and keeps those
+whose title has the day shape; a day note's title *is* the date.
+`detectPeriodLevel` is already in `trail-core` and needs no settings, so this
+reads **a title and a link and never a body**. No contract, and nothing in
+APERtrail parses a format it does not own -- which is the same line §F.3 held,
+reached from the other side.
+
+**The cost is real and was taken deliberately.** A day note that merely mentions
+a place counts as a visit. That is looser than the trip rule, which refuses a
+Planned trip precisely because an intention is not a visit, and the two are
+inconsistent on purpose: telling them apart would mean reading the day-entry
+format to find which line the link is on, which is a contract over somebody
+else's note body for one flag on a card. The three alternatives priced against
+it were that contract, NODAtrail stamping `visited:` onto the place note, and
+doing nothing but putting §H's fence in the place note.
+
+**It never claims a trip contributed.** `visitedFromTrips` stays false, so the
+card draws the calendar icon and the date rather than the route icon, which is
+the shape it already had for a hand-written `lastVisit:`.
+
+**A vault that renames its day notes gets no day visits rather than wrong
+ones**, because the shape is the whole of the recognition.
+
 ---
 
 ## G. What crosses the package boundary
@@ -451,6 +482,7 @@ and APERtrail reading plan folders is the same kind of read NODAtrail's
 | `TRAVEL_PLACE_FOLDER_SETTING` | **No.** It names `APERtrailSettings` fields, which the core cannot see and should not learn |
 | `day-body.ts` and the entry line composer | **No.** `day-notes.md` already ruled: it moves on the two-consumer test, and one consumer reading a day note is not two writing one |
 | A "resolve a link and say what kind of note it is" helper | **No.** It needs an `App`, which is the core's own disqualification |
+| Anything that would let APERtrail read a day note's body | **No, twice over** (§F.3, §F.4). Both times the answer was a link rather than a format: which days name this note, and which of those is a day |
 
 ---
 
