@@ -511,7 +511,7 @@ happened at, never an error.
 
 **It covers what the seeder reads and no more**: the trips folder, the status,
 the departure and return, the persons, and the `stops` list with `place`,
-`from`, `to`, `excursion`, `persons`, `optional` and `chosen`. Nights,
+`day`, `from`, `to`, `excursion`, `persons`, `optional` and `chosen`. Nights,
 transport, variants, costs and bookings stay APERtrail's alone, because a
 contract pinning the whole note would be revisited every time APERtrail grew a
 field and would make NODAtrail ship defaults for things it never looks at. The
@@ -520,6 +520,19 @@ field and would make NODAtrail ship defaults for things it never looks at. The
 **It rides the 2.3.0 release**, which is why the order of work now puts the core
 step first. Two core releases three days apart, for one feature, would be an
 avoidable thing to ask somebody to publish twice.
+
+**Amended while building the seeder: the contract was one field short, and the
+missing one was the worst to be missing.** A trip is a shape before it is a set
+of dates. A stop may carry `day: 3` and a bare `14:00` instead of a stamp, which
+is what lets a brochure be written down before a departure is fixed, and
+`stopDayField` was not in the contract at all. A reader that did not know that
+sub-key would not mis-date a relative stop; it would skip it, silently, which is
+the quietest failure the whole contract exists to prevent. Fifteen fields now.
+
+**And `relative-days.ts` moved into the core with it**, re-exported from
+APERtrail so its ten call sites did not move. The alternative was NODAtrail
+doing the same date arithmetic a second time, which is how two readers end up
+disagreeing about which calendar day the third day of a trip is.
 
 ---
 
@@ -531,15 +544,17 @@ format.
 1. **Chips in the day tab** for the links an entry already carries, in a
    NODAtrail-only form: PARA and CRM notes named, everything else a plain link.
    **Done.**
-2. **`trail-core` 2.3.0**: the two type lists, `TRIP_CONTRACT`, their tests, the
-   changelog and the version bump; APERtrail re-exporting the lists and carrying
-   its half of the trip contract; NODAtrail naming travel notes, so step 1's
-   chips start saying `Restaurant: Gifthüttli`. **Pushed, merged, tagged and
-   released by Thomas**, who approves the staged npm publish.
+2. **`trail-core` 2.3.0**: the two type lists, `TRIP_CONTRACT`, `relative-days`,
+   their tests, the changelog and the version bump; APERtrail re-exporting what
+   moved and carrying its half of the trip contract; NODAtrail naming travel
+   notes, so step 1's chips start saying `Restaurant: Gifthüttli`. **Pushed,
+   merged, tagged and released by Thomas**, who approves the staged npm publish.
+   **Built; not yet released.** The seeder below amended the contract after the
+   first push, so the branch has to go up again before the tag.
 3. **Seed a day from a trip** (§F.1): NODAtrail's own trip settings and its half
    of the contract, the itinerary reader, the plan, the preview modal, and the
    write through `appendUnderHeading`. Reuses the calendar import's discipline
-   and adds no archive. Children come later, at step 5.
+   and adds no archive. Children come later, at step 5. **Done.**
 4. **The chosen shape**: `place` and `persons` on the draft, the two markers and
    their settings, the dialog fields, the composer, the round-trip guard, the
    span rules of §D.5, the settings reference rows, both translation tables.
