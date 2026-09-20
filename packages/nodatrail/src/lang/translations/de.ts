@@ -49,6 +49,36 @@ export const deTranslations: Translations = {
     no: 'Nein',
   },
 
+  trip: {
+    departure: 'Abreise',
+    return: 'Rueckkehr',
+    persons: 'Mitreisende',
+    stops: 'Reiseverlauf',
+    place: 'Ort',
+    day: 'Reisetag',
+    excursion: 'Ausflug',
+    optional: 'Optional',
+    chosen: 'Gebucht',
+    seed: 'Tag aus einer Reise erzeugen',
+    trip: 'Reise',
+    noTrips:
+      'Keine Reisenotizen im Reisenordner. Bitte den Ordner auf der Ordnerseite pruefen oder leer lassen, um dies auszuschalten.',
+    noStops: 'Diese Reise hat noch keinen Reiseverlauf.',
+    undated:
+      'Ein Halt ohne Datum und ohne Reisetag kann keinem Tag zugeordnet werden. Bitte der Reise eine Abreise geben oder dem Halt ein Datum.',
+    counts: '{write} zu schreiben, {present} bereits vorhanden, {skipped} uebersprungen.',
+    daysTouched: 'Betroffene Tage: {days}',
+    write: 'Eintraege schreiben',
+    wrote: '{count} Eintraege in {days} Tagesnotizen geschrieben.',
+    nothing: 'Nichts zu schreiben. Jeder Eintrag steht bereits in seiner Tagesnotiz.',
+    status: {
+      new: 'Wird geschrieben',
+      alreadyPresent: 'Steht bereits in der Notiz',
+      duplicate: 'Von dieser Reise doppelt genannt',
+      notChosen: 'Optional, nicht gebucht',
+      undated: 'Kein Datum und kein Reisetag',
+    },
+  },
   types: {
     area: 'Bereich',
     goal: 'Ziel',
@@ -199,6 +229,13 @@ export const deTranslations: Translations = {
     },
     text: 'Text',
     context: 'Projekt oder Bereich',
+    place: 'Wo',
+    placeHint:
+      'Ein Notiztitel. Er wird als eigene Zeile unter den Eintrag geschrieben, der Eintrag selbst bleibt also unveraendert, und ein Ort, den es noch nicht als Notiz gibt, loest sich auf, sobald sie geschrieben ist.',
+    persons: 'Wer dabei war',
+    personsEmpty: 'Noch niemand genannt.',
+    noNamingDays: 'Noch keine Tageseintraege nennen diese Person.',
+    moreNamingDays: 'Und {count} weitere, weiter zurueck.',
     from: 'Von',
     until: 'Bis',
     lastDay: 'Letzter Tag',
@@ -1026,6 +1063,8 @@ export const deTranslations: Translations = {
       noteMarker: 'Zeichen für eine Notiz',
       ideaMarker: 'Zeichen für eine Idee',
       spanMarker: 'Zeichen für mehrere Tage',
+      placeMarker: 'Zeichen für den Ort',
+      personMarker: 'Zeichen für die Beteiligten',
       markerDesc:
         'Aufgaben brauchen kein Zeichen: sie sind Kontrollkästchen im Format des Tasks-Plugins. Leer lassen schreibt einen einfachen Aufzählungspunkt.',
     },
@@ -1082,6 +1121,9 @@ export const deTranslations: Translations = {
       recurringFolder: 'Wiederkehrende Kosten',
       ordersNote:
         'Wo ein Schwester-Plugin seine Bestellnotizen fuehrt. NODAtrail liest sie, damit eine Kartenzeile mit einer Bestellnummer sich selbst ausfuellen kann, und schreibt nie eine. Leer lassen schaltet es aus.',
+      tripsFolder: 'Reisen (nur lesend)',
+      tripsNote:
+        'Wo ein Schwester-Plugin seine Reisenotizen fuehrt. NODAtrail liest den Reiseverlauf, damit die Eintraege eines Tages daraus entstehen koennen, und schreibt nie eine Reise. Leer lassen schaltet es aus.',
       budgetsFolder: 'Budgets',
       accountsFolder: 'Konten',
       journalFolder: 'Journal',
@@ -1140,6 +1182,7 @@ export const deTranslations: Translations = {
     },
     properties: {
       ordersSection: 'Bestellungen (Notizen eines anderen Plugins)',
+      tripsSection: 'Reisen (Notizen eines anderen Plugins)',
       heading: 'Eigenschaftsnamen',
       description: 'Jeder Frontmatter-Name, den NODAtrail liest oder schreibt.',
       openPage: 'Eigenschaftsnamen',

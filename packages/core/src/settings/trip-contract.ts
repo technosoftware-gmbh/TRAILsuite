@@ -40,7 +40,21 @@ export interface TripContract {
   stopsProperty: string;
   /** The place a stop is at. A city or any place note. */
   stopPlaceField: string;
-  /** The stop's own clock, which decides the day and the time of the entry written from it. */
+  /**
+   * Which day of the trip a stop is on, when it says a day number rather than a
+   * date.
+   *
+   * A trip is a shape before it is a set of dates: a brochure names day one,
+   * day two, day twelve and no calendar day at all, and the note goes on saying
+   * `day: 3` for as long as it exists. A reader that did not know this sub-key
+   * would not mis-date a relative stop, it would skip it entirely, which is the
+   * quietest failure in the whole contract. See `travel/relative-days.ts`.
+   */
+  stopDayField: string;
+  /**
+   * The stop's own clock, which decides the day and the time of the entry
+   * written from it. A bare `HH:mm` on a relative stop, a full stamp otherwise.
+   */
   stopFromField: string;
   stopToField: string;
   /** The outing a stop IS, beside the place it happens at. */
@@ -73,6 +87,7 @@ export const TRIP_CONTRACT: Readonly<TripContract> = Object.freeze({
   personsProperty: 'persons',
   stopsProperty: 'stops',
   stopPlaceField: 'place',
+  stopDayField: 'day',
   stopFromField: 'from',
   stopToField: 'to',
   stopExcursionField: 'excursion',
@@ -91,6 +106,7 @@ export const TRIP_CONTRACT_KEYS = [
   'personsProperty',
   'stopsProperty',
   'stopPlaceField',
+  'stopDayField',
   'stopFromField',
   'stopToField',
   'stopExcursionField',

@@ -236,16 +236,29 @@ same reasoning: they were captured as one thing, and a child left under nothing
 is an orphan nobody can place.
 
 **The span walk keeps comparing headlines only.** `day-span.ts`'s `sameEntry()`
-compares `kind`, `draft.text` and `draft.context`, and **must not** grow to
-compare children: the whole point of children on a span is that the Tuesday and
-the Wednesday of one holiday say different things. Two further rules fall out of
-that:
+compares `kind`, `draft.text` and `draft.context`, and it did not have to grow.
 
-- **Editing a whole span rewrites the headline line on every day and leaves each
-  day's children alone.** Anything else would copy Tuesday's dinner onto
-  Wednesday.
-- **Editing a span's children is this day only**, always, with no span option
-  offered. The dialog says so rather than leaving it to be discovered.
+**Amended while building it, and the amendment made two of these rules
+unnecessary.** This section assumed a span's children would differ from day to
+day -- Tuesday's dinner against Wednesday's -- and worked out an elaborate
+answer: rewrite the headline across the span and leave each day's children
+alone, and edit a child for one day only. The answer was sound and the premise
+was wrong.
+
+**A span carries a place and the people, and both are true of every day of it.**
+A week in a hotel is one hotel and one set of people from Monday to Sunday. What
+differs per day is what you did, and that is a meeting or a note **on that day**,
+not a child of the span. So a span's children are span-wide facts, the whole
+entry is written into every day, and editing the span rewrites all of it. No
+per-day child rule is needed, and none was written.
+
+**What a span still does not take is what was said and what follows.** A
+fortnight has no room in that sense, so a `📝` or a checkbox indented under a
+span is a line the dialog cannot compose back: that day goes read-only and a
+span edit refuses it by name rather than rewriting it without what it said. That
+is the round-trip rule doing its job one level down, and it is also the signal
+to come back to this section if per-day children turn out to be wanted after
+all.
 
 The existing boundary rules are untouched: a day holding two identical entries
 still stops the walk, and a day whose line says more than the dialog can compose
@@ -356,12 +369,23 @@ import performs, against a different source, and it should be built as one:
   spans days is the span shape, one untimed line per day, exactly as §E.3 of
   `calendar-import.md` settled for holidays. An `optional: true` stop that is
   not `chosen` produces nothing: it is not planned, it is offered.
-- **What it may fill in as children**, once §D.5 ships: the stop's `place` as a
-  `📍` child and the stop's `persons` as `🧑` children. Both come off the stop
-  and neither is invented. The stop's `note` and `rating` do **not** become a
-  `📝` child: they are the plan's own words about the plan, and copying them
-  into the diary would put the same sentence in two places with no way to tell
-  which was later.
+- **What it fills in as children**: the stop's `place` as a `📍` child and the
+  stop's `persons` as `🧑` children. Both come off the stop and neither is
+  invented. The stop's `note` and `rating` do **not** become a `📝` child: they
+  are the plan's own words about the plan, and copying them into the diary would
+  put the same sentence in two places with no way to tell which was later.
+- **The trip's own travellers are not filled in either**, and the plan stopped
+  carrying them when the writer started using them. A stop naming nobody on a
+  two-person trip does mean both went, and that is a *derived* fact: the trip
+  note says who is travelling and goes on saying it, where a line on every day
+  repeating it would be a second copy to disagree with the first the moment
+  somebody drops out. Nothing derived is written, which is visit derivation's
+  own rule one level up.
+- **The place is written even where the headline already reads like it.** A stop
+  with no excursion says the place as its text, so the line looks as though it
+  says the same thing twice. It does not: the text is words and the child is a
+  link, and only the link resolves to a note, draws a chip and appears in that
+  place's backlinks.
 
 ### F.2 What "it happened" means, and who may say so
 
@@ -383,12 +407,32 @@ counts as visited.
 
 ### F.3 Reading the day back from the travel side
 
-The direction that currently does not exist. A trip's document and an
-excursion's note could show what the day notes say about them, the way a Person
-note already shows `travel-related-trips`. That is a read of the plan folders,
-scoped to a trip's date range, matching on the link the day line carries --
-which means it only works once §D.2 has given the day entry something to match
-on. **It is therefore the last thing built, not the first.**
+The direction that did not exist. A trip's document and an excursion's note
+could show what the day notes say about them, the way a Person note already
+shows `travel-related-trips`.
+
+**It was going to be APERtrail reading the plan folders, and that would have
+been wrong.** Parsing a day note means knowing the day path template, the
+schedule heading in both languages and the seven markers: the whole day-note
+format, which is NODAtrail's own rather than a shared one. A fourth contract for
+it would have been several times the size of the trip contract, and in the wrong
+direction -- the trip contract pins a format APERtrail *writes*, where this
+would pin one it has no business in.
+
+**The answer was already a link away.** The block §H added asks "which days name
+this note", and a trip is a note: a seeded stop carries the trip as its context
+link, so the same fence in a trip note lists the days its stops were written
+into. NODAtrail reads its own format, APERtrail keeps its boundary, and the
+whole of F.3 cost a rename. `readPersonDays` became `readDaysNaming` and the
+block's argument `person:` became `note:`, before either had shipped.
+
+**An excursion is the case it cannot answer**, and the reason is a format
+question rather than a reading one: a seeded stop says the excursion as its
+*text* and links only the trip, so nothing points at the excursion note to be
+found by. Making it a link would mean a second link on the headline, which §D
+ruled out, or a third child marker. **Deferred rather than decided**: it is
+worth knowing whether a trip note answering this is enough before adding another
+element to a format that is much easier to add to than to take back.
 
 ---
 
@@ -415,10 +459,29 @@ and APERtrail reading plan folders is the same kind of read NODAtrail's
 - **The day tab** of the plan view: chips beside an entry for its place and its
   people, drawn from the links the reader already collects. Costs nothing
   written and is the first visible benefit.
-- **A Person note**, a new fenced block beside `travel-related-trips` and
-  `nod-spending`. NODAtrail's own, listing the day entries that name them. It
-  degrades to a plain code block when NODAtrail is off, which is the rule all
-  three blocks already follow.
+- **A Person note**, `nod-day-entries`, beside `travel-related-trips` and
+  `nod-spending`. NODAtrail's own, listing the day entries that name them,
+  newest first. It degrades to a plain code block when NODAtrail is off, which
+  is the rule all three blocks already follow.
+
+  **It asks the vault which notes link here.** `metadataCache.resolvedLinks`
+  already knows, so a person who appears in forty days costs forty reads rather
+  than one per day note in the vault. That is the difference between a block
+  that renders when a note is opened and one that makes opening a note slow, and
+  it is why this does not reuse `readScheduleRange`, which reads a range whether
+  or not those days say anything.
+
+  **Matched on the link, never on the text.** A meeting whose words happen to
+  mention a name is not an answer; saying it in a way a reader can be sure about
+  is the whole reason the person went on a child line.
+
+  **Nothing writes the fence.** A Person note is shared with the sibling
+  plugins, and a plugin appending its own block to notes nobody asked it to
+  touch would be editing an address book on its own initiative. The sample vault
+  does not seed it either: `ensureBlock` in `trail-core`'s `SampleNote` takes
+  one language, so a second fence in the body alone would make a person note the
+  plan *creates* render two blocks where one it *augments* renders one, and
+  widening a shared type for a sample vault is not the trade to make.
 - **A place note** is the one to leave alone. A restaurant already gets
   `travel-related-trips` from APERtrail, and a second block from a second plugin
   answering nearly the same question is two lists somebody reconciles by eye.
@@ -511,7 +574,7 @@ happened at, never an error.
 
 **It covers what the seeder reads and no more**: the trips folder, the status,
 the departure and return, the persons, and the `stops` list with `place`,
-`from`, `to`, `excursion`, `persons`, `optional` and `chosen`. Nights,
+`day`, `from`, `to`, `excursion`, `persons`, `optional` and `chosen`. Nights,
 transport, variants, costs and bookings stay APERtrail's alone, because a
 contract pinning the whole note would be revisited every time APERtrail grew a
 field and would make NODAtrail ship defaults for things it never looks at. The
@@ -520,6 +583,19 @@ field and would make NODAtrail ship defaults for things it never looks at. The
 **It rides the 2.3.0 release**, which is why the order of work now puts the core
 step first. Two core releases three days apart, for one feature, would be an
 avoidable thing to ask somebody to publish twice.
+
+**Amended while building the seeder: the contract was one field short, and the
+missing one was the worst to be missing.** A trip is a shape before it is a set
+of dates. A stop may carry `day: 3` and a bare `14:00` instead of a stamp, which
+is what lets a brochure be written down before a departure is fixed, and
+`stopDayField` was not in the contract at all. A reader that did not know that
+sub-key would not mis-date a relative stop; it would skip it, silently, which is
+the quietest failure the whole contract exists to prevent. Fifteen fields now.
+
+**And `relative-days.ts` moved into the core with it**, re-exported from
+APERtrail so its ten call sites did not move. The alternative was NODAtrail
+doing the same date arithmetic a second time, which is how two readers end up
+disagreeing about which calendar day the third day of a trip is.
 
 ---
 
@@ -531,24 +607,28 @@ format.
 1. **Chips in the day tab** for the links an entry already carries, in a
    NODAtrail-only form: PARA and CRM notes named, everything else a plain link.
    **Done.**
-2. **`trail-core` 2.3.0**: the two type lists, `TRIP_CONTRACT`, their tests, the
-   changelog and the version bump; APERtrail re-exporting the lists and carrying
-   its half of the trip contract; NODAtrail naming travel notes, so step 1's
-   chips start saying `Restaurant: Gifthüttli`. **Pushed, merged, tagged and
-   released by Thomas**, who approves the staged npm publish.
+2. **`trail-core` 2.3.0**: the two type lists, `TRIP_CONTRACT`, `relative-days`,
+   their tests, the changelog and the version bump; APERtrail re-exporting what
+   moved and carrying its half of the trip contract; NODAtrail naming travel
+   notes, so step 1's chips start saying `Restaurant: Gifthüttli`. **Pushed,
+   merged, tagged and released by Thomas**, who approves the staged npm publish.
+   **Built; not yet released.** The seeder below amended the contract after the
+   first push, so the branch has to go up again before the tag.
 3. **Seed a day from a trip** (§F.1): NODAtrail's own trip settings and its half
    of the contract, the itinerary reader, the plan, the preview modal, and the
    write through `appendUnderHeading`. Reuses the calendar import's discipline
-   and adds no archive. Children come later, at step 5.
+   and adds no archive. Children come later, at step 5. **Done.**
 4. **The chosen shape**: `place` and `persons` on the draft, the two markers and
    their settings, the dialog fields, the composer, the round-trip guard, the
    span rules of §D.5, the settings reference rows, both translation tables.
-   **This is the step that writes into somebody's notes.**
+   **This is the step that writes into somebody's notes. Done.**
 5. **The trip seeder fills in children** (§F.1's last bullet): the stop's place
-   and persons, and never its note or rating.
-6. **The Person note block** (§H).
+   and persons, and never its note or rating. **Done.**
+6. **The Person note block** (§H). **Done.**
 7. **The travel side reading the day notes back** (§F.3), last, because it needs
-   step 4 to have something to match on.
+   step 4 to have something to match on. **Done, and it turned out to be a
+   rename**: the block from step 6 answers for a trip note unchanged. The
+   excursion half is deferred, and §F.3 says what it would cost.
 
 **The order changed once already** and the reason is worth keeping: the seeder
 turned out to need a core change of its own, so the core step moved in front of

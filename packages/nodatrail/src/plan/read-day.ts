@@ -141,16 +141,29 @@ function meetings(body: string, settings: NODAtrailSettings): DayEntryRecord[] {
     const parsed = parseScheduleLine(row.line, scheduleMarkers(settings));
     if (!parsed) continue;
 
-    // **Only a meeting adopts the lines indented under it.** Those children are
-    // what was said in the room and what came out of it; a span is a fortnight
-    // away and has no room. Swallowing the next meeting's children into a span
-    // that happened to sit above it would take them out of the note the moment
-    // the span was edited.
-    const end = parsed.kind === 'span' ? index + 1 : childrenOf(lines, index);
+    // **A span adopts its children too, and it did not used to.** The note
+    // against this said a span "is a fortnight away and has no room", which is
+    // true of a holiday and false of a week in a hotel: that has a place and
+    // the people who came, and both are true of every day of it. What a span
+    // still does not take is what was said and what follows -- a fortnight has
+    // no room in the sense that matters there -- so a checkbox indented under
+    // one is a line this cannot compose back, and the entry goes read-only
+    // rather than being rewritten without it. See J.8 of
+    // `docs/design/day-entry-links.md`.
+    const end = childrenOf(lines, index);
     const own = lines.slice(index, end).map((entry) => entry.line);
+    const place = childLinks(own, settings.dayPlaceMarker).at(0) ?? '';
+    const persons = childLinks(own, settings.dayPersonMarker);
+
     const draft: DayEntryDraft =
       parsed.kind === 'span'
-        ? { ...emptyDraft('span'), text: parsed.text, context: parsed.links[0] ?? '' }
+        ? {
+            ...emptyDraft('span'),
+            text: parsed.text,
+            context: parsed.links[0] ?? '',
+            place,
+            persons,
+          }
         : {
             ...emptyDraft('meeting'),
             attendance: parsed.attendance,
@@ -158,7 +171,9 @@ function meetings(body: string, settings: NODAtrailSettings): DayEntryRecord[] {
             context: parsed.links[0] ?? '',
             startTime: parsed.from,
             endTime: parsed.to,
-            notes: childText(own, settings.dayNoteMarker),
+            place,
+            persons,
+            notes: childText(own, settings),
             followUps: childTasks(own),
           };
 
@@ -167,7 +182,10 @@ function meetings(body: string, settings: NODAtrailSettings): DayEntryRecord[] {
       draft,
       label: parsed.text,
       span: parsed.from && parsed.to ? `${parsed.from}-${parsed.to}` : parsed.from || parsed.to,
-      links: parsed.links,
+      // **Every link the entry carries, headline and children alike.** What a
+      // view may show is everything the note says; what the dialog may rewrite
+      // is only what composes back, and a read-only entry still gets its chips.
+      links: [...parsed.links, ...(place ? [place] : []), ...persons],
       from: row.at,
       to: (lines[end - 1]?.at ?? row.at) + 1,
       editable: reproduces(settings, draft, own),
@@ -177,16 +195,48 @@ function meetings(body: string, settings: NODAtrailSettings): DayEntryRecord[] {
   return out;
 }
 
-/** The indented note lines under a meeting, as the dialog's box would hold them. */
-function childText(own: readonly string[], marker: string): string {
+/**
+ * The titles named on an entry's child lines under one marker.
+ *
+ * **Exactly one wikilink and nothing else counts.** A child carrying a title
+ * plus somebody's own words is a line the dialog has no field for, so it is not
+ * read back here; the round trip then fails and the entry is shown read-only
+ * rather than rewritten without what it said. That is the same arbiter the
+ * headline already has, applied one level down.
+ *
+ * A blank marker reads nothing, which is what "do not distinguish these" means.
+ */
+function childLinks(own: readonly string[], marker: string): string[] {
   const mark = marker.trim();
+  if (!mark) return [];
+
+  return own.slice(1).flatMap((line) => {
+    const rest = /^\s*[-*+]\s+(.*)$/.exec(line)?.[1]?.trim() ?? '';
+    if (!rest.startsWith(mark)) return [];
+    const link = /^\[\[([^\]]+)\]\]$/.exec(rest.slice(mark.length).trim());
+    return link ? [(link[1] ?? '').trim()] : [];
+  });
+}
+
+/**
+ * The indented note lines under a meeting, as the dialog's box would hold them.
+ *
+ * **A place or a person child is not a note.** All three are children of the
+ * same shape, and a reader that took everything indented would put
+ * `\u{1F4CD} [[Gifthuettli]]` in the notes box, write it back as a note on save,
+ * and lose the place. So the two marked kinds are skipped here by the marker
+ * they carry.
+ */
+function childText(own: readonly string[], settings: NODAtrailSettings): string {
+  const mark = settings.dayNoteMarker.trim();
+  const others = [settings.dayPlaceMarker.trim(), settings.dayPersonMarker.trim()].filter(Boolean);
+
   return own
     .slice(1)
     .filter((line) => !/^\s*[-*+]\s+\[.\]/.test(line))
-    .map((line) => {
-      const rest = /^\s*[-*+]\s+(.*)$/.exec(line)?.[1] ?? '';
-      return mark && rest.startsWith(mark) ? rest.slice(mark.length).trim() : rest.trim();
-    })
+    .map((line) => /^\s*[-*+]\s+(.*)$/.exec(line)?.[1]?.trim() ?? '')
+    .filter((rest) => !others.some((other) => rest.startsWith(other)))
+    .map((rest) => (mark && rest.startsWith(mark) ? rest.slice(mark.length).trim() : rest))
     .filter((line) => line !== '')
     .join('\n');
 }

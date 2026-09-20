@@ -290,6 +290,21 @@ export interface NODAtrailSettings {
   dayNoteMarker: string;
   dayIdeaMarker: string;
   /**
+   * The markers on an entry's child lines: where it was, and who was there.
+   *
+   * **The headline does not change and must not.** A place or a person on the
+   * line itself would be a fourth thing the derived import key has to ignore
+   * and a second link the editing dialog has to put back in the order it found
+   * it. On a child, the key never reads them at all. See
+   * `docs/design/day-entry-links.md` section D.
+   *
+   * Blank means "do not distinguish these", which is the rule the meeting
+   * markers already follow, not "write these unmarked": a child with no marker
+   * cannot be told from a note.
+   */
+  dayPlaceMarker: string;
+  dayPersonMarker: string;
+  /**
    * What marks a line that runs over several days: a holiday, a course, a
    * fortnight away.
    *
@@ -521,6 +536,49 @@ export interface NODAtrailSettings {
    * on the amount and date rather than on a name that will never agree.
    */
   companyPaymentProviderProperty: string;
+
+  // APERtrail's trip note, read and never written ----------------------
+  /**
+   * Where the sibling's trip notes are, and what a trip note calls things.
+   *
+   * Held in trail-core's `TRIP_CONTRACT` so both sides ship one set of values
+   * rather than two lists of literals that nothing compares, and adopted from
+   * APERtrail's own settings when it is installed, which is what hands a German
+   * vault `Reisen` rather than `Trips`.
+   *
+   * **NODAtrail reads a trip and never writes one.** It seeds a day note's
+   * entries from an itinerary; whether a stop happened is the day note's to
+   * say, and the plan stays the trip's. `tests/trip-contract.test.ts` fails if
+   * these stop matching.
+   *
+   * The `trip` type value is not among them: it is one of the twelve fixed
+   * values in `trail-core`, which both plugins import rather than configure.
+   */
+  tripsFolder: string;
+  travelStatusProperty: string;
+  departureProperty: string;
+  returnProperty: string;
+  /** Who is travelling, on the trip as a whole. */
+  personsProperty: string;
+  /** The itinerary. Its entries are what become a day's entries. */
+  stopsProperty: string;
+  stopPlaceField: string;
+  /**
+   * Which day of the trip a stop is on, where it says a day number rather than
+   * a date. A trip is a shape before it is a set of dates, and a reader that
+   * did not know this sub-key would skip every relative stop rather than
+   * mis-date it.
+   */
+  stopDayField: string;
+  stopFromField: string;
+  stopToField: string;
+  /** The outing a stop IS, beside the place it happens at. */
+  stopExcursionField: string;
+  /** Who takes this stop, where that is not everybody on the trip. */
+  stopPersonsField: string;
+  /** Might not happen, and whether it was taken. An offer is not a plan. */
+  stopOptionalField: string;
+  stopChosenField: string;
 
   ordersFolder: string;
   orderTypeValue: string;

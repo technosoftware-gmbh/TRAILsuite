@@ -7,15 +7,16 @@
  * folder path pointing at nothing, and the only cure would be somebody noticing
  * a settings row they have no reason to look at.
  *
- * `adoptOrderSettings` closes it for the six order fields, on a rule narrow
- * enough to be safe: adopt only while the value is exactly what shipped. That
- * cannot overwrite a choice, because no choice has been made. It is safe for
- * these and would not be for the CRM fields, and the difference is what the
- * default means: `Eating/Orders` is a guess about another plugin's folder,
- * whereas `CRM/People` is a real answer somebody may have deliberately kept.
+ * `adoptForeignNoteSettings` closes it for the order fields and the trip ones,
+ * on a rule narrow enough to be safe: adopt only while the value is exactly
+ * what shipped. That cannot overwrite a choice, because no choice has been
+ * made. It is safe for these and would not be for the CRM fields, and the
+ * difference is what the default means: `Eating/Orders` and `Trips` are guesses
+ * about another plugin's folders, whereas `CRM/People` is a real answer
+ * somebody may have deliberately kept.
  */
 import { describe, expect, it, vi } from 'vitest';
-import { adoptOrderSettings } from '../src/settings/foreign-settings-import';
+import { adoptForeignNoteSettings } from '../src/settings/foreign-settings-import';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import type { NODAtrailSettings } from '../src/settings/types';
 
@@ -59,7 +60,7 @@ const fresh = (): NODAtrailSettings => ({ ...DEFAULT_SETTINGS });
 describe('learning where a sibling keeps its orders', () => {
   it('takes the folder from the sibling when nothing has been chosen', async () => {
     const settings = fresh();
-    const changed = await adoptOrderSettings(
+    const changed = await adoptForeignNoteSettings(
       appWith({ [CULI]: SIBLING }),
       settings,
       DEFAULT_SETTINGS
@@ -72,7 +73,7 @@ describe('learning where a sibling keeps its orders', () => {
     // Field by field, not all-or-nothing: the folder was answered and the
     // property names were not, so only the names are taken.
     const settings = { ...fresh(), ordersFolder: 'Meine Bestellungen' };
-    await adoptOrderSettings(appWith({ [CULI]: SIBLING }), settings, DEFAULT_SETTINGS);
+    await adoptForeignNoteSettings(appWith({ [CULI]: SIBLING }), settings, DEFAULT_SETTINGS);
     expect(settings.ordersFolder).toBe('Meine Bestellungen');
   });
 
@@ -80,7 +81,7 @@ describe('learning where a sibling keeps its orders', () => {
     // Already holding exactly what the sibling would give. Reporting a change
     // here would cost a settings save on every single load.
     const settings = { ...fresh(), ...SIBLING };
-    const changed = await adoptOrderSettings(
+    const changed = await adoptForeignNoteSettings(
       appWith({ [CULI]: SIBLING }),
       settings,
       DEFAULT_SETTINGS
@@ -92,20 +93,20 @@ describe('learning where a sibling keeps its orders', () => {
     // Blank is a decision: it says "do not read orders". Refilling it would
     // turn a feature back on that somebody turned off.
     const settings = { ...fresh(), ordersFolder: '' };
-    await adoptOrderSettings(appWith({ [CULI]: SIBLING }), settings, DEFAULT_SETTINGS);
+    await adoptForeignNoteSettings(appWith({ [CULI]: SIBLING }), settings, DEFAULT_SETTINGS);
     expect(settings.ordersFolder).toBe('');
   });
 
   it('changes nothing when no sibling is installed', async () => {
     const settings = fresh();
-    const changed = await adoptOrderSettings(appWith({}), settings, DEFAULT_SETTINGS);
+    const changed = await adoptForeignNoteSettings(appWith({}), settings, DEFAULT_SETTINGS);
     expect(changed).toBe(false);
     expect(settings.ordersFolder).toBe(DEFAULT_SETTINGS.ordersFolder);
   });
 
   it('ignores a sibling that states the field blank', async () => {
     const settings = fresh();
-    await adoptOrderSettings(
+    await adoptForeignNoteSettings(
       appWith({ [CULI]: { ordersFolder: '   ' } }),
       settings,
       DEFAULT_SETTINGS
@@ -116,7 +117,7 @@ describe('learning where a sibling keeps its orders', () => {
   it('takes each field from the first sibling that states it', async () => {
     // APERtrail has no orders, so it answers none of these and CULItrail does.
     const settings = fresh();
-    await adoptOrderSettings(
+    await adoptForeignNoteSettings(
       appWith({ [APER]: { crmFolder: 'CRM' }, [CULI]: SIBLING }),
       settings,
       DEFAULT_SETTINGS
@@ -129,7 +130,7 @@ describe('learning where a sibling keeps its orders', () => {
     // A folder without the names reads every order as unpriced, which is worse
     // than not looking at all.
     const settings = fresh();
-    await adoptOrderSettings(
+    await adoptForeignNoteSettings(
       appWith({ [CULI]: { ...SIBLING, orderPriceProperty: 'gesamt' } }),
       settings,
       DEFAULT_SETTINGS
@@ -139,7 +140,7 @@ describe('learning where a sibling keeps its orders', () => {
 
   it('touches nothing outside the six order fields', async () => {
     const settings = fresh();
-    await adoptOrderSettings(
+    await adoptForeignNoteSettings(
       appWith({
         [CULI]: { ...SIBLING, personsFolder: 'Somewhere else', typePropertyName: 'kind' },
       }),

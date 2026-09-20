@@ -102,6 +102,8 @@ second heading beside the first.
 | `dayNoteMarker` | `'📝'` |
 | `dayIdeaMarker` | `'💡'` |
 | `daySpanMarker` | `'🏖️'` |
+| `dayPlaceMarker` | `'📍'` |
+| `dayPersonMarker` | `'🧑'` |
 | `dayShowClosedTasks` | `true` |
 | `weekWorkdaysOnly` | `false` |
 | `weekLunchStart` | `'12:00'` |
@@ -316,6 +318,38 @@ than by importing a line of its code.
 | `orderDateProperty` | `'orderDate'` |
 | `orderPriceProperty` | `'price'` |
 | `orderPriceCurrencyProperty` | `'priceCurrency'` |
+
+## Adopted from APERtrail
+
+APERtrail's own defaults, adopted from its settings when it is installed and a
+reasonable guess when it is not. They exist so a day's entries can be seeded
+from a trip's itinerary, by reading that plugin's notes rather than by importing
+a line of its code, and they are pinned on both sides by `trail-core`'s
+`TRIP_CONTRACT`.
+
+The `trip` type value has no row: it is one of the twelve fixed travel values in
+`trail-core`, which both plugins import rather than configure. Only the folder
+is a setting. **Nothing here is ever written**: NODAtrail reads a trip and never
+edits one.
+
+A German vault keeps its trips in `Reisen`, which is the adoption's main job.
+
+| Setting | Default |
+|---|---|
+| `tripsFolder` | `'Trips'` |
+| `travelStatusProperty` | `'travelStatus'` |
+| `departureProperty` | `'departure'` |
+| `returnProperty` | `'return'` |
+| `personsProperty` | `'persons'` |
+| `stopsProperty` | `'stops'` |
+| `stopPlaceField` | `'place'` |
+| `stopDayField` | `'day'` |
+| `stopFromField` | `'from'` |
+| `stopToField` | `'to'` |
+| `stopExcursionField` | `'excursion'` |
+| `stopPersonsField` | `'persons'` |
+| `stopOptionalField` | `'optional'` |
+| `stopChosenField` | `'chosen'` |
 
 ## Budget
 

@@ -367,6 +367,8 @@ describe('the round trip the editable flag depends on', () => {
         startTime: '11:00',
         endTime: '12:00',
         attendance: '',
+        place: '',
+        persons: [],
         notes: '',
         followUps: [],
       },

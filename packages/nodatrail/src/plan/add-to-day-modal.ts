@@ -36,8 +36,10 @@ import { openOrCreatePeriodNote } from './write-period';
 import type { DayEntryRecord } from './read-day';
 import { listEditor } from '../ui/kit/list-editor';
 import { activeDisplayLocale } from '../ui/kit/format';
+import { eligiblePersonTitles } from '../crm/read-persons';
 import {
   DAY_ENTRY_KINDS,
+  carriesPlace,
   copyDraft,
   emptyFollowUp,
   emptyDraft,
@@ -96,6 +98,17 @@ export class AddToDayModal extends FormModal {
   private applyTo: 'day' | 'span' = 'day';
   /** Projects made from this form, which the metadata cache has not indexed yet. */
   private readonly createdContexts: string[] = [];
+  /**
+   * The person rows, as objects the list editor can mutate in place.
+   *
+   * The draft holds titles, which is what the line carries and what every
+   * reader downstream wants. A list editor cannot edit a string in an array --
+   * there is nothing to mutate -- so the dialog keeps wrappers and writes the
+   * titles back on every change. Kept on the dialog rather than rebuilt in
+   * `fields()`, which runs again on every rerender and would throw away a row
+   * somebody had just added and not yet filled in.
+   */
+  private personRows: { title: string }[] = [];
 
   /**
    * The entry being edited, and the note it is in.
@@ -112,6 +125,10 @@ export class AddToDayModal extends FormModal {
   ) {
     super(deps.app);
     this.draft = editing ? copyDraft(editing.entry.draft) : emptyDraft();
+    // The rows the list editor works on, built once from whatever the entry
+    // already said. `copyDraft` has already detached the array, so editing
+    // these cannot reach the record the guard measures against.
+    this.personRows = this.draft.persons.map((title) => ({ title }));
     // **Blank at week and month level, and that is the feature.** The date
     // field decides where the entry lands: name a day and it goes into that
     // day's note, leave it empty and it goes into the period's note with the
@@ -250,11 +267,21 @@ export class AddToDayModal extends FormModal {
           ? (value as DayEntryKind)
           : 'task';
         if (next === this.draft.kind) return;
-        // The text survives the switch and nothing else does. Somebody who
-        // typed a sentence and then realised it was a meeting rather than a
-        // task should not have to type it again.
-        const { text, context } = this.draft;
-        this.draft = { ...emptyDraft(next), text, context };
+        // The text survives the switch, and so do the place and the people
+        // when both kinds carry them: a week in a hotel that turns out to be
+        // one afternoon is the same place with the same people. Everything
+        // else is dropped, because a field the new kind does not write is a
+        // field nothing on screen would show.
+        const { text, context, place, persons } = this.draft;
+        const keepsPlace = carriesPlace(next) && carriesPlace(this.draft.kind);
+        this.draft = {
+          ...emptyDraft(next),
+          text,
+          context,
+          place: keepsPlace ? place : '',
+          persons: keepsPlace ? persons : [],
+        };
+        this.syncPersonRows();
         // A range left over from a span would otherwise still be set on a
         // meeting, where nothing shows it and nothing writes it -- the same
         // reason the due date is dropped here.
@@ -309,6 +336,20 @@ export class AddToDayModal extends FormModal {
         () => this.draft.priority,
         (value) => (this.draft.priority = value)
       );
+    }
+
+    // Where it was and who was there, for the two kinds that can say so. Both
+    // are written as child lines, so the entry's own line is untouched and the
+    // derived key an importer builds from it cannot move.
+    if (carriesPlace(this.draft.kind)) {
+      this.text(
+        container,
+        t('day.place'),
+        () => this.draft.place,
+        (value) => (this.draft.place = value)
+      );
+      this.hint(container, t('day.placeHint'));
+      this.personRowsField(container);
     }
 
     if (this.draft.kind === 'meeting') {
@@ -500,6 +541,56 @@ export class AddToDayModal extends FormModal {
         });
       },
     });
+  }
+
+  /**
+   * Who was there: a row each, each a person the vault already knows.
+   *
+   * **A dropdown rather than a text box**, because a person is a note and a
+   * mistyped title is a link to nothing. The same list the rest of the plugin
+   * offers, narrowed by the same tag setting.
+   *
+   * A row each rather than a comma list: four at a table should read as four
+   * things, and removing one should not mean re-reading a sentence.
+   */
+  private personRowsField(container: HTMLElement): void {
+    new Setting(container).setName(t('day.persons'));
+
+    const choices = eligiblePersonTitles(this.deps.app, this.deps.getSettings());
+    listEditor(container.createDiv(), {
+      rows: this.personRows,
+      blank: () => ({ title: '' }),
+      addLabel: t('day.persons'),
+      emptyLabel: t('day.personsEmpty'),
+      onChange: () => this.syncPersons(),
+      renderRow: (row, cell) => {
+        const setting = new Setting(cell);
+        setting.settingEl.addClass('nod-list-setting');
+        setting.addDropdown((dropdown) => {
+          dropdown.addOption('', t('common.none'));
+          for (const title of choices) dropdown.addOption(title, title);
+          dropdown.setValue(row.title);
+          dropdown.onChange((value) => {
+            // Mutated in place, like a follow-up row: the list editor holds
+            // this very array and redraws the whole list.
+            row.title = value;
+            this.syncPersons();
+          });
+        });
+      },
+    });
+  }
+
+  /** The rows, rebuilt from the draft. For a kind change, which replaces the draft. */
+  private syncPersonRows(): void {
+    this.personRows = this.draft.persons.map((title) => ({ title }));
+  }
+
+  /** The draft, brought back in line with the rows. A row nobody filled in writes nothing. */
+  private syncPersons(): void {
+    this.draft.persons = this.personRows
+      .map((row) => row.title.trim())
+      .filter((title) => title !== '');
   }
 
   /** The live projects and areas, title-sorted, with a blank for an entry about nothing in particular. */

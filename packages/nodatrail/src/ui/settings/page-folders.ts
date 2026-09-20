@@ -38,6 +38,7 @@ type FolderKey = Extract<
   | 'accountsFolder'
   | 'journalFolder'
   | 'ordersFolder'
+  | 'tripsFolder'
   | 'crmFolder'
   | 'personsFolder'
   | 'companiesFolder'
@@ -114,6 +115,11 @@ export function renderFolderPage(containerEl: HTMLElement, deps: FolderPageDeps)
   // Somebody else's folder, read and never written. Blank turns the reading off.
   folder(finance, 'ordersFolder', t('settings.folders.ordersFolder'));
   noteLine(finance, t('settings.folders.ordersNote'));
+  // The other one: APERtrail's trips, read to seed a day's entries and never
+  // written. Blank turns the seeding off, the same way a blank orders folder
+  // turns the order reading off.
+  folder(finance, 'tripsFolder', t('settings.folders.tripsFolder'));
+  noteLine(finance, t('settings.folders.tripsNote'));
   const subfolders: [SubfolderKey, string][] = [
     ['billSubfolder', t('finance.bills')],
     ['purchaseSubfolder', t('finance.purchases')],
@@ -329,7 +335,9 @@ export function renderFolderPage(containerEl: HTMLElement, deps: FolderPageDeps)
       | 'dayMeetingDeclinedMarker'
       | 'dayNoteMarker'
       | 'dayIdeaMarker'
-      | 'daySpanMarker',
+      | 'daySpanMarker'
+      | 'dayPlaceMarker'
+      | 'dayPersonMarker',
     name: string
   ) => {
     textRow(
@@ -349,6 +357,8 @@ export function renderFolderPage(containerEl: HTMLElement, deps: FolderPageDeps)
   markerRow('dayNoteMarker', t('settings.day.noteMarker'));
   markerRow('dayIdeaMarker', t('settings.day.ideaMarker'));
   markerRow('daySpanMarker', t('settings.day.spanMarker'));
+  markerRow('dayPlaceMarker', t('settings.day.placeMarker'));
+  markerRow('dayPersonMarker', t('settings.day.personMarker'));
   noteLine(day, t('settings.day.markerDesc'));
   noteLine(day, t('settings.day.attendanceDesc'));
 

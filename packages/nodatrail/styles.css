@@ -935,6 +935,15 @@
   gap: 0.1em;
 }
 
+/* The line under a block's rows that says what it is not showing: how many
+   entries are further back than the cap. Muted, because it is about the list
+   rather than in it. */
+.nod-block-note {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  padding: 0.35em 0.5em;
+}
+
 .nod-whats-new .setting-item {
   border: none;
 }

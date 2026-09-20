@@ -25,6 +25,7 @@ import {
   DISPLAY_CONTRACT,
   SHEET_CONTRACT,
   ORDER_CONTRACT,
+  TRIP_CONTRACT,
   joinFolder,
 } from '@technosoftware/trail-core';
 import { NODAtrailSettings } from './types';
@@ -118,6 +119,8 @@ export const DEFAULT_SETTINGS: NODAtrailSettings = {
   dayMeetingDeclinedMarker: '🚫',
   dayNoteMarker: '📝',
   dayIdeaMarker: '💡',
+  dayPlaceMarker: '📍',
+  dayPersonMarker: '🧑',
   daySpanMarker: '🏖️',
   // Blank on purpose: see the note on these in `types.ts`. Narrowing an
   // unclassified vault's pickers to nothing would be worse than not narrowing.
@@ -258,6 +261,26 @@ export const DEFAULT_SETTINGS: NODAtrailSettings = {
   // compares. Adopted from the sibling's settings when it is installed; when it
   // is not, these are what an order note written by a fresh CULItrail looks
   // like. tests/order-contract.test.ts fails if this stops matching.
+  // APERtrail's trip note, held in trail-core's TRIP_CONTRACT for the same
+  // reason the order fields below are: two lists of literals that nothing
+  // compares is how `place` and `ort` end up in one vault. Adopted from
+  // APERtrail's own settings when it is installed, which is what hands a German
+  // vault `Reisen`. tests/trip-contract.test.ts fails if this stops matching.
+  tripsFolder: TRIP_CONTRACT.tripsFolder,
+  travelStatusProperty: TRIP_CONTRACT.travelStatusProperty,
+  departureProperty: TRIP_CONTRACT.departureProperty,
+  returnProperty: TRIP_CONTRACT.returnProperty,
+  personsProperty: TRIP_CONTRACT.personsProperty,
+  stopsProperty: TRIP_CONTRACT.stopsProperty,
+  stopPlaceField: TRIP_CONTRACT.stopPlaceField,
+  stopDayField: TRIP_CONTRACT.stopDayField,
+  stopFromField: TRIP_CONTRACT.stopFromField,
+  stopToField: TRIP_CONTRACT.stopToField,
+  stopExcursionField: TRIP_CONTRACT.stopExcursionField,
+  stopPersonsField: TRIP_CONTRACT.stopPersonsField,
+  stopOptionalField: TRIP_CONTRACT.stopOptionalField,
+  stopChosenField: TRIP_CONTRACT.stopChosenField,
+
   ordersFolder: ORDER_CONTRACT.ordersFolder,
   orderTypeValue: ORDER_CONTRACT.orderTypeValue,
   orderCompanyProperty: ORDER_CONTRACT.orderCompanyProperty,

@@ -20,7 +20,7 @@ import {
   dayOfDate,
   endpointDate,
   tripDayCount,
-} from '../src/trips/relative-days';
+} from '../src/travel/relative-days';
 
 const DEPARTURE = '2026-11-02';
 

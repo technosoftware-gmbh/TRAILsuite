@@ -147,6 +147,31 @@ is NODAtrail's counterpart to APERtrail's `travel-related-trips` and CULItrail's
 `culi-related-orders`, and like them it renders as a plain code block when the
 plugin is disabled rather than as an error.
 
+````
+```nod-day-entries
+```
+````
+in a **Person** note: the days you wrote them into, newest first. An entry names
+somebody by carrying a link to their note, which is what the **Who was there**
+field on the capture dialog writes as a `🧑` line under the entry; a meeting
+whose text merely mentions a name is not an answer, and saying it in a way a
+reader can be sure about is the whole point of the child line.
+
+**It works in any note**, because the question is "which days name this one".
+Put the same fence in a **trip** note and it lists the days that trip's stops
+were written into. An excursion note is the one case it cannot answer yet: a
+seeded stop says the excursion as its text and links only the trip, so nothing
+points at the excursion note to be found by.
+
+It asks the vault which notes link here rather than reading every day note, so
+it costs one read per day that actually names them. The forty most recent are
+drawn and the rest are counted.
+
+**Add the fence yourself** to the note you want it in. Nothing writes it for
+you: a person note is shared with the sibling plugins, and a plugin that
+appended its own block to notes nobody asked it to touch would be editing an
+address book on its own initiative.
+
 ## When something does not show up
 
 A note counts as a given kind only if it sits under the configured folder **and**
