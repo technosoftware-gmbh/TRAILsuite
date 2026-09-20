@@ -22,7 +22,15 @@
 import { describe, expect, it } from 'vitest';
 import { parseScheduleLine } from '../src/plan/read-schedule';
 
-const MARKERS = { accepted: '👥', tentative: '❓', unanswered: '✉️', declined: '🚫', span: '🏖️' };
+const MARKERS = {
+  accepted: '👥',
+  tentative: '❓',
+  unanswered: '✉️',
+  declined: '🚫',
+  span: '🏖️',
+  place: '📍',
+  person: '🧑',
+};
 
 const parse = (line: string, marker = '👥') =>
   parseScheduleLine(line, { ...MARKERS, accepted: marker });
@@ -92,6 +100,16 @@ describe('a line somebody wrote by hand', () => {
 });
 
 describe('what it refuses to read', () => {
+  it('skips a place or a person child, which belong to the entry above them', () => {
+    // The week reads a day through this. Without it, a lunch with a restaurant
+    // and two people would draw four rows where the day draws one.
+    expect(parse('    - 📍 [[Gifthüttli]]')).toBeNull();
+    expect(parse('    - 🧑 [[Anna Muster]]')).toBeNull();
+    // Refused by the marker rather than by being indented, so an unindented
+    // line somebody typed with the same marker is refused too.
+    expect(parse('- 📍 [[Gifthüttli]]')).toBeNull();
+  });
+
   it('skips a checkbox, so a follow-up is not listed twice', () => {
     // The rule that keeps the plan view from showing one task in two sections.
     expect(parse('    - [ ] Beim Design nachfassen')).toBeNull();
@@ -140,7 +158,14 @@ describe('what was answered', () => {
     // Two markers can share a prefix -- an emoji and the same emoji with a
     // variation selector differ only in the tail -- and stripping the shorter
     // would leave the difference sitting at the front of the text.
-    const markers = { accepted: '👥', tentative: '👥❓', unanswered: '', declined: '', span: '' };
+    const markers = {
+      ...MARKERS,
+      accepted: '👥',
+      tentative: '👥❓',
+      unanswered: '',
+      declined: '',
+      span: '',
+    };
     expect(parseScheduleLine('- 👥❓ 09:00 Standup', markers)).toMatchObject({
       attendance: 'tentative',
       text: 'Standup',
@@ -154,7 +179,14 @@ describe('what was answered', () => {
   it('ignores a marker a vault has cleared', () => {
     // Blank means "do not distinguish these", and a blank marker matching
     // every line would read the whole day as declined.
-    const markers = { accepted: '👥', tentative: '', unanswered: '', declined: '', span: '' };
+    const markers = {
+      ...MARKERS,
+      accepted: '👥',
+      tentative: '',
+      unanswered: '',
+      declined: '',
+      span: '',
+    };
     expect(parseScheduleLine('- 👥 09:00 Standup', markers)?.attendance).toBe('');
     expect(parseScheduleLine('- 09:00 Standup', markers)?.attendance).toBe('');
   });
