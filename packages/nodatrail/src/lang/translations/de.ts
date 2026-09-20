@@ -234,6 +234,8 @@ export const deTranslations: Translations = {
       'Ein Notiztitel. Er wird als eigene Zeile unter den Eintrag geschrieben, der Eintrag selbst bleibt also unveraendert, und ein Ort, den es noch nicht als Notiz gibt, loest sich auf, sobald sie geschrieben ist.',
     persons: 'Wer dabei war',
     personsEmpty: 'Noch niemand genannt.',
+    noPersonDays: 'Noch keine Tageseintraege nennen diese Person.',
+    morePersonDays: 'Und {count} weitere, weiter zurueck.',
     from: 'Von',
     until: 'Bis',
     lastDay: 'Letzter Tag',

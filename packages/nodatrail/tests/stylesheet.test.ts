@@ -6,8 +6,8 @@
  * in a way nobody notices until a theme changes. A rule the source never sets is
  * dead weight that the next person to edit the sheet has to reason about.
  *
- * The six fence languages are excluded, because they are strings a reader types
- * into a note rather than classes anything sets.
+ * The seven fence languages are excluded, because they are strings a reader
+ * types into a note rather than classes anything sets.
  */
 import { describe, expect, it } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
@@ -17,6 +17,7 @@ const ROOT = join(__dirname, '..');
 const FENCE_LANGUAGES = new Set([
   'nod-bills',
   'nod-budget',
+  'nod-day-entries',
   'nod-period',
   'nod-projects',
   'nod-spending',

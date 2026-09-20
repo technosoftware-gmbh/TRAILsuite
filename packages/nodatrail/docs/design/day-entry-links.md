@@ -439,10 +439,29 @@ and APERtrail reading plan folders is the same kind of read NODAtrail's
 - **The day tab** of the plan view: chips beside an entry for its place and its
   people, drawn from the links the reader already collects. Costs nothing
   written and is the first visible benefit.
-- **A Person note**, a new fenced block beside `travel-related-trips` and
-  `nod-spending`. NODAtrail's own, listing the day entries that name them. It
-  degrades to a plain code block when NODAtrail is off, which is the rule all
-  three blocks already follow.
+- **A Person note**, `nod-day-entries`, beside `travel-related-trips` and
+  `nod-spending`. NODAtrail's own, listing the day entries that name them,
+  newest first. It degrades to a plain code block when NODAtrail is off, which
+  is the rule all three blocks already follow.
+
+  **It asks the vault which notes link here.** `metadataCache.resolvedLinks`
+  already knows, so a person who appears in forty days costs forty reads rather
+  than one per day note in the vault. That is the difference between a block
+  that renders when a note is opened and one that makes opening a note slow, and
+  it is why this does not reuse `readScheduleRange`, which reads a range whether
+  or not those days say anything.
+
+  **Matched on the link, never on the text.** A meeting whose words happen to
+  mention a name is not an answer; saying it in a way a reader can be sure about
+  is the whole reason the person went on a child line.
+
+  **Nothing writes the fence.** A Person note is shared with the sibling
+  plugins, and a plugin appending its own block to notes nobody asked it to
+  touch would be editing an address book on its own initiative. The sample vault
+  does not seed it either: `ensureBlock` in `trail-core`'s `SampleNote` takes
+  one language, so a second fence in the body alone would make a person note the
+  plan *creates* render two blocks where one it *augments* renders one, and
+  widening a shared type for a sample vault is not the trade to make.
 - **A place note** is the one to leave alone. A restaurant already gets
   `travel-related-trips` from APERtrail, and a second block from a second plugin
   answering nearly the same question is two lists somebody reconciles by eye.
@@ -585,7 +604,7 @@ format.
    **This is the step that writes into somebody's notes. Done.**
 5. **The trip seeder fills in children** (§F.1's last bullet): the stop's place
    and persons, and never its note or rating. **Done.**
-6. **The Person note block** (§H).
+6. **The Person note block** (§H). **Done.**
 7. **The travel side reading the day notes back** (§F.3), last, because it needs
    step 4 to have something to match on.
 

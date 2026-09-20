@@ -233,6 +233,8 @@ export const enTranslations = {
       'A note title. It is written on its own line under the entry, so the entry itself is unchanged and a place typed before its note exists starts resolving the day it is written.',
     persons: 'Who was there',
     personsEmpty: 'Nobody named yet.',
+    noPersonDays: 'No day entries name this person yet.',
+    morePersonDays: 'And {count} more, further back.',
     from: 'From',
     until: 'Until',
     lastDay: 'Last day',

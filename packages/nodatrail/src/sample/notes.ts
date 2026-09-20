@@ -927,6 +927,13 @@ function crm(settings: NODAtrailSettings): SampleNote[] {
     // plugin's own block and nothing else. It renders its empty state until
     // somebody in this vault invoices the household, which is exactly what it
     // should say about a person who never has.
+    //
+    // **`nod-day-entries` is deliberately not here.** `ensureBlock` takes one
+    // language, in `trail-core`'s own `SampleNote`, and a second fence in the
+    // body alone would mean a person note this plan *creates* renders two
+    // blocks while one it *augments* renders one. Two shapes for one note is
+    // worse than one fence somebody adds when they want it, and widening a
+    // shared type for a sample vault is not the trade to make.
     body: `${fence(NOD_SPENDING_BLOCK_LANG)}\n`,
     ensureBlock: NOD_SPENDING_BLOCK_LANG,
     // The one folder this plan writes into that it does not own. `CRM/People` is
