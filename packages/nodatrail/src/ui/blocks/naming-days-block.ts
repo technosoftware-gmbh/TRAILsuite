@@ -1,15 +1,26 @@
 /**
- * `nod-day-entries`, the block a Person note carries.
+ * `nod-day-entries`: which days wrote about this note.
  *
  * The third plugin's answer in a note none of them owns: APERtrail's
  * `travel-related-trips` says which trips somebody came on, NODAtrail's
- * `nod-spending` says what was spent at a company, and this says when you last
- * spent an afternoon with them. Each renders its own fence inside a note it
- * does not own, and a fence whose plugin is disabled shows as a plain code
- * block rather than an error.
+ * `nod-spending` says what was spent at a company, and this says which days
+ * named them. Each renders its own fence inside a note it does not own, and a
+ * fence whose plugin is disabled shows as a plain code block rather than an
+ * error.
+ *
+ * **A Person note is the first use and not the only one.** "Which days name
+ * this note" is one question whatever the note is, so the same fence in a
+ * **trip** note lists the days its seeded stops were written into. That is
+ * §F.3 of `docs/design/day-entry-links.md`, and it cost no code: the answer was
+ * already a link away.
+ *
+ * **An excursion note is the case that does not work**, and the reason is a
+ * format question rather than a reading one: a seeded stop says the excursion
+ * as its text and links only the trip, so nothing points at the excursion note
+ * to be found by.
  *
  * **It answers about the note it is in.** No argument needed and none usually
- * given; `person:` is accepted for a block somebody has put somewhere else,
+ * given; `note:` is accepted for a block somebody has put somewhere else,
  * which is the same courtesy `nod-spending` extends.
  *
  * **A place note gets no block of its own**, deliberately. A restaurant already
@@ -21,7 +32,7 @@
  */
 import { TFile, type MarkdownPostProcessorContext } from 'obsidian';
 import { t } from '../../lang/I18nManager';
-import { readPersonDays } from '../../plan/read-person-days';
+import { readDaysNaming } from '../../plan/read-naming-days';
 import { emptyState, row } from '../kit/elements';
 import { blockArgs, hostNote, type BlockDeps } from './context';
 
@@ -31,14 +42,14 @@ function subject(
   source: string,
   context: MarkdownPostProcessorContext
 ): TFile | null {
-  const named = blockArgs(source).get('person');
+  const named = blockArgs(source).get('note');
   if (!named) return hostNote(deps.app, context);
 
   const file = deps.app.metadataCache.getFirstLinkpathDest(named, '');
   return file instanceof TFile ? file : null;
 }
 
-export async function renderPersonDaysBlock(
+export async function renderNamingDaysBlock(
   deps: BlockDeps,
   source: string,
   element: HTMLElement,
@@ -46,15 +57,15 @@ export async function renderPersonDaysBlock(
 ): Promise<void> {
   element.addClass('nod-block');
 
-  const person = subject(deps, source, context);
-  if (!person) {
-    emptyState(element, t('day.noPersonDays'));
+  const about = subject(deps, source, context);
+  if (!about) {
+    emptyState(element, t('day.noNamingDays'));
     return;
   }
 
-  const found = await readPersonDays(deps.app, deps.getSettings(), person);
+  const found = await readDaysNaming(deps.app, deps.getSettings(), about);
   if (found.entries.length === 0) {
-    emptyState(element, t('day.noPersonDays'));
+    emptyState(element, t('day.noNamingDays'));
     return;
   }
 
@@ -75,7 +86,7 @@ export async function renderPersonDaysBlock(
   if (found.more > 0) {
     element.createDiv({
       cls: 'nod-block-note',
-      text: t('day.morePersonDays', { count: String(found.more) }),
+      text: t('day.moreNamingDays', { count: String(found.more) }),
     });
   }
 }

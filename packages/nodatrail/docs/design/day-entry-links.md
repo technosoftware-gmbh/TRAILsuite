@@ -407,12 +407,32 @@ counts as visited.
 
 ### F.3 Reading the day back from the travel side
 
-The direction that currently does not exist. A trip's document and an
-excursion's note could show what the day notes say about them, the way a Person
-note already shows `travel-related-trips`. That is a read of the plan folders,
-scoped to a trip's date range, matching on the link the day line carries --
-which means it only works once §D.2 has given the day entry something to match
-on. **It is therefore the last thing built, not the first.**
+The direction that did not exist. A trip's document and an excursion's note
+could show what the day notes say about them, the way a Person note already
+shows `travel-related-trips`.
+
+**It was going to be APERtrail reading the plan folders, and that would have
+been wrong.** Parsing a day note means knowing the day path template, the
+schedule heading in both languages and the seven markers: the whole day-note
+format, which is NODAtrail's own rather than a shared one. A fourth contract for
+it would have been several times the size of the trip contract, and in the wrong
+direction -- the trip contract pins a format APERtrail *writes*, where this
+would pin one it has no business in.
+
+**The answer was already a link away.** The block §H added asks "which days name
+this note", and a trip is a note: a seeded stop carries the trip as its context
+link, so the same fence in a trip note lists the days its stops were written
+into. NODAtrail reads its own format, APERtrail keeps its boundary, and the
+whole of F.3 cost a rename. `readPersonDays` became `readDaysNaming` and the
+block's argument `person:` became `note:`, before either had shipped.
+
+**An excursion is the case it cannot answer**, and the reason is a format
+question rather than a reading one: a seeded stop says the excursion as its
+*text* and links only the trip, so nothing points at the excursion note to be
+found by. Making it a link would mean a second link on the headline, which §D
+ruled out, or a third child marker. **Deferred rather than decided**: it is
+worth knowing whether a trip note answering this is enough before adding another
+element to a format that is much easier to add to than to take back.
 
 ---
 
@@ -606,7 +626,9 @@ format.
    and persons, and never its note or rating. **Done.**
 6. **The Person note block** (§H). **Done.**
 7. **The travel side reading the day notes back** (§F.3), last, because it needs
-   step 4 to have something to match on.
+   step 4 to have something to match on. **Done, and it turned out to be a
+   rename**: the block from step 6 answers for a trip note unchanged. The
+   excursion half is deferred, and §F.3 says what it would cost.
 
 **The order changed once already** and the reason is worth keeping: the seeder
 turned out to need a core change of its own, so the core step moved in front of

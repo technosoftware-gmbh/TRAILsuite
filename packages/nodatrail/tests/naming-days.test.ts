@@ -1,5 +1,5 @@
 /**
- * The days a Person note's block lists.
+ * The days a note's block lists.
  *
  * Two properties carry the whole feature. It must find an entry by the **link**
  * rather than by the text, because saying it in a way a reader can be sure
@@ -12,7 +12,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { App, TFile } from 'obsidian';
 import { TFile as StubFile } from './obsidian-stub';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
-import { readPersonDays } from '../src/plan/read-person-days';
+import { readDaysNaming } from '../src/plan/read-naming-days';
 
 vi.mock('obsidian', () => import('./obsidian-stub'));
 
@@ -42,7 +42,12 @@ function appWith(vault: Vault): { app: App; reads: string[] } {
   const reads: string[] = [];
   const resolvedLinks: Record<string, Record<string, number>> = {};
   for (const path of Object.keys(vault.notes)) {
-    resolvedLinks[path] = vault.links.includes(path) ? { [PERSON]: 1 } : {};
+    // Every linked source is recorded as linking to both subjects the suite
+    // uses. What decides whether an entry counts is the link on the line, and
+    // that is the half worth asserting.
+    resolvedLinks[path] = vault.links.includes(path)
+      ? { [PERSON]: 1, 'Trips/Nordkap 2027.md': 1 }
+      : {};
   }
 
   const app = {
@@ -73,14 +78,14 @@ const LUNCH = [
   '',
 ].join('\n');
 
-describe('readPersonDays', () => {
+describe('readDaysNaming', () => {
   it('finds the entry that links to the person, newest day first', async () => {
     const { app } = appWith({
       notes: { [dayPath('2026-09-14')]: LUNCH, [dayPath('2026-09-18')]: LUNCH },
       links: [dayPath('2026-09-14'), dayPath('2026-09-18')],
     });
 
-    const found = await readPersonDays(app, S, fileAt(PERSON));
+    const found = await readDaysNaming(app, S, fileAt(PERSON));
     expect(found.entries.map((one) => one.day)).toEqual(['2026-09-18', '2026-09-14']);
     expect(found.entries[0]?.record.label).toBe('Mittagessen');
     expect(found.more).toBe(0);
@@ -99,7 +104,7 @@ describe('readPersonDays', () => {
       links: [dayPath('2026-09-15')],
     });
 
-    const found = await readPersonDays(app, S, fileAt(PERSON));
+    const found = await readDaysNaming(app, S, fileAt(PERSON));
     expect(reads).toEqual([dayPath('2026-09-15')]);
     expect(found.entries).toHaveLength(1);
   });
@@ -111,7 +116,7 @@ describe('readPersonDays', () => {
       notes: { '3 Projects/Umzug.md': LUNCH },
       links: ['3 Projects/Umzug.md'],
     });
-    expect((await readPersonDays(app, S, fileAt(PERSON))).entries).toEqual([]);
+    expect((await readDaysNaming(app, S, fileAt(PERSON))).entries).toEqual([]);
   });
 
   it('does not match a name that is only in the text', async () => {
@@ -124,7 +129,28 @@ describe('readPersonDays', () => {
       notes: { [dayPath('2026-09-14')]: mentioned },
       links: [dayPath('2026-09-14')],
     });
-    expect((await readPersonDays(app, S, fileAt(PERSON))).entries).toEqual([]);
+    expect((await readDaysNaming(app, S, fileAt(PERSON))).entries).toEqual([]);
+  });
+
+  it('answers for a trip note the same way, which is what section F.3 needed', () => {
+    // The question is "which days name this note", and a trip is a note. A
+    // seeded stop carries the trip as its context link, so the trip's own fence
+    // lists the days its stops were written into, with no reader of its own.
+    const trip = [
+      '## 📅 Schedule',
+      '- 👥 09:00-12:30 Hundeschlittenfahrt [[Nordkap 2027]]',
+      '    - 📍 [[Tromso]]',
+      '',
+    ].join('\n');
+    const { app } = appWith({
+      notes: { [dayPath('2027-02-17')]: trip },
+      links: [dayPath('2027-02-17')],
+    });
+
+    const file = fileAt('Trips/Nordkap 2027.md');
+    return readDaysNaming(app, S, file).then((found) => {
+      expect(found.entries.map((one) => one.record.label)).toEqual(['Hundeschlittenfahrt']);
+    });
   });
 
   it('counts what it does not draw rather than cutting off silently', async () => {
@@ -134,7 +160,7 @@ describe('readPersonDays', () => {
     }
     const { app } = appWith({ notes, links: Object.keys(notes) });
 
-    const found = await readPersonDays(app, S, fileAt(PERSON), 4);
+    const found = await readDaysNaming(app, S, fileAt(PERSON), 4);
     expect(found.entries).toHaveLength(4);
     expect(found.more).toBe(2);
     // Newest kept, oldest dropped: what somebody is looking for is the last

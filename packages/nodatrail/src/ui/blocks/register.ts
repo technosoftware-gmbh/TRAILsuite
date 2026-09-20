@@ -16,7 +16,7 @@ import { NOD_DAY_ENTRIES_BLOCK_LANG } from '../../crm/day-entries-block-lang';
 import { renderProjectsBlock } from './para-blocks';
 import { renderBillsBlock, renderBudgetBlock, renderSpendingBlock } from './finance-blocks';
 import { renderPeriodBlock, renderTasksBlock } from './plan-blocks';
-import { renderPersonDaysBlock } from './person-blocks';
+import { renderNamingDaysBlock } from './naming-days-block';
 import { renderJournalBlock } from './journal-block';
 import type { BlockDeps } from './context';
 
@@ -47,7 +47,7 @@ export function registerBlocks(plugin: Plugin, deps: BlockDeps): void {
   plugin.registerMarkdownCodeBlockProcessor(
     NOD_DAY_ENTRIES_BLOCK_LANG,
     (source, element, context) => {
-      void renderPersonDaysBlock(deps, source, element, context);
+      void renderNamingDaysBlock(deps, source, element, context);
     }
   );
 
