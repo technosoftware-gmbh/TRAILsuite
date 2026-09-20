@@ -19,6 +19,14 @@
  *
  * Only trips whose effective status is `Over` count. A Planned or Booked
  * trip is an intention, and a Cancelled one is evidence of the opposite.
+ *
+ * **A day note naming the place is the second kind of evidence**, and it is
+ * looser than the first on purpose. A restaurant on an ordinary Tuesday is not
+ * a trip and never will be, so without it the Prospekt said `nicht besucht`
+ * about a place somebody had eaten at the day before. What it cannot do is tell
+ * a visit from an intention: a day note that merely mentions a place counts.
+ * `day-visits.ts` says why that trade was taken rather than reading the day
+ * note's own format.
  */
 import { TravelCity, TravelPlace, TravelTrip } from './types';
 
@@ -68,18 +76,22 @@ export function deriveVisit(
   title: string,
   explicitVisited: boolean,
   explicitLastVisit: string | null,
-  index: Map<string, string[]>
+  index: Map<string, string[]>,
+  dayDates: readonly string[] = []
 ): DerivedVisit {
   const tripDates = index.get(title) ?? [];
   const fromTrips = tripDates.length > 0;
 
-  const candidates = [explicitLastVisit, ...tripDates].filter(
+  const candidates = [explicitLastVisit, ...tripDates, ...dayDates].filter(
     (d): d is string => typeof d === 'string' && d !== ''
   );
   const lastVisit = candidates.length > 0 ? candidates.reduce((a, b) => (a > b ? a : b)) : null;
 
   return {
-    visited: explicitVisited || fromTrips,
+    // **A day note is evidence on its own**, not only a date for a visit a trip
+    // already established. That is the whole point: the places it adds are the
+    // ones no trip will ever mention.
+    visited: explicitVisited || fromTrips || dayDates.length > 0,
     lastVisit,
     fromTrips,
   };
@@ -96,17 +108,35 @@ export function deriveVisit(
 export function applyDerivedVisits(
   cities: TravelCity[],
   places: TravelPlace[],
-  trips: TravelTrip[]
+  trips: TravelTrip[],
+  dayVisits: Map<string, string[]> = new Map()
 ): void {
   const index = buildVisitIndex(trips);
+  // By path, because that is what a resolved link resolved to and what tells
+  // two notes of one title apart. The trip index is by title for the opposite
+  // reason: a stop names a title and has no path to offer.
+  const daysOf = (path: string): string[] => dayVisits.get(path) ?? [];
+
   for (const city of cities) {
-    const derived = deriveVisit(city.title, city.visited, city.lastVisit, index);
+    const derived = deriveVisit(
+      city.title,
+      city.visited,
+      city.lastVisit,
+      index,
+      daysOf(city.file.path)
+    );
     city.visited = derived.visited;
     city.lastVisit = derived.lastVisit;
     city.visitedFromTrips = derived.fromTrips;
   }
   for (const place of places) {
-    const derived = deriveVisit(place.title, place.visited, place.lastVisit, index);
+    const derived = deriveVisit(
+      place.title,
+      place.visited,
+      place.lastVisit,
+      index,
+      daysOf(place.file.path)
+    );
     place.visited = derived.visited;
     place.lastVisit = derived.lastVisit;
     place.visitedFromTrips = derived.fromTrips;

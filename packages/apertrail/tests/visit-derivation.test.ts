@@ -1,8 +1,8 @@
 /**
- * Deriving visited/lastVisit from finished trips -- see
- * vault/visit-derivation.ts. Pure, so this exercises the derivation
- * directly; trip-read-visits.test.ts covers it end to end through the
- * board reader.
+ * Deriving visited/lastVisit from finished trips and from the day notes that
+ * name a place -- see vault/visit-derivation.ts. Pure, so this exercises the
+ * derivation directly; trip-read-visits.test.ts covers it end to end through
+ * the board reader.
  */
 import { describe, expect, it } from 'vitest';
 import { aStop, aTrip } from './fixtures';
@@ -107,5 +107,50 @@ describe('deriveVisit', () => {
       lastVisit: null,
       fromTrips: false,
     });
+  });
+});
+
+describe('a day note as evidence', () => {
+  const noTrips = new Map<string, string[]>();
+
+  it('counts on its own, which is the whole reason it exists', () => {
+    // A restaurant on an ordinary Tuesday is not a trip and never will be, so
+    // without this the Prospekt said "nicht besucht" about a place somebody
+    // had eaten at the day before.
+    const derived = deriveVisit('Landgasthof Keppel', false, null, noTrips, ['2026-09-20']);
+    expect(derived.visited).toBe(true);
+    expect(derived.lastVisit).toBe('2026-09-20');
+  });
+
+  it('does not claim a trip contributed it', () => {
+    // `visitedFromTrips` is what lets a card explain a flag the note does not
+    // carry, and a day note is not a trip. It always brings a date, so the card
+    // shows the date rather than needing the explanation.
+    expect(deriveVisit('Landgasthof Keppel', false, null, noTrips, ['2026-09-20']).fromTrips).toBe(
+      false
+    );
+  });
+
+  it('is folded in beside the trips rather than replacing them', () => {
+    const index = buildVisitIndex([
+      trip('Done', { effectiveStatus: 'Over', stops: [stop('Falknis', '2026-02-13T12:00')] }),
+    ]);
+    const derived = deriveVisit('Falknis', false, null, index, ['2026-08-01']);
+    expect(derived.fromTrips).toBe(true);
+    // The most recent across every source, which is the rule the explicit
+    // lastVisit already follows.
+    expect(derived.lastVisit).toBe('2026-08-01');
+  });
+
+  it('leaves an older day note behind a newer trip', () => {
+    const index = buildVisitIndex([
+      trip('Done', { effectiveStatus: 'Over', stops: [stop('Falknis', '2026-02-13T12:00')] }),
+    ]);
+    expect(deriveVisit('Falknis', false, null, index, ['2025-01-01']).lastVisit).toBe('2026-02-13');
+  });
+
+  it('changes nothing for a place no day note names', () => {
+    expect(deriveVisit('Unbesucht', false, null, noTrips, []).visited).toBe(false);
+    expect(deriveVisit('Unbesucht', false, null, noTrips, []).lastVisit).toBeNull();
   });
 });

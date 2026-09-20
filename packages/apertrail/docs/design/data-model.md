@@ -104,7 +104,7 @@ Three things are computed at read time and never written back:
 
 | Derived | From | Rule |
 |---|---|---|
-| `visited` / `lastVisit` on a City or place | Stops on trips whose effective status is `Over` | An explicit `visited: true` always wins; an explicit `lastVisit:` is folded in alongside derived dates rather than replaced; the most recent date across all sources wins |
+| `visited` / `lastVisit` on a City or place | Stops on trips whose effective status is `Over`, **and day notes that link to the note** | An explicit `visited: true` always wins; an explicit `lastVisit:` is folded in alongside derived dates rather than replaced; the most recent date across all sources wins. A day note counts on its own, which is how a restaurant nobody made a trip to is ever marked visited: `day-visits.ts` reads the title and the link and never the body, and says why it accepts a mention it cannot tell from a visit |
 | A Trip's effective status | Its own `departure`/`return` when `travelStatus` is absent or unrecognized | A trip whose return date has passed reads `Over`, everything else reads `Planned`; a trip ending today is still current |
 | The date an itinerary item falls on | Its `day` number and the trip's `departure` | Day 1 is the departure day. Resolved on every render; the note goes on saying `day: 3`, so moving the departure moves the whole trip without rewriting a line. See [Relative days](relative-days.md) |
 | A Trip's `extensions` | The trips that name it in their own `extends:` | The link is written on the trip that comes second, so adding three days in Kopenhagen never reopens the voyage note it follows. One level deep and never a chain, and a trip is never its own extension. See [Excursions](excursions.md) |

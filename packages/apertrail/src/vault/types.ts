@@ -105,10 +105,17 @@ export interface TravelCity {
   cityState: boolean;
   /** [latitude, longitude] as pasted from a map view, or null if unset. */
   geoLocation: [string, string] | null;
-  /** Explicit frontmatter OR derived from a finished trip that stops here -- see vault/visit-derivation.ts. */
+  /** Explicit frontmatter, a finished trip that stops here, or a day note naming it -- see vault/visit-derivation.ts. */
   visited: boolean;
   lastVisit: string | null;
-  /** True when a finished trip contributed the visit, so the UI can explain a flag the note itself doesn't carry. */
+  /**
+   * True when a finished trip contributed the visit, so the UI can explain a
+   * flag the note itself doesn't carry.
+   *
+   * False for a visit that came from a day note, which always brings a date
+   * with it -- the card then shows that date under the calendar icon, which is
+   * the shape it already had for an explicit `lastVisit:`.
+   */
   visitedFromTrips: boolean;
   tags: string[]; /** What it shows on a cover: a line, a picture, the rest of them, and its highlights. See vault/read-cover.ts. */
   description: string | null;
@@ -136,7 +143,7 @@ export interface TravelPlace {
   cityTitle: string | null;
   city: TravelCity | null;
   geoLocation: [string, string] | null;
-  /** Explicit frontmatter OR derived from a finished trip that stops here -- see vault/visit-derivation.ts. */
+  /** Explicit frontmatter, a finished trip that stops here, or a day note naming it -- see vault/visit-derivation.ts. */
   visited: boolean;
   lastVisit: string | null;
   visitedFromTrips: boolean;
