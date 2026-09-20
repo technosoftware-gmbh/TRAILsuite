@@ -41,6 +41,23 @@ export interface LinkSelectOptions {
   /** Both of these, or neither: the last option is only offered when something can act on it. */
   createLabel?: string;
   onCreateNew?: (adopt: (title: string) => void) => void;
+  /**
+   * One choice that is a title like any other but has to READ as something
+   * else.
+   *
+   * The city-state is the case it was built for. A city's `state:` may name
+   * the city itself -- Hamburg's Bundesland is Hamburg -- and the value that
+   * expresses is the plain title, so it belongs in this control rather than
+   * in a switch beside it. But "Hamburg" sitting among the Bundeslaender
+   * reads as a mis-click unless it says what choosing it means, and it is
+   * offered on one city's own dialog rather than on all of them, so it
+   * cannot simply be pushed into `titles`.
+   *
+   * Offered directly under the empty choice, above the notes: it answers the
+   * question differently rather than more specifically, and a reader
+   * scanning a list of real Bundeslaender should meet it before them.
+   */
+  extraOption?: { value: string; label: string };
 }
 
 /**
@@ -57,13 +74,18 @@ export function renderLinkSelect(
   const select = container.createEl('select', { cls: 'apt-modal-select dropdown' });
 
   const canCreate = options.createLabel !== undefined && options.onCreateNew !== undefined;
+  const extra = options.extraOption;
   const offered = [...options.titles];
   let chosen = options.value.trim();
-  if (chosen && !offered.includes(chosen)) offered.unshift(chosen);
+  // The extra choice has a row of its own below, so a value that IS it must
+  // not also be unshifted here under its bare title: the note would be
+  // offered twice, once saying what it means and once not.
+  if (chosen && chosen !== extra?.value && !offered.includes(chosen)) offered.unshift(chosen);
 
   const rebuild = (): void => {
     select.empty();
     select.createEl('option', { attr: { value: '' }, text: options.noneLabel });
+    if (extra) select.createEl('option', { attr: { value: extra.value }, text: extra.label });
     for (const title of offered) {
       select.createEl('option', { attr: { value: title }, text: title });
     }
@@ -81,7 +103,7 @@ export function renderLinkSelect(
   const adopt = (title: string): void => {
     const trimmed = title.trim();
     if (!trimmed) return;
-    if (!offered.includes(trimmed)) offered.push(trimmed);
+    if (trimmed !== extra?.value && !offered.includes(trimmed)) offered.push(trimmed);
     chosen = trimmed;
     rebuild();
     options.onChange(trimmed);

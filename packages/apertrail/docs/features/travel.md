@@ -96,7 +96,7 @@ Every property name below is a setting (`src/settings/types.ts`), shown at its E
 | Property | On | Read as |
 |---|---|---|
 | `country` | Trip, State, City, all five place types | Wikilink to a Country note |
-| `state` | City | Wikilink to a State note |
+| `state` | City | Wikilink to a State note, **or to the city itself** for a city-state (Hamburg, Berlin, Bremen): the town is its own first-level division, and no second note is created. The city editor offers it as *<City> itself (city-state)* in the Bundesland dropdown |
 | `city` | all five place types | Wikilink to a City note |
 | `capital` | Country, State | Wikilink to a City note |
 | `archived` | Trip | The day a trip was archived. Written by the Archive command and read for display; the folder is what makes a trip archived, this says when |

@@ -38,6 +38,7 @@ import {
   TravelVehicle,
   TravelExcursion,
 } from '../../vault/types';
+import { countryDivisions } from '../country-divisions';
 import { readTravelBoard } from '../../vault/read-entities';
 import {
   relatedTrips,
@@ -265,7 +266,12 @@ function cityFacts(city: TravelCity): ProspectFact[] {
   return rows([
     [
       t('prospect.where'),
-      hierarchy(city.state?.title ?? city.stateTitle, city.country?.title ?? city.countryTitle),
+      hierarchy(
+        // The same rule the card's meta row follows: a city-state names what it
+        // is rather than repeating its own name as its division.
+        city.cityState ? t('city.cityState') : (city.state?.title ?? city.stateTitle),
+        city.country?.title ?? city.countryTitle
+      ),
     ],
     [t('fieldNames.geoLocation'), city.geoLocation?.join(', ') ?? null],
     ...visitFacts(city.visited, city.lastVisit),
@@ -284,11 +290,21 @@ function stateFacts(state: TravelState): ProspectFact[] {
 }
 
 function countryFacts(country: TravelCountry): ProspectFact[] {
+  // A city-state is named as one, so the row does not read as a town filed in
+  // the wrong place. What belongs in the list is decided in
+  // places/country-divisions.ts; this only spells it.
+  const divisions = countryDivisions(country).map((division) =>
+    division.cityState ? t('city.cityStateNamed', { title: division.title }) : division.title
+  );
   return rows([
     [t('fieldNames.capital'), country.capital?.title ?? country.capitalTitle],
+    [t('galleryView.filters.state'), divisions.length > 0 ? divisions.join(', ') : null],
+    // Every city in the country. Reaching them through the states meant a
+    // country that uses no state level listed none of its cities at all, and
+    // a city-state listed none of itself.
     [
-      t('galleryView.filters.state'),
-      country.states.length > 0 ? country.states.map((state) => state.title).join(', ') : null,
+      t('galleryView.filters.city'),
+      country.cities.length > 0 ? country.cities.map((city) => city.title).join(', ') : null,
     ],
   ]);
 }
@@ -327,9 +343,12 @@ function subjectTrips(board: TravelBoard, subject: ProspectSubject) {
         subject.state.cities.map((city) => city.title)
       );
     case 'country':
+      // Its own cities, not the cities of its states: see regionTitles() in
+      // the related-trips block, which asks the same question from the other
+      // side and used to get the same answer wrong.
       return tripsCovering(board, [
         subject.country.title,
-        ...subject.country.states.flatMap((state) => state.cities.map((city) => city.title)),
+        ...subject.country.cities.map((city) => city.title),
       ]);
   }
 }

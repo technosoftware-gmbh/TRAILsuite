@@ -120,3 +120,52 @@ describe('renderLinkSelect', () => {
     expect(picked).toEqual([]);
   });
 });
+
+/**
+ * The choice that is a title like any other but has to read as something else.
+ *
+ * Hamburg's Bundesland is Hamburg, and the value that expresses is the plain
+ * title -- so it belongs in this control rather than in a switch beside it,
+ * where two controls would write one field and the dialog could show one
+ * answer while saving another. What it needs from the control is a label of
+ * its own, and not to be offered twice.
+ */
+describe('renderLinkSelect with a city-state option', () => {
+  const extra = { value: 'Hamburg', label: 'Hamburg itself (city-state)' };
+
+  it('offers it under the empty choice, ahead of the real notes', () => {
+    const { select } = render({ extraOption: extra });
+    expect(optionValues(select)).toEqual(['', 'Hamburg', 'Brugg', 'Stavanger']);
+    expect(select.children[1].text).toBe('Hamburg itself (city-state)');
+  });
+
+  /**
+   * The rule that keeps a value the vault no longer has from being erased
+   * would otherwise unshift this one under its bare title, and the note would
+   * appear twice: once saying what it means and once not.
+   */
+  it('does not also offer it as a bare title when it is the current value', () => {
+    const { select } = render({ value: 'Hamburg', extraOption: extra });
+    expect(optionValues(select)).toEqual(['', 'Hamburg', 'Brugg', 'Stavanger']);
+    expect(select.value).toBe('Hamburg');
+  });
+
+  it('reports the plain title when it is chosen, because that is what the note says', () => {
+    const { select, picked } = render({ extraOption: extra });
+    change(select, 'Hamburg');
+    expect(picked).toEqual(['Hamburg']);
+  });
+
+  /** Picking a real Bundesland afterwards is how a city stops being one, and it needs no second control to say so. */
+  it('is left behind by picking an ordinary note', () => {
+    const { select, picked } = render({ value: 'Hamburg', extraOption: extra });
+    change(select, 'Brugg');
+    expect(picked).toEqual(['Brugg']);
+  });
+
+  /** A value the vault no longer has is still offered, extra option or not. */
+  it('keeps offering a stale value alongside it', () => {
+    const { select } = render({ value: 'Preussen', extraOption: extra });
+    expect(optionValues(select)).toEqual(['', 'Hamburg', 'Preussen', 'Brugg', 'Stavanger']);
+  });
+});

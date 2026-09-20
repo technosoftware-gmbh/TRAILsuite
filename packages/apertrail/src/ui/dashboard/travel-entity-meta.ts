@@ -96,6 +96,15 @@ export function countryMetaItems(country: TravelCountry): EntityCardMetaItem[] {
       text: t('dashboard.stateCount', { count: country.states.length }),
     });
   }
+  // Every city in the country, not the ones that happen to sit under a state:
+  // a country that uses no state level has none of the first and all of the
+  // second, and its card said nothing at all before this.
+  if (country.cities.length > 0) {
+    items.push({
+      icon: 'building-2',
+      text: t('dashboard.cityCount', { count: country.cities.length }),
+    });
+  }
   return items;
 }
 
@@ -113,7 +122,12 @@ export function stateMetaItems(state: TravelState): EntityCardMetaItem[] {
 
 export function cityMetaItems(city: TravelCity): EntityCardMetaItem[] {
   const items: EntityCardMetaItem[] = [];
-  const parts = [city.state?.title, city.country?.title].filter((x): x is string => !!x);
+  // A city-state says so where a town names its Bundesland, because that row
+  // answers "which first-level division is this in" and for Hamburg the answer
+  // is that it is one. Repeating the city's own name there would read as a
+  // mistake rather than as the fact it is.
+  const division = city.cityState ? t('city.cityState') : city.state?.title;
+  const parts = [division, city.country?.title].filter((x): x is string => !!x);
   if (parts.length > 0) items.push({ icon: 'flag', text: parts.join(', ') });
   items.push(visitedMetaItem(city.visited, city.lastVisit, city.visitedFromTrips));
   return items;

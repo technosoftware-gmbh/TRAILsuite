@@ -43,7 +43,21 @@ export interface TravelCountry {
   capitalTitle: string | null;
   capital: TravelCity | null;
   /** Every State whose `country:` names this one, alphabetically. Derived at read time; a Country note's own `states:` list is not read. */
-  states: TravelState[]; /** What it shows on a cover: a line, a picture, the rest of them, and its highlights. See vault/read-cover.ts. */
+  states: TravelState[];
+  /**
+   * Every City whose `country:` names this one, alphabetically, whether or not
+   * it sits under a State.
+   *
+   * **Direct, and not the flattening of `states`.** Reaching a country's cities
+   * through its states assumes every country uses that level, and most do not:
+   * in the vault this was found in, sixteen cities of thirty-two named a
+   * country and no state, and every one of them was invisible to its country --
+   * missing from the prospect and from the trips the country's own block
+   * reported. City-states joined them, which is how it surfaced. The upward
+   * link each city already carries is the answer, the same one `states` is
+   * derived from.
+   */
+  cities: TravelCity[]; /** What it shows on a cover: a line, a picture, the rest of them, and its highlights. See vault/read-cover.ts. */
   description: string | null;
   image: string | null;
   gallery: ParsedTripPicture[];
@@ -73,6 +87,22 @@ export interface TravelCity {
   /** Raw wikilink target from `state:` -- null for countries that don't use the State level. */
   stateTitle: string | null;
   state: TravelState | null;
+  /**
+   * The city is its own first-level division: a Stadtstaat, a city-state, a
+   * federal district.
+   *
+   * Written as `state:` naming the city itself, which is not a trick but the
+   * fact: Hamburg's Bundesland is Hamburg. That spelling was chosen over a
+   * property of its own because it is what somebody fills in by hand anyway,
+   * and over a second note in the States folder because wikilinks resolve by
+   * title -- two notes called Hamburg would make every `[[Hamburg]]` in the
+   * vault ambiguous, and the documented tie-break would silently pick one.
+   *
+   * `state` stays null even so. There is no separate note to point at, and a
+   * city that pointed at itself through a field typed `TravelState` would be
+   * a cycle every consumer would have to know about.
+   */
+  cityState: boolean;
   /** [latitude, longitude] as pasted from a map view, or null if unset. */
   geoLocation: [string, string] | null;
   /** Explicit frontmatter OR derived from a finished trip that stops here -- see vault/visit-derivation.ts. */

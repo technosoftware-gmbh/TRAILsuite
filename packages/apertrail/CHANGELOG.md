@@ -17,6 +17,24 @@ naming and do not get renamed. See
 
 ### Added
 
+- **A city can be its own first-level division.** Hamburg, Berlin, Bremen,
+  Vienna: `state:` naming the city itself now reads as a city-state, and the
+  card and the prospect say so where a town names its Bundesland. That spelling
+  was chosen over a property of its own because it is what somebody fills in by
+  hand anyway and it is true, and over a second note in the States folder
+  because wikilinks resolve by title: two notes called Hamburg make every
+  `[[Hamburg]]` in the vault ambiguous, and the documented City-wins tie-break
+  would then silently pick one. A city-state resolves `state` to null and does
+  not appear among its country's states -- it is a city that needs no division
+  above it, not a state note wearing a city's name.
+
+  It is set from the city's own editor: the Bundesland dropdown offers
+  *<City> itself (city-state)* above the real ones. Deliberately one control
+  rather than a switch beside the dropdown -- the fact IS the value of
+  `state:`, and two controls writing one field is how a dialog ends up showing
+  one answer and saving another. Only on an existing city, because in create
+  mode the title is still being typed and there is nothing stable to name.
+
 - **A trip can be archived.** **Archive trip**, from the command palette or a
   gallery card, moves the note into `<archiveFolder>/<tripsArchiveFolder>/`
   (`6 Archive/Trips` by default, `6 Archiv/Trips` in German) and stamps
@@ -64,6 +82,26 @@ naming and do not get renamed. See
   `citiesProperty` remain settings because that check reads them.
 
 ### Fixed
+
+- **A country now reaches its cities directly, instead of through its states.**
+  A Country's prospect listed the cities of its states and its related-trips
+  block counted trips to them, which quietly asked every country to use a level
+  most of them do not have: a city naming a country and no state belonged to
+  nothing. In the vault this was found in, sixteen cities of thirty-two were in
+  that position -- every Norwegian city but three, every South African one --
+  and none of them appeared on its country's page or contributed a trip to it.
+  City-states made it visible rather than causing it. `country.cities` is
+  derived from the `country:` link each city already carries, the same way
+  `country.states` is, and the prospect gained a Cities row and a city count on
+  the card.
+
+  **The prospect's divisions row names city-states alongside the states**, from
+  `places/country-divisions.ts`. They are still not in `country.states` -- a
+  city that is its own division stays a city, and making that collection hold
+  both would push the union into every consumer -- but a list of German
+  Bundeslaender that stopped at Hessen would be wrong on the page whatever the
+  type says. The membership is decided in a pure function with a suite of its
+  own, and the words are applied at the edge that renders them.
 
 - **A wikilink whose umlaut is normalized differently from the file name it
   names now resolves.** Every title index in `readTravelBoard()` -- countries,

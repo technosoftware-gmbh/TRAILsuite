@@ -40,6 +40,7 @@ function fakeCountry(title: string): TravelCountry {
     gallery: [],
     highlights: [],
     states: [],
+    cities: [],
   };
 }
 function fakeState(title: string): TravelState {
@@ -65,6 +66,7 @@ function fakeCity(title: string): TravelCity {
     country: null,
     stateTitle: null,
     state: null,
+    cityState: false,
     geoLocation: null,
     visited: false,
     lastVisit: null,

@@ -602,6 +602,7 @@ export const deTranslations: Translations = {
       titleField: 'Titel',
       countryField: 'Land',
       stateField: 'Bundesland',
+      cityStateOption: '{title} selbst (Stadtstaat)',
       cityField: 'Stadt',
       noneOption: '(Keine)',
       create: 'Erstellen',
@@ -1510,6 +1511,11 @@ export const deTranslations: Translations = {
       },
     },
   },
+  city: {
+    cityState: 'Stadtstaat',
+    cityStateNamed: '{title} (Stadtstaat)',
+  },
+
   archive: {
     archiveTrip: 'Trip archivieren',
     unarchiveTrip: 'Trip aus dem Archiv holen',

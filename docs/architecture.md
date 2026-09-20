@@ -673,7 +673,7 @@ fact about a trip rather than a place -- no coordinates, never an itinerary stop
 | Property | Setting key | On | Meaning |
 |---|---|---|---|
 | `country` | `countryProperty` | State, City, all place types | Link upwards |
-| `state` | `stateProperty` | City | Link upwards |
+| `state` | `stateProperty` | City | Link upwards, or to the city itself for a city-state. The reader sets `cityState` and leaves `state` null |
 | `city` | `cityProperty` | All place types | Link upwards |
 | `capital` | `capitalProperty` | Country, State | Link to a City |
 | `archived` | `archivedProperty` | Trip | The day it was archived. Written, unlike the other derived-looking values: the folder says that, this says when |

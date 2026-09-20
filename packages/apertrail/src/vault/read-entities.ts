@@ -140,7 +140,7 @@ function readGeoLocation(value: unknown): [string, string] | null {
 function readTravelCountriesUnresolved(
   app: App,
   settings: APERtrailSettings
-): Omit<TravelCountry, 'capital' | 'states'>[] {
+): Omit<TravelCountry, 'capital' | 'states' | 'cities'>[] {
   return travelNotesOfType(app, settings, settings.countriesFolder, 'country').map(
     ({ file, title, frontmatter: fm }) => ({
       file,
@@ -296,6 +296,11 @@ function readTravelCitiesUnresolved(
       title,
       countryTitle: wikilinkTarget(findValue(fm, settings.countryProperty)),
       stateTitle: wikilinkTarget(findValue(fm, settings.stateProperty)),
+      // A city whose `state:` names itself is its own first-level division.
+      // See TravelCity.cityState for why that spelling rather than a property
+      // or a second note.
+      cityState:
+        caseFold(wikilinkTarget(findValue(fm, settings.stateProperty))) === caseFold(title),
       geoLocation: readGeoLocation(findValue(fm, settings.geoLocationProperty)),
       visited: readBool(findValue(fm, settings.visitedProperty)),
       lastVisit: readDateLike(findValue(fm, settings.lastVisitProperty)),
@@ -584,6 +589,7 @@ export function readTravelBoard(
     ...c,
     capital: null,
     states: [],
+    cities: [],
   }));
   const states: TravelState[] = readTravelStatesUnresolved(app, settings).map((s) => ({
     ...s,
@@ -618,7 +624,13 @@ export function readTravelBoard(
     city.country = city.countryTitle
       ? (countryByTitle.get(caseFold(city.countryTitle)) ?? null)
       : null;
-    city.state = city.stateTitle ? (stateByTitle.get(caseFold(city.stateTitle)) ?? null) : null;
+    // A city-state points at no State note, even when a vault happens to hold
+    // one of the same name: it IS the division, and resolving the link would
+    // hand every consumer a cycle to know about.
+    city.state =
+      city.stateTitle && !city.cityState
+        ? (stateByTitle.get(caseFold(city.stateTitle)) ?? null)
+        : null;
   }
 
   // The two downward lists are derived from the upward links and read from
@@ -638,11 +650,18 @@ export function readTravelBoard(
   }
   for (const city of cities) {
     city.state?.cities.push(city);
+    // Straight onto the country as well, not only through a state. Most
+    // countries in a real vault do not use the state level at all, and a
+    // country that could only reach its cities through one saw none of them.
+    city.country?.cities.push(city);
   }
   // Sorted here rather than left in read order, because read order is
   // folder order and a province listing its towns alphabetically is the
   // only order a reader can predict.
-  for (const country of countries) country.states.sort(byTitle);
+  for (const country of countries) {
+    country.states.sort(byTitle);
+    country.cities.sort(byTitle);
+  }
   for (const state of states) state.cities.sort(byTitle);
 
   // Places and Trips only ever reference Country/City (never each other,

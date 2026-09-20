@@ -40,6 +40,7 @@ function makeCountry(title: string, overrides: Partial<TravelCountry> = {}): Tra
     gallery: [],
     highlights: [],
     states: [],
+    cities: [],
     ...overrides,
   };
 }
@@ -52,6 +53,7 @@ function makeCity(title: string, overrides: Partial<TravelCity> = {}): TravelCit
     country: null,
     stateTitle: null,
     state: null,
+    cityState: false,
     geoLocation: null,
     visited: false,
     lastVisit: null,

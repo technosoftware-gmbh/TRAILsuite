@@ -213,6 +213,11 @@ export class RegionEditorModal extends BaseModal {
             this.input.stateTitle = title || null;
           },
           childKind: 'state',
+          // Hamburg, Berlin, Bremen: a town that is its own first-level
+          // division says so by naming itself here, which is the fact rather
+          // than a trick. Only on an existing city, because in create mode the
+          // title is still being typed and there is nothing stable to name.
+          extraOption: this.cityStateOption(),
         });
         return;
       case 'capital':
@@ -265,6 +270,20 @@ export class RegionEditorModal extends BaseModal {
   }
 
   /** One dropdown naming another note, with this same dialog behind its "create one" entry. */
+  /**
+   * The "this city is its own Bundesland" choice, or nothing.
+   *
+   * A city only, and an existing one only. It is deliberately not a second
+   * control beside the dropdown: the fact IS the value of `state:`, and two
+   * controls writing one field is how a dialog ends up showing one answer and
+   * saving another.
+   */
+  private cityStateOption(): { value: string; label: string } | undefined {
+    const title = this.existing?.title.trim();
+    if (this.kind !== 'city' || !title) return undefined;
+    return { value: title, label: t('modals.common.cityStateOption', { title }) };
+  }
+
   private renderLink(
     fields: HTMLElement,
     options: {
@@ -273,12 +292,14 @@ export class RegionEditorModal extends BaseModal {
       value: string;
       onPick: (title: string) => void;
       childKind: RegionKind;
+      extraOption?: { value: string; label: string };
     }
   ): void {
     linkRow(fields, {
       label: options.label,
       titles: options.titles,
       value: options.value,
+      extraOption: options.extraOption,
       noneLabel: t('modals.common.noneOption'),
       onChange: options.onPick,
       createLabel: t('modals.common.createNewOption'),

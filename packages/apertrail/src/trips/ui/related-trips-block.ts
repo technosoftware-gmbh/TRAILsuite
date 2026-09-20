@@ -121,10 +121,10 @@ function blockSubject(
 function regionTitles(subject: { kind: 'city' | 'state' | 'country' } & BlockSubject): string[] {
   if (subject.kind === 'city') return [subject.city.title];
   if (subject.kind === 'state') return subject.state.cities.map((city) => city.title);
-  return [
-    subject.country.title,
-    ...subject.country.states.flatMap((state) => state.cities.map((city) => city.title)),
-  ];
+  // The country's own cities, rather than the cities of its states. Flattening
+  // the states asks every country to use a level most of them do not have, and
+  // a country that does not had no cities here at all.
+  return [subject.country.title, ...subject.country.cities.map((city) => city.title)];
 }
 
 function formatDate(value: string): string {

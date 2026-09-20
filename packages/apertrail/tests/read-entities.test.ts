@@ -183,6 +183,143 @@ describe('readTravelBoard', () => {
     expect(board.countries[0].states).toEqual([region]);
   });
 
+  /**
+   * A Stadtstaat: Hamburg, Berlin, Bremen, Vienna.
+   *
+   * The town IS the first-level division, and the vault says so the way a
+   * person would write it -- `state:` naming the city itself, which is true
+   * rather than a trick. A second note in the States folder was the obvious
+   * alternative and is the broken one: wikilinks resolve by title, so two
+   * notes called Hamburg make every `[[Hamburg]]` in the vault ambiguous.
+   */
+  it('reads a city whose state names itself as its own division', () => {
+    const { app } = makeFakeVault([
+      { path: `${settings.countriesFolder}/Germany.md`, frontmatter: { type: 'country' } },
+      {
+        path: `${settings.citiesFolder}/Hamburg.md`,
+        frontmatter: { type: 'city', country: '[[Germany]]', state: '[[Hamburg]]' },
+      },
+      {
+        path: `${settings.citiesFolder}/Wiesbaden.md`,
+        frontmatter: { type: 'city', country: '[[Germany]]', state: '[[Hesse]]' },
+      },
+      {
+        path: `${settings.statesFolder}/Hesse.md`,
+        frontmatter: { type: 'state', country: '[[Germany]]' },
+      },
+    ]);
+
+    const board = readTravelBoard(app, settings);
+    const hamburg = board.cities.find((c) => c.title === 'Hamburg');
+    expect(hamburg.cityState).toBe(true);
+    // No separate note to point at, and a self-pointing `state` would be a
+    // cycle every consumer would have to know about.
+    expect(hamburg.state).toBeNull();
+    expect(hamburg.stateTitle).toBe('Hamburg');
+    expect(hamburg.country?.title).toBe('Germany');
+
+    const wiesbaden = board.cities.find((c) => c.title === 'Wiesbaden');
+    expect(wiesbaden.cityState).toBe(false);
+    expect(wiesbaden.state?.title).toBe('Hesse');
+  });
+
+  it('folds the two spellings, the way every other link resolves', () => {
+    const { app } = makeFakeVault([
+      {
+        path: `${settings.citiesFolder}/Zürich.md`,
+        frontmatter: { type: 'city', state: '[[z\u0075\u0308rich]]' },
+      },
+    ]);
+    expect(readTravelBoard(app, settings).cities[0].cityState).toBe(true);
+  });
+
+  /**
+   * A vault that has both is a vault with two notes of one title, which is
+   * already ambiguous to every resolver here. The city-state reading wins on
+   * purpose: the self-reference is an explicit statement, and resolving it
+   * would hand a city a State object that is a different note with its name.
+   */
+  it('stays its own division even when a state note shares its name', () => {
+    const { app } = makeFakeVault([
+      {
+        path: `${settings.citiesFolder}/Hamburg.md`,
+        frontmatter: { type: 'city', state: '[[Hamburg]]' },
+      },
+      { path: `${settings.statesFolder}/Hamburg.md`, frontmatter: { type: 'state' } },
+    ]);
+
+    const hamburg = readTravelBoard(app, settings).cities[0];
+    expect(hamburg.cityState).toBe(true);
+    expect(hamburg.state).toBeNull();
+  });
+
+  /** A city-state is not a state note, so it does not turn up among a country's divisions. That is the line this answer draws, and it is worth stating. */
+  it('is not counted among the states of its country', () => {
+    const { app } = makeFakeVault([
+      { path: `${settings.countriesFolder}/Germany.md`, frontmatter: { type: 'country' } },
+      {
+        path: `${settings.citiesFolder}/Hamburg.md`,
+        frontmatter: { type: 'city', country: '[[Germany]]', state: '[[Hamburg]]' },
+      },
+    ]);
+
+    expect(readTravelBoard(app, settings).countries[0].states).toEqual([]);
+  });
+
+  /**
+   * A country reaches its cities directly, not through its states.
+   *
+   * Flattening the states asks every country to use a level most of them do
+   * not have. In the vault this was found in, sixteen cities of thirty-two
+   * named a country and no state, and every one was invisible to its country:
+   * absent from the prospect and from the trips the country's own block
+   * reported. A city-state joined them, which is how it surfaced.
+   */
+  it('gives a country every city that names it, state or no state', () => {
+    const { app } = makeFakeVault([
+      { path: `${settings.countriesFolder}/Germany.md`, frontmatter: { type: 'country' } },
+      {
+        path: `${settings.statesFolder}/Hesse.md`,
+        frontmatter: { type: 'state', country: '[[Germany]]' },
+      },
+      {
+        path: `${settings.citiesFolder}/Wiesbaden.md`,
+        frontmatter: { type: 'city', country: '[[Germany]]', state: '[[Hesse]]' },
+      },
+      {
+        path: `${settings.citiesFolder}/Hamburg.md`,
+        frontmatter: { type: 'city', country: '[[Germany]]', state: '[[Hamburg]]' },
+      },
+      {
+        path: `${settings.citiesFolder}/Munich.md`,
+        // No state at all, which is the ordinary case in most countries.
+        frontmatter: { type: 'city', country: '[[Germany]]' },
+      },
+      {
+        path: `${settings.citiesFolder}/Vienna.md`,
+        frontmatter: { type: 'city', country: '[[Austria]]' },
+      },
+    ]);
+
+    const germany = readTravelBoard(app, settings).countries.find((c) => c.title === 'Germany');
+    expect(germany.cities.map((c) => c.title)).toEqual(['Hamburg', 'Munich', 'Wiesbaden']);
+    // The state level is unchanged and still holds only real State notes.
+    expect(germany.states.map((s) => s.title)).toEqual(['Hesse']);
+  });
+
+  it('gives a country no city that names a different one', () => {
+    const { app } = makeFakeVault([
+      { path: `${settings.countriesFolder}/Germany.md`, frontmatter: { type: 'country' } },
+      {
+        path: `${settings.citiesFolder}/Vienna.md`,
+        frontmatter: { type: 'city', country: '[[Austria]]' },
+      },
+      { path: `${settings.citiesFolder}/Nowhere.md`, frontmatter: { type: 'city' } },
+    ]);
+
+    expect(readTravelBoard(app, settings).countries[0].cities).toEqual([]);
+  });
+
   // Photo spot is the fifth member of the place family, so the only thing
   // worth asserting is that membership: it must come back in board.places
   // with the same resolved shape the other four get, without a line of

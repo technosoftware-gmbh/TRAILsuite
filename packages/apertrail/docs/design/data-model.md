@@ -59,6 +59,10 @@ The twelve recognized values are fixed (`src/vault/entity-types.ts`): `trip`, `b
 
 A City's `country:` and `state:`, a Country's `capital:`, a place's `country:` and `city:`, a Trip's `cities:` and `persons:`, every `stops[].place`, and the `persons` on any itinerary line reference another note as a real `[[Wikilink]]`, resolved at read time. Obsidian's own backlink and graph features work on this data for free, and a broken reference is just an unresolved wikilink, visible and fixable the normal way.
 
+**A country reaches its cities directly.** `country.cities` is every City whose `country:` names it, derived exactly as `country.states` is, and it is not the flattening of the states: most countries in a real vault do not use the state level at all, and one that could only reach its cities through it saw none of them. The prospect's divisions row is the one place states and city-states are put back together, decided in `places/country-divisions.ts` and named at the edge that renders it.
+
+**A city that is its own first-level division** -- Hamburg, Berlin, Bremen, Vienna, Washington DC -- writes `state:` naming itself. That is the fact rather than a trick: Hamburg's Bundesland is Hamburg. The reader sets `cityState` on it, leaves `state` null (there is no other note to point at, and a self-pointing `TravelState` would be a cycle every consumer would have to know about), and the card and the prospect say *City-state* where a town names its division. **A second note in the States folder is the wrong answer here**, and not merely untidy: see the rule immediately below.
+
 **Wikilinks resolve by note title (basename), never by path.** Two notes with the same basename in different folders are indistinguishable to every resolver in the codebase, and a link that matches nothing resolves to `null` rather than raising: the referring card renders one fewer meta row and nothing else breaks. A value that is not wikilink-shaped at all is treated as absent rather than guessed at.
 
 ### Two-pass resolution for Country, State and City

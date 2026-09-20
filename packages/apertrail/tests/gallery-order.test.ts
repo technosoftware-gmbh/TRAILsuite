@@ -31,6 +31,7 @@ function country(title: string): TravelCountry {
     gallery: [],
     highlights: [],
     states: [],
+    cities: [],
   };
 }
 
@@ -42,6 +43,7 @@ function city(title: string, lastVisit: string | null = null): TravelCity {
     country: null,
     stateTitle: null,
     state: null,
+    cityState: false,
     geoLocation: null,
     visited: lastVisit !== null,
     lastVisit,

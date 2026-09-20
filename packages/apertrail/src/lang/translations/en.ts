@@ -609,6 +609,8 @@ export const enTranslations = {
       titleField: 'Title',
       countryField: 'Country',
       stateField: 'State',
+      /** Hamburg, Berlin, Bremen: the town IS the division, so it names itself here. */
+      cityStateOption: '{title} itself (city-state)',
       cityField: 'City',
       noneOption: '(None)',
       create: 'Create',
@@ -1477,6 +1479,13 @@ export const enTranslations = {
       },
     },
   },
+  city: {
+    /** Hamburg, Berlin, Bremen, Vienna, Washington DC: a town that is its own first-level division. */
+    cityState: 'City-state',
+    /** Named among its country's divisions, where it is one alongside the real State notes. */
+    cityStateNamed: '{title} (city-state)',
+  },
+
   archive: {
     archiveTrip: 'Archive trip',
     unarchiveTrip: 'Restore trip from archive',
