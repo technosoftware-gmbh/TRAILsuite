@@ -21,6 +21,8 @@ what counts as a breaking change:
   day's entries, and its quiet failure is an entry written without the place it
   happened at.
 
+## [Unreleased]
+
 ## [2.3.0] - 2026-09-20
 
 ### Added
