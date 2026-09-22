@@ -802,7 +802,7 @@ export class LedgerView extends NodaView {
     const measured = await measureMonth(this.deps.app, settings, this.periodDate());
     if (measured) {
       const measure = measured.measure;
-      const left = measure.plannedTotal - measure.actualTotal;
+      const left = measure.variance;
       const strip = statRow(parent);
       stat(strip, t('finance.planned'), money(measure.plannedTotal, currency));
       stat(strip, t('finance.actual'), money(measure.actualTotal, currency));

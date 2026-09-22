@@ -23,6 +23,21 @@ what counts as a breaking change:
 
 ## [Unreleased]
 
+### Fixed
+
+- **`measureBudgetMonth` measures an account once.** Several lines on one
+  account (a salary planned one line a month) each counted the account's whole
+  movement, so the actual was counted once per line and every line but one read
+  as the month's salary missing. There is now one row per account, planned as
+  the sum of its lines, with their notes joined.
+- **An income account's variance has the right sign.** `left` is negative when
+  the month is worse than planned on either side of the ledger; an income
+  account that earned less than planned used to read as under budget.
+- **The totals are the result.** `plannedTotal` and `actualTotal` are income
+  less expenses rather than income and expenses added together, and the new
+  `variance` is actual less planned. Income no line claimed is listed in
+  `unbudgeted` and counted into the actual result.
+
 ## [2.3.0] - 2026-09-20
 
 ### Added

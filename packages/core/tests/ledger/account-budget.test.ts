@@ -168,9 +168,11 @@ describe('a month measured', () => {
     expect(measure.unbudgeted.map((row) => [row.number, row.actual])).toEqual([[4003, 79]]);
   });
 
-  it('counts the unbudgeted into the actual total but not the planned', () => {
-    expect(measure.plannedTotal).toBe(320);
-    expect(measure.actualTotal).toBe(427.45);
+  it('counts the unbudgeted into the actual result but not the planned', () => {
+    // Expenses only here, so the result is what was spent, negative.
+    expect(measure.plannedTotal).toBe(-320);
+    expect(measure.actualTotal).toBe(-427.45);
+    expect(measure.variance).toBe(-107.45);
   });
 
   it('keeps a line whose account note is missing, so it is visible rather than lost', () => {
@@ -190,6 +192,62 @@ describe('a month measured', () => {
     expect(measure.unbudgeted.map((row) => row.number)).not.toContain(1005);
   });
 });
+
+describe('a month with several lines on one account, and income', () => {
+  const SALARY = account(3010, 'Einkommen Netto');
+  const OTHER = account(3020, 'Einkommen Netto Partner');
+  const BONUS = account(3090, 'Bonus');
+  const HOUSE = account(4000, 'Haushaltsrechnungen');
+  const BANK = account(1005, 'Haushaltskonto CHF');
+  const ACCOUNTS = [SALARY, OTHER, BONUS, HOUSE, BANK];
+
+  const POSTINGS = parseJournal(
+    [
+      '2026-01-25 | 1005 | 3010 | 10102.20 | Lohn Januar',
+      '2026-01-25 | 1005 | 3020 | 3740.95 | Lohn Januar',
+      '2026-01-26 | 1005 | 3090 | 500.00 | Bonus',
+      '2026-01-28 | 4000 | 1005 | 1279.90 | Rechnungen',
+    ].join('\n')
+  ).postings;
+
+  // The salary planned one line a month, as a budget had to be written before
+  // a line could carry a range: the case that showed the salary three times.
+  const LINES = [
+    line({ account: 3010, amount: 10102.2, rhythm: 'once', startMonth: 1, note: 'Januar' }),
+    line({ account: 3010, amount: 10102.2, rhythm: 'once', startMonth: 2 }),
+    line({ account: 3010, amount: 10102.2, rhythm: 'once', startMonth: 3, note: 'März' }),
+    line({ account: 3020, amount: 3793.1 }),
+    line({ account: 4000, amount: 1950 }),
+  ];
+  const measure = measureBudgetMonth(LINES, ACCOUNTS, POSTINGS, 2026, 1);
+
+  it('measures an account once, however many lines plan it', () => {
+    expect(measure.rows.map((row) => row.number)).toEqual([3010, 3020, 4000]);
+    expect(measure.rows[0]).toMatchObject({ planned: 10102.2, actual: 10102.2, left: 0 });
+  });
+
+  it('joins the notes of the lines it merged', () => {
+    expect(measure.rows[0]?.note).toBe('Januar · März');
+  });
+
+  it('calls income earned short of its plan worse, not better', () => {
+    expect(measure.rows[1]?.left).toBe(-52.15);
+    expect(measure.rows[2]?.left).toBe(670.1);
+  });
+
+  it('shows income no line claimed, and counts it into the result', () => {
+    expect(measure.unbudgeted.map((row) => [row.number, row.actual, row.left])).toEqual([
+      [3090, 500, 500],
+    ]);
+    expect(measure.plannedTotal).toBe(roundTo(10102.2 + 3793.1 - 1950));
+    expect(measure.actualTotal).toBe(roundTo(10102.2 + 3740.95 + 500 - 1279.9));
+    expect(measure.variance).toBe(roundTo(measure.actualTotal - measure.plannedTotal));
+  });
+});
+
+function roundTo(value: number): number {
+  return Math.round(value * 100) / 100;
+}
 
 describe('monthRange', () => {
   it('ends on the last day the month actually has', () => {
@@ -237,6 +295,6 @@ describe('a transfer in a month measured against its plan', () => {
       1
     );
     expect(measure.rows.map((row) => row.number)).toEqual([6110]);
-    expect(measure.plannedTotal).toBe(100);
+    expect(measure.plannedTotal).toBe(-100);
   });
 });

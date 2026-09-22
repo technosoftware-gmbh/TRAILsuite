@@ -415,7 +415,13 @@ be measured; a line naming nothing can never be measured at all.
 **What no line claimed is shown, not hidden.** An expense account with spending
 on it and no budget line is the most interesting row on the page, so it appears
 as unbudgeted. A report that quietly left it out would be a report that
-flatters.
+flatters. An income account with money on it and no line appears there too.
+
+**A month is measured one row per account**, however many lines plan it: the
+account's postings are counted once against the sum of its lines. A row's
+variance is negative when the month is worse than planned, which for an income
+account means earning less. The three totals are the **result**, income less
+expenses, planned against actual, and the variance is actual less planned.
 
 **This replaced a budget keyed to an area and a category**, which measured
 itself against the bill, purchase and recurring notes. Two budget systems in one
