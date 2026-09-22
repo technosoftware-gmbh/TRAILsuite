@@ -23,6 +23,18 @@ what counts as a breaking change:
 
 ## [Unreleased]
 
+### Added
+
+- **A budget line can run for part of the year.** `AccountBudgetLine.fromMonth`
+  and `toMonth`, read and written under the new
+  `AccountBudgetProperties.lineFromField` and `lineToField`. Null is January and
+  December, and a first month after the last wraps past the year end.
+  `expandBudgetLine` masks the rhythm with the range, counts a skipping rhythm
+  from `fromMonth` when the line names no month of its own, and applies the
+  overrides after the mask. `inBudgetRange()` and `hasBudgetRange()` are
+  exported beside it. A budget note without the two fields reads exactly as
+  before.
+
 ### Fixed
 
 - **`measureBudgetMonth` measures an account once.** Several lines on one
