@@ -92,7 +92,7 @@ export async function writeBudgetLines(
       if (line.startMonth !== null) value[settings.budgetLineMonthField] = line.startMonth;
       if (line.fromMonth !== null) value[settings.budgetLineFromField] = line.fromMonth;
       if (line.toMonth !== null) value[settings.budgetLineToField] = line.toMonth;
-      if (line.note) value[settings.budgetLineNoteField] = line.note;
+      if (line.note.trim()) value[settings.budgetLineNoteField] = line.note.trim();
       if (Object.keys(line.overrides).length > 0) {
         value[settings.budgetLineOverridesField] = { ...line.overrides };
       }

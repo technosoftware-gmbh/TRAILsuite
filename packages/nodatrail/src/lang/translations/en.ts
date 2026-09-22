@@ -562,6 +562,7 @@ export const enTranslations = {
     via: 'Via account',
     viaDefault: 'Default via account',
     viaNone: 'No account',
+    lineNote: 'Comment',
     rangeFrom: 'From month',
     rangeTo: 'Until month',
     viaFromNote: 'The budget\u2019s default',

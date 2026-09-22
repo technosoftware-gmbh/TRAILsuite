@@ -1016,6 +1016,12 @@
   max-width: 6em;
 }
 
+/* A budget line's comment: prose, so the full width under the figures. */
+.nod-list-comment .setting-item-control,
+.nod-list-comment input {
+  width: 100%;
+}
+
 .nod-list-controls {
   display: flex;
   gap: 0.15em;
