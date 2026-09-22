@@ -44,6 +44,8 @@ function line(partial: Partial<AccountBudgetLine> & { account: number }): Accoun
     amount: 0,
     rhythm: 'monthly',
     startMonth: null,
+    fromMonth: null,
+    toMonth: null,
     note: '',
     overrides: {},
     via: null,
@@ -236,8 +238,36 @@ describe('what a budget note says', () => {
     lineOverridesField: 'months',
     closedThroughProperty: 'closedThrough',
     lineViaField: 'via',
+    lineFromField: 'from',
+    lineToField: 'to',
     viaProperty: 'via',
   };
+
+  it("reads and writes a line's range, and writes nothing for a line without one", () => {
+    const read = parseAccountBudget(
+      {
+        period: '2026',
+        lines: [
+          { account: 4210, amount: 120, from: 3, to: 11 },
+          { account: 4020, amount: 300, from: '11', to: 2 },
+          { account: 4001, amount: 140 },
+          // A month that is not one is not read as the nearest that is.
+          { account: 4002, amount: 10, from: 0, to: 14 },
+        ],
+      },
+      BP
+    );
+    expect(read.lines.map((entry) => [entry.fromMonth, entry.toMonth])).toEqual([
+      [3, 11],
+      [11, 2],
+      [null, null],
+      [null, null],
+    ]);
+    const written = buildAccountBudgetFrontmatter(BP, read).lines as Record<string, unknown>[];
+    expect(written[0]).toMatchObject({ from: 3, to: 11 });
+    expect('from' in (written[2] ?? {})).toBe(false);
+    expect('to' in (written[2] ?? {})).toBe(false);
+  });
 
   it('reads and writes the months closed, and writes nothing when none are', () => {
     const read = parseAccountBudget({ period: '2026', closedThrough: 3, lines: [] }, BP);

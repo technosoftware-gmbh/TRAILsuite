@@ -205,6 +205,8 @@ describe('the money checks', () => {
       amount: 100,
       rhythm: 'monthly' as const,
       startMonth: null,
+      fromMonth: null,
+      toMonth: null,
       note: '',
       overrides: {},
       via: null,

@@ -61,6 +61,14 @@ function numberField(
   });
 }
 
+/**
+ * A month number as a range end, or null: a 14 typed into the box is not
+ * written, because the note would then say something the reader refuses.
+ */
+function monthOrNull(value: number | null): number | null {
+  return value !== null && Number.isInteger(value) && value >= 1 && value <= 12 ? value : null;
+}
+
 export class EditPurchaseItemsModal extends Modal {
   private readonly items: ExpenseLine[];
   private summary!: HTMLElement;
@@ -251,6 +259,8 @@ export class EditBudgetLinesModal extends Modal {
         amount: 0,
         rhythm: 'monthly',
         startMonth: null,
+        fromMonth: null,
+        toMonth: null,
         note: '',
         overrides: {},
         via: null,
@@ -299,6 +309,28 @@ export class EditBudgetLinesModal extends Modal {
           t('period.month'),
           () => line.startMonth,
           (v) => (line.startMonth = v),
+          () => {
+            fallsIn();
+            this.renderSummary();
+          }
+        );
+        // The range: the garden from March until November is one line. Blank
+        // is the whole year, and a first month after the last wraps.
+        numberField(
+          setting,
+          t('ledger.rangeFrom'),
+          () => line.fromMonth,
+          (v) => (line.fromMonth = monthOrNull(v)),
+          () => {
+            fallsIn();
+            this.renderSummary();
+          }
+        );
+        numberField(
+          setting,
+          t('ledger.rangeTo'),
+          () => line.toMonth,
+          (v) => (line.toMonth = monthOrNull(v)),
           () => {
             fallsIn();
             this.renderSummary();

@@ -41,4 +41,22 @@ describe('the months a line falls in', () => {
       /^M\S+ · Jun\S* · Sep\S* · Dez\S*$/
     );
   });
+
+  it('says the range of a monthly line that runs for part of the year', () => {
+    expect(
+      budgetLineMonths({ rhythm: 'monthly', startMonth: null, fromMonth: 3, toMonth: 11 })
+    ).toBe('Mar - Nov');
+    expect(
+      budgetLineMonths({ rhythm: 'weekly', startMonth: null, fromMonth: 11, toMonth: 2 })
+    ).toBe('Nov - Feb');
+    expect(
+      budgetLineMonths({ rhythm: 'monthly', startMonth: null, fromMonth: 1, toMonth: 12 })
+    ).toBe('');
+  });
+
+  it('lists only the months in range for a line that skips months', () => {
+    expect(
+      budgetLineMonths({ rhythm: 'quarterly', startMonth: null, fromMonth: 3, toMonth: 11 })
+    ).toBe('Mar · Jun · Sep');
+  });
 });

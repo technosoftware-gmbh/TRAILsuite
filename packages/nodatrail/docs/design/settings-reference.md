@@ -366,4 +366,6 @@ A German vault keeps its trips in `Reisen`, which is the adoption's main job.
 | `budgetLineOverridesField` | `'months'` |
 | `budgetClosedThroughProperty` | `'closedThrough'` |
 | `budgetLineViaField` | `'via'` |
+| `budgetLineFromField` | `'from'` |
+| `budgetLineToField` | `'to'` |
 | `budgetViaProperty` | `'via'` |

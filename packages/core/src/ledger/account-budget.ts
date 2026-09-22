@@ -40,8 +40,22 @@ export interface AccountBudgetLine {
   /** What one occurrence costs. */
   amount: number;
   rhythm: BudgetRhythm;
-  /** 1 to 12. Which month a rhythm that skips months falls in first. Defaults to January. */
+  /**
+   * 1 to 12. Which month a rhythm that skips months falls in first. Defaults to
+   * the first month of the line's range, and failing that to January.
+   */
   startMonth: number | null;
+  /**
+   * 1 to 12. The first month the line applies in, or null for January.
+   *
+   * With `toMonth` it says the line runs for part of the year: the garden from
+   * March until November is one line rather than nine. A range whose first
+   * month is after its last wraps past the year end, so `11` to `2` is
+   * January, February, November and December of this year's note.
+   */
+  fromMonth: number | null;
+  /** 1 to 12. The last month the line applies in, or null for December. */
+  toMonth: number | null;
   note: string;
   /**
    * Month number to the figure that replaces whatever the rhythm implies.
@@ -87,7 +101,9 @@ function strideOf(rhythm: BudgetRhythm): number | null {
  */
 export function expandBudgetLine(line: AccountBudgetLine): number[] {
   const months = new Array<number>(12).fill(0);
-  const start = clampMonth(line.startMonth ?? 1);
+  // The rhythm counts from the start of the range unless the line names its
+  // own month: a quarterly line from March falls in March, June, September.
+  const start = clampMonth(line.startMonth ?? line.fromMonth ?? 1);
 
   if (line.rhythm === 'weekly') {
     const monthly = roundCents((line.amount * 52) / 12);
@@ -105,12 +121,45 @@ export function expandBudgetLine(line: AccountBudgetLine): number[] {
     }
   }
 
+  // The range masks what the rhythm produced. It is applied before the
+  // overrides on purpose: an override names a month and a figure outright,
+  // and a figure somebody wrote against a month is not second-guessed.
+  for (let month = 1; month <= 12; month += 1) {
+    if (!inBudgetRange(line, month)) months[month - 1] = 0;
+  }
+
   for (const [key, value] of Object.entries(line.overrides)) {
     const month = Number(key);
     if (month >= 1 && month <= 12) months[month - 1] = roundCents(value);
   }
 
   return months.map(roundCents);
+}
+
+/**
+ * Whether a month, 1 to 12, lies inside a line's range.
+ *
+ * A missing end is the year's end: `from: 3` alone runs to December, `to: 11`
+ * alone from January. **A range whose first month is after its last wraps**
+ * rather than being refused, because a winter cost -- heating, snow clearing --
+ * is one line from November until February, and the note is one year: it
+ * covers January and February and November and December of that year.
+ */
+export function inBudgetRange(
+  line: Pick<AccountBudgetLine, 'fromMonth' | 'toMonth'>,
+  month: number
+): boolean {
+  const from = clampMonth(line.fromMonth ?? 1);
+  const to = clampMonth(line.toMonth ?? 12);
+  return from <= to ? month >= from && month <= to : month >= from || month <= to;
+}
+
+/** Whether a line runs for less than the whole year. */
+export function hasBudgetRange(line: Pick<AccountBudgetLine, 'fromMonth' | 'toMonth'>): boolean {
+  for (let month = 1; month <= 12; month += 1) {
+    if (!inBudgetRange(line, month)) return true;
+  }
+  return false;
 }
 
 /** One row of the year overview: the account, its twelve figures, and the year. */
@@ -286,6 +335,10 @@ export interface AccountBudgetProperties {
   lineOverridesField: string;
   /** The other account a line moves money through. */
   lineViaField: string;
+  /** The first month a line applies in. Absent on a line means January. */
+  lineFromField: string;
+  /** The last month a line applies in. Absent on a line means December. */
+  lineToField: string;
   /** The account a line without its own `via` uses. */
   viaProperty: string;
   /** How many months of the year have been closed: replaced by what happened. See `rollingYear`. */
@@ -344,6 +397,8 @@ export function parseAccountBudget(
       amount: roundCents(readNumberLike(record[p.lineAmountField]) ?? 0),
       rhythm: isBudgetRhythm(rhythm) ? rhythm : 'monthly',
       startMonth: readNumberLike(record[p.lineMonthField]),
+      fromMonth: readMonth(record[p.lineFromField]),
+      toMonth: readMonth(record[p.lineToField]),
       note: readString(record[p.lineNoteField]) ?? '',
       overrides: readOverrides(record[p.lineOverridesField]),
       via: readNumberLike(record[p.lineViaField]),
@@ -357,6 +412,12 @@ export function parseAccountBudget(
     closedThrough: clampClosedThrough(readNumberLike(frontmatter[p.closedThroughProperty])),
     via: readNumberLike(frontmatter[p.viaProperty]),
   };
+}
+
+/** A month number, 1 to 12, or null: a 14 is not quietly read as December. */
+function readMonth(value: unknown): number | null {
+  const month = readNumberLike(value);
+  return month !== null && Number.isInteger(month) && month >= 1 && month <= 12 ? month : null;
 }
 
 function readOverrides(value: unknown): Record<number, number> {
@@ -392,6 +453,8 @@ export function buildAccountBudgetFrontmatter(
       [p.lineAmountField]: line.amount,
       [p.lineRhythmField]: line.rhythm,
       ...(line.startMonth === null ? {} : { [p.lineMonthField]: line.startMonth }),
+      ...(line.fromMonth === null ? {} : { [p.lineFromField]: line.fromMonth }),
+      ...(line.toMonth === null ? {} : { [p.lineToField]: line.toMonth }),
       ...(line.note ? { [p.lineNoteField]: line.note } : {}),
       ...(Object.keys(line.overrides).length > 0
         ? { [p.lineOverridesField]: { ...line.overrides } }

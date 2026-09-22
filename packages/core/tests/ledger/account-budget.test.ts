@@ -10,6 +10,8 @@ import {
   budgetYear,
   budgetYearOf,
   expandBudgetLine,
+  hasBudgetRange,
+  inBudgetRange,
   measureBudgetMonth,
   monthRange,
   type AccountBudgetLine,
@@ -42,6 +44,8 @@ function line(partial: Partial<AccountBudgetLine> & { account: number }): Accoun
     amount: 0,
     rhythm: 'monthly',
     startMonth: null,
+    fromMonth: null,
+    toMonth: null,
     note: '',
     overrides: {},
     via: null,
@@ -107,6 +111,70 @@ describe('a line as twelve months', () => {
   it('ignores an override for a month that does not exist', () => {
     const months = expandBudgetLine(line({ account: 4001, amount: 10, overrides: { 13: 999 } }));
     expect(months).toEqual(new Array<number>(12).fill(10));
+  });
+});
+
+describe('a line that runs for part of the year', () => {
+  it('falls only between its first and last month', () => {
+    // The garden from March until November: one line rather than nine.
+    const months = expandBudgetLine(
+      line({ account: 4210, amount: 120, fromMonth: 3, toMonth: 11 })
+    );
+    expect(months).toEqual([0, 0, 120, 120, 120, 120, 120, 120, 120, 120, 120, 0]);
+  });
+
+  it('runs to December when only the start is named, and from January when only the end is', () => {
+    expect(expandBudgetLine(line({ account: 4210, amount: 10, fromMonth: 10 }))).toEqual([
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 10, 10,
+    ]);
+    expect(expandBudgetLine(line({ account: 4210, amount: 10, toMonth: 2 }))).toEqual([
+      10, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    ]);
+  });
+
+  it('wraps past the year end when the first month is after the last', () => {
+    // Heating from November until February, in one year's note: both ends of it.
+    const months = expandBudgetLine(
+      line({ account: 4020, amount: 300, fromMonth: 11, toMonth: 2 })
+    );
+    expect(months).toEqual([300, 300, 0, 0, 0, 0, 0, 0, 0, 0, 300, 300]);
+  });
+
+  it('counts a skipping rhythm from the start of the range', () => {
+    const months = expandBudgetLine(
+      line({ account: 4002, amount: 90, rhythm: 'quarterly', fromMonth: 3, toMonth: 11 })
+    );
+    expect(months).toEqual([0, 0, 90, 0, 0, 90, 0, 0, 90, 0, 0, 0]);
+  });
+
+  it('lets a named month win over the start of the range', () => {
+    const months = expandBudgetLine(
+      line({ account: 4002, amount: 90, rhythm: 'quarterly', startMonth: 1, fromMonth: 3 })
+    );
+    expect(months).toEqual([0, 0, 0, 90, 0, 0, 90, 0, 0, 90, 0, 0]);
+  });
+
+  it('spreads a weekly amount over the months in range only', () => {
+    const months = expandBudgetLine(
+      line({ account: 4000, amount: 60, rhythm: 'weekly', fromMonth: 4, toMonth: 9 })
+    );
+    expect(months.filter((value) => value !== 0)).toEqual(new Array<number>(6).fill(260));
+  });
+
+  it('keeps an override outside the range, because it names its month outright', () => {
+    const months = expandBudgetLine(
+      line({ account: 4210, amount: 120, fromMonth: 3, toMonth: 11, overrides: { 12: 40 } })
+    );
+    expect(months[11]).toBe(40);
+    expect(months[0]).toBe(0);
+  });
+
+  it('says whether a line has a range at all', () => {
+    expect(hasBudgetRange(line({ account: 1 }))).toBe(false);
+    expect(hasBudgetRange(line({ account: 1, fromMonth: 1, toMonth: 12 }))).toBe(false);
+    expect(hasBudgetRange(line({ account: 1, fromMonth: 3 }))).toBe(true);
+    expect(inBudgetRange(line({ account: 1, fromMonth: 11, toMonth: 2 }), 1)).toBe(true);
+    expect(inBudgetRange(line({ account: 1, fromMonth: 11, toMonth: 2 }), 6)).toBe(false);
   });
 });
 
