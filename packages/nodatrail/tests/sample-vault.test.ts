@@ -492,11 +492,12 @@ describe('the seeded vault, read back', () => {
     const measured = await measureMonth(vault.app, settings, NOW);
 
     expect(measured).not.toBeNull();
-    expect(measured?.measure.plannedTotal).toBeGreaterThan(0);
-    expect(measured?.measure.actualTotal).toBeGreaterThan(0);
-    // Nothing is unbudgeted: every expense account these postings touch has a
-    // line, which is the state a budget page reads as complete.
-    expect(measured?.measure.unbudgeted).toEqual([]);
+    // The sample plans expenses only, so the planned result is money going
+    // out; the salary it posts is income no line claimed, and it is shown.
+    expect(measured?.measure.plannedTotal).toBeLessThan(0);
+    // Every expense account these postings touch has a line, which is the
+    // state a budget page reads as complete; the salary is the one exception.
+    expect(measured?.measure.unbudgeted.map((row) => row.account?.kind)).toEqual(['income']);
   });
 
   it('reads six accounts and a journal that parses without a single problem', async () => {

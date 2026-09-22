@@ -198,10 +198,16 @@ export function budgetYear(lines: readonly AccountBudgetLine[]): {
 export interface BudgetMeasureRow {
   account: Account | null;
   number: number;
+  /** What every line on this account plans for the month, together. */
   planned: number;
   actual: number;
-  /** Planned less actual. Negative is over. */
+  /**
+   * How the month compares with its plan. **Negative is worse than planned,
+   * whichever side of the ledger:** an expense account that spent more, or an
+   * income account that earned less.
+   */
   left: number;
+  /** The lines' notes, joined. Empty when none carries one. */
   note: string;
 }
 
@@ -211,10 +217,15 @@ export interface BudgetMeasure {
   month: number;
   from: string;
   to: string;
+  /** One row per budgeted account, in the order its first line appears. */
   rows: BudgetMeasureRow[];
   unbudgeted: BudgetMeasureRow[];
+  /** The planned result: income less expenses. */
   plannedTotal: number;
+  /** The result from the postings, unbudgeted accounts included. */
   actualTotal: number;
+  /** The actual result less the planned one. Negative is worse than planned. */
+  variance: number;
 }
 
 /**
@@ -243,9 +254,16 @@ export function monthRange(year: number, month: number): { from: string; to: str
 /**
  * One month of a budget held up against the postings.
  *
+ * **One row per account, however many lines plan it.** An account's postings
+ * are measured once; measuring them against each line on their own counted a
+ * salary planned as one line a month twelve times over, and showed eleven of
+ * the twelve as a month's salary missing.
+ *
  * **What no line claimed is shown, not hidden.** An expense account with
  * spending on it and no budget line is the most interesting row on the page,
- * and a report that quietly left it out would be a report that flatters.
+ * and a report that quietly left it out would be a report that flatters. An
+ * income account with money on it and no line is shown for the same reason,
+ * and because the result would be wrong without it.
  */
 export function measureBudgetMonth(
   lines: readonly AccountBudgetLine[],
@@ -262,26 +280,32 @@ export function measureBudgetMonth(
   // something spent or earned. Measured here it would hold a bank balance's
   // movement up against a plan for a move into it, which is no comparison at
   // all, so it is left out as a transfer is left out of an income statement.
-  const rows: BudgetMeasureRow[] = lines
-    .filter((line) => !isTransferLine(line, byNumber))
-    .map((line) => {
-      const account = byNumber.get(line.account) ?? null;
-      const planned = expandBudgetLine(line)[index] ?? 0;
-      const actual = account ? movementBetween(postings, account, from, to) : 0;
-      return {
-        account,
-        number: line.account,
-        planned,
-        actual,
-        left: roundCents(planned - actual),
-        note: line.note,
-      };
-    });
+  const grouped = new Map<number, { planned: number; notes: string[] }>();
+  for (const line of lines) {
+    if (isTransferLine(line, byNumber)) continue;
+    const entry = grouped.get(line.account) ?? { planned: 0, notes: [] };
+    entry.planned = roundCents(entry.planned + (expandBudgetLine(line)[index] ?? 0));
+    if (line.note.trim()) entry.notes.push(line.note.trim());
+    grouped.set(line.account, entry);
+  }
 
-  const claimed = new Set(lines.map((line) => line.account));
+  const rows: BudgetMeasureRow[] = [...grouped].map(([number, entry]) => {
+    const account = byNumber.get(number) ?? null;
+    const actual = account ? movementBetween(postings, account, from, to) : 0;
+    return {
+      account,
+      number,
+      planned: entry.planned,
+      actual,
+      left: leftOf(account, entry.planned, actual),
+      note: entry.notes.join(' · '),
+    };
+  });
+
   const unbudgeted: BudgetMeasureRow[] = [];
   for (const account of accounts) {
-    if (account.kind !== 'expense' || claimed.has(account.number)) continue;
+    if (account.kind !== 'expense' && account.kind !== 'income') continue;
+    if (grouped.has(account.number)) continue;
     const actual = movementBetween(postings, account, from, to);
     if (actual === 0) continue;
     unbudgeted.push({
@@ -289,11 +313,13 @@ export function measureBudgetMonth(
       number: account.number,
       planned: 0,
       actual,
-      left: roundCents(-actual),
+      left: leftOf(account, 0, actual),
       note: '',
     });
   }
 
+  const plannedTotal = resultOf(rows, (row) => row.planned);
+  const actualTotal = resultOf([...rows, ...unbudgeted], (row) => row.actual);
   return {
     year,
     month,
@@ -301,9 +327,32 @@ export function measureBudgetMonth(
     to,
     rows,
     unbudgeted: unbudgeted.sort((a, b) => a.number - b.number),
-    plannedTotal: roundCents(rows.reduce((sum, row) => sum + row.planned, 0)),
-    actualTotal: roundCents([...rows, ...unbudgeted].reduce((sum, row) => sum + row.actual, 0)),
+    plannedTotal,
+    actualTotal,
+    variance: roundCents(actualTotal - plannedTotal),
   };
+}
+
+/**
+ * Better or worse than planned, as one sign: earning more is better, spending
+ * more is worse. An account the chart does not have is taken as an expense,
+ * which is what almost every orphaned budget line turns out to be.
+ */
+function leftOf(account: Account | null, planned: number, actual: number): number {
+  return roundCents(account?.kind === 'income' ? actual - planned : planned - actual);
+}
+
+/** Income less expenses, over whichever figure of each row is asked for. */
+function resultOf(
+  rows: readonly BudgetMeasureRow[],
+  figure: (row: BudgetMeasureRow) => number
+): number {
+  return roundCents(
+    rows.reduce(
+      (sum, row) => sum + (row.account?.kind === 'income' ? figure(row) : -figure(row)),
+      0
+    )
+  );
 }
 
 /** The months closed, clamped: a note saying 14 or -1 is read as 12 or 0 rather than refused. */

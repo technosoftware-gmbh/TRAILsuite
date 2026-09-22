@@ -358,7 +358,7 @@ export class DashboardView extends NodaView {
 
     const { measure } = measured;
     const currency = measured.budget.currency ?? this.deps.getSettings().homeCurrency;
-    const left = measure.plannedTotal - measure.actualTotal;
+    const left = measure.variance;
 
     const strip = statRow(body);
     stat(strip, t('finance.planned'), money(measure.plannedTotal, currency));
