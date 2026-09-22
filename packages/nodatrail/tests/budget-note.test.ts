@@ -97,6 +97,33 @@ describe('what a year of it comes to', () => {
   });
 });
 
+describe('a line that runs from March until November', () => {
+  // The case that used to take nine lines, one per month.
+  const budget = parseAccountBudget(
+    {
+      period: '2026',
+      currency: 'CHF',
+      lines: [
+        { account: 4210, amount: 120, rhythm: 'monthly', from: 3, to: 11 },
+        { account: 4020, amount: 300, rhythm: 'monthly', from: 11, to: 2 },
+      ],
+    },
+    P
+  );
+
+  it('is read under the default field names', () => {
+    expect(budget.lines[0]).toMatchObject({ fromMonth: 3, toMonth: 11 });
+  });
+
+  it('plans nine months of the garden and four of the heating', () => {
+    const year = budgetYear(budget.lines);
+    expect(year.rows.map((row) => row.total)).toEqual([120 * 9, 300 * 4]);
+    expect(year.monthTotals[0]).toBe(300);
+    expect(year.monthTotals[5]).toBe(120);
+    expect(year.monthTotals[10]).toBe(420);
+  });
+});
+
 describe('writing it back', () => {
   it('round trips through the note', () => {
     const before = parseAccountBudget(

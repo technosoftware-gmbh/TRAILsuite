@@ -569,6 +569,8 @@ export const deTranslations: Translations = {
     via: 'Über Konto',
     viaDefault: 'Standardkonto (via)',
     viaNone: 'Kein Konto',
+    rangeFrom: 'Von Monat',
+    rangeTo: 'Bis Monat',
     viaFromNote: 'Standard des Budgets',
     closeMonth: '{month} abschliessen',
     budgetModeYear: 'Das Jahr',
