@@ -7,20 +7,33 @@
  * entered, and nothing on the row said so. Showing "Jan · Apr · Jul · Okt"
  * beside it makes the missing month visible while it is being typed.
  *
- * Empty for a line that falls every month, where the list would say nothing.
- * Worked out from the rhythm and the month alone: overrides change what a
- * month holds, not whether the line falls in it.
+ * A line that falls every month says its range instead, "Mar - Nov", or
+ * nothing at all when it runs the whole year, where the list would say
+ * nothing. Worked out from the rhythm, the month and the range alone:
+ * overrides change what a month holds, not whether the line falls in it.
  */
-import { expandBudgetLine, type AccountBudgetLine } from '@technosoftware/trail-core';
+import {
+  expandBudgetLine,
+  hasBudgetRange,
+  type AccountBudgetLine,
+} from '@technosoftware/trail-core';
 import { monthName } from '../ui/kit/format';
 
-export function budgetLineMonths(line: Pick<AccountBudgetLine, 'rhythm' | 'startMonth'>): string {
-  if (line.rhythm === 'monthly' || line.rhythm === 'weekly') return '';
+export function budgetLineMonths(
+  line: Pick<AccountBudgetLine, 'rhythm' | 'startMonth'> &
+    Partial<Pick<AccountBudgetLine, 'fromMonth' | 'toMonth'>>
+): string {
+  const range = { fromMonth: line.fromMonth ?? null, toMonth: line.toMonth ?? null };
+  if (line.rhythm === 'monthly' || line.rhythm === 'weekly') {
+    if (!hasBudgetRange(range)) return '';
+    return `${monthName(range.fromMonth ?? 1)} - ${monthName(range.toMonth ?? 12)}`;
+  }
   const months = expandBudgetLine({
     account: 0,
     amount: 1,
     rhythm: line.rhythm,
     startMonth: line.startMonth,
+    ...range,
     note: '',
     overrides: {},
     via: null,

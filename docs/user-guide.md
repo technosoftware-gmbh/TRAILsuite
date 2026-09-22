@@ -792,6 +792,13 @@ and out in columns of their own, the Gewinnermittlung, or the Bestandeskonten
 on the last day of the period. The statement tab has a period of its own now,
 so a statement is the month or quarter you compare with the bank's.
 
+**A line for part of the year.** A budget line can say the months it runs in:
+"From month" 3 and "Until month" 11 plan the garden from March until November
+in one line, and the months are shown under the line as you type. Leave either
+empty for January or December. A first month after the last wraps round the
+year end, so 11 until 2 is the heating in January, February, November and
+December.
+
 **Where the money moves.** Each budget line can name the account it moves via:
 the Haushaltskonto a household cost is paid from, the account a salary arrives
 in. The budget itself names a default for the lines that do not. A line on a bank

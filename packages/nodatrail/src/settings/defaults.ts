@@ -299,6 +299,8 @@ export const DEFAULT_SETTINGS: NODAtrailSettings = {
   budgetLineOverridesField: 'months',
   budgetClosedThroughProperty: 'closedThrough',
   budgetLineViaField: 'via',
+  budgetLineFromField: 'from',
+  budgetLineToField: 'to',
   budgetViaProperty: 'via',
 };
 

@@ -368,7 +368,7 @@ the 31st in March: the step is always computed from the original day.
 | `via` | `budgetViaProperty` | The account a line without its own `via` moves money through | number |
 
 A line carries `account` (a number), `amount`, `rhythm`, `month`, `note`,
-`months` and `via`, under seven `*Field` settings.
+`months`, `via`, `from` and `to`, under nine `*Field` settings.
 
 **A line is a planned posting.** `via` is the other account: the one an expense
 is paid from, an income received into, a transfer into a reserve taken out of, a
@@ -397,6 +397,16 @@ rhythm that skips months first falls in, and `months` maps a month number to the
 figure that replaces whatever the rhythm implies, for where reality departs from
 it: the premium that rises in July, the month the holiday falls in. Nobody has
 to use them, and a line with none behaves exactly as its rhythm says.
+
+**`from` and `to` say a line runs for part of the year**, as month numbers: the
+garden from March until November is `from: 3`, `to: 11`, one line rather than
+nine. Either may be left out, meaning January or December. A `from` after its
+`to` **wraps past the year end**: heating from November until February is
+`from: 11`, `to: 2`, and covers January, February, November and December of this
+year's note. A rhythm that skips months counts from `from` unless `month` names
+its own. The range masks what the rhythm gives and `months` is applied after it,
+so an override names its month outright even outside the range. A value that is
+not a month from 1 to 12 is read as absent. See `budget-line-range.md`.
 
 **One note a year**, because the rhythm is what makes the months. `2026-08` is
 refused as a period rather than read as 2026: a note whose period names a month

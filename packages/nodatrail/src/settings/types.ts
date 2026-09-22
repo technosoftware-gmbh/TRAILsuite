@@ -604,6 +604,10 @@ export interface NODAtrailSettings {
   budgetClosedThroughProperty: string;
   /** The other account a budget line moves money through: paid from, received into. */
   budgetLineViaField: string;
+  /** The first month a budget line applies in. Absent means January. */
+  budgetLineFromField: string;
+  /** The last month a budget line applies in. Absent means December; before the first wraps. */
+  budgetLineToField: string;
   /** The account a budget line without its own `via` uses. */
   budgetViaProperty: string;
 }

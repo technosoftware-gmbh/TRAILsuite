@@ -74,6 +74,8 @@ function line(partial: Partial<AccountBudgetLine> & { account: number }): Accoun
     amount: 0,
     rhythm: 'monthly',
     startMonth: null,
+    fromMonth: null,
+    toMonth: null,
     note: '',
     overrides: {},
     via: null,
