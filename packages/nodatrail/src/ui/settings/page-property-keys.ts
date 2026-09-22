@@ -266,7 +266,7 @@ function sections(): Section[] {
         { key: 'budgetViaProperty', label: t('ledger.viaDefault') },
         { key: 'budgetLineViaField', label: t('ledger.via') },
         { key: 'budgetLineAmountField', label: t('finance.amount') },
-        { key: 'budgetLineNoteField', label: t('common.edit') },
+        { key: 'budgetLineNoteField', label: t('ledger.lineNote') },
       ],
     },
     {

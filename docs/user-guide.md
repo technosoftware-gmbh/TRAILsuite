@@ -799,6 +799,11 @@ empty for January or December. A first month after the last wraps round the
 year end, so 11 until 2 is the heating in January, February, November and
 December.
 
+**A comment on a line.** Under each line in the budget editor is a "Comment"
+box for why the figure is what it is: which contract, what it was last year. It
+is kept in the note as the line's `note` and shown only in the editor, not in
+the year view.
+
 **Where the money moves.** Each budget line can name the account it moves via:
 the Haushaltskonto a household cost is paid from, the account a salary arrives
 in. The budget itself names a default for the lines that do not. A line on a bank

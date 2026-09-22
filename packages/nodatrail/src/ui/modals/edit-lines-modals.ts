@@ -340,6 +340,17 @@ export class EditBudgetLinesModal extends Modal {
         // After the controls, so the months read under the line they describe.
         cell.appendChild(months);
         fallsIn();
+
+        // The comment on its own line and the whole width, because it is
+        // prose: why the figure is what it is, which contract it comes from.
+        // Shown here and nowhere else; the year view stays a table of figures.
+        const comment = new Setting(cell);
+        comment.settingEl.addClass('nod-list-setting', 'nod-list-comment');
+        comment.addText((input) => {
+          input.setPlaceholder(t('ledger.lineNote'));
+          input.setValue(line.note);
+          input.onChange((value) => (line.note = value));
+        });
       },
     });
 

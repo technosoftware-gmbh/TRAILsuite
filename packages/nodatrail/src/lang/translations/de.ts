@@ -569,6 +569,7 @@ export const deTranslations: Translations = {
     via: 'Über Konto',
     viaDefault: 'Standardkonto (via)',
     viaNone: 'Kein Konto',
+    lineNote: 'Kommentar',
     rangeFrom: 'Von Monat',
     rangeTo: 'Bis Monat',
     viaFromNote: 'Standard des Budgets',
