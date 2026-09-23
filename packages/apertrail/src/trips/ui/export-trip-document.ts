@@ -23,7 +23,7 @@ import { TravelTrip, TravelVehicle } from '../../vault/types';
 import { inlinePicture } from '../../shared/inline-picture';
 import { itineraryDays } from '../itinerary-days';
 import { clockTime, endpointDate, RelativeEndpoint, tripDayCount } from '../relative-days';
-import { legClock, legDayText, legRouteText, legWhen } from '../journey-text';
+import { legArrivalText, legClock, legDayText, legWhen } from '../journey-text';
 import { estimateLabels } from '../costs/estimate-labels';
 import { plannedByCategory, plannedTotal } from '../costs/planned-total';
 import { legRoute, tripItemEstimates } from '../costs/estimates';
@@ -193,7 +193,7 @@ export function documentDays(trip: TravelTrip, settings: APERtrailSettings): Tri
     // What a leg says outside its own section: that it leaves today, and that
     // it lands today. Nothing else -- see trips/leg-days.ts.
     arrivals: legsArrivingOn(trip.transport, group, trip.departure).map((leg) => ({
-      text: t('tripDocument.arrivals', { legs: legRouteText(leg) }),
+      text: t('tripDocument.arrivals', { legs: legArrivalText(leg) }),
       icon: travelModeIcon(leg.mode),
     })),
     // A flight takes off, everything else leaves: "Abflug" beside "Abfahrt",

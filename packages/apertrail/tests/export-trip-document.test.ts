@@ -927,6 +927,28 @@ describe('a leg named on a day of the itinerary', () => {
     ]);
   });
 
+  it('gives the arrival its own time, without the nights marker', async () => {
+    const { aLeg } = await import('./fixtures');
+    const groups = await days([
+      aLeg({
+        day: 1,
+        toDay: 12,
+        mode: 'boat',
+        from: '20:30',
+        to: '14:45',
+        origin: 'Bergen',
+        destination: 'Kirkenes',
+      }),
+    ]);
+
+    expect(groups[0].departures.map((line) => line.text)).toEqual([
+      'Departs today: Bergen to Kirkenes \u00b7 20:30 - 14:45 +11',
+    ]);
+    expect(groups[1].arrivals.map((line) => line.text)).toEqual([
+      'Arrives today: Bergen to Kirkenes \u00b7 14:45',
+    ]);
+  });
+
   it('draws the day a return flight falls on after the trip', async () => {
     const { aLeg } = await import('./fixtures');
     const groups = await days([

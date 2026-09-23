@@ -43,7 +43,7 @@ import { DuplicateTripModal } from './duplicate-trip-modal';
 import { moveInList } from '../../shared/reorder';
 import { itineraryDays, ItineraryDayGroup, spannedDates } from '../itinerary-days';
 import { clockTime, endpointDate, RelativeEndpoint } from '../relative-days';
-import { legClock, legDayText, legRouteText, legWhen } from '../journey-text';
+import { legArrivalText, legClock, legDayText, legWhen } from '../journey-text';
 import { legsArrivingOn, legsDepartingOn } from '../leg-days';
 import { cabinDescription } from '../../places/vehicle-note';
 import { countsInPlan, lineFigure } from '../costs/line-variants';
@@ -441,7 +441,7 @@ class ItineraryRenderer extends MarkdownRenderChild {
       // days in it. The arrival first: a day is read in the order it happens,
       // and you land before you leave again.
       for (const leg of legsArrivingOn(trip.transport, group, trip.departure)) {
-        this.renderLegLine(leg, t('itinerary.legArrival', { leg: legRouteText(leg) }));
+        this.renderLegLine(leg, t('itinerary.legArrival', { leg: legArrivalText(leg) }));
       }
       for (const leg of legsDepartingOn(trip.transport, group, trip.departure)) {
         this.renderLegLine(
