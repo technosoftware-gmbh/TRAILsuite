@@ -68,7 +68,7 @@ import { exportTripDocument } from './export-trip-document';
 import { TravelBooking, TravelVehicle } from '../../vault/types';
 import { resolveImageFile } from '../../ui/components/image-resolve';
 import { hour12For } from '../../shared/clock';
-import { travelModeIcon } from '../../shared/travel-mode';
+import { isFlight, travelModeIcon } from '../../shared/travel-mode';
 import { resolveReference } from '../../shared/vault-file';
 import { formatDistanceIn } from '../../shared/units';
 import { stopMotif } from '../trip-light';
@@ -446,7 +446,9 @@ class ItineraryRenderer extends MarkdownRenderChild {
       for (const leg of legsDepartingOn(trip.transport, group, trip.departure)) {
         this.renderLegLine(
           leg,
-          t('itinerary.legDeparture', { leg: legDayText(leg, trip.departure) })
+          t(isFlight(leg.mode) ? 'itinerary.legFlight' : 'itinerary.legDeparture', {
+            leg: legDayText(leg, trip.departure),
+          })
         );
       }
 
@@ -637,8 +639,11 @@ class ItineraryRenderer extends MarkdownRenderChild {
     }
     // A stop whose end time lands on the next day would otherwise read as
     // ending before it started, since the day header above only covers
-    // its start date.
-    if (spannedDates(stop.from, stop.to).length > 1 && stop.to) {
+    // its start date. Only a stop that names its own dates: a stop on a day
+    // number carries bare clock times, whose first ten characters are the
+    // time itself, so "02:45" and "03:00" read as two dates and the end time
+    // was printed a second time under the one the gutter already shows.
+    if (stop.day === null && spannedDates(stop.from, stop.to).length > 1 && stop.to) {
       body.createDiv({ cls: 'apt-itinerary-note', text: `→ ${formatDate(stop.to)}` });
     }
     if (stop.note) {

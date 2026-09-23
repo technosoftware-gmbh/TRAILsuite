@@ -20,6 +20,8 @@ function unmocked(name: string): never {
 export const getLanguage = (): never => unmocked('getLanguage');
 export const stringifyYaml = (): never => unmocked('stringifyYaml');
 export const normalizePath = (): never => unmocked('normalizePath');
+/** No drawing, rather than a throw: a trip document built in a test prints its leg lines as text, as it does for an icon Obsidian does not know. */
+export const getIcon = (): null => null;
 
 /**
  * A stand-in class for `instanceof TFile`, which `image-upload.ts` uses to read
