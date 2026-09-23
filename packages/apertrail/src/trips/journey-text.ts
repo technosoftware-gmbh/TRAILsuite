@@ -138,15 +138,29 @@ export function legRouteText(leg: ParsedTripLeg): string {
 /**
  * A leg as the day-by-day names it: where it goes and when it goes.
  *
- * The clock belongs here and not on the arrival line above it. A day that
- * says a flight leaves says nothing useful without the time -- the whole
- * point of naming it under day one is that day one is largely that flight --
- * whereas an arrival is placed by the day it lands on and its own row carries
- * the times. Null clock for a leg nobody has timed, which prints the route
- * alone rather than a stray separator.
+ * A day that says a flight leaves says nothing useful without the time --
+ * the whole point of naming it under day one is that day one is largely that
+ * flight. Null clock for a leg nobody has timed, which prints the route alone
+ * rather than a stray separator.
  */
 export function legDayText(leg: ParsedTripLeg, departure: string | null): string {
   const clock = legClock(leg, departure);
+  const route = legRouteText(leg);
+  return clock ? `${route} \u00b7 ${clock}` : route;
+}
+
+/**
+ * A leg as the day it lands on names it: where it went and when it gets in.
+ *
+ * The arrival time alone, and with no `+11` beside it: the day this line sits
+ * under already is the later day, so the marker would count the nights a
+ * second time. It was left out at first on the reasoning that the day places
+ * an arrival well enough; a twelve-day voyage showed otherwise, because the
+ * only other place its 14:45 was written was the departure line eleven days
+ * earlier, and the afternoon of the last day is arranged around it.
+ */
+export function legArrivalText(leg: ParsedTripLeg): string {
+  const clock = clockTime(leg.to);
   const route = legRouteText(leg);
   return clock ? `${route} \u00b7 ${clock}` : route;
 }

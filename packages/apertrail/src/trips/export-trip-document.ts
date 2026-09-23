@@ -84,6 +84,19 @@ export interface TripDocumentEntry {
   fares: TripDocumentFare[];
 }
 
+/**
+ * One leg named on a day: its line, already localized, and the icon of how it
+ * travels, by its Obsidian icon name ('plane', 'ship').
+ *
+ * The name rather than the picture, so the model stays free of Obsidian. The
+ * picture is looked up once per name in `TripDocument.icons`, and a name with
+ * no picture there prints the line alone, which is what it did before.
+ */
+export interface TripDocumentLegLine {
+  text: string;
+  icon: string;
+}
+
 export interface TripDocumentDay {
   /** "Day 3", already localized. Null for the stops before the first dated one, which are not a numbered day of anything. */
   label: string | null;
@@ -97,7 +110,7 @@ export interface TripDocumentDay {
    * nothing about it left the longest thing on the trip absent from the day
    * it finishes.
    */
-  arrivals: string[];
+  arrivals: TripDocumentLegLine[];
   /**
    * What leaves on this day, already localized, with its clock:
    * "Departs today: Zurich to Oslo - 09:40 - 12:10".
@@ -108,7 +121,7 @@ export interface TripDocumentDay {
    * what the rest of the day is arranged around; an arrival needs no clock,
    * being placed by the day it lands on.
    */
-  departures: string[];
+  departures: TripDocumentLegLine[];
   /** What the day is called: "Pretoria", beside its number. */
   title: string | null;
   date: string | null;
@@ -282,6 +295,12 @@ export interface TripDocument {
    */
   overview: ProseBlock[];
   days: TripDocumentDay[];
+  /**
+   * The SVG markup for each icon name a leg line uses, the same drawing the
+   * itinerary in the note shows beside it. Optional: without it the lines
+   * print as text, which is also how a test builds a document.
+   */
+  icons?: Record<string, string>;
   transport: TripDocumentJourney[];
   stays: TripDocumentJourney[];
   /**
@@ -383,6 +402,8 @@ const STYLE = `
   .journey ul.fares .price { color: #565c66; font-variant-numeric: tabular-nums; }
   .journey ul.fares div { font-size: 9pt; color: #6b7079; white-space: pre-line; }
   .day .arrival { font-size: 9.5pt; color: #565c66; margin: 0 0 1.5mm; }
+  .day .arrival .mode svg { width: 1.1em; height: 1.1em; vertical-align: -0.2em;
+                            margin-right: 1.5mm; stroke: currentColor; fill: none; }
   /* An offered extra reads as offered rather than scheduled. */
   .optional { font-size: 8.5pt; color: #6b7079; border: 0.4pt dashed #c9ccd2;
               border-radius: 1mm; padding: 0.2mm 1.2mm; white-space: nowrap; }
@@ -450,7 +471,7 @@ function pictureFigure(picture: TripDocumentPicture): string {
   return `<figure>${image}${caption}</figure>`;
 }
 
-function dayBlock(day: TripDocumentDay): string {
+function dayBlock(day: TripDocumentDay, icons: Record<string, string>): string {
   // "1. Tag: Pretoria" -- the number and the name together, which is how the
   // reference document heads a day and how somebody says it out loud.
   const named = day.label && day.title ? `${day.label}: ${day.title}` : (day.label ?? day.title);
@@ -460,7 +481,12 @@ function dayBlock(day: TripDocumentDay): string {
   // Arrivals above departures: a day is read in the order it happens, and you
   // land before you leave again.
   const legs = [...day.arrivals, ...day.departures]
-    .map((line) => `<p class="arrival">${esc(line)}</p>`)
+    .map((line) => {
+      // Trusted markup: it is Obsidian's own icon, serialised by the caller,
+      // never text from a note.
+      const icon = icons[line.icon] ? `<span class="mode">${icons[line.icon]}</span>` : '';
+      return `<p class="arrival">${icon}${esc(line.text)}</p>`;
+    })
     .join('');
 
   const entries = day.entries
@@ -621,7 +647,10 @@ export function buildTripDocumentHtml(sheet: TripDocument): string {
 
   const overview = section(sheet.labels.overview, proseSections(sheet.overview));
 
-  const itinerary = section(sheet.labels.itinerary, sheet.days.map(dayBlock));
+  const itinerary = section(
+    sheet.labels.itinerary,
+    sheet.days.map((day) => dayBlock(day, sheet.icons ?? {}))
+  );
 
   // The hint rides with the first leg rather than standing on its own, so the
   // heading, the sentence explaining what a day outside the trip means, and

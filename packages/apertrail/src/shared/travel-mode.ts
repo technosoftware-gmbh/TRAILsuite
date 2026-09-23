@@ -41,3 +41,8 @@ export function travelModeLabel(mode: string | null | undefined): string | null 
     ? t(`modals.tripEditor.mode.${value}`)
     : value;
 }
+
+/** Whether a leg flies, which is the one mode whose departure has a word of its own ("Abflug", not "Abfahrt"). */
+export function isFlight(mode: string | null | undefined): boolean {
+  return mode?.trim() === 'plane';
+}

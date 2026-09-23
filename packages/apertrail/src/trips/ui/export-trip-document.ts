@@ -14,7 +14,7 @@
  * asking: it is a rendering of a note, not something anybody edits, and a
  * folder of "Shongololo 2.html" would be worse than a stale copy replaced.
  */
-import { App } from 'obsidian';
+import { App, getIcon } from 'obsidian';
 import { caseFold, parseDayTitle, proseBlocks, sanitizeTitle } from '@technosoftware/trail-core';
 import { sheetCredit } from '../../shared/sheet-credit';
 import { t } from '../../lang/I18nManager';
@@ -23,11 +23,12 @@ import { TravelTrip, TravelVehicle } from '../../vault/types';
 import { inlinePicture } from '../../shared/inline-picture';
 import { itineraryDays } from '../itinerary-days';
 import { clockTime, endpointDate, RelativeEndpoint, tripDayCount } from '../relative-days';
-import { legClock, legDayText, legRouteText, legWhen } from '../journey-text';
+import { legArrivalText, legClock, legDayText, legWhen } from '../journey-text';
 import { estimateLabels } from '../costs/estimate-labels';
 import { plannedByCategory, plannedTotal } from '../costs/planned-total';
 import { legRoute, tripItemEstimates } from '../costs/estimates';
 import { legsArrivingOn, legsDepartingOn } from '../leg-days';
+import { isFlight, travelModeIcon } from '../../shared/travel-mode';
 import { ParsedTripLineChoice } from '../trip-note';
 import { cabinDescription } from '../../places/vehicle-note';
 import { optionalItems, optionalTotal, plannedEstimates } from '../costs/estimates';
@@ -191,12 +192,18 @@ export function documentDays(trip: TravelTrip, settings: APERtrailSettings): Tri
     date: group.date ? formatDay(group.date) : null,
     // What a leg says outside its own section: that it leaves today, and that
     // it lands today. Nothing else -- see trips/leg-days.ts.
-    arrivals: legsArrivingOn(trip.transport, group, trip.departure).map((leg) =>
-      t('tripDocument.arrivals', { legs: legRouteText(leg) })
-    ),
-    departures: legsDepartingOn(trip.transport, group, trip.departure).map((leg) =>
-      t('tripDocument.departures', { legs: legDayText(leg, trip.departure) })
-    ),
+    arrivals: legsArrivingOn(trip.transport, group, trip.departure).map((leg) => ({
+      text: t('tripDocument.arrivals', { legs: legArrivalText(leg) }),
+      icon: travelModeIcon(leg.mode),
+    })),
+    // A flight takes off, everything else leaves: "Abflug" beside "Abfahrt",
+    // the word the itinerary in the note uses on the same line.
+    departures: legsDepartingOn(trip.transport, group, trip.departure).map((leg) => ({
+      text: t(isFlight(leg.mode) ? 'tripDocument.flights' : 'tripDocument.departures', {
+        legs: legDayText(leg, trip.departure),
+      }),
+      icon: travelModeIcon(leg.mode),
+    })),
     note: group.note,
     entries: group.stops.map((stop) => ({
       time: timeRange(stop.from, stop.to),
@@ -542,6 +549,27 @@ function lengthLine(trip: TravelTrip): string | null {
   return days !== null && days > 0 ? t('tripDocument.days', { count: days }) : null;
 }
 
+/**
+ * The drawing for every icon a day's leg line names, as SVG markup.
+ *
+ * Obsidian's own icon, so the printed day shows the same plane or ship as the
+ * itinerary in the note. Inline rather than linked: the document is one file
+ * that opens and prints anywhere, with no icon font to find.
+ */
+function legIcons(days: TripDocumentDay[]): Record<string, string> {
+  const icons: Record<string, string> = {};
+  for (const day of days) {
+    for (const line of [...day.arrivals, ...day.departures]) {
+      if (line.icon in icons) continue;
+      const svg = getIcon(line.icon);
+      // Serialised rather than read back as markup, which also writes the SVG
+      // namespace out, so the drawing survives as a file of its own.
+      if (svg) icons[line.icon] = new XMLSerializer().serializeToString(svg);
+    }
+  }
+  return icons;
+}
+
 /** The whole document as a model, before it is markup. Separate from the writing so a caller could preview it. */
 export async function buildTripDocument(
   app: App,
@@ -553,6 +581,8 @@ export async function buildTripDocument(
 
   const gallery: TripDocumentPicture[] = [];
   for (const entry of trip.gallery) gallery.push(await picture(app, entry.image, entry.caption));
+
+  const days = documentDays(trip, settings);
 
   return {
     title: trip.title,
@@ -568,7 +598,8 @@ export async function buildTripDocument(
     hero: trip.image ? await picture(app, trip.image, null) : null,
     highlights: trip.highlights,
     overview: proseBlocks(overview),
-    days: documentDays(trip, settings),
+    days,
+    icons: legIcons(days),
     transport: documentTransport(trip, settings),
     stays: documentStays(trip, settings),
     transportHint: transportHint(trip),

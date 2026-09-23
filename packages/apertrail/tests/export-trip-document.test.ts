@@ -244,8 +244,8 @@ describe('a trip document', () => {
             note: 'Finale in Kopenhagen.',
             date: null,
             entries: [],
-            arrivals: ['Arrives today: Oslo to Kopenhagen'],
-            departures: ['Departs today: CPH to ZRH \u00b7 09:50 - 11:45'],
+            arrivals: [{ text: 'Arrives today: Oslo to Kopenhagen', icon: 'ship' }],
+            departures: [{ text: 'Departs today: CPH to ZRH \u00b7 09:50 - 11:45', icon: 'plane' }],
           },
         ],
       })
@@ -255,6 +255,27 @@ describe('a trip document', () => {
     expect(html).toContain('Departs today: CPH to ZRH');
     expect(html.indexOf('Arrives today')).toBeLessThan(html.indexOf('Departs today'));
     expect(html.indexOf('Departs today')).toBeLessThan(html.indexOf('Finale in Kopenhagen.'));
+  });
+
+  it('draws the icon a leg line names, and prints the line alone without one', () => {
+    const line = (icon: string) => ({
+      label: 'Day 1',
+      title: 'Bergen',
+      note: null,
+      date: null,
+      entries: [],
+      arrivals: [],
+      departures: [{ text: 'Flies today: Zürich to Bergen', icon }],
+    });
+    const drawn = buildTripDocumentHtml(
+      sheet({ days: [line('plane')], icons: { plane: '<svg class="lucide-plane"></svg>' } })
+    );
+    expect(drawn).toContain(
+      '<p class="arrival"><span class="mode"><svg class="lucide-plane"></svg></span>Flies today'
+    );
+
+    const plain = buildTripDocumentHtml(sheet({ days: [line('route')] }));
+    expect(plain).toContain('<p class="arrival">Flies today');
   });
 
   it('leaves out every section the trip says nothing about', () => {
@@ -868,20 +889,64 @@ describe('a leg named on a day of the itinerary', () => {
     ]);
 
     expect(day.label).toBe('Day 1');
-    expect(day.departures).toEqual(['Departs today: Zürich to Oslo · 09:40 - 12:10']);
-    expect(day.arrivals).toEqual([]);
+    expect(day.departures.map((line) => line.text)).toEqual([
+      'Flies today: Zürich to Oslo · 09:40 - 12:10',
+    ]);
+    expect(day.arrivals.map((line) => line.text)).toEqual([]);
   });
 
   it('names a voyage on both the day it leaves and the day it ends', async () => {
     const { aLeg } = await import('./fixtures');
     const groups = await days([
-      aLeg({ day: 2, toDay: 16, origin: 'Oslo', destination: 'Kopenhagen' }),
+      aLeg({ day: 2, toDay: 16, mode: 'boat', origin: 'Oslo', destination: 'Kopenhagen' }),
     ]);
 
     expect(groups.map((g) => g.label)).toEqual(['Day 2', 'Day 16']);
-    expect(groups[0].departures).toEqual(['Departs today: Oslo to Kopenhagen']);
-    expect(groups[1].arrivals).toEqual(['Arrives today: Oslo to Kopenhagen']);
-    expect(groups[1].departures).toEqual([]);
+    expect(groups[0].departures.map((line) => line.text)).toEqual([
+      'Departs today: Oslo to Kopenhagen',
+    ]);
+    expect(groups[1].arrivals.map((line) => line.text)).toEqual([
+      'Arrives today: Oslo to Kopenhagen',
+    ]);
+    expect(groups[1].departures.map((line) => line.text)).toEqual([]);
+  });
+
+  it('says a flight takes off, and carries the icon of how each leg travels', async () => {
+    const { aLeg } = await import('./fixtures');
+    const groups = await days([
+      aLeg({ day: 1, toDay: 1, mode: 'plane', origin: 'Zürich', destination: 'Bergen' }),
+      aLeg({ day: 1, toDay: 12, mode: 'boat', origin: 'Bergen', destination: 'Kirkenes' }),
+    ]);
+
+    expect(groups[0].departures).toEqual([
+      { text: 'Flies today: Zürich to Bergen', icon: 'plane' },
+      { text: 'Departs today: Bergen to Kirkenes', icon: 'ship' },
+    ]);
+    expect(groups[1].arrivals).toEqual([
+      { text: 'Arrives today: Bergen to Kirkenes', icon: 'ship' },
+    ]);
+  });
+
+  it('gives the arrival its own time, without the nights marker', async () => {
+    const { aLeg } = await import('./fixtures');
+    const groups = await days([
+      aLeg({
+        day: 1,
+        toDay: 12,
+        mode: 'boat',
+        from: '20:30',
+        to: '14:45',
+        origin: 'Bergen',
+        destination: 'Kirkenes',
+      }),
+    ]);
+
+    expect(groups[0].departures.map((line) => line.text)).toEqual([
+      'Departs today: Bergen to Kirkenes \u00b7 20:30 - 14:45 +11',
+    ]);
+    expect(groups[1].arrivals.map((line) => line.text)).toEqual([
+      'Arrives today: Bergen to Kirkenes \u00b7 14:45',
+    ]);
   });
 
   it('draws the day a return flight falls on after the trip', async () => {
@@ -891,7 +956,9 @@ describe('a leg named on a day of the itinerary', () => {
     ]);
 
     expect(groups.map((g) => g.label)).toEqual(['Day 18']);
-    expect(groups[0].departures).toEqual(['Departs today: CPH to ZRH · 09:50 - 11:45']);
+    expect(groups[0].departures.map((line) => line.text)).toEqual([
+      'Flies today: CPH to ZRH · 09:50 - 11:45',
+    ]);
   });
 });
 
