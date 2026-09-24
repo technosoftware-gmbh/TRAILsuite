@@ -112,6 +112,11 @@ const DYNAMIC_KEYS = [
   ...['accommodation', 'fnb', 'landmark', 'location', 'photospot'].flatMap((kind) => [
     `galleryView.filters.${kind}`,
   ]),
+  // trips/ui/export-booking-sheet.ts names a line nobody named by the table it
+  // belongs to, in the sheet's open items.
+  ...['flight', 'hotel', 'transport', 'excursion'].map(
+    (section) => `bookingSheet.section.${section}`
+  ),
   // ui/settings/page-property-keys.ts builds
   // `settings.properties.fields.<field>.name` / `.desc` from its catalogue,
   // one entry per frontmatter name the plugin reads or writes.

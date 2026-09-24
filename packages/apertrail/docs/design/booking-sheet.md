@@ -1,6 +1,6 @@
 # The booking sheet
 
-**Planned 24 September 2026. Steps 1 and 2 built, the sheet itself not yet.** The
+**Planned 24 September 2026. Steps 1 to 3 built; step 4 needs a real trip.** The
 fourth trip sheet, beside the trip document and the cost sheet: a page taken
 to a travel agency to book a trip that is planned but not yet booked. The four
 decisions below and the "Noch offen" section are Thomas's own; the rest is a
@@ -207,8 +207,24 @@ copy: stay grouping, `persons` "only X" labels, day resolution, leg icons, the
      rental car has a pick-up, not a timetable.
    The model stays unformatted (ISO dates, `HH:mm`, unit words); step 3 turns
    it into sentences.
-3. The builder, the App-bound half, the button and the command.
-4. Render the Nordkap trip, print, correct.
+3. **Built.** `trips/export-booking-sheet.ts` (markup) and
+   `trips/ui/export-booking-sheet.ts` (words and figures), the **Booking
+   sheet** button beside Trip document and the `export-booking-sheet`
+   command. Three things the page does that the plan did not say:
+   - **A table is printed as two**: the header and first row inside the box
+     that keeps a heading with its first block, the rest in a second table
+     free to break. Both share fixed column widths, so they read as one.
+     Wrapping the whole table would have made a long excursion list
+     unbreakable.
+   - **"Noch offen" says once that a trip has no departure date**, rather
+     than once per undatable line; six identical sentences would bury the two
+     that ask for a decision.
+   - **An open cell is set in italics and says "offen"**, not in colour alone,
+     so it survives a black-and-white printer.
+4. Render the Nordkap trip, print, correct. Rendered from the test fixture
+   and printed from headless Chromium on 24 September 2026, which caught a
+   price's per-unit line being clipped by `nowrap`; still to do against the
+   real note in the vault.
 5. Optional, and only if wanted: a health check that flags a plane leg whose
    `reference` looks like a flight number (two letters and digits) and has no
    `number`. Reports only; never rewrites.

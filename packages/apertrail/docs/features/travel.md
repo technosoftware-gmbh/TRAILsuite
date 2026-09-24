@@ -599,6 +599,34 @@ It states the **plan**, not the ledger: the prices are the trip's budget, and
 the itinerary's own estimates for whatever the budget does not name. What has
 actually been spent is the cost sheet beside it.
 
+### The booking sheet
+
+The itinerary block's **Booking sheet** button, or *Export a booking sheet for
+this trip* from the command palette inside a trip note, writes
+`<Trip> booking sheet.html` into the same `_exports` folder. It is the page you
+take to a travel agency: the itinerary filtered down to what is sold, one
+table each for flights, accommodation, other transport and the chosen
+excursions, dated and in travelling order.
+
+| Column | Where it comes from |
+|---|---|
+| Flight / operator | `carrier` and `number`, with the ship or train from `vehicle` |
+| Departs / arrives | `from` and `to`, `+1` for one night, both dates for a voyage |
+| Class, cabin, room | The chosen variant, with the ship's own cabin text |
+| Reference | A leg's `reference`; for a stay or excursion, a booking note marked booked or paid |
+| Price | The planned figure with its unit, and what it comes to |
+
+The travellers are listed once with two empty columns, date of birth and name
+as in the passport, for filling in by hand: nothing personal is read from the
+vault or written into the file. A stop that is not an excursion is not on the
+sheet; it is bought at the door.
+
+**It never picks for you.** A line sold at several prices with none chosen
+prints "open" where the class and the price would be, and an optional extra
+nobody has decided on is left off the tables. Both are listed under **Still
+open** at the end, with lines that cannot be dated yet and legs with no
+departure time. The total is what the decided lines come to, per currency.
+
 
 ## Photo spots
 
@@ -848,6 +876,7 @@ The review modal never writes without an explicit click. There is no silent bulk
 | Check entity types | Runs the [health check](#entity-type-health-check) |
 | Export this photo spot as a field sheet | Only offered inside a photo spot note. Writes the sheet described in [the photo spot block](#the-photo-spot-block) into the note's exports folder |
 | Export this trip as a document | Only offered inside a trip note. Writes [the trip document](#the-trip-document) into the trip's exports folder |
+| Export a booking sheet for this trip | Only offered inside a trip note. Writes [the booking sheet](#the-booking-sheet) into the trip's exports folder |
 | New ship or train | Title, optional mode, optional operator. The cabin catalogue is filled in afterwards, from the Cabins command |
 | Cabins and details of this ship or train | Only offered inside a vehicle note. Also a button on that note's related-trips block, beside Cover and Prospect |
 | New excursion | Title, optional City, optional operator, optional duration. No price field, here or on the note: the same tour is sold at a different figure on every trip that offers it |

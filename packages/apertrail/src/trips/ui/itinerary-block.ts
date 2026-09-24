@@ -65,6 +65,7 @@ import { legRoute } from '../costs/estimates';
 import { CostUnit, lineCost, LineCost, lineTravellers } from '../costs/line-cost';
 import { BookingPreset, NewBookingModal } from './new-booking-modal';
 import { exportTripDocument } from './export-trip-document';
+import { exportBookingSheet } from './export-booking-sheet';
 import { TravelBooking, TravelVehicle } from '../../vault/types';
 import { resolveImageFile } from '../../ui/components/image-resolve';
 import { hour12For } from '../../shared/clock';
@@ -1249,6 +1250,24 @@ class ItineraryRenderer extends MarkdownRenderChild {
     });
     documentBtn.addEventListener('click', () => {
       void exportTripDocument(this.app, this.deps.getSettings(), trip);
+    });
+
+    // Beside the document for the same reason the document is here: the sheet
+    // is printed from the trip, while looking at it. The bookings are read at
+    // the click rather than taken from the last render, so a booking made a
+    // minute ago is on the sheet.
+    const bookingBtn = actions.createEl('button', {
+      cls: 'apt-itinerary-export',
+      text: t('bookingSheet.exportButton'),
+    });
+    bookingBtn.addEventListener('click', () => {
+      const settings = this.deps.getSettings();
+      void exportBookingSheet(
+        this.app,
+        settings,
+        trip,
+        readTravelBoard(this.app, settings).bookings
+      );
     });
 
     // Beside the export rather than in a menu: a shorter version of a trip is
