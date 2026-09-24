@@ -584,6 +584,8 @@ export const deTranslations: Translations = {
       dayDesc: 'Leer lassen, um ein eigenes Datum zu vergeben.',
       stopFrom: 'Von',
       stopTo: 'Bis',
+      stopPastMidnight:
+        'Eine Bis-Zeit vor der Von-Zeit heisst: am nächsten Tag. Ein Schiff, das um 23:45 anlegt und um 01:30 ablegt, erscheint als 23:45 - 01:30 +1.',
       stopNote: 'Notiz',
       stopRating: 'Bewertung',
       removeStop: 'Station entfernen',

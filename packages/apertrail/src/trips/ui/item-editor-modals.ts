@@ -830,6 +830,13 @@ export class StopEditorModal extends ItemEditorModal<TripStopInput> {
       this.departure,
       () => this.render()
     );
+    // Said under the times rather than left to be discovered: a stop has one
+    // day, and an end earlier than its start is how it says it runs past
+    // midnight (see `stopEndsNextDay`). Only on a stop written in days, since
+    // a dated one picks the next day in its own date field.
+    if (this.value.day !== null) {
+      new Setting(containerEl).setDesc(t('modals.tripEditor.stopPastMidnight'));
+    }
     // A textarea, like the day's own note beside it. A stop's note is a
     // sentence on an ordinary day and a whole paragraph of an operator's
     // brochure on an optional excursion, and a one-line box showed about four

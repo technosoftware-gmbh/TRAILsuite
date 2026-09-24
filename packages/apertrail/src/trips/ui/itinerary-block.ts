@@ -33,7 +33,6 @@ import { APERtrailSettings } from '../../settings/types';
 import {
   caseFold,
   dateTimeDatePart,
-  dateTimeTimePart,
   formatDayTitle,
   parseDayTitle,
   parseGeoPoint,
@@ -42,8 +41,16 @@ import { readTravelBoard } from '../../vault/read-entities';
 import { DuplicateTripModal } from './duplicate-trip-modal';
 import { moveInList } from '../../shared/reorder';
 import { itineraryDays, ItineraryDayGroup, spannedDates } from '../itinerary-days';
-import { clockTime, endpointDate, RelativeEndpoint } from '../relative-days';
-import { legArrivalText, legClock, legDayText, legService, legVia, legWhen } from '../journey-text';
+import { endpointDate, RelativeEndpoint } from '../relative-days';
+import {
+  legArrivalText,
+  legClock,
+  legDayText,
+  legService,
+  legVia,
+  legWhen,
+  stopClock,
+} from '../journey-text';
 import { legsArrivingOn, legsDepartingOn } from '../leg-days';
 import { cabinDescription } from '../../places/vehicle-note';
 import { countsInPlan, lineFigure } from '../costs/line-variants';
@@ -195,20 +202,6 @@ function formatWhenSpan(
   const days = [from.day, to.day].filter((day): day is number => day !== null);
   if (days.length === 0) return null;
   return [...new Set(days)].map((day) => t('itinerary.dayNumber', { number: day })).join(' → ');
-}
-
-/** "09:30 - 11:30", "from 12:00", "until 13:30", or null when a stop carries no time at all. */
-function formatTimeRange(stop: Pick<TravelTripStop, 'day' | 'from' | 'to'>): string | null {
-  // A relative stop carries a bare clock time where an absolute one carries a
-  // datetime; `clockTime` reads both, which is what lets one gutter serve a
-  // trip before and after it is planned.
-  const from =
-    stop.day === null ? (stop.from ? dateTimeTimePart(stop.from) : null) : clockTime(stop.from);
-  const to = stop.day === null ? (stop.to ? dateTimeTimePart(stop.to) : null) : clockTime(stop.to);
-  if (from && to) return `${from} - ${to}`;
-  if (from) return t('itinerary.fromTime', { time: from });
-  if (to) return t('itinerary.untilTime', { time: to });
-  return null;
 }
 
 /** The day a capture happened: the trip's own day when it is in the past, today when the trip is still ahead. */
@@ -604,7 +597,7 @@ class ItineraryRenderer extends MarkdownRenderChild {
   private renderStopRow(trip: TravelTrip, stop: TravelTripStop, index: number): void {
     const row = this.el.createDiv({ cls: 'apt-itinerary-stop' });
 
-    row.createDiv({ cls: 'apt-itinerary-time', text: formatTimeRange(stop) ?? '' });
+    row.createDiv({ cls: 'apt-itinerary-time', text: stopClock(stop, trip.departure) ?? '' });
     setIcon(
       row.createSpan({ cls: 'apt-itinerary-icon' }),
       stop.targetKind ? KIND_ICONS[stop.targetKind] : 'help-circle'

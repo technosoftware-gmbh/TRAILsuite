@@ -38,7 +38,7 @@ import { namesSomebodyElse } from './costs/per-person';
 import { legRoute } from './costs/estimates';
 import { cabinDescription } from '../places/vehicle-note';
 import { isFlight } from '../shared/travel-mode';
-import { legNights } from './journey-text';
+import { legNights, stopEndsNextDay } from './journey-text';
 import { clockTime, endpointDate, RelativeEndpoint } from './relative-days';
 
 /** Which of the four tables a line belongs in. */
@@ -157,6 +157,8 @@ export interface BookingExcursionLine extends BookingLineBase {
   start: BookingWhen;
   from: string | null;
   to: string | null;
+  /** True when it ends the next morning: out at 01:30 after in at 23:45. */
+  nextDay: boolean;
   duration: string | null;
   operator: string | null;
 }
@@ -517,6 +519,7 @@ export function bookingSheetLines(
       start,
       from: clockTime(stop.from),
       to: clockTime(stop.to),
+      nextDay: stopEndsNextDay(stop),
       duration: stop.excursion?.duration ?? null,
       operator: stop.excursion?.operatorTitle ?? null,
       persons: personsOf(stop, trip),

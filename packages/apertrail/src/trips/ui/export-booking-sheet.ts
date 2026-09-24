@@ -288,7 +288,12 @@ function excursionsTable(lines: BookingSheetLines): BookingSheetTable {
     ],
     rows: lines.excursions.map((line) => [
       { main: whenText(line.start) },
-      { main: line.from && line.to ? `${line.from} - ${line.to}` : line.from },
+      {
+        main:
+          line.from && line.to
+            ? `${line.from} - ${line.to}${line.nextDay ? ' +1' : ''}`
+            : line.from,
+      },
       {
         main: line.excursion,
         sub: subs(
