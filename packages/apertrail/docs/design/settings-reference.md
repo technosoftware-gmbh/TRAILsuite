@@ -306,13 +306,14 @@ edit clears the keys above and leaves a picture alone.
 | `legModeField` | `mode` | Sub-key: train, plane, car, ... |
 | `legVehicleField` | `vehicle` | Sub-key: which ship or named train the leg is taken on, as a link to a vehicle note. Separate from `carrier`, which is who runs it |
 | `legCarrierField` | `carrier` | Sub-key: the airline, the railway, or the train's own name. Free text, or a wikilink when the vault has a note for it |
+| `legNumberField` | `number` | Sub-key: the flight or train number, `LX288`. Not the booking reference, which is what a booking note is matched on. A bare `812` is read as the text it was typed as. See [The booking sheet](booking-sheet.md) |
 | `legFromField` | `from` | Sub-key: departure time |
 | `legToField` | `to` | Sub-key: arrival time |
 | `legDayField` | `day` | Sub-key: which day of the trip the leg departs on. 0 and negative are allowed, for a flight leaving the evening before day one |
 | `legToDayField` | `toDay` | Sub-key: which day it arrives on. One night beside a clock prints as `+1` on the arrival time; a leg that runs longer, or one with no clock to mark, states both ends and its nights instead |
 | `legOriginField` | `origin` | Sub-key: where the leg departs from |
 | `legDestinationField` | `destination` | Sub-key: where it arrives |
-| `legReferenceField` | `reference` | Sub-key: booking or ticket reference |
+| `legReferenceField` | `reference` | Sub-key: the booking reference, which a booking note carrying the same one is matched on. The flight number goes in `number` |
 | `legCostField` | `cost` | Sub-key: what the leg is expected to cost |
 | `legCurrencyField` | `currency` | Sub-key: the currency that figure is in |
 | `legCostUnitField` | `costUnit` | Sub-key: per person, or in total |

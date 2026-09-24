@@ -355,6 +355,8 @@ export interface TravelTripLeg extends ParsedTripLineChoice {
   toDay: number | null;
   /** Who runs it: Swiss, Edelweiss, Rovos Rail. As written. */
   carrier: string | null;
+  /** The flight or train number, LX288. Not the booking reference, which is `reference`. */
+  number: string | null;
   direction: 'outbound' | 'inbound';
   mode: string | null;
   from: string | null;

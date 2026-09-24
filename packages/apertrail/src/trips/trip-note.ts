@@ -50,6 +50,12 @@ import { clockTime } from './relative-days';
 export const TRAVEL_STATUS_VALUES = ['Planned', 'Booked', 'Over', 'Cancelled'] as const;
 export type TravelStatusValue = (typeof TRAVEL_STATUS_VALUES)[number];
 
+/** Text, or a bare number read back as the text it was typed as: a train called 812. */
+function readCode(value: unknown): string | null {
+  if (typeof value === 'number' && Number.isFinite(value)) return String(value);
+  return readString(value);
+}
+
 export function isTravelStatusValue(value: unknown): value is TravelStatusValue {
   return (
     typeof value === 'string' && (TRAVEL_STATUS_VALUES as readonly string[]).includes(value.trim())
@@ -146,6 +152,8 @@ export interface TripLegInput extends TripLineChoiceInput {
   mode: string | null;
   /** Who runs it: an airline, a railway, a named train. */
   carrier: string | null;
+  /** The flight or train number, LX288. Not the booking reference. */
+  number: string | null;
   /** Which day of the trip the leg leaves and arrives on. Two, because an overnight leg is ordinary. */
   day: number | null;
   toDay: number | null;
@@ -274,6 +282,17 @@ export interface TripPropertyNames {
    * same answer often enough that they share the field.
    */
   legCarrierField: string;
+  /**
+   * The flight or train number: LX288, IC 812.
+   *
+   * Its own field because `legReferenceField` is already the booking
+   * reference, and a booking note finds its leg by that one. A flight number
+   * typed into the reference is overwritten the day the booking code arrives,
+   * and the match with the booking note breaks until it is. A travel agency
+   * asks for the number before there is a code, which is why the booking
+   * sheet needs both.
+   */
+  legNumberField: string;
   legModeField: string;
   /**
    * Which day of the trip a leg leaves and arrives on.
@@ -739,6 +758,7 @@ export function buildTripFrontmatter(input: TripFrontmatterInput): Record<string
       (leg) =>
         cleanString(leg.mode) !== null ||
         cleanString(leg.carrier) !== null ||
+        cleanString(leg.number) !== null ||
         cleanDay(leg.day) !== null ||
         cleanDay(leg.toDay) !== null ||
         isoDateTimeValue(leg.from) !== null ||
@@ -762,6 +782,8 @@ export function buildTripFrontmatter(input: TripFrontmatterInput): Record<string
       const reference = cleanString(leg.reference);
       const carrier = cleanString(leg.carrier);
       if (carrier) entry[p.legCarrierField] = carrier;
+      const number = cleanString(leg.number);
+      if (number) entry[p.legNumberField] = number;
       if (mode) entry[p.legModeField] = mode;
       const legDay = cleanDay(leg.day);
       const legToDay = cleanDay(leg.toDay);
@@ -1002,6 +1024,8 @@ export interface ParsedTripLeg extends ParsedTripLineChoice {
   toDay: number | null;
   /** Who runs it, as written: a wikilink read down to its target, or the plain text. */
   carrier: string | null;
+  /** The flight or train number, as written. */
+  number: string | null;
   direction: TripLegDirection;
   mode: string | null;
   from: string | null;
@@ -1214,6 +1238,9 @@ export function parseTripRecord(input: ParseTripRecordInput): ParsedTripRecord {
         // A wikilink reads down to its target, like a leg's own origin:
         // `[[Swiss]]` and `Swiss` arrive the same, and neither needs a note.
         carrier: placeLabel(entry[p.legCarrierField]),
+        // A train number is often only digits, and YAML reads a bare 812 as a
+        // number rather than the text it is.
+        number: readCode(entry[p.legNumberField]),
         from: relative
           ? clockTime(readString(entry[p.legFromField]))
           : readDateTimeLike(entry[p.legFromField]),

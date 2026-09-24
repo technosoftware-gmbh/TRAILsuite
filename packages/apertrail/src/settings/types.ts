@@ -315,6 +315,8 @@ export interface APERtrailSettings {
   legToDayField: string;
   /** Who runs a leg: an airline, a railway, a named train. Free text or a wikilink. */
   legCarrierField: string;
+  /** The flight or train number, LX288. Not the booking reference, which is what a booking note is matched on. */
+  legNumberField: string;
   legModeField: string;
   legFromField: string;
   legToField: string;

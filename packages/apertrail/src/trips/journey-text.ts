@@ -136,6 +136,18 @@ export function legRouteText(leg: ParsedTripLeg): string {
 }
 
 /**
+ * Who runs a leg and under which number: "Swiss LX288".
+ *
+ * One part rather than two, because that is how a departure board and a
+ * boarding pass print it, and a number alone ("LX288") or an airline alone
+ * both still read. Null when the leg says neither.
+ */
+export function legService(leg: { carrier: string | null; number: string | null }): string | null {
+  const text = [leg.carrier, leg.number].filter((part): part is string => !!part).join(' ');
+  return text === '' ? null : text;
+}
+
+/**
  * A leg as the day-by-day names it: where it goes and when it goes.
  *
  * A day that says a flight leaves says nothing useful without the time --

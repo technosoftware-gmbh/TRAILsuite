@@ -580,6 +580,10 @@ export const deTranslations: Translations = {
       legCarrierDesc:
         'Die Fluggesellschaft, die Bahn oder der Name des Zuges. Freitext, oder ein Wikilink, wenn der Vault eine Notiz dafür hat.',
       legCarrierPlaceholder: 'Swiss',
+      legNumber: 'Flug- oder Zugnummer',
+      legNumberDesc:
+        'Die Nummer, unter der dieser Abschnitt fährt oder fliegt. Nicht die Buchungsreferenz darunter: nach der sucht eine Buchungsnotiz ihren Abschnitt.',
+      legNumberPlaceholder: 'LX288',
       legReference: 'Referenz',
       removeLeg: 'Abschnitt entfernen',
       remove: '{item} entfernen',

@@ -1019,6 +1019,20 @@ export class LegEditorModal extends ItemEditorModal<TripLegInput> {
       },
       'apt-leg-carrier-suggestions'
     );
+    // Beside the carrier it belongs to, and above the reference it is so
+    // often mistaken for: LX288 is the flight, the booking code is the seat on
+    // it, and a booking note finds this leg by the code.
+    new Setting(containerEl)
+      .setName(t('modals.tripEditor.legNumber'))
+      .setDesc(t('modals.tripEditor.legNumberDesc'))
+      .addText((text) =>
+        text
+          .setPlaceholder(t('modals.tripEditor.legNumberPlaceholder'))
+          .setValue(this.value.number ?? '')
+          .onChange((raw) => {
+            this.value.number = raw.trim() === '' ? null : raw;
+          })
+      );
     new Setting(containerEl)
       .setName(t('modals.tripEditor.legReference'))
       .setDesc(t('modals.tripEditor.legReferenceDesc'))

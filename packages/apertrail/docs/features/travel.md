@@ -181,9 +181,15 @@ because the mode is what kind of thing it is and the carrier is which one: two
 flights on the same day are both `plane` and only one of them is the Edelweiss
 you have to be at the right terminal for.
 
+`number:` is the flight or train number, LX288, and is not the same thing as
+`reference:`. The reference is the booking code, and a booking note finds its
+leg by it; a flight number typed there is overwritten the day the code arrives.
+A travel agency asks for the number long before there is a code, which is why
+the booking sheet needs both.
+
 The itinerary row leads with the route, "Zürich to Pretoria", and puts the
-direction, the carrier and the reference under it: "Hinreise · Swiss · LX288".
-Each is omitted when the leg does not say it.
+direction, the carrier with its number, and the reference under it:
+"Hinreise · Swiss LX288 · K7Q2XF". Each is omitted when the leg does not say it.
 
 Optional fields are omitted, never written empty. A day trip's note carries no `nights:` or `transport:` key at all rather than two empty lists.
 

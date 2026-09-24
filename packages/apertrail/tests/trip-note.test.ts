@@ -221,6 +221,7 @@ describe('buildTripFrontmatter -> parseTripRecord round trip', () => {
           direction: 'outbound',
           mode: 'plane',
           carrier: 'Swiss',
+          number: null,
           vehicleTitle: null,
           day: null,
           toDay: null,
@@ -241,6 +242,7 @@ describe('buildTripFrontmatter -> parseTripRecord round trip', () => {
           direction: 'inbound',
           mode: 'train',
           carrier: null,
+          number: null,
           vehicleTitle: 'Rovos Rail Pride of Africa',
           day: null,
           toDay: null,
@@ -1041,5 +1043,75 @@ describe('the vehicle a leg is taken on', () => {
     );
 
     expect(yaml.transport).toHaveLength(1);
+  });
+});
+
+/**
+ * The flight or train number a leg runs under.
+ *
+ * Its own sub-key rather than more work for `reference`, which is the booking
+ * code a booking note finds its leg by: LX288 typed there is overwritten the
+ * day the code arrives. The booking sheet needs both, and needs the number
+ * first, since that is what a travel agency asks for.
+ */
+describe('the number a leg runs under', () => {
+  it('is written beside the carrier and read back as typed', () => {
+    const yaml = buildTripFrontmatter(
+      input({
+        transport: [
+          aLegInput({
+            direction: 'outbound',
+            carrier: 'Swiss',
+            number: 'LX288',
+            reference: 'K7Q2XF',
+          }),
+        ],
+      })
+    );
+
+    expect(yaml.transport).toEqual([
+      { direction: 'outbound', carrier: 'Swiss', number: 'LX288', reference: 'K7Q2XF' },
+    ]);
+    const parsed = roundTrip({
+      transport: [aLegInput({ carrier: 'Swiss', number: 'LX288', reference: 'K7Q2XF' })],
+    });
+    expect(parsed.transport[0].number).toBe('LX288');
+    expect(parsed.transport[0].reference).toBe('K7Q2XF');
+  });
+
+  /** YAML reads a bare 812 as a number; a train called 812 is still text. */
+  it('reads a number typed without quotes as its text', () => {
+    const parsed = parseTripRecord({
+      properties: PROPS,
+      frontmatter: { transport: [{ direction: 'outbound', mode: 'train', number: 812 }] },
+    });
+
+    expect(parsed.transport[0].number).toBe('812');
+  });
+
+  it('is left off entirely by a leg that names none', () => {
+    const yaml = buildTripFrontmatter(input({ transport: [aLegInput({ carrier: 'Swiss' })] }));
+    const legs = yaml.transport as Record<string, unknown>[];
+
+    expect(legs[0]).not.toHaveProperty('number');
+  });
+
+  it('is enough on its own to keep a leg', () => {
+    const yaml = buildTripFrontmatter(input({ transport: [aLegInput({ number: 'IC 812' })] }));
+
+    expect(yaml.transport).toHaveLength(1);
+  });
+
+  it('honours a renamed sub-key', () => {
+    const yaml = buildTripFrontmatter(
+      input({
+        properties: { ...PROPS, legNumberField: 'flight' },
+        transport: [aLegInput({ number: 'LX288' })],
+      })
+    );
+    const legs = yaml.transport as Record<string, unknown>[];
+
+    expect(legs[0].flight).toBe('LX288');
+    expect(legs[0]).not.toHaveProperty('number');
   });
 });

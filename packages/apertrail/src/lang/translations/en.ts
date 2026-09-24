@@ -587,6 +587,10 @@ export const enTranslations = {
       legCarrierDesc:
         'The airline, railway or named train. Free text, or a wikilink if the vault has a note for it.',
       legCarrierPlaceholder: 'Swiss',
+      legNumber: 'Flight or train number',
+      legNumberDesc:
+        'The number this leg runs or flies under. Not the booking reference below, which is what a booking note finds this leg by.',
+      legNumberPlaceholder: 'LX288',
       legReference: 'Reference',
       removeLeg: 'Remove leg',
       remove: 'Remove {item}',

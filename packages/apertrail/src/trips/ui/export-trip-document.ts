@@ -23,7 +23,7 @@ import { TravelTrip, TravelVehicle } from '../../vault/types';
 import { inlinePicture } from '../../shared/inline-picture';
 import { itineraryDays } from '../itinerary-days';
 import { clockTime, endpointDate, RelativeEndpoint, tripDayCount } from '../relative-days';
-import { legArrivalText, legClock, legDayText, legWhen } from '../journey-text';
+import { legArrivalText, legClock, legDayText, legService, legWhen } from '../journey-text';
 import { estimateLabels } from '../costs/estimate-labels';
 import { plannedByCategory, plannedTotal } from '../costs/planned-total';
 import { legRoute, tripItemEstimates } from '../costs/estimates';
@@ -287,7 +287,7 @@ export function documentTransport(
     detail:
       [
         t(leg.direction === 'inbound' ? 'itinerary.inbound' : 'itinerary.outbound'),
-        leg.carrier,
+        legService(leg),
         // The ship between who runs it and the booking reference, which is the
         // order somebody reads a ticket in.
         leg.vehicleTitle,
