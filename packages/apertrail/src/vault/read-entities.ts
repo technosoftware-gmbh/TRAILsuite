@@ -258,6 +258,7 @@ export function excursionProperties(settings: APERtrailSettings): ExcursionPrope
     descriptionProperty: settings.descriptionProperty,
     operatorProperty: settings.excursionOperatorProperty,
     durationProperty: settings.excursionDurationProperty,
+    codeProperty: settings.excursionCodeProperty,
     countryProperty: settings.countryProperty,
     cityProperty: settings.cityProperty,
     websiteProperty: settings.websiteProperty,

@@ -42,6 +42,15 @@ every trip that takes it; what it costs is a fact about the trip.
 Correcting the description on the excursion corrects every trip that ever took
 it. Nothing is copied and nothing is written back.
 
+**The operator's booking code is one of those facts** (`code:`, added 24
+September 2026). Hurtigruten quotes `HR-TOS5A` for "Die Hauptstadt der
+Arktis: Tromsø", and a port often has two tours of nearly one name with
+different content: the code is what tells them apart at a booking counter, and
+the booking sheet prints it first under the tour's name. It is on the note and
+not on the stop because the same code is quoted on every sailing that offers
+the tour. It is not the booking reference either: that is the code you get
+back once it is booked, and it lives in a booking note.
+
 ## Where it differs from the ship: no catalogue
 
 A vehicle lists its cabins because one sailing sells several grades of the same

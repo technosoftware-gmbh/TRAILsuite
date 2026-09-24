@@ -159,6 +159,8 @@ export interface BookingExcursionLine extends BookingLineBase {
   to: string | null;
   /** True when it ends the next morning: out at 01:30 after in at 23:45. */
   nextDay: boolean;
+  /** The operator's code for booking it, from the excursion note: what tells two tours of one name apart. */
+  code: string | null;
   duration: string | null;
   operator: string | null;
 }
@@ -520,6 +522,7 @@ export function bookingSheetLines(
       from: clockTime(stop.from),
       to: clockTime(stop.to),
       nextDay: stopEndsNextDay(stop),
+      code: stop.excursion?.code ?? null,
       duration: stop.excursion?.duration ?? null,
       operator: stop.excursion?.operatorTitle ?? null,
       persons: personsOf(stop, trip),

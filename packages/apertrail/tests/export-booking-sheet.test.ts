@@ -70,7 +70,7 @@ describe('the rows', () => {
     const [sled] = table(build(), 'Excursions').rows;
 
     expect(sled?.[1]?.main).toBe('14:30 - 17:30');
-    expect(sled?.[2]?.sub).toBe('3 Std. · Only Anna · Extra, chosen');
+    expect(sled?.[2]?.sub).toBe('HR-TOS5A · 3 Std. · Only Anna · Extra, chosen');
   });
 
   it('puts the hotel’s own cells on its first room only', () => {

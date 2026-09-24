@@ -51,6 +51,15 @@ export interface ExcursionPropertyNames {
    * Nothing computes with it.
    */
   durationProperty: string;
+  /**
+   * The operator's own code for the tour: HR-TOS5A.
+   *
+   * A port often offers two tours of nearly the same name with different
+   * content, and the code is what tells them apart at a booking counter. It
+   * belongs to the tour rather than to any trip, the way a ship's cabins do:
+   * the same code is quoted on every sailing that offers it.
+   */
+  codeProperty: string;
   /** Where it is offered. Resolved by the caller, the same way a place's are. */
   countryProperty: string;
   cityProperty: string;
@@ -75,6 +84,8 @@ export interface ParsedExcursion {
   /** Who runs it, as written: a wikilink read down to its target. Nothing here joins a trip to a company. */
   operatorTitle: string | null;
   duration: string | null;
+  /** The operator's code for booking it, as written. */
+  code: string | null;
   /** Raw wikilink targets. Resolved against the board's Cities and Countries by the caller. */
   countryTitle: string | null;
   cityTitle: string | null;
@@ -99,6 +110,7 @@ export function parseExcursion(
     description: readString(fm[p.descriptionProperty]),
     operatorTitle: wikilinkTarget(fm[p.operatorProperty]) ?? readString(fm[p.operatorProperty]),
     duration: readString(fm[p.durationProperty]),
+    code: readString(fm[p.codeProperty]),
     countryTitle: wikilinkTarget(fm[p.countryProperty]),
     cityTitle: wikilinkTarget(fm[p.cityProperty]),
     website: readString(fm[p.websiteProperty]),
@@ -125,6 +137,7 @@ export interface ExcursionInput {
   description: string | null;
   operatorTitle: string | null;
   duration: string | null;
+  code: string | null;
   countryTitle: string | null;
   cityTitle: string | null;
   website: string | null;
@@ -154,6 +167,7 @@ export function buildExcursionFrontmatter(
   write(p.descriptionProperty, input.description);
   link(p.operatorProperty, input.operatorTitle);
   write(p.durationProperty, input.duration);
+  write(p.codeProperty, input.code);
   link(p.countryProperty, input.countryTitle);
   link(p.cityProperty, input.cityTitle);
   write(p.websiteProperty, input.website);
@@ -176,6 +190,7 @@ export function excursionManagedKeys(p: ExcursionPropertyNames): string[] {
     p.descriptionProperty,
     p.operatorProperty,
     p.durationProperty,
+    p.codeProperty,
     p.countryProperty,
     p.cityProperty,
     p.websiteProperty,
@@ -188,6 +203,7 @@ export function excursionToInput(excursion: ParsedExcursion): ExcursionInput {
     description: excursion.description,
     operatorTitle: excursion.operatorTitle,
     duration: excursion.duration,
+    code: excursion.code,
     countryTitle: excursion.countryTitle,
     cityTitle: excursion.cityTitle,
     website: excursion.website,

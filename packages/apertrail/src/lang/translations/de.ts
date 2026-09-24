@@ -131,6 +131,7 @@ export const deTranslations: Translations = {
   },
   fieldNames: {
     duration: 'Dauer',
+    bookingCode: 'Buchungsnummer',
     operator: 'Betrieben von',
     built: 'Baujahr',
     refurbished: 'Umbau',
@@ -847,6 +848,7 @@ export const deTranslations: Translations = {
     newExcursionModal: {
       title: 'Neuer Ausflug',
       durationPlaceholder: 'ca. 4 Stunden',
+      codePlaceholder: 'HR-TOS5A',
       created: '"{title}" angelegt.',
     },
     noteCover: {
@@ -1476,6 +1478,10 @@ export const deTranslations: Translations = {
         excursionDuration: {
           name: 'Eigenschaft "Dauer"',
           desc: 'Wie lange er dauert, in den Worten des Veranstalters. Freier Text statt einer Stundenzahl: "halber Tag" und "ca. 4 Stunden" meinen dasselbe, und hier rechnet nichts damit.',
+        },
+        excursionCode: {
+          name: 'Eigenschaft "Buchungsnummer"',
+          desc: 'Die Buchungsnummer des Veranstalters für diesen Ausflug, HR-TOS5A. Sie unterscheidet zwei ähnlich benannte Ausflüge im selben Hafen und steht im Buchungsblatt.',
         },
         personTag: {
           name: 'Tag-Eigenschaft für Personen',

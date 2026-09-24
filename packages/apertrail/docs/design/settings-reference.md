@@ -278,6 +278,7 @@ The Trip schema's own property names are real settings, honored by both the read
 | `excursionsFolder`                          | `Places/Excursions`   | The outings you are sold a day of. Not a place either, and filed under the Places root for the vehicle's reason                                                                                                    |
 | `excursionOperatorProperty`                 | `operator`            | Who runs the tour, as a link to a Company note. A fact about the excursion; no code joins a trip to a company through it                                                                                           |
 | `excursionDurationProperty`                 | `duration`            | How long it takes, in the operator's own words. Free text rather than a number of hours: "half day" and "ca. 4 Stunden" mean the same kind of thing, and nothing computes with it                                  |
+| `excursionCodeProperty`                     | `code`                | The operator's own code for the tour, `HR-TOS5A`. Tells two tours of nearly one name in one port apart; printed on the booking sheet, the prospect and the itinerary. On the excursion, not the trip: the same code is quoted on every sailing |
 
 An excursion also reads `descriptionProperty`, `websiteProperty`,
 `countryProperty`, `cityProperty`, `imageProperty` and `tripGalleryProperty`:

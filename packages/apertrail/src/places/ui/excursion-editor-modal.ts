@@ -55,6 +55,7 @@ function emptyInput(): ExcursionInput {
     description: null,
     operatorTitle: null,
     duration: null,
+    code: null,
     countryTitle: null,
     cityTitle: null,
     website: null,
@@ -190,6 +191,17 @@ export class ExcursionEditorModal extends BaseModal {
             this.input.duration = value.trim() ? value : null;
           },
           t('modals.newExcursionModal.durationPlaceholder')
+        );
+        return;
+      case 'code':
+        this.textField(
+          fields,
+          t('fieldNames.bookingCode'),
+          this.input.code ?? '',
+          (value) => {
+            this.input.code = value.trim() ? value : null;
+          },
+          t('modals.newExcursionModal.codePlaceholder')
         );
         return;
       case 'website':

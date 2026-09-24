@@ -139,6 +139,7 @@ export const enTranslations = {
    */
   fieldNames: {
     duration: 'Duration',
+    bookingCode: 'Booking code',
     operator: 'Operated by',
     built: 'Built',
     refurbished: 'Refurbished',
@@ -855,6 +856,7 @@ export const enTranslations = {
     newExcursionModal: {
       title: 'New excursion',
       durationPlaceholder: 'About 4 hours',
+      codePlaceholder: 'HR-TOS5A',
       created: 'Created "{title}".',
     },
     noteCover: {
@@ -1448,6 +1450,10 @@ export const enTranslations = {
         excursionDuration: {
           name: 'Excursion duration property',
           desc: 'How long it takes, in the operator\u2019s own words. Free text rather than a number of hours: "half day" and "ca. 4 Stunden" mean the same kind of thing, and nothing here computes with it.',
+        },
+        excursionCode: {
+          name: 'Excursion booking code property',
+          desc: "The operator's own code for this excursion, HR-TOS5A. It tells two similarly named tours in one port apart, and the booking sheet prints it.",
         },
         personTag: {
           name: 'Person tag property',

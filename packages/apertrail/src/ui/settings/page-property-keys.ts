@@ -192,6 +192,7 @@ const PROPERTY_GROUPS: PropertyGroup[] = [
     fields: [
       { key: 'excursionOperatorProperty', label: 'excursionOperator' },
       { key: 'excursionDurationProperty', label: 'excursionDuration' },
+      { key: 'excursionCodeProperty', label: 'excursionCode' },
     ],
   },
   {

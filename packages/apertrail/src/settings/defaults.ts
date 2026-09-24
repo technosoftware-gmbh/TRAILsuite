@@ -158,6 +158,7 @@ export const DEFAULT_SETTINGS: APERtrailSettings = {
   excursionsFolder: 'Places/Excursions',
   excursionOperatorProperty: 'operator',
   excursionDurationProperty: 'duration',
+  excursionCodeProperty: 'code',
   cabinNameField: 'name',
   cabinDescriptionField: 'description',
   cabinImageField: 'image',
