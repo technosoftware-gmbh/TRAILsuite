@@ -1,6 +1,6 @@
 # The booking sheet
 
-**Planned 24 September 2026. Step 1 built, the sheet itself not yet.** The
+**Planned 24 September 2026. Steps 1 and 2 built, the sheet itself not yet.** The
 fourth trip sheet, beside the trip document and the cost sheet: a page taken
 to a travel agency to book a trip that is planned but not yet booked. The four
 decisions below and the "Noch offen" section are Thomas's own; the rest is a
@@ -191,7 +191,22 @@ copy: stay grouping, `persons` "only X" labels, day resolution, leg icons, the
    carrier as "Swiss LX288" (`legService()` in `journey-text.ts`), so it is not
    a field only one sheet can see. A bare `812` in YAML is a number, and is
    read back as the text it was typed as.
-2. `booking-sheet-lines.ts` with its tests.
+2. **Built.** `trips/booking-sheet-lines.ts` with
+   `tests/booking-sheet-lines.test.ts`: the four tables sorted by when, the
+   rooms grouped, the chosen variant with the ship's cabin text, the price and
+   its total per currency, the booked state, and the open items. Three
+   decisions made while building it, all small enough to reverse:
+   - **A leg carrying a `reference` is booked.** The field is the booking
+     code, so a leg with one needs no booking note to say so. A stay or an
+     excursion is booked only by a booking note with status `booked` or
+     `paid`; an `estimate` is not a booking.
+   - **An excursion's booking is found by the excursion's title first**, and
+     by its place only when that place has no other excursion on the trip.
+     A booking naming "Tromsø" cannot say which of two tours it paid for.
+   - **"Noch offen" asks for a departure time on every leg except `car`**: a
+     rental car has a pick-up, not a timetable.
+   The model stays unformatted (ISO dates, `HH:mm`, unit words); step 3 turns
+   it into sentences.
 3. The builder, the App-bound half, the button and the command.
 4. Render the Nordkap trip, print, correct.
 5. Optional, and only if wanted: a health check that flags a plane leg whose
