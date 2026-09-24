@@ -592,6 +592,8 @@ export const enTranslations = {
       dayDesc: 'Leave empty to give this a date of its own.',
       stopFrom: 'From',
       stopTo: 'Until',
+      stopPastMidnight:
+        'An until time before the from time means the next day. A ship in at 23:45 and out at 01:30 shows as 23:45 - 01:30 +1.',
       stopNote: 'Note',
       stopRating: 'Rating',
       removeStop: 'Remove stop',

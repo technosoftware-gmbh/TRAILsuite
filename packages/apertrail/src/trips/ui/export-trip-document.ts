@@ -22,8 +22,16 @@ import { APERtrailSettings } from '../../settings/types';
 import { TravelTrip, TravelVehicle } from '../../vault/types';
 import { inlinePicture } from '../../shared/inline-picture';
 import { itineraryDays } from '../itinerary-days';
-import { clockTime, endpointDate, RelativeEndpoint, tripDayCount } from '../relative-days';
-import { legArrivalText, legClock, legDayText, legService, legVia, legWhen } from '../journey-text';
+import { endpointDate, RelativeEndpoint, tripDayCount } from '../relative-days';
+import {
+  legArrivalText,
+  legClock,
+  legDayText,
+  legService,
+  legVia,
+  legWhen,
+  stopClock,
+} from '../journey-text';
 import { estimateLabels } from '../costs/estimate-labels';
 import { plannedByCategory, plannedTotal } from '../costs/planned-total';
 import { legRoute, tripItemEstimates } from '../costs/estimates';
@@ -71,18 +79,6 @@ function dateRange(trip: TravelTrip): string | null {
   const to = formatDay(trip.return);
   if (from && to) return from === to ? from : `${from} - ${to}`;
   return from ?? to;
-}
-
-/** "09:00" or "09:00 - 13:30", the same three shapes the itinerary block draws. */
-function timeRange(from: string | null, to: string | null): string | null {
-  // `clockTime` rather than `dateTimeTimePart`, because a stop on a trip with
-  // no dates carries a bare time and would otherwise print none at all.
-  const start = clockTime(from);
-  const end = clockTime(to);
-  if (start && end) return `${start} - ${end}`;
-  if (start) return t('itinerary.fromTime', { time: start });
-  if (end) return t('itinerary.untilTime', { time: end });
-  return null;
 }
 
 /**
@@ -206,7 +202,7 @@ export function documentDays(trip: TravelTrip, settings: APERtrailSettings): Tri
     })),
     note: group.note,
     entries: group.stops.map((stop) => ({
-      time: timeRange(stop.from, stop.to),
+      time: stopClock(stop, trip.departure),
       place: stop.placeTitle,
       // The raw title, so a tour the vault has no note for still prints. The
       // description below is the half that needs the note.

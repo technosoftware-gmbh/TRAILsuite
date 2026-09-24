@@ -17,6 +17,8 @@ import {
   legClock,
   legNights,
   legService,
+  stopClock,
+  stopEndsNextDay,
   legVia,
   legWhen,
   LegSpan,
@@ -186,5 +188,36 @@ describe('a leg in segments', () => {
     expect(legVia(leg)).toBe('via Frankfurt');
     expect(legVia({ segments: [] })).toBeNull();
     expect(legService({ carrier: 'Swiss', number: 'LX 1218' })).toBe('Swiss LX 1218');
+  });
+});
+
+/**
+ * A ship in port across midnight: in at 23:45 on day 8, out at 01:30. A stop
+ * has one day, so it printed "from 23:45" and had nowhere to put the 01:30.
+ */
+describe('a stop past midnight', () => {
+  it('reads an end earlier than its start as the next morning', () => {
+    expect(stopEndsNextDay({ day: 8, from: '23:45', to: '01:30' })).toBe(true);
+    expect(stopClock({ day: 8, from: '23:45', to: '01:30' }, null)).toBe('23:45 - 01:30 +1');
+    expect(stopClock({ day: 8, from: '23:45', to: '01:30' }, '2027-12-03')).toBe(
+      '23:45 - 01:30 +1'
+    );
+  });
+
+  it('leaves an ordinary stop as it was', () => {
+    expect(stopEndsNextDay({ day: 8, from: '09:00', to: '11:30' })).toBe(false);
+    expect(stopClock({ day: 8, from: '09:00', to: '11:30' }, null)).toBe('09:00 - 11:30');
+    expect(stopClock({ day: 8, from: '23:45', to: null }, null)).toBe('from 23:45');
+  });
+
+  /** A stop with its own dates says which day it ends on; nothing is guessed. */
+  it('takes a dated stop\u2019s marker from its dates', () => {
+    const stop = { day: null, from: '2027-12-10T23:45', to: '2027-12-11T01:30' };
+
+    expect(stopEndsNextDay(stop)).toBe(false);
+    expect(stopClock(stop, null)).toBe('23:45 - 01:30 +1');
+    expect(stopClock({ day: null, from: '2027-12-10T09:00', to: '2027-12-10T11:00' }, null)).toBe(
+      '09:00 - 11:00'
+    );
   });
 });

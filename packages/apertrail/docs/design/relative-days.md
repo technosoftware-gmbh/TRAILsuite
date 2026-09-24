@@ -278,6 +278,21 @@ marker, not a row: the leg is still edited, priced and booked in its own band.
 own times, reference and price, and one leg against two is already the
 difference between non-stop and a change.
 
+## A stop past midnight
+
+**24 September 2026**, from a Hurtigruten port call: in at 23:45 on day 8, out
+at 01:30. A stop has one day and no `toDay`, so the arrival went into "from"
+and printed "ab 23:45", and the departure had nowhere to go.
+
+No new sub-key. **An end earlier than its start on a stop written in days is
+the next morning**, because nothing lasts backwards, and the stop prints
+"23:45 - 01:30 +1" through the same `legClock` a leg uses (`stopClock` and
+`stopEndsNextDay` in `journey-text.ts`). A stop with its own dates is not
+guessed at: its dates say which day it ends on, and they give the marker. The
+stop editor says so under the times, since a rule nobody is told about is a
+field that looks broken. The itinerary block, the trip document and the
+booking sheet all print it.
+
 ## Removing a day, and inserting one
 
 **The operation the relative days were for.** "Not two nights in Johannesburg

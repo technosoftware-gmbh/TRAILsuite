@@ -65,6 +65,42 @@ export function legClock(leg: LegSpan, departure: string | null): string | null 
   return t('itinerary.untilTime', { time: to ?? '' });
 }
 
+/**
+ * Whether a stop written against a day of the trip ends the next morning.
+ *
+ * A stop has one day and no second, because nearly every stop starts and
+ * ends on it. The exception is a ship in port across midnight, in at 23:45
+ * on day 8 and out at 01:30: an end earlier than its start can only mean the
+ * next day, since nothing lasts backwards. A stop with its own dates says so
+ * in them, and is not guessed at here.
+ */
+export function stopEndsNextDay(stop: {
+  day: number | null;
+  from: string | null;
+  to: string | null;
+}): boolean {
+  if (stop.day === null) return false;
+  const from = clockTime(stop.from);
+  const to = clockTime(stop.to);
+  return from !== null && to !== null && to < from;
+}
+
+/**
+ * A stop's times, "23:45 - 01:30 +1" for one that runs past midnight.
+ *
+ * The leg's own rule, so a stop and a leg print the marker the same way: a
+ * stop is a leg's span with one day for both ends, and the next day for its
+ * end where `stopEndsNextDay` says so. A stop with its own dates gets its
+ * marker from the dates.
+ */
+export function stopClock(
+  stop: { day: number | null; from: string | null; to: string | null },
+  departure: string | null
+): string | null {
+  const toDay = stop.day === null ? null : stop.day + (stopEndsNextDay(stop) ? 1 : 0);
+  return legClock({ day: stop.day, toDay, from: stop.from, to: stop.to }, departure);
+}
+
 /** One end of a leg, said the way the reader can place it: a date once the trip has one, a day number before that. */
 function endpointLabel(point: RelativeEndpoint, departure: string | null): string | null {
   const date = endpointDate(point, departure);
