@@ -305,3 +305,89 @@ describe('the leg pickers', () => {
     expect(leg.carrier).toBe('Helvetic Airs');
   });
 });
+
+/**
+ * A leg that changes planes, entered as one ticket. Reported from the first
+ * real booking sheet: a flight via Frankfurt had to be typed as two legs with
+ * half the fare on each.
+ */
+describe('a leg with a change of plane', () => {
+  const SEGMENTS = () => t('modals.tripEditor.addSegment');
+
+  it('makes what was typed the first flight, and the second start where it lands', () => {
+    const { save } = openLeg({
+      number: 'LH 1199',
+      origin: 'Zürich',
+      destination: 'Frankfurt',
+      from: '2027-12-03T07:00',
+      to: '2027-12-03T08:00',
+    });
+
+    buttonLabelled(SEGMENTS())?.click?.();
+    const leg = save();
+
+    expect(leg.origin).toBeNull();
+    expect(leg.number).toBeNull();
+    expect(leg.segments).toHaveLength(2);
+    expect(leg.segments[0]).toMatchObject({
+      number: 'LH 1199',
+      origin: 'Zürich',
+      destination: 'Frankfurt',
+    });
+    expect(leg.segments[1]).toMatchObject({ origin: 'Frankfurt', destination: null });
+  });
+
+  it('shows no route of the leg’s own once it has flights', () => {
+    openLeg({ origin: 'Zürich' });
+
+    expect(rowsNamed(t('modals.tripEditor.legOrigin'))).toHaveLength(1);
+    buttonLabelled(SEGMENTS())?.click?.();
+
+    // One per flight, and none for the leg.
+    expect(rowsNamed(t('modals.tripEditor.legOrigin'))).toHaveLength(2);
+    expect(rowsNamed(t('modals.tripEditor.segmentNumber', { number: 2 }))).toHaveLength(1);
+  });
+
+  it('turns back into a direct leg when one flight is left', () => {
+    const { save } = openLeg({ number: 'LH 1199', origin: 'Zürich', destination: 'Frankfurt' });
+
+    buttonLabelled(SEGMENTS())?.click?.();
+    control(t('modals.tripEditor.segmentNumber', { number: 2 }), 'extraButton')?.click?.();
+    const leg = save();
+
+    expect(leg.segments).toEqual([]);
+    expect(leg).toMatchObject({ number: 'LH 1199', origin: 'Zürich', destination: 'Frankfurt' });
+  });
+
+  it('leaves the caller’s leg alone until Save', () => {
+    const segments = [
+      {
+        carrier: null,
+        number: 'LH 1199',
+        origin: 'Zürich',
+        destination: 'Frankfurt',
+        day: null,
+        toDay: null,
+        from: null,
+        to: null,
+      },
+      {
+        carrier: null,
+        number: 'LH 872',
+        origin: 'Frankfurt',
+        destination: 'Bergen',
+        day: null,
+        toDay: null,
+        from: null,
+        to: null,
+      },
+    ];
+    const { value } = openLeg({ segments });
+
+    const inputs = rowsNamed(t('modals.tripEditor.legNumber'));
+    expect(inputs).toHaveLength(2);
+    control(t('modals.tripEditor.legNumber'), 'text')?.change?.('LH 9999' as never);
+
+    expect(value.segments[0]?.number).toBe('LH 1199');
+  });
+});

@@ -104,14 +104,23 @@ const DYNAMIC_KEYS = [
   // vault/health/entity-type-check-modal.ts builds `health.<section>.heading`
   // and `.explain` from the section it is drawing, so the four warning lists
   // are one renderer rather than four copies of the same twelve lines.
-  ...['photoSpotCheck', 'bookingCheck', 'variantCabinCheck', 'missingFileCheck'].flatMap(
-    (section) => [`health.${section}.heading`, `health.${section}.explain`]
-  ),
+  ...[
+    'photoSpotCheck',
+    'bookingCheck',
+    'variantCabinCheck',
+    'legNumberCheck',
+    'missingFileCheck',
+  ].flatMap((section) => [`health.${section}.heading`, `health.${section}.explain`]),
   // places/ui/export-prospect.ts names a place's kind on the prospect's meta
   // line, from the same chip labels the gallery uses.
   ...['accommodation', 'fnb', 'landmark', 'location', 'photospot'].flatMap((kind) => [
     `galleryView.filters.${kind}`,
   ]),
+  // trips/ui/export-booking-sheet.ts names a line nobody named by the table it
+  // belongs to, in the sheet's open items.
+  ...['flight', 'hotel', 'transport', 'excursion'].map(
+    (section) => `bookingSheet.section.${section}`
+  ),
   // ui/settings/page-property-keys.ts builds
   // `settings.properties.fields.<field>.name` / `.desc` from its catalogue,
   // one entry per frontmatter name the plugin reads or writes.

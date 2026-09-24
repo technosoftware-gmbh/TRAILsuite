@@ -43,7 +43,7 @@ import { DuplicateTripModal } from './duplicate-trip-modal';
 import { moveInList } from '../../shared/reorder';
 import { itineraryDays, ItineraryDayGroup, spannedDates } from '../itinerary-days';
 import { clockTime, endpointDate, RelativeEndpoint } from '../relative-days';
-import { legArrivalText, legClock, legDayText, legService, legWhen } from '../journey-text';
+import { legArrivalText, legClock, legDayText, legService, legVia, legWhen } from '../journey-text';
 import { legsArrivingOn, legsDepartingOn } from '../leg-days';
 import { cabinDescription } from '../../places/vehicle-note';
 import { countsInPlan, lineFigure } from '../costs/line-variants';
@@ -65,6 +65,7 @@ import { legRoute } from '../costs/estimates';
 import { CostUnit, lineCost, LineCost, lineTravellers } from '../costs/line-cost';
 import { BookingPreset, NewBookingModal } from './new-booking-modal';
 import { exportTripDocument } from './export-trip-document';
+import { exportBookingSheet } from './export-booking-sheet';
 import { TravelBooking, TravelVehicle } from '../../vault/types';
 import { resolveImageFile } from '../../ui/components/image-resolve';
 import { hour12For } from '../../shared/clock';
@@ -941,7 +942,13 @@ class ItineraryRenderer extends MarkdownRenderChild {
       // The ship's name between the carrier and the reference: Hurtigruten is
       // who runs it and MS Trollfjord is what you are on, and the row reads in
       // that order.
-      const detail = [route ? direction : null, legService(leg), leg.vehicleTitle, leg.reference]
+      const detail = [
+        route ? direction : null,
+        legVia(leg),
+        legService(leg),
+        leg.vehicleTitle,
+        leg.reference,
+      ]
         .filter((part): part is string => !!part)
         .join(' · ');
       if (detail) body.createDiv({ cls: 'apt-itinerary-note', text: detail });
@@ -1251,6 +1258,24 @@ class ItineraryRenderer extends MarkdownRenderChild {
       void exportTripDocument(this.app, this.deps.getSettings(), trip);
     });
 
+    // Beside the document for the same reason the document is here: the sheet
+    // is printed from the trip, while looking at it. The bookings are read at
+    // the click rather than taken from the last render, so a booking made a
+    // minute ago is on the sheet.
+    const bookingBtn = actions.createEl('button', {
+      cls: 'apt-itinerary-export',
+      text: t('bookingSheet.exportButton'),
+    });
+    bookingBtn.addEventListener('click', () => {
+      const settings = this.deps.getSettings();
+      void exportBookingSheet(
+        this.app,
+        settings,
+        trip,
+        readTravelBoard(this.app, settings).bookings
+      );
+    });
+
     // Beside the export rather than in a menu: a shorter version of a trip is
     // made from the trip, while looking at it, and a command somebody has to
     // know the name of is a feature they have to be told about. Same reasoning
@@ -1469,6 +1494,7 @@ class ItineraryRenderer extends MarkdownRenderChild {
       carrier: null,
       number: null,
       vehicleTitle: null,
+      segments: [],
       day: null,
       toDay: null,
       from: null,

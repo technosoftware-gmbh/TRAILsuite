@@ -599,6 +599,34 @@ It states the **plan**, not the ledger: the prices are the trip's budget, and
 the itinerary's own estimates for whatever the budget does not name. What has
 actually been spent is the cost sheet beside it.
 
+### The booking sheet
+
+The itinerary block's **Booking sheet** button, or *Export a booking sheet for
+this trip* from the command palette inside a trip note, writes
+`<Trip> booking sheet.html` into the same `_exports` folder. It is the page you
+take to a travel agency: the itinerary filtered down to what is sold, one
+table each for flights, accommodation, other transport and the chosen
+excursions, dated and in travelling order.
+
+| Column | Where it comes from |
+|---|---|
+| Flight / operator | `carrier` and `number`, with the ship or train from `vehicle` |
+| Departs / arrives | `from` and `to`, `+1` for one night, both dates for a voyage |
+| Class, cabin, room | The chosen variant, with the ship's own cabin text |
+| Reference | A leg's `reference`; for a stay or excursion, a booking note marked booked or paid |
+| Price | The planned figure with its unit, and what it comes to |
+
+The travellers are listed once with two empty columns, date of birth and name
+as in the passport, for filling in by hand: nothing personal is read from the
+vault or written into the file. A stop that is not an excursion is not on the
+sheet; it is bought at the door.
+
+**It never picks for you.** A line sold at several prices with none chosen
+prints "open" where the class and the price would be, and an optional extra
+nobody has decided on is left off the tables. Both are listed under **Still
+open** at the end, with lines that cannot be dated yet and legs with no
+departure time. The total is what the decided lines come to, per currency.
+
 
 ## Photo spots
 
@@ -818,6 +846,8 @@ The same review also lists three **photo spot warnings** (`src/vault/health/phot
 
 It lists every **reference to a file the vault does not have** (`src/vault/health/missing-file-issues.ts`): an `image:` on any note, a trip's or a ship's gallery entry, a cabin's photograph, a photo spot's sample, a ship's deck plan. Every reader treats a reference it cannot resolve exactly like no reference at all, which is right at render time and means the failure is completely silent -- a renamed attachments folder can empty an entire brochure without a word. A value pointing out of the vault (`https:`, `data:`) is not reported: it is not a file, and it is not a mistake. An empty value is not reported either, because that is the ordinary state of most notes.
 
+It lists **flights whose flight number sits in the booking reference** (`src/vault/health/leg-number-issues.ts`): a plane leg with no `number` whose `reference` reads as an airline code and one to four digits, `LX1218` or `LH 872`. The reference is the booking code a booking note finds its leg by, so a flight number left there prints as a booking code on the booking sheet and is lost the day the real code is typed over it. Trains are not checked, because a train number has no shape to test, and nothing is moved for you: only you know whether a six-character code that looks like a flight is one.
+
 Last, it lists **variants naming a cabin their ship does not list** (`src/vault/health/variant-cabin-issues.ts`). A leg's variant borrows its description from the cabin of the same name on the vehicle, so a difference in spelling shows as a description that quietly is not there. Only a variant carrying **no description of its own** is reported: borrowing one is what the match was for, and a leg deliberately priced for something the ship does not sell is a normal note. A ship whose cabins nobody has written down yet is skipped entirely, or every variant on every leg would be reported for as long as the catalogue stayed empty.
 
 Each of the twelve folders maps to exactly one entity type, so there is always a confident suggestion and never a guess. There is no "no suggestion available" branch to fall into.
@@ -848,6 +878,7 @@ The review modal never writes without an explicit click. There is no silent bulk
 | Check entity types | Runs the [health check](#entity-type-health-check) |
 | Export this photo spot as a field sheet | Only offered inside a photo spot note. Writes the sheet described in [the photo spot block](#the-photo-spot-block) into the note's exports folder |
 | Export this trip as a document | Only offered inside a trip note. Writes [the trip document](#the-trip-document) into the trip's exports folder |
+| Export a booking sheet for this trip | Only offered inside a trip note. Writes [the booking sheet](#the-booking-sheet) into the trip's exports folder |
 | New ship or train | Title, optional mode, optional operator. The cabin catalogue is filled in afterwards, from the Cabins command |
 | Cabins and details of this ship or train | Only offered inside a vehicle note. Also a button on that note's related-trips block, beside Cover and Prospect |
 | New excursion | Title, optional City, optional operator, optional duration. No price field, here or on the note: the same tour is sold at a different figure on every trip that offers it |

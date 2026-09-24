@@ -43,6 +43,7 @@ import { TravelPlace, TravelTrip, TravelVehicle } from './vault/types';
 import { readTravelBoard } from './vault/read-entities';
 import { exportPhotoSpotSheet } from './places/ui/export-photo-spot';
 import { exportTripDocument } from './trips/ui/export-trip-document';
+import { exportBookingSheet } from './trips/ui/export-booking-sheet';
 import { registerTravelItineraryBlock } from './trips/ui/itinerary-block';
 import { registerRelatedTripsBlock } from './trips/ui/related-trips-block';
 import { registerPhotoSpotBlock } from './places/ui/photo-spot-block';
@@ -295,6 +296,24 @@ export default class APERtrailPlugin extends Plugin {
         const trip = this.activeTrip();
         if (!trip) return false;
         if (!checking) void exportTripDocument(this.app, this.getSettings(), trip);
+        return true;
+      },
+    });
+    this.addCommand({
+      id: 'export-booking-sheet',
+      name: t('commands.exportBookingSheet'),
+      checkCallback: (checking: boolean) => {
+        const trip = this.activeTrip();
+        if (!trip) return false;
+        if (!checking) {
+          const settings = this.getSettings();
+          void exportBookingSheet(
+            this.app,
+            settings,
+            trip,
+            readTravelBoard(this.app, settings).bookings
+          );
+        }
         return true;
       },
     });

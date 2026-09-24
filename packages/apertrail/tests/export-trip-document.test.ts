@@ -18,6 +18,7 @@ import { type ProseBlock } from '@technosoftware/trail-core';
 import { buildTripDocumentHtml, TripDocument } from '../src/trips/export-trip-document';
 import { buildFieldSheetHtml } from '../src/places/export-photo-spot';
 import { buildCostSheetHtml } from '../src/trips/costs/export-trip-costs';
+import { buildBookingSheetHtml } from '../src/trips/export-booking-sheet';
 
 /**
  * Paragraphs, as the parser would hand them over.
@@ -386,6 +387,20 @@ describe('every sheet stylesheet', () => {
           date: 'Date',
           reference: 'Reference',
         },
+        caveat: '',
+        footer: '',
+      }),
+    ],
+    [
+      'booking sheet',
+      buildBookingSheetHtml({
+        title: 'Booking sheet',
+        subtitle: null,
+        dateRange: null,
+        travellers: { heading: 'Travellers', columns: ['Name'], names: [] },
+        tables: [],
+        totals: null,
+        open: null,
         caveat: '',
         footer: '',
       }),

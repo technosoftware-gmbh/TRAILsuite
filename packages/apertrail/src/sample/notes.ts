@@ -570,6 +570,7 @@ function trips(settings: APERtrailSettings): SampleNote[] {
         // The company runs it; the train is the thing you are on. The sample
         // carries both because the pair is the whole reason the field exists.
         vehicleTitle: 'Rovos Rail Pride of Africa',
+        segments: [],
         day: null,
         toDay: null,
         from: '2026-02-09T09:00',
@@ -599,6 +600,7 @@ function trips(settings: APERtrailSettings): SampleNote[] {
         // which is why this is a link somebody may make rather than a field
         // every leg fills in.
         vehicleTitle: null,
+        segments: [],
         day: null,
         toDay: null,
         from: '2026-02-14T18:30',

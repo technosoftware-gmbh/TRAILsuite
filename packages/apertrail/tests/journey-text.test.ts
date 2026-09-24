@@ -13,7 +13,14 @@
  * arrival hanging off it.
  */
 import { describe, expect, it } from 'vitest';
-import { legClock, legNights, legWhen, LegSpan } from '../src/trips/journey-text';
+import {
+  legClock,
+  legNights,
+  legService,
+  legVia,
+  legWhen,
+  LegSpan,
+} from '../src/trips/journey-text';
 import { dayOffset } from '../src/trips/relative-days';
 
 const DEPARTURE = '2026-11-02';
@@ -157,5 +164,27 @@ describe('how long a leg runs', () => {
 
   it('is nothing for a leg that names no arrival', () => {
     expect(legNights(leg({ day: 3, from: '09:00' }), null)).toBeNull();
+  });
+});
+
+/** A leg that changes planes, as the itinerary block and the trip document name it. */
+describe('a leg in segments', () => {
+  const leg = {
+    carrier: 'Lufthansa',
+    number: null,
+    segments: [
+      { number: 'LH 1199', destination: 'Frankfurt' },
+      { number: 'LH 872', destination: 'Bergen' },
+    ],
+  };
+
+  it('lists every flight number after the carrier', () => {
+    expect(legService(leg)).toBe('Lufthansa LH 1199 / LH 872');
+  });
+
+  it('says where it changes, and nothing for a direct leg', () => {
+    expect(legVia(leg)).toBe('via Frankfurt');
+    expect(legVia({ segments: [] })).toBeNull();
+    expect(legService({ carrier: 'Swiss', number: 'LX 1218' })).toBe('Swiss LX 1218');
   });
 });

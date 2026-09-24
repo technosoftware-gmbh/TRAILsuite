@@ -112,6 +112,25 @@ export interface BookingLegLine extends BookingLineBase {
   nights: number | null;
   departs: string | null;
   arrives: string | null;
+  /**
+   * The flights of a leg that changes planes, each with its own number and
+   * times; empty for a direct leg. The class, reference and price above are
+   * the ticket's and belong to all of them.
+   */
+  segments: BookingSegment[];
+}
+
+/** One flight of a leg that changes planes. */
+export interface BookingSegment {
+  /** Its own carrier for a codeshare, otherwise the leg's. */
+  carrier: string | null;
+  number: string | null;
+  origin: string | null;
+  destination: string | null;
+  start: BookingWhen;
+  nights: number | null;
+  departs: string | null;
+  arrives: string | null;
 }
 
 /** One room of a stay: who sleeps in it and what it is. */
@@ -370,6 +389,16 @@ export function bookingSheetLines(
       nights,
       departs,
       arrives: clockTime(leg.to),
+      segments: leg.segments.map((segment) => ({
+        carrier: segment.carrier ?? leg.carrier,
+        number: segment.number,
+        origin: segment.origin,
+        destination: segment.destination,
+        start: when({ day: segment.day, value: segment.from }, departure),
+        nights: legNights(segment, departure),
+        departs: clockTime(segment.from),
+        arrives: clockTime(segment.to),
+      })),
       persons: personsOf(leg, trip),
       choice: choiceOf(leg, leg.vehicle),
       choiceOpen: choiceOpen(leg),

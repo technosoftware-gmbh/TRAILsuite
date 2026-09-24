@@ -17,6 +17,7 @@ import {
   ParsedTripBudgetLine,
   ParsedTripDay,
   ParsedTripLineChoice,
+  TripLegSegment,
   ParsedTripPicture,
   ParsedTripRate,
   TravelStatusValue,
@@ -375,6 +376,8 @@ export interface TravelTripLeg extends ParsedTripLineChoice {
   vehicleTitle: string | null;
   /** The same, resolved. Null for a leg that names none, which is most of them, and for a name the vault has no note for. */
   vehicle: TravelVehicle | null;
+  /** The flights it is made of, two or more, or empty for a direct leg. The ends above are theirs when there are any. */
+  segments: TripLegSegment[];
 }
 
 /**
