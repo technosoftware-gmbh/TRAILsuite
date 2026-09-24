@@ -297,6 +297,9 @@ function excursionsTable(lines: BookingSheetLines): BookingSheetTable {
       {
         main: line.excursion,
         sub: subs(
+          // First, because it is what the agent types in: the name alone may
+          // match two tours in one port.
+          line.code,
           line.operator,
           line.duration,
           personsText(line.persons),

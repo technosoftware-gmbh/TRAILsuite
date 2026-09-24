@@ -299,6 +299,7 @@ export async function createExcursionNote(
     description?: string | null;
     operatorTitle?: string | null;
     duration?: string | null;
+    code?: string | null;
     countryTitle?: string | null;
     cityTitle?: string | null;
   } = {},
@@ -309,6 +310,7 @@ export async function createExcursionNote(
       description: draft.description ?? null,
       operatorTitle: draft.operatorTitle ?? null,
       duration: draft.duration ?? null,
+      code: draft.code ?? null,
       countryTitle: draft.countryTitle ?? null,
       cityTitle: draft.cityTitle ?? null,
       website: null,

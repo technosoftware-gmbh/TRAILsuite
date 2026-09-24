@@ -205,6 +205,7 @@ export function mergeSettings(raw: unknown): APERtrailSettings {
     excursionsFolder: str(r.excursionsFolder, f.excursionsFolder),
     excursionOperatorProperty: str(r.excursionOperatorProperty, d.excursionOperatorProperty),
     excursionDurationProperty: str(r.excursionDurationProperty, d.excursionDurationProperty),
+    excursionCodeProperty: str(r.excursionCodeProperty, d.excursionCodeProperty),
     cabinNameField: str(r.cabinNameField, d.cabinNameField),
     cabinDescriptionField: str(r.cabinDescriptionField, d.cabinDescriptionField),
     cabinImageField: str(r.cabinImageField, d.cabinImageField),

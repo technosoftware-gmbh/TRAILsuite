@@ -109,7 +109,7 @@ export function nordkap(over: Parameters<typeof aTrip>[1] = {}) {
       aStop({
         placeTitle: 'Tromsø',
         excursionTitle: 'Hundeschlittenfahrt',
-        excursion: anExcursion('Hundeschlittenfahrt', { duration: '3 Std.' }),
+        excursion: anExcursion('Hundeschlittenfahrt', { duration: '3 Std.', code: 'HR-TOS5A' }),
         day: 7,
         from: '14:30',
         to: '17:30',

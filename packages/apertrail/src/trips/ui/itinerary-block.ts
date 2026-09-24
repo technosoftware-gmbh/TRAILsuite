@@ -592,6 +592,10 @@ class ItineraryRenderer extends MarkdownRenderChild {
     if (stop.excursion?.duration) {
       line.createSpan({ text: ` · ${stop.excursion.duration}` });
     }
+    // The operator's code, where two tours in one port share nearly a name.
+    if (stop.excursion?.code) {
+      line.createSpan({ text: ` · ${stop.excursion.code}` });
+    }
   }
 
   private renderStopRow(trip: TravelTrip, stop: TravelTripStop, index: number): void {

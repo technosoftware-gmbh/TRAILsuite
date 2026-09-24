@@ -241,6 +241,7 @@ export function anExcursion(title: string, over: Partial<TravelExcursion> = {}):
     description: null,
     operatorTitle: null,
     duration: null,
+    code: null,
     countryTitle: null,
     cityTitle: null,
     country: null,

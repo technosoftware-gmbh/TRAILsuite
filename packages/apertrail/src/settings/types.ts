@@ -307,6 +307,8 @@ export interface APERtrailSettings {
   excursionOperatorProperty: string;
   /** How long it takes, as free text: operators quote "ca. 4 Stunden" and "half day" and mean the same kind of thing. */
   excursionDurationProperty: string;
+  /** The operator's own code for the tour, HR-TOS5A: what tells two tours of the same name in one port apart when booking. */
+  excursionCodeProperty: string;
 
   transportProperty: string;
   legDirectionField: string;

@@ -207,6 +207,7 @@ function rows(entries: [string, string | null][]): ProspectFact[] {
 function excursionFacts(excursion: TravelExcursion): ProspectFact[] {
   const facts = rows([
     [t('fieldNames.duration'), excursion.duration],
+    [t('fieldNames.bookingCode'), excursion.code],
     [
       t('prospect.where'),
       hierarchy(

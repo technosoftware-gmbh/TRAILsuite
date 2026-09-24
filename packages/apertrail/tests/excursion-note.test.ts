@@ -29,6 +29,7 @@ const FULL = {
   description: 'Chapman’s Peak and the penguins, in one day.',
   operatorTitle: 'Peninsula Tours',
   duration: 'About 8 hours',
+  code: 'PT-CAPE1',
   countryTitle: 'South Africa',
   cityTitle: 'Cape Town',
   website: 'https://example.invalid/by-road',
@@ -60,6 +61,15 @@ describe('an excursion note', () => {
     expect(P.durationProperty in yaml).toBe(false);
     expect(P.websiteProperty in yaml).toBe(false);
     expect(P.operatorProperty in yaml).toBe(false);
+  });
+
+  /** Two tours of nearly one name in one port: the operator's code is what says which. */
+  it('keeps the operator\u2019s booking code, and owns it', () => {
+    const yaml = buildExcursionFrontmatter(FULL, P);
+
+    expect(yaml[P.codeProperty]).toBe('PT-CAPE1');
+    expect(excursionManagedKeys(P)).toContain(P.codeProperty);
+    expect(P.codeProperty in buildExcursionFrontmatter({ ...FULL, code: null }, P)).toBe(false);
   });
 
   it('reads an absent field as unset rather than throwing', () => {
@@ -94,13 +104,14 @@ describe('an excursion note', () => {
     expect(parsed.gallery).toEqual([{ image: 'a.png', caption: 'The cape' }]);
   });
 
-  it('owns its own six fields and neither the picture nor the gallery', () => {
+  it('owns its own seven fields and neither the picture nor the gallery', () => {
     const managed = excursionManagedKeys(P);
 
     expect(managed).toEqual([
       P.descriptionProperty,
       P.operatorProperty,
       P.durationProperty,
+      P.codeProperty,
       P.countryProperty,
       P.cityProperty,
       P.websiteProperty,

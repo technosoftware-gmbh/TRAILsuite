@@ -4,7 +4,7 @@ import { excursionEditorFields } from '../src/places/excursion-editor-fields';
 
 describe('excursionEditorFields', () => {
   it('asks at creation for what tells one tour from another', () => {
-    expect(excursionEditorFields(false)).toEqual(['title', 'city', 'operator', 'duration']);
+    expect(excursionEditorFields(false)).toEqual(['title', 'city', 'operator', 'duration', 'code']);
   });
 
   it('never offers a title box in edit mode', () => {
