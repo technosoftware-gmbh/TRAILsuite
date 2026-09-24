@@ -1679,6 +1679,13 @@ export const deTranslations: Translations = {
       namesNobody:
         '{property} führt „{child}“ auf, diese Notiz nennt aber keine übergeordnete Notiz.',
     },
+    legNumberCheck: {
+      heading: 'Flugnummern in der Buchungsreferenz ({count})',
+      explain:
+        'Ein Abschnitt hat ein eigenes Feld für die Flug- oder Zugnummer. Bei diesen Flügen steht in der Referenz etwas, das wie eine Flugnummer aussieht, und die Nummer ist leer. Die Referenz ist die Buchungsreferenz, über die eine Buchungsnotiz ihren Abschnitt findet: trag die Flugnummer im Abschnitt unter „Flug- oder Zugnummer“ ein und die Referenz, sobald du sie hast. Hier wird nichts automatisch verschoben, weil nur du weisst, ob es wirklich eine Flugnummer ist.',
+      inReference:
+        '„{reference}“ auf der Etappe {leg} sieht wie eine Flugnummer aus, steht aber in der Referenz.',
+    },
     variantCabinCheck: {
       heading: 'Varianten mit unbekannter Kabine ({count})',
       explain:

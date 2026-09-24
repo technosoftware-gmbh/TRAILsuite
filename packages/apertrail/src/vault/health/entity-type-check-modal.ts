@@ -26,6 +26,7 @@ import { PhotoSpotIssue, scanPhotoSpotIssues } from './photo-spot-issues';
 import { BookingIssue, scanBookingIssues } from './booking-issues';
 import { MissingFileIssue, scanMissingFileIssues } from './missing-file-issues';
 import { scanVariantCabinIssues, VariantCabinIssue } from './variant-cabin-issues';
+import { LegNumberIssue, scanLegNumberIssues } from './leg-number-issues';
 import { ChildListIssue, scanChildListIssues } from './child-list-issues';
 
 function locationLabel(location: EntityFolderLocation): string {
@@ -115,6 +116,13 @@ function describeVariantCabin(issue: VariantCabinIssue): string {
   });
 }
 
+function describeLegNumber(issue: LegNumberIssue): string {
+  return t('health.legNumberCheck.inReference', {
+    reference: issue.reference,
+    leg: issue.legLabel,
+  });
+}
+
 /** The zone the runtime is in, so the row can say whose clock the times are currently on. */
 function deviceTimeZone(): string {
   try {
@@ -130,6 +138,7 @@ export class EntityTypeCheckModal extends Modal {
   private bookingIssues: BookingIssue[] = [];
   private missingFileIssues: MissingFileIssue[] = [];
   private variantCabinIssues: VariantCabinIssue[] = [];
+  private legNumberIssues: LegNumberIssue[] = [];
   private childListIssues: ChildListIssue[] = [];
   private confirmingBulkApply = false;
   private confirmTimeoutId: number | undefined;
@@ -159,6 +168,7 @@ export class EntityTypeCheckModal extends Modal {
       : [];
     this.missingFileIssues = scanMissingFileIssues(this.app, this.settings);
     this.variantCabinIssues = scanVariantCabinIssues(this.app, this.settings);
+    this.legNumberIssues = scanLegNumberIssues(this.app, this.settings);
     this.childListIssues = scanChildListIssues(this.app, this.settings);
     this.confirmingBulkApply = false;
     this.render();
@@ -204,6 +214,7 @@ export class EntityTypeCheckModal extends Modal {
       'variantCabinCheck',
       describeVariantCabin
     );
+    this.renderWarningList(contentEl, this.legNumberIssues, 'legNumberCheck', describeLegNumber);
     this.renderWarningList(
       contentEl,
       this.missingFileIssues,

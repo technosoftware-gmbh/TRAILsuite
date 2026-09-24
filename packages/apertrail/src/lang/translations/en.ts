@@ -1647,6 +1647,13 @@ export const enTranslations = {
       pointsElsewhere: '{property} lists "{child}", but that note names "{actual}" instead.',
       namesNobody: '{property} lists "{child}", but that note names no parent of its own.',
     },
+    legNumberCheck: {
+      heading: 'Flight numbers in the booking reference ({count})',
+      explain:
+        'A leg has a field of its own for the flight or train number. On these flights the reference holds something that looks like a flight number, and the number is empty. The reference is the booking code a booking note finds its leg by: put the flight number into the leg\'s "Flight or train number" and the reference in once you have it. Nothing is moved for you, because only you know whether it really is a flight number.',
+      inReference:
+        '"{reference}" on the {leg} leg looks like a flight number but is in the reference.',
+    },
     variantCabinCheck: {
       heading: 'Variants naming an unknown cabin ({count})',
       explain:

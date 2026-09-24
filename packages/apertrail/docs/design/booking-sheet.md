@@ -1,6 +1,6 @@
 # The booking sheet
 
-**Planned 24 September 2026. Steps 1 to 3 built; step 4 needs a real trip.** The
+**Planned and built 24 September 2026**, checked against the Bergen - Kirkenes trip the same day. The
 fourth trip sheet, beside the trip document and the cost sheet: a page taken
 to a travel agency to book a trip that is planned but not yet booked. The four
 decisions below and the "Noch offen" section are Thomas's own; the rest is a
@@ -225,9 +225,11 @@ copy: stay grouping, `persons` "only X" labels, day resolution, leg icons, the
    and printed from headless Chromium on 24 September 2026, which caught a
    price's per-unit line being clipped by `nowrap`; still to do against the
    real note in the vault.
-5. Optional, and only if wanted: a health check that flags a plane leg whose
-   `reference` looks like a flight number (two letters and digits) and has no
-   `number`. Reports only; never rewrites.
+5. **Built.** `vault/health/leg-number-issues.ts`: a plane leg with no
+   `number` whose `reference` reads as a flight number (an airline's two
+   characters and one to four digits) is listed in the vault check. Reports
+   only, never moves: a booking code can look like a flight. Trains are not
+   checked, since a train number has no shape to test.
 
 ## Not in this plan
 
