@@ -214,6 +214,7 @@ export function mergeSettings(raw: unknown): APERtrailSettings {
     legDayField: str(r.legDayField, d.legDayField),
     legToDayField: str(r.legToDayField, d.legToDayField),
     legCarrierField: str(r.legCarrierField, d.legCarrierField),
+    legNumberField: str(r.legNumberField, d.legNumberField),
     legModeField: str(r.legModeField, d.legModeField),
     legFromField: str(r.legFromField, d.legFromField),
     legToField: str(r.legToField, d.legToField),

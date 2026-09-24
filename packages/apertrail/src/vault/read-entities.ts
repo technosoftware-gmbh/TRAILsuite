@@ -427,6 +427,7 @@ export function tripPropertyNames(settings: APERtrailSettings): TripPropertyName
     legDayField: settings.legDayField,
     legToDayField: settings.legToDayField,
     legCarrierField: settings.legCarrierField,
+    legNumberField: settings.legNumberField,
     legModeField: settings.legModeField,
     legFromField: settings.legFromField,
     legToField: settings.legToField,

@@ -156,10 +156,11 @@ transport:
   - direction: outbound
     mode: plane
     carrier: Swiss
+    number: LX288
     origin: Zürich
     destination: Pretoria, South Africa
     from: "2026-02-13T09:00"
-    reference: LX288
+    reference: K7Q2XF
     cost: 890
     costUnit: person
     persons:

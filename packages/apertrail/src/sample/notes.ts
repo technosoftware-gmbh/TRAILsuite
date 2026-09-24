@@ -566,6 +566,7 @@ function trips(settings: APERtrailSettings): SampleNote[] {
         // its title either way, which is what lets an airline that will never
         // be a note stand as plain text in the same field.
         carrier: link('Rovos Rail Charters'),
+        number: null,
         // The company runs it; the train is the thing you are on. The sample
         // carries both because the pair is the whole reason the field exists.
         vehicleTitle: 'Rovos Rail Pride of Africa',
@@ -593,6 +594,7 @@ function trips(settings: APERtrailSettings): SampleNote[] {
         direction: 'inbound',
         mode: 'plane',
         carrier: 'Swiss',
+        number: 'LX289',
         // A flight is not a vehicle note. Nobody keeps a note per airframe,
         // which is why this is a link somebody may make rather than a field
         // every leg fills in.
@@ -601,7 +603,7 @@ function trips(settings: APERtrailSettings): SampleNote[] {
         toDay: null,
         from: '2026-02-14T18:30',
         to: '2026-02-15T05:25',
-        reference: 'LX289',
+        reference: 'K7Q2XF',
         origin: 'Cape Town',
         destination: 'Zurich',
         cost: 910,

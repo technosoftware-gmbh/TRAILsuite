@@ -167,6 +167,7 @@ export const DEFAULT_SETTINGS: APERtrailSettings = {
   legDayField: 'day',
   legToDayField: 'toDay',
   legCarrierField: 'carrier',
+  legNumberField: 'number',
   legModeField: 'mode',
   legFromField: 'from',
   legToField: 'to',
