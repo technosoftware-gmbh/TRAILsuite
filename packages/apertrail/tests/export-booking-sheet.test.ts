@@ -224,3 +224,27 @@ describe('the markup', () => {
     expect(people.slice(0, people.indexOf('</table>')).match(/<tr><td><\/td>/g)).toHaveLength(2);
   });
 });
+
+/**
+ * Found on the first real sheet: a voyage at CHF 5'040.00 ran past the edge of
+ * its column and the figure under it broke as "CHF 2'520.0" over "0". The
+ * columns are fixed widths, so they have to add up, and a figure may only
+ * break where it has a space.
+ */
+describe('the columns', () => {
+  it.each(['Flights', 'Accommodation', 'Transport', 'Excursions'])(
+    'fill the row exactly: %s',
+    (heading) => {
+      const sheet = build();
+      const widths = table(sheet, heading).columns.reduce((sum, column) => sum + column.width, 0);
+
+      expect(widths).toBe(100);
+    }
+  );
+
+  it('never breaks a price inside a number', () => {
+    const html = buildBookingSheetHtml(build());
+
+    expect(html).toMatch(/td\.num\s*\{\s*overflow-wrap:\s*normal;/);
+  });
+});

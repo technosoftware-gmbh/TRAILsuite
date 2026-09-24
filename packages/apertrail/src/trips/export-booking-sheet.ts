@@ -68,6 +68,10 @@ const STYLE = `
   td .sub { display: block; font-size: 8pt; color: #6b7079; margin-top: 0.4mm; }
   /* The working under a price may wrap: the total above it is what must not. */
   td.num .sub { white-space: normal; }
+  /* A figure breaks at its spaces or not at all: "CHF 2'520.0" over "0" is a
+     different number. The price column is wide enough for the total; the
+     working under it wraps between words. */
+  td.num { overflow-wrap: normal; }
   /* Waiting on a decision. Marked rather than coloured alone, so it survives a
      black-and-white printer. */
   td .open { font-style: italic; color: #8a4b00; }
