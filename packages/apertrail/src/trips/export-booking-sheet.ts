@@ -72,6 +72,8 @@ const STYLE = `
      different number. The price column is wide enough for the total; the
      working under it wraps between words. */
   td.num { overflow-wrap: normal; }
+  /* The price column ends at the page edge, not a gutter short of it. */
+  tr > :last-child { padding-inline-end: 0; }
   /* Waiting on a decision. Marked rather than coloured alone, so it survives a
      black-and-white printer. */
   td .open { font-style: italic; color: #8a4b00; }

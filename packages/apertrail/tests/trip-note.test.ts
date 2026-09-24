@@ -223,6 +223,7 @@ describe('buildTripFrontmatter -> parseTripRecord round trip', () => {
           carrier: 'Swiss',
           number: null,
           vehicleTitle: null,
+          segments: [],
           day: null,
           toDay: null,
           from: '2026-04-26T07:00',
@@ -244,6 +245,7 @@ describe('buildTripFrontmatter -> parseTripRecord round trip', () => {
           carrier: null,
           number: null,
           vehicleTitle: 'Rovos Rail Pride of Africa',
+          segments: [],
           day: null,
           toDay: null,
           from: '2026-04-28T14:00',
@@ -1113,5 +1115,200 @@ describe('the number a leg runs under', () => {
 
     expect(legs[0].flight).toBe('LX288');
     expect(legs[0]).not.toHaveProperty('number');
+  });
+});
+
+/**
+ * A leg that changes planes: one ticket, one fare, two flights.
+ *
+ * The leg's ends are the segments' and are stored once, in the segments, so
+ * they cannot drift apart; the reader fills them back in, which is what lets
+ * every other reader of a leg go on seeing Zürich to Bergen. See
+ * docs/design/leg-segments.md.
+ */
+describe('a leg in segments', () => {
+  const VIA_FRANKFURT = [
+    {
+      carrier: null,
+      number: 'LH 1199',
+      origin: 'Zürich',
+      destination: 'Frankfurt',
+      day: null,
+      toDay: null,
+      from: '2027-12-03T07:00',
+      to: '2027-12-03T08:00',
+    },
+    {
+      carrier: null,
+      number: 'LH 872',
+      origin: 'Frankfurt',
+      destination: 'Bergen',
+      day: null,
+      toDay: null,
+      from: '2027-12-03T10:10',
+      to: '2027-12-03T12:10',
+    },
+  ];
+
+  it('writes the flights under the leg and no ends of its own', () => {
+    const yaml = buildTripFrontmatter(
+      input({
+        transport: [
+          aLegInput({
+            mode: 'plane',
+            carrier: 'Lufthansa',
+            // Left over from before the leg was split: the segments win.
+            origin: 'Zürich',
+            number: 'LH 1199',
+            cost: 160,
+            segments: VIA_FRANKFURT,
+          }),
+        ],
+      })
+    );
+
+    expect(yaml.transport).toEqual([
+      {
+        direction: 'outbound',
+        carrier: 'Lufthansa',
+        mode: 'plane',
+        cost: 160,
+        costUnit: 'person',
+        segments: [
+          {
+            number: 'LH 1199',
+            origin: 'Zürich',
+            destination: 'Frankfurt',
+            from: '2027-12-03T07:00',
+            to: '2027-12-03T08:00',
+          },
+          {
+            number: 'LH 872',
+            origin: 'Frankfurt',
+            destination: 'Bergen',
+            from: '2027-12-03T10:10',
+            to: '2027-12-03T12:10',
+          },
+        ],
+      },
+    ]);
+  });
+
+  it('reads the leg’s ends back from its first and last flight', () => {
+    const [leg] = roundTrip({
+      transport: [aLegInput({ mode: 'plane', carrier: 'Lufthansa', segments: VIA_FRANKFURT })],
+    }).transport;
+
+    expect(leg?.origin).toBe('Zürich');
+    expect(leg?.destination).toBe('Bergen');
+    expect(leg?.from).toBe('2027-12-03T07:00');
+    expect(leg?.to).toBe('2027-12-03T12:10');
+    expect(leg?.number).toBeNull();
+    expect(leg?.segments.map((segment) => segment.number)).toEqual(['LH 1199', 'LH 872']);
+  });
+
+  it('keeps a codeshare’s own carrier on its flight', () => {
+    const [leg] = roundTrip({
+      transport: [
+        aLegInput({
+          carrier: 'Lufthansa',
+          segments: [
+            {
+              ...VIA_FRANKFURT[1],
+              origin: 'Bergen',
+              destination: 'Frankfurt',
+              carrier: 'Edelweiss',
+              number: 'LH 873',
+            },
+            { ...VIA_FRANKFURT[0], origin: 'Frankfurt', destination: 'Zürich', number: 'LH 1196' },
+          ],
+        }),
+      ],
+    }).transport;
+
+    expect(leg?.segments.map((segment) => segment.carrier)).toEqual(['Edelweiss', null]);
+  });
+
+  it('reads the days of a trip written in days, the leg arriving on the last flight’s day', () => {
+    const [leg] = parseTripRecord({
+      properties: PROPS,
+      frontmatter: {
+        transport: [
+          {
+            direction: 'inbound',
+            segments: [
+              { number: 'LH 873', day: 14, from: '12:55', to: '15:00' },
+              { number: 'LH 1196', day: 14, toDay: 15, from: '23:05', to: '00:10' },
+            ],
+          },
+        ],
+      },
+    }).transport;
+
+    expect(leg).toMatchObject({ day: 14, toDay: 15, from: '12:55', to: '00:10' });
+  });
+
+  /** One segment is not a list: a direct flight stays four lines of YAML however it was entered. */
+  it('writes a single flight as the plain leg it is', () => {
+    const yaml = buildTripFrontmatter(
+      input({ transport: [aLegInput({ carrier: 'Swiss', segments: [VIA_FRANKFURT[0]] })] })
+    );
+
+    expect(yaml.transport).toEqual([
+      {
+        direction: 'outbound',
+        carrier: 'Swiss',
+        number: 'LH 1199',
+        from: '2027-12-03T07:00',
+        to: '2027-12-03T08:00',
+        origin: 'Zürich',
+        destination: 'Frankfurt',
+      },
+    ]);
+  });
+
+  it('reads a single hand-written segment as the plain leg', () => {
+    const [leg] = parseTripRecord({
+      properties: PROPS,
+      frontmatter: {
+        transport: [{ direction: 'outbound', segments: [{ number: 'LX 1218', origin: 'Zürich' }] }],
+      },
+    }).transport;
+
+    expect(leg).toMatchObject({ number: 'LX 1218', origin: 'Zürich', segments: [] });
+  });
+
+  it('drops a segment row somebody opened and left', () => {
+    const yaml = buildTripFrontmatter(
+      input({
+        transport: [
+          aLegInput({
+            segments: [
+              ...VIA_FRANKFURT,
+              {
+                carrier: null,
+                number: '  ',
+                origin: null,
+                destination: null,
+                day: null,
+                toDay: null,
+                from: null,
+                to: null,
+              },
+            ],
+          }),
+        ],
+      })
+    );
+    const legs = yaml.transport as Record<string, unknown>[];
+
+    expect(legs[0]?.segments).toHaveLength(2);
+  });
+
+  it('is left off entirely by a direct leg', () => {
+    const yaml = buildTripFrontmatter(input({ transport: [aLegInput({ carrier: 'Swiss' })] }));
+    const legs = yaml.transport as Record<string, unknown>[];
+
+    expect(legs[0]).not.toHaveProperty('segments');
   });
 });

@@ -110,7 +110,11 @@ function modeText(mode: string | null): string | null {
   return known ? t(`modals.tripEditor.mode.${mode}`) : mode;
 }
 
-function routeText(leg: BookingLegLine): string | null {
+function serviceText(carrier: string | null, number: string | null): string | null {
+  return [carrier, number].filter(Boolean).join(' ') || null;
+}
+
+function routeText(leg: { origin: string | null; destination: string | null }): string | null {
   const ends = [leg.origin, leg.destination].filter((end): end is string => !!end);
   return ends.length === 0 ? null : ends.join(` ${t('itinerary.legJoiner')} `);
 }
@@ -136,9 +140,52 @@ function legDateCell(leg: BookingLegLine): BookingSheetCell {
   };
 }
 
-function arrivesText(leg: BookingLegLine): string | null {
+function arrivesText(leg: { arrives: string | null; nights: number | null }): string | null {
   if (leg.arrives === null) return null;
   return leg.nights === 1 ? `${leg.arrives} +1` : leg.arrives;
+}
+
+/**
+ * A leg as table rows: one for a direct leg, one per flight for a leg that
+ * changes planes.
+ *
+ * The ticket's cells (class, reference, price) sit on the first flight only,
+ * the way a hotel's own cells sit on its first room, and for the same reason:
+ * it is one booking, and a price on every flight would read as several.
+ */
+function legRows(
+  leg: BookingLegLine,
+  service: (carrier: string | null, number: string | null) => BookingSheetCell
+): BookingSheetCell[][] {
+  const ticket = [
+    choiceCell(leg.choice, leg.choiceOpen),
+    referenceCell(leg.state),
+    priceCell(leg.price, leg.choiceOpen),
+  ];
+  const note = subs(
+    personsText(leg.persons),
+    leg.optional ? t('bookingSheet.optionalChosen') : null
+  );
+  if (leg.segments.length === 0) {
+    return [
+      [
+        legDateCell(leg),
+        service(leg.carrier, leg.number),
+        { main: routeText(leg), sub: note },
+        { main: leg.departs },
+        { main: arrivesText(leg) },
+        ...ticket,
+      ],
+    ];
+  }
+  return leg.segments.map((segment, index) => [
+    { main: whenText(segment.start) },
+    service(segment.carrier, segment.number),
+    { main: routeText(segment), sub: index === 0 ? note : null },
+    { main: segment.departs },
+    { main: arrivesText(segment) },
+    ...(index === 0 ? ticket : [{ main: null }, { main: null }, { main: null }]),
+  ]);
 }
 
 function flightsTable(lines: BookingSheetLines): BookingSheetTable {
@@ -154,19 +201,9 @@ function flightsTable(lines: BookingSheetLines): BookingSheetTable {
       { label: t('bookingSheet.reference'), width: 12 },
       { label: t('bookingSheet.price'), width: 14, num: true },
     ],
-    rows: lines.flights.map((leg) => [
-      legDateCell(leg),
-      { main: [leg.carrier, leg.number].filter(Boolean).join(' ') || null },
-      {
-        main: routeText(leg),
-        sub: subs(personsText(leg.persons), leg.optional ? t('bookingSheet.optionalChosen') : null),
-      },
-      { main: leg.departs },
-      { main: arrivesText(leg) },
-      choiceCell(leg.choice, leg.choiceOpen),
-      referenceCell(leg.state),
-      priceCell(leg.price, leg.choiceOpen),
-    ]),
+    rows: lines.flights.flatMap((leg) =>
+      legRows(leg, (carrier, number) => ({ main: serviceText(carrier, number) }))
+    ),
   };
 }
 
@@ -183,25 +220,14 @@ function transportTable(lines: BookingSheetLines): BookingSheetTable {
       { label: t('bookingSheet.reference'), width: 9 },
       { label: t('bookingSheet.price'), width: 14, num: true },
     ],
-    rows: lines.transport.map((leg) => [
-      legDateCell(leg),
-      {
-        main:
-          [leg.carrier, leg.number].filter(Boolean).join(' ') || leg.vehicle || modeText(leg.mode),
+    rows: lines.transport.flatMap((leg) =>
+      legRows(leg, (carrier, number) => ({
+        main: serviceText(carrier, number) ?? leg.vehicle ?? modeText(leg.mode),
         // The ship after who runs it, and what kind of thing it is: Hurtigruten
         // is who you book with, MS Trollfjord is what you board.
-        sub: subs(modeText(leg.mode), leg.carrier || leg.number ? leg.vehicle : null),
-      },
-      {
-        main: routeText(leg),
-        sub: subs(personsText(leg.persons), leg.optional ? t('bookingSheet.optionalChosen') : null),
-      },
-      { main: leg.departs },
-      { main: arrivesText(leg) },
-      choiceCell(leg.choice, leg.choiceOpen),
-      referenceCell(leg.state),
-      priceCell(leg.price, leg.choiceOpen),
-    ]),
+        sub: subs(modeText(leg.mode), carrier || number ? leg.vehicle : null),
+      }))
+    ),
   };
 }
 

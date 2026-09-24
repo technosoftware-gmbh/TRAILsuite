@@ -327,6 +327,12 @@ edit clears the keys above and leaves a picture alone.
 | `variantCurrencyField` | `currency` | Sub-key of a variant: the currency that figure is in; empty inherits the line's, then the trip's |
 | `variantCostUnitField` | `costUnit` | Sub-key of a variant: per person, per night, or in total |
 | `variantChosenField` | `chosen` | Sub-key of a variant: true on the one settled on, and written on no other. Absent everywhere while the choice is open |
+| `legSegmentsField` | `segments` | Sub-key: the flights a leg is made of where it changes planes. Two or more carry the leg's ends, and the leg writes none of its own; one is written as the plain leg. See [A leg with a change of plane](leg-segments.md) |
+| `segmentCarrierField` | `carrier` | Sub-key of a segment: who flies it, for a codeshare. Empty means the leg's |
+| `segmentNumberField` | `number` | Sub-key of a segment: its flight or train number |
+| `segmentOriginField` / `segmentDestinationField` | `origin` / `destination` | Sub-key of a segment: where it leaves from and lands |
+| `segmentFromField` / `segmentToField` | `from` / `to` | Sub-key of a segment: departure and arrival, a bare `HH:mm` beside a day of the trip |
+| `segmentDayField` / `segmentToDayField` | `day` / `toDay` | Sub-key of a segment: which day of the trip it leaves and lands on |
 | `stopOptionalField` | `optional` | Sub-key: true on a stop that may not happen, which is most of a brochure day |
 | `nightOptionalField` | `optional` | Sub-key: the same, on a stay |
 | `legOptionalField` | `optional` | Sub-key: the same, on a leg |

@@ -142,9 +142,35 @@ export function legRouteText(leg: ParsedTripLeg): string {
  * boarding pass print it, and a number alone ("LX288") or an airline alone
  * both still read. Null when the leg says neither.
  */
-export function legService(leg: { carrier: string | null; number: string | null }): string | null {
-  const text = [leg.carrier, leg.number].filter((part): part is string => !!part).join(' ');
+export function legService(leg: {
+  carrier: string | null;
+  number: string | null;
+  segments?: readonly { number: string | null }[];
+}): string | null {
+  // A leg that changes planes has a number per flight and none of its own:
+  // "Lufthansa LH 1199 / LH 872", the way a booking confirmation lists them.
+  const numbers = (leg.segments ?? [])
+    .map((segment) => segment.number)
+    .filter((number): number is string => !!number);
+  const number = numbers.length > 0 ? numbers.join(' / ') : leg.number;
+  const text = [leg.carrier, number].filter((part): part is string => !!part).join(' ');
   return text === '' ? null : text;
+}
+
+/**
+ * Where a leg that changes planes changes them: "via Frankfurt".
+ *
+ * Every landing but the last, in order. Null for a direct leg, which is what
+ * lets a caller print it only where it says something.
+ */
+export function legVia(leg: {
+  segments?: readonly { destination: string | null }[];
+}): string | null {
+  const stops = (leg.segments ?? [])
+    .slice(0, -1)
+    .map((segment) => segment.destination)
+    .filter((place): place is string => !!place);
+  return stops.length === 0 ? null : t('itinerary.via', { places: stops.join(', ') });
 }
 
 /**

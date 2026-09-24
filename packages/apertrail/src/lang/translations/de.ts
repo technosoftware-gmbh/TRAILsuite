@@ -435,6 +435,7 @@ export const deTranslations: Translations = {
     markCaptured: '„{motif}“ als fotografiert markieren',
     transport: 'Anreise & Rückreise',
     legJoiner: 'nach',
+    via: 'über {places}',
     unnamedLeg: 'Reiseabschnitt',
     unnamedNight: 'Unterkunft',
     unnamedStop: 'Station',
@@ -646,6 +647,15 @@ export const deTranslations: Translations = {
       legNumberDesc:
         'Die Nummer, unter der dieser Abschnitt fährt oder fliegt. Nicht die Buchungsreferenz darunter: nach der sucht eine Buchungsnotiz ihren Abschnitt.',
       legNumberPlaceholder: 'LX288',
+      segments: 'Umsteigen',
+      segmentsDesc:
+        'Ein Ticket, mehrere Flüge: Preis, Klasse und Referenz bleiben beim Abschnitt, jeder Flug bekommt Nummer, Strecke und Zeiten. Die bisherige Strecke wird zum ersten Flug.',
+      addSegment: 'Weiterer Flug',
+      segmentNumber: 'Flug {number}',
+      removeSegment: 'Diesen Flug entfernen',
+      segmentCarrier: 'Durchgeführt von',
+      segmentCarrierDesc:
+        'Nur wenn eine andere Gesellschaft fliegt als oben (Codeshare). Leer heisst: dieselbe.',
       legReference: 'Referenz',
       removeLeg: 'Abschnitt entfernen',
       remove: '{item} entfernen',

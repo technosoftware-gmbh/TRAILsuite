@@ -43,7 +43,7 @@ import { DuplicateTripModal } from './duplicate-trip-modal';
 import { moveInList } from '../../shared/reorder';
 import { itineraryDays, ItineraryDayGroup, spannedDates } from '../itinerary-days';
 import { clockTime, endpointDate, RelativeEndpoint } from '../relative-days';
-import { legArrivalText, legClock, legDayText, legService, legWhen } from '../journey-text';
+import { legArrivalText, legClock, legDayText, legService, legVia, legWhen } from '../journey-text';
 import { legsArrivingOn, legsDepartingOn } from '../leg-days';
 import { cabinDescription } from '../../places/vehicle-note';
 import { countsInPlan, lineFigure } from '../costs/line-variants';
@@ -942,7 +942,13 @@ class ItineraryRenderer extends MarkdownRenderChild {
       // The ship's name between the carrier and the reference: Hurtigruten is
       // who runs it and MS Trollfjord is what you are on, and the row reads in
       // that order.
-      const detail = [route ? direction : null, legService(leg), leg.vehicleTitle, leg.reference]
+      const detail = [
+        route ? direction : null,
+        legVia(leg),
+        legService(leg),
+        leg.vehicleTitle,
+        leg.reference,
+      ]
         .filter((part): part is string => !!part)
         .join(' · ');
       if (detail) body.createDiv({ cls: 'apt-itinerary-note', text: detail });
@@ -1488,6 +1494,7 @@ class ItineraryRenderer extends MarkdownRenderChild {
       carrier: null,
       number: null,
       vehicleTitle: null,
+      segments: [],
       day: null,
       toDay: null,
       from: null,

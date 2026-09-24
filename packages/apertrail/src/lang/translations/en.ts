@@ -444,6 +444,7 @@ export const enTranslations = {
     markCaptured: 'Mark "{motif}" as captured',
     transport: 'Transport',
     legJoiner: 'to',
+    via: 'via {places}',
     unnamedLeg: 'Transport leg',
     unnamedNight: 'Accommodation',
     unnamedStop: 'Stop',
@@ -653,6 +654,15 @@ export const enTranslations = {
       legNumberDesc:
         'The number this leg runs or flies under. Not the booking reference below, which is what a booking note finds this leg by.',
       legNumberPlaceholder: 'LX288',
+      segments: 'Change of plane',
+      segmentsDesc:
+        'One ticket, several flights: the price, class and reference stay on the leg, and each flight gets its number, route and times. The route so far becomes the first flight.',
+      addSegment: 'Another flight',
+      segmentNumber: 'Flight {number}',
+      removeSegment: 'Remove this flight',
+      segmentCarrier: 'Operated by',
+      segmentCarrierDesc:
+        'Only where another airline flies it than the one above (codeshare). Empty means the same.',
       legReference: 'Reference',
       removeLeg: 'Remove leg',
       remove: 'Remove {item}',

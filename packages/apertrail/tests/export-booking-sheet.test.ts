@@ -248,3 +248,67 @@ describe('the columns', () => {
     expect(html).toMatch(/td\.num\s*\{\s*overflow-wrap:\s*normal;/);
   });
 });
+
+/** The Bergen flights as Thomas first had to type them, as one ticket instead. */
+describe('a flight with a change of plane', () => {
+  function viaFrankfurt() {
+    const trip = nordkap();
+    const outbound = trip.transport[2];
+    if (!outbound) throw new Error('fixture');
+    Object.assign(outbound, {
+      carrier: 'Lufthansa',
+      number: null,
+      origin: 'Zürich',
+      destination: 'Bergen',
+      from: '07:00',
+      to: '12:10',
+      cost: 160,
+      segments: [
+        {
+          carrier: null,
+          number: 'LH 1199',
+          origin: 'Zürich',
+          destination: 'Frankfurt',
+          day: 1,
+          toDay: null,
+          from: '07:00',
+          to: '08:00',
+        },
+        {
+          carrier: 'Edelweiss',
+          number: 'LH 872',
+          origin: 'Frankfurt',
+          destination: 'Bergen',
+          day: 1,
+          toDay: null,
+          from: '10:10',
+          to: '12:10',
+        },
+      ],
+    });
+    return trip;
+  }
+
+  it('prints a row per flight, each with its own number, route and times', () => {
+    const rows = table(build(viaFrankfurt()), 'Flights').rows.slice(0, 2);
+
+    expect(rows.map((row) => row[1]?.main)).toEqual(['Lufthansa LH 1199', 'Edelweiss LH 872']);
+    expect(rows.map((row) => row[2]?.main)).toEqual(['Zürich to Frankfurt', 'Frankfurt to Bergen']);
+    expect(rows.map((row) => row[3]?.main)).toEqual(['07:00', '10:10']);
+  });
+
+  it('prints the ticket’s reference and price once, on the first flight', () => {
+    const [first, second] = table(build(viaFrankfurt()), 'Flights').rows;
+
+    expect(first?.[6]).toEqual({ main: 'K7Q2XF', sub: 'booked' });
+    expect(first?.[7]?.main).toBe(formatMoney(320, 'CHF'));
+    expect(second?.slice(5)).toEqual([{ main: null }, { main: null }, { main: null }]);
+  });
+
+  it('counts the fare once in the total', () => {
+    const sheet = build(viaFrankfurt());
+
+    // 2 x 160 in place of 2 x 290 for the outbound flight.
+    expect(sheet.totals?.amounts).toEqual([formatMoney(320 + 760 + 8958 + 240 + 220 + 318, 'CHF')]);
+  });
+});

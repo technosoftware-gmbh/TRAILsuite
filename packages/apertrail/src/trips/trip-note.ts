@@ -167,6 +167,33 @@ export interface TripLegInput extends TripLineChoiceInput {
   currency: string | null;
   costUnit: CostUnit;
   persons: string[];
+  /**
+   * The flights a leg is made of, where it changes planes: one ticket, one
+   * fare, two segments. Empty for a direct leg, which is nearly all of them.
+   * When there are two or more, the leg's own ends are theirs; see
+   * docs/design/leg-segments.md.
+   */
+  segments: TripLegSegment[];
+}
+
+/**
+ * One flight of a leg that changes planes.
+ *
+ * Only what differs from one flight to the next. The fare, the class, the
+ * booking code and who flies are the ticket's, and stay on the leg. A carrier
+ * is here for a codeshare, Edelweiss flying LH 873, and absent means the
+ * leg's. Days and times follow the leg's own rule: `HH:mm` beside a day of
+ * the trip, a full timestamp otherwise.
+ */
+export interface TripLegSegment {
+  carrier: string | null;
+  number: string | null;
+  origin: string | null;
+  destination: string | null;
+  day: number | null;
+  toDay: number | null;
+  from: string | null;
+  to: string | null;
 }
 
 /**
@@ -329,6 +356,15 @@ export interface TripPropertyNames {
   variantCurrencyField: string;
   variantCostUnitField: string;
   variantChosenField: string;
+  legSegmentsField: string;
+  segmentCarrierField: string;
+  segmentNumberField: string;
+  segmentOriginField: string;
+  segmentDestinationField: string;
+  segmentFromField: string;
+  segmentToField: string;
+  segmentDayField: string;
+  segmentToDayField: string;
   stopOptionalField: string;
   nightOptionalField: string;
   legOptionalField: string;
@@ -418,6 +454,49 @@ function placeLabel(value: unknown): string | null {
  * dropped, and sent every such stop down the relative branch on the way back
  * in.
  */
+/** The segments that say anything, in the note's order. A row somebody opened and left is dropped, like an empty variant. */
+function keptSegments(segments: readonly TripLegSegment[] | undefined): TripLegSegment[] {
+  return (segments ?? []).filter(
+    (segment) =>
+      cleanString(segment.number) !== null ||
+      cleanString(segment.carrier) !== null ||
+      cleanString(segment.origin) !== null ||
+      cleanString(segment.destination) !== null ||
+      cleanString(segment.from) !== null ||
+      cleanString(segment.to) !== null ||
+      cleanDay(segment.day) !== null ||
+      cleanDay(segment.toDay) !== null
+  );
+}
+
+/** A segment's values with the empty ones left out, so spreading it over a leg only fills and never blanks. */
+function definedOf(segment: TripLegSegment): Partial<TripLegSegment> {
+  return Object.fromEntries(
+    Object.entries(segment).filter(
+      ([, value]) => value !== null && value !== undefined && value !== ''
+    )
+  );
+}
+
+function segmentEntry(segment: TripLegSegment, p: TripPropertyNames): Record<string, unknown> {
+  const entry: Record<string, unknown> = {};
+  const put = (key: string, value: string | null): void => {
+    const clean = cleanString(value);
+    if (clean) entry[key] = clean;
+  };
+  put(p.segmentCarrierField, segment.carrier);
+  put(p.segmentNumberField, segment.number);
+  put(p.segmentOriginField, segment.origin);
+  put(p.segmentDestinationField, segment.destination);
+  const day = cleanDay(segment.day);
+  const toDay = cleanDay(segment.toDay);
+  if (day !== null) entry[p.segmentDayField] = day;
+  if (toDay !== null) entry[p.segmentToDayField] = toDay;
+  put(p.segmentFromField, isoDateTimeValue(segment.from));
+  put(p.segmentToField, isoDateTimeValue(segment.to));
+  return entry;
+}
+
 function cleanDay(value: number | null | undefined): number | null {
   return value === null || value === undefined ? null : value;
 }
@@ -769,6 +848,7 @@ export function buildTripFrontmatter(input: TripFrontmatterInput): Record<string
         cleanString(leg.destination) !== null ||
         leg.cost !== null ||
         (leg.persons?.length ?? 0) > 0 ||
+        keptSegments(leg.segments).length > 0 ||
         // A leg whose only content is the prices it can be bought at is a leg
         // somebody has done real work on, so it is worth keeping even before
         // it says where it goes.
@@ -776,28 +856,41 @@ export function buildTripFrontmatter(input: TripFrontmatterInput): Record<string
     )
     .map((leg) => {
       const entry: Record<string, unknown> = { [p.legDirectionField]: leg.direction };
+      // Two or more segments carry the leg's ends, and the leg writes none of
+      // its own: the same fact in two places drifts. A single segment is not
+      // a list and is written as the plain leg it is, so a direct flight stays
+      // four lines of YAML whichever way it was entered.
+      const segments = keptSegments(leg.segments);
+      const split = segments.length >= 2;
+      const only = segments.length === 1 ? segments[0] : undefined;
+      const ends = split ? null : only ? { ...leg, ...definedOf(only) } : leg;
       const mode = cleanString(leg.mode);
-      const from = isoDateTimeValue(leg.from);
-      const to = isoDateTimeValue(leg.to);
       const reference = cleanString(leg.reference);
-      const carrier = cleanString(leg.carrier);
+      const carrier = cleanString(leg.carrier) ?? (only ? cleanString(only.carrier) : null);
       if (carrier) entry[p.legCarrierField] = carrier;
-      const number = cleanString(leg.number);
-      if (number) entry[p.legNumberField] = number;
       if (mode) entry[p.legModeField] = mode;
-      const legDay = cleanDay(leg.day);
-      const legToDay = cleanDay(leg.toDay);
-      if (legDay !== null) entry[p.legDayField] = legDay;
-      if (legToDay !== null) entry[p.legToDayField] = legToDay;
-      if (from) entry[p.legFromField] = from;
-      if (to) entry[p.legToField] = to;
+      if (ends) {
+        const number = cleanString(ends.number);
+        if (number) entry[p.legNumberField] = number;
+        const legDay = cleanDay(ends.day);
+        const legToDay = cleanDay(ends.toDay);
+        if (legDay !== null) entry[p.legDayField] = legDay;
+        if (legToDay !== null) entry[p.legToDayField] = legToDay;
+        const from = isoDateTimeValue(ends.from);
+        const to = isoDateTimeValue(ends.to);
+        if (from) entry[p.legFromField] = from;
+        if (to) entry[p.legToField] = to;
+      }
       if (reference) entry[p.legReferenceField] = reference;
       const vehicle = cleanString(leg.vehicleTitle);
       if (vehicle) entry[p.legVehicleField] = toWikilink(vehicle);
-      const origin = cleanString(leg.origin);
-      const destination = cleanString(leg.destination);
-      if (origin) entry[p.legOriginField] = origin;
-      if (destination) entry[p.legDestinationField] = destination;
+      if (ends) {
+        const origin = cleanString(ends.origin);
+        const destination = cleanString(ends.destination);
+        if (origin) entry[p.legOriginField] = origin;
+        if (destination) entry[p.legDestinationField] = destination;
+      }
+      if (split) entry[p.legSegmentsField] = segments.map((segment) => segmentEntry(segment, p));
       writeLineCost(entry, leg, {
         cost: p.legCostField,
         currency: p.legCurrencyField,
@@ -1056,6 +1149,8 @@ export interface ParsedTripLeg extends ParsedTripLineChoice {
    * you are on, and a leg often wants to say both.
    */
   vehicleTitle: string | null;
+  /** The flights it is made of, two or more, or empty for a direct leg. The ends above are theirs when there are any. */
+  segments: TripLegSegment[];
 }
 
 /** One picture in a trip's gallery, as the note carries it. */
@@ -1220,54 +1315,130 @@ export function parseTripRecord(input: ParseTripRecordInput): ParsedTripRecord {
       currency: normalizeCurrency(readString(entry[p.rateCurrencyField])) ?? '',
       rate: readNumberLike(entry[p.rateValueField]),
     })),
-    transport: objectEntries(fm[p.transportProperty]).map((entry) => {
-      // A leg is relative when it names a day for either end: an overnight
-      // flight may say `day: 0` and arrive on `toDay: 1`, and one that names
-      // only the day it leaves still carries a clock time rather than a date.
-      const day = readNumberLike(entry[p.legDayField]);
-      const toDay = readNumberLike(entry[p.legToDayField]);
-      const relative = day !== null || toDay !== null;
-      return {
-        day,
-        toDay,
-        // Anything that isn't explicitly "inbound" is treated as outbound.
-        // A leg has to have some direction to render under, and outbound is
-        // the one a partially-filled note most likely means.
-        direction: readString(entry[p.legDirectionField]) === 'inbound' ? 'inbound' : 'outbound',
-        mode: readString(entry[p.legModeField]),
-        // A wikilink reads down to its target, like a leg's own origin:
-        // `[[Swiss]]` and `Swiss` arrive the same, and neither needs a note.
-        carrier: placeLabel(entry[p.legCarrierField]),
-        // A train number is often only digits, and YAML reads a bare 812 as a
-        // number rather than the text it is.
-        number: readCode(entry[p.legNumberField]),
-        from: relative
-          ? clockTime(readString(entry[p.legFromField]))
-          : readDateTimeLike(entry[p.legFromField]),
-        to: relative
-          ? clockTime(readString(entry[p.legToField]))
-          : readDateTimeLike(entry[p.legToField]),
-        reference: readString(entry[p.legReferenceField]),
-        // A wikilink reads down to its target so `[[Zürich]]` and `Zürich`
-        // arrive the same, and the renderer links whichever the vault has a
-        // note for. Most airports never will.
-        // A wikilink read down to its target, like the carrier beside it. A
-        // vehicle that has no note reads as its plain text rather than as
-        // nothing, so a ship somebody only typed the name of still prints.
-        vehicleTitle: placeLabel(entry[p.legVehicleField]),
-        origin: placeLabel(entry[p.legOriginField]),
-        destination: placeLabel(entry[p.legDestinationField]),
-        cost: readNumberLike(entry[p.legCostField]),
-        currency: normalizeCurrency(readString(entry[p.legCurrencyField])),
-        costUnit: parseCostUnit(readString(entry[p.legCostUnitField])),
-        persons: wikilinkTargets(entry[p.legPersonsField]),
-        ...readLineChoice(
-          entry,
-          { variants: p.legVariantsField, optional: p.legOptionalField, chosen: p.legChosenField },
-          p
-        ),
-      };
-    }),
+    transport: objectEntries(fm[p.transportProperty]).map((entry) =>
+      withSegmentEnds(readLeg(entry, p), entry, p)
+    ),
+  };
+}
+
+/** One leg as the note writes it, before its segments are read. */
+function readLeg(entry: Record<string, unknown>, p: TripPropertyNames): ParsedTripLeg {
+  // A leg is relative when it names a day for either end: an overnight
+  // flight may say `day: 0` and arrive on `toDay: 1`, and one that names
+  // only the day it leaves still carries a clock time rather than a date.
+  const day = readNumberLike(entry[p.legDayField]);
+  const toDay = readNumberLike(entry[p.legToDayField]);
+  const relative = day !== null || toDay !== null;
+  return {
+    day,
+    toDay,
+    // Anything that isn't explicitly "inbound" is treated as outbound.
+    // A leg has to have some direction to render under, and outbound is
+    // the one a partially-filled note most likely means.
+    direction: readString(entry[p.legDirectionField]) === 'inbound' ? 'inbound' : 'outbound',
+    mode: readString(entry[p.legModeField]),
+    // A wikilink reads down to its target, like a leg's own origin:
+    // `[[Swiss]]` and `Swiss` arrive the same, and neither needs a note.
+    carrier: placeLabel(entry[p.legCarrierField]),
+    // A train number is often only digits, and YAML reads a bare 812 as a
+    // number rather than the text it is.
+    number: readCode(entry[p.legNumberField]),
+    from: relative
+      ? clockTime(readString(entry[p.legFromField]))
+      : readDateTimeLike(entry[p.legFromField]),
+    to: relative
+      ? clockTime(readString(entry[p.legToField]))
+      : readDateTimeLike(entry[p.legToField]),
+    reference: readString(entry[p.legReferenceField]),
+    // A wikilink reads down to its target so `[[Zürich]]` and `Zürich`
+    // arrive the same, and the renderer links whichever the vault has a
+    // note for. Most airports never will.
+    // A wikilink read down to its target, like the carrier beside it. A
+    // vehicle that has no note reads as its plain text rather than as
+    // nothing, so a ship somebody only typed the name of still prints.
+    vehicleTitle: placeLabel(entry[p.legVehicleField]),
+    origin: placeLabel(entry[p.legOriginField]),
+    destination: placeLabel(entry[p.legDestinationField]),
+    cost: readNumberLike(entry[p.legCostField]),
+    currency: normalizeCurrency(readString(entry[p.legCurrencyField])),
+    costUnit: parseCostUnit(readString(entry[p.legCostUnitField])),
+    persons: wikilinkTargets(entry[p.legPersonsField]),
+    ...readLineChoice(
+      entry,
+      { variants: p.legVariantsField, optional: p.legOptionalField, chosen: p.legChosenField },
+      p
+    ),
+    segments: [],
+  };
+}
+
+/**
+ * A leg's segments, and the leg's ends read from them.
+ *
+ * Two or more segments are the flights of one ticket, and the leg writes no
+ * ends of its own: its origin, departure and day are the first segment's, its
+ * destination, arrival and arrival day the last's. Filled in here, at read
+ * time, so every reader of a leg (the day-by-day, the estimates, the health
+ * check) goes on seeing Zürich to Bergen without knowing segments exist.
+ *
+ * A single segment hand-written as a list is read as the plain leg it is:
+ * its values fill whatever the leg left empty, and the leg has no segments.
+ * That is also what the writer does with one.
+ */
+function withSegmentEnds(
+  leg: ParsedTripLeg,
+  entry: Record<string, unknown>,
+  p: TripPropertyNames
+): ParsedTripLeg {
+  const segments = keptSegments(
+    objectEntries(entry[p.legSegmentsField]).map((raw) => readSegment(raw, p))
+  );
+  const [first] = segments;
+  const last = segments[segments.length - 1];
+  if (!first || !last) return leg;
+  if (segments.length === 1) {
+    return {
+      ...leg,
+      carrier: leg.carrier ?? first.carrier,
+      number: leg.number ?? first.number,
+      origin: leg.origin ?? first.origin,
+      destination: leg.destination ?? first.destination,
+      day: leg.day ?? first.day,
+      toDay: leg.toDay ?? first.toDay,
+      from: leg.from ?? first.from,
+      to: leg.to ?? first.to,
+    };
+  }
+  return {
+    ...leg,
+    origin: first.origin,
+    destination: last.destination,
+    day: first.day,
+    toDay: last.toDay ?? last.day,
+    from: first.from,
+    to: last.to,
+    // The numbers are the segments'. A leg-level one left over from before
+    // the leg was split would name one flight as if it were the ticket.
+    number: null,
+    segments,
+  };
+}
+
+function readSegment(entry: Record<string, unknown>, p: TripPropertyNames): TripLegSegment {
+  const day = readNumberLike(entry[p.segmentDayField]);
+  const toDay = readNumberLike(entry[p.segmentToDayField]);
+  const relative = day !== null || toDay !== null;
+  const time = (raw: unknown): string | null =>
+    relative ? clockTime(readString(raw)) : readDateTimeLike(raw);
+  return {
+    carrier: placeLabel(entry[p.segmentCarrierField]),
+    number: readCode(entry[p.segmentNumberField]),
+    origin: placeLabel(entry[p.segmentOriginField]),
+    destination: placeLabel(entry[p.segmentDestinationField]),
+    day,
+    toDay,
+    from: time(entry[p.segmentFromField]),
+    to: time(entry[p.segmentToField]),
   };
 }
 

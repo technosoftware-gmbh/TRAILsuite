@@ -24,6 +24,7 @@ import { APERtrailSettings } from '../../settings/types';
 import {
   TripDayInput,
   TripLegInput,
+  TripLegSegment,
   TripLineChoiceInput,
   TripVariantInput,
   TripNightInput,
@@ -481,6 +482,171 @@ function renderWhen(
   });
 }
 
+/** The flight or train number: the leg's own, or one flight's of a leg that changes planes. */
+function renderNumberField(containerEl: HTMLElement, value: { number: string | null }): void {
+  new Setting(containerEl)
+    .setName(t('modals.tripEditor.legNumber'))
+    .setDesc(t('modals.tripEditor.legNumberDesc'))
+    .addText((text) =>
+      text
+        .setPlaceholder(t('modals.tripEditor.legNumberPlaceholder'))
+        .setValue(value.number ?? '')
+        .onChange((raw) => {
+          value.number = raw.trim() === '' ? null : raw;
+        })
+    );
+}
+
+/**
+ * Turns a direct leg into one that changes planes.
+ *
+ * The leg's route, times and number become the first flight, the way a
+ * line's figure becomes its first variant: what was typed is the first
+ * flight's, and leaving it on the leg would be a second copy nothing reads.
+ * The second flight starts where the first lands.
+ */
+function renderAddConnection(
+  containerEl: HTMLElement,
+  value: TripLegInput,
+  rerender: () => void
+): void {
+  new Setting(containerEl)
+    .setName(t('modals.tripEditor.segments'))
+    .setDesc(t('modals.tripEditor.segmentsDesc'))
+    .addButton((button) =>
+      button.setButtonText(t('modals.tripEditor.addSegment')).onClick(() => {
+        const first: TripLegSegment = {
+          carrier: null,
+          number: value.number,
+          origin: value.origin,
+          destination: value.destination,
+          day: value.day,
+          toDay: value.toDay,
+          from: value.from,
+          to: value.to,
+        };
+        value.segments = [first, nextSegment(first)];
+        value.number = null;
+        value.origin = null;
+        value.destination = null;
+        value.day = null;
+        value.toDay = null;
+        value.from = null;
+        value.to = null;
+        rerender();
+      })
+    );
+}
+
+/** An empty flight that starts where the one before it lands, on the day it lands. */
+function nextSegment(previous: TripLegSegment | undefined): TripLegSegment {
+  const day = previous ? (previous.toDay ?? previous.day) : null;
+  return {
+    carrier: null,
+    number: null,
+    origin: previous?.destination ?? null,
+    destination: null,
+    day,
+    toDay: null,
+    from: day === null && previous?.to ? previous.to.slice(0, 10) : null,
+    to: null,
+  };
+}
+
+/**
+ * The flights of a leg that changes planes, one block each.
+ *
+ * Removing one down to a single flight turns the leg back into a direct one,
+ * its fields moving onto the leg, because a list of one is not a list: the
+ * note writes it flat either way, and the form should show what the note
+ * will say.
+ */
+function renderSegmentFields(
+  containerEl: HTMLElement,
+  value: TripLegInput,
+  departure: string | null,
+  rerender: () => void
+): void {
+  value.segments.forEach((segment, index) => {
+    new Setting(containerEl)
+      .setName(t('modals.tripEditor.segmentNumber', { number: index + 1 }))
+      .setHeading()
+      .addExtraButton((button) =>
+        button
+          .setIcon('trash-2')
+          .setTooltip(t('modals.tripEditor.removeSegment'))
+          .onClick(() => {
+            value.segments.splice(index, 1);
+            const [only] = value.segments;
+            if (value.segments.length === 1 && only) {
+              value.number = only.number;
+              value.origin = only.origin;
+              value.destination = only.destination;
+              value.day = only.day;
+              value.toDay = only.toDay;
+              value.from = only.from;
+              value.to = only.to;
+              value.carrier = value.carrier ?? only.carrier;
+              value.segments = [];
+            }
+            rerender();
+          })
+      );
+    renderNumberField(containerEl, segment);
+    new Setting(containerEl)
+      .setName(t('modals.tripEditor.segmentCarrier'))
+      .setDesc(t('modals.tripEditor.segmentCarrierDesc'))
+      .addText((text) =>
+        text
+          .setPlaceholder(value.carrier ?? '')
+          .setValue(segment.carrier ?? '')
+          .onChange((raw) => {
+            segment.carrier = raw.trim() === '' ? null : raw;
+          })
+      );
+    new Setting(containerEl).setName(t('modals.tripEditor.legOrigin')).addText((text) =>
+      text.setValue(segment.origin ?? '').onChange((raw) => {
+        segment.origin = raw.trim() === '' ? null : raw;
+      })
+    );
+    new Setting(containerEl).setName(t('modals.tripEditor.legDestination')).addText((text) =>
+      text.setValue(segment.destination ?? '').onChange((raw) => {
+        segment.destination = raw.trim() === '' ? null : raw;
+      })
+    );
+    renderWhen(
+      containerEl,
+      {
+        day: t('modals.tripEditor.legDay'),
+        from: t('modals.tripEditor.legFrom'),
+        to: t('modals.tripEditor.legTo'),
+      },
+      segment,
+      departure,
+      rerender
+    );
+    if (segment.day !== null) {
+      renderDayField(
+        containerEl,
+        t('modals.tripEditor.legToDay'),
+        arrivalHint(departure, segment.toDay ?? segment.day),
+        segment.toDay,
+        (day) => {
+          segment.toDay = day;
+          rerender();
+        }
+      );
+    }
+  });
+
+  new Setting(containerEl).addButton((button) =>
+    button.setButtonText(t('modals.tripEditor.addSegment')).onClick(() => {
+      value.segments = [...value.segments, nextSegment(value.segments[value.segments.length - 1])];
+      rerender();
+    })
+  );
+}
+
 /** What a day number resolves to, for the field's own description. */
 function arrivalHint(departure: string | null, day: number | null): string {
   const date = day === null ? null : dateOfDay(departure, day);
@@ -903,7 +1069,17 @@ export class LegEditorModal extends ItemEditorModal<TripLegInput> {
     return t('modals.legEditor.title');
   }
 
+  /** Whether the flights have been copied off the caller's leg yet. See `renderFields`. */
+  private segmentsOwned = false;
+
   protected renderFields(containerEl: HTMLElement): void {
+    // The flights are edited in place, so they are copied off the leg the
+    // editor was handed before the first edit: otherwise Cancel would leave
+    // the itinerary's own line changed underneath it.
+    if (!this.segmentsOwned) {
+      this.value.segments = this.value.segments.map((segment) => ({ ...segment }));
+      this.segmentsOwned = true;
+    }
     new Setting(containerEl).setName(t('modals.legEditor.directionField')).addDropdown((dd) => {
       dd.addOption('outbound', t('modals.tripEditor.outbound'));
       dd.addOption('inbound', t('modals.tripEditor.inbound'));
@@ -927,55 +1103,63 @@ export class LegEditorModal extends ItemEditorModal<TripLegInput> {
       });
     });
 
-    // Where the leg starts and ends, above its times: a flight is "Zurich to
-    // Pretoria" before it is "10:15 to 07:30", and the times mean little
-    // without it. Free text or a wikilink, because most airports will never
-    // be a note in anybody's vault.
-    new Setting(containerEl)
-      .setName(t('modals.tripEditor.legOrigin'))
-      .setDesc(t('modals.tripEditor.legPlaceDesc'))
-      .addText((text) =>
+    // A leg that changes planes says its ends once, in its flights; showing
+    // the leg's own route and times beside them would be two places to type
+    // one fact. See docs/design/leg-segments.md.
+    if (this.value.segments.length === 0) {
+      // Where the leg starts and ends, above its times: a flight is "Zurich to
+      // Pretoria" before it is "10:15 to 07:30", and the times mean little
+      // without it. Free text or a wikilink, because most airports will never
+      // be a note in anybody's vault.
+      new Setting(containerEl)
+        .setName(t('modals.tripEditor.legOrigin'))
+        .setDesc(t('modals.tripEditor.legPlaceDesc'))
+        .addText((text) =>
+          text
+            .setPlaceholder(t('modals.tripEditor.legOriginPlaceholder'))
+            .setValue(this.value.origin ?? '')
+            .onChange((raw) => {
+              this.value.origin = raw.trim() === '' ? null : raw;
+            })
+        );
+      new Setting(containerEl).setName(t('modals.tripEditor.legDestination')).addText((text) =>
         text
-          .setPlaceholder(t('modals.tripEditor.legOriginPlaceholder'))
-          .setValue(this.value.origin ?? '')
+          .setPlaceholder(t('modals.tripEditor.legDestinationPlaceholder'))
+          .setValue(this.value.destination ?? '')
           .onChange((raw) => {
-            this.value.origin = raw.trim() === '' ? null : raw;
+            this.value.destination = raw.trim() === '' ? null : raw;
           })
       );
-    new Setting(containerEl).setName(t('modals.tripEditor.legDestination')).addText((text) =>
-      text
-        .setPlaceholder(t('modals.tripEditor.legDestinationPlaceholder'))
-        .setValue(this.value.destination ?? '')
-        .onChange((raw) => {
-          this.value.destination = raw.trim() === '' ? null : raw;
-        })
-    );
 
-    renderWhen(
-      containerEl,
-      {
-        day: t('modals.tripEditor.legDay'),
-        from: t('modals.tripEditor.legFrom'),
-        to: t('modals.tripEditor.legTo'),
-      },
-      this.value,
-      this.departure,
-      () => this.render()
-    );
-    // The arrival day, and only once the leg is relative at all: an overnight
-    // flight leaves on day 0 and lands on day 1, and a leg that says nothing
-    // about days has no second one to say anything about either.
-    if (this.value.day !== null) {
-      renderDayField(
+      renderWhen(
         containerEl,
-        t('modals.tripEditor.legToDay'),
-        arrivalHint(this.departure, this.value.toDay ?? this.value.day),
-        this.value.toDay,
-        (day) => {
-          this.value.toDay = day;
-          this.render();
-        }
+        {
+          day: t('modals.tripEditor.legDay'),
+          from: t('modals.tripEditor.legFrom'),
+          to: t('modals.tripEditor.legTo'),
+        },
+        this.value,
+        this.departure,
+        () => this.render()
       );
+      // The arrival day, and only once the leg is relative at all: an overnight
+      // flight leaves on day 0 and lands on day 1, and a leg that says nothing
+      // about days has no second one to say anything about either.
+      if (this.value.day !== null) {
+        renderDayField(
+          containerEl,
+          t('modals.tripEditor.legToDay'),
+          arrivalHint(this.departure, this.value.toDay ?? this.value.day),
+          this.value.toDay,
+          (day) => {
+            this.value.toDay = day;
+            this.render();
+          }
+        );
+      }
+      renderAddConnection(containerEl, this.value, () => this.render());
+    } else {
+      renderSegmentFields(containerEl, this.value, this.departure, () => this.render());
     }
     // The ship or named train, under the carrier: Hurtigruten is who runs it
     // and MS Trollfjord is what you are on, and a leg often wants to say both.
@@ -1022,17 +1206,9 @@ export class LegEditorModal extends ItemEditorModal<TripLegInput> {
     // Beside the carrier it belongs to, and above the reference it is so
     // often mistaken for: LX288 is the flight, the booking code is the seat on
     // it, and a booking note finds this leg by the code.
-    new Setting(containerEl)
-      .setName(t('modals.tripEditor.legNumber'))
-      .setDesc(t('modals.tripEditor.legNumberDesc'))
-      .addText((text) =>
-        text
-          .setPlaceholder(t('modals.tripEditor.legNumberPlaceholder'))
-          .setValue(this.value.number ?? '')
-          .onChange((raw) => {
-            this.value.number = raw.trim() === '' ? null : raw;
-          })
-      );
+    if (this.value.segments.length === 0) {
+      renderNumberField(containerEl, this.value);
+    }
     new Setting(containerEl)
       .setName(t('modals.tripEditor.legReference'))
       .setDesc(t('modals.tripEditor.legReferenceDesc'))

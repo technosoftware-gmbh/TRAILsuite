@@ -374,6 +374,16 @@ export interface APERtrailSettings {
   variantCostUnitField: string;
   /** True on the one variant settled on. Absent on the rest, and absent everywhere while the choice is open. */
   variantChosenField: string;
+  /** The flights a leg is made of, where it changes planes. See docs/design/leg-segments.md. */
+  legSegmentsField: string;
+  segmentCarrierField: string;
+  segmentNumberField: string;
+  segmentOriginField: string;
+  segmentDestinationField: string;
+  segmentFromField: string;
+  segmentToField: string;
+  segmentDayField: string;
+  segmentToDayField: string;
   /** True on a line that might not happen: an excursion offered, a transfer you may not take. */
   stopOptionalField: string;
   nightOptionalField: string;
