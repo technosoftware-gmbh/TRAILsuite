@@ -216,8 +216,8 @@ src/shared/       helpers with no module of their own: short-url,
                   (formatting and cents) and print-sheet (the A4 paper
                   both exports share)
 src/vault/        cross-module note reading and writing: entity-types,
-                  types, read-entities, create-entities, visit-derivation,
-                  health/
+                  types, board-reader, read-entities, create-entities,
+                  visit-derivation, health/
 src/trips/        the Trip module: itinerary-days, trip-note, trip-light,
                   write-trip, related-trips, trip-stats, costs/ (booking
                   notes, totals, the split, the invoice adapter,
@@ -234,6 +234,15 @@ src/ui/           shared UI: components/, dashboard/, gallery/, settings/
   belongs in `src/vault/`, and anything that needs no Obsidian `App` at all
   belongs in `src/shared/`. Growing a module should not mean growing
   `src/vault/` alongside it.
+- **The board reader comes in a pair.** `vault/board-reader.ts` reads the
+  travel notes through the core's `VaultHost` and imports nothing from
+  `obsidian` at runtime; `vault/read-entities.ts` is its Obsidian twin, one
+  delegation through `hostFor()` plus the day-note visits only Obsidian's
+  resolved-link cache knows. The split is what lets the same reader run outside
+  Obsidian (an import tool, a standalone app), and the root
+  `tests/host-free.test.ts` walks the reader's import graph to keep it true.
+  Records are generic over the file type and default to `TFile`, so no
+  Obsidian caller writes a type argument.
 - **Frontmatter, links and paths come from `trail-core` too.**
   `src/shared/wikilink.ts`, `src/shared/wikilink-strip.ts`,
   `src/shared/frontmatter-lookup.ts` and `src/shared/tag-list.ts` are gone.

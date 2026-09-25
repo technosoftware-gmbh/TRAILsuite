@@ -173,9 +173,11 @@ A convention with a test behind it is not a preference. These fail the build:
 - `settings-reference` (root) -- a setting with no row in its package's settings
   reference, or a row for a setting that no longer exists.
 - `name-fold` (root) -- a name trimmed and lower-cased by hand, or a title
-  lowered on its own, rather than folded with the core's `caseFold()`. There are
-  **five** root tests, and the last two are the ones easy to miss when the others
-  are listed from memory.
+  lowered on its own, rather than folded with the core's `caseFold()`.
+- `host-free` (root) -- a plugin's vault reader (`*-reader.ts`) that reaches
+  `obsidian` at runtime anywhere in its import graph. Type-only imports are
+  allowed. There are **six** root tests, and the last three are the ones easy
+  to miss when the others are listed from memory.
 - `obsidian-free` (core) -- the core imports no `obsidian`, reads no filesystem,
   and calls no unmockable clock. It reads the source text, because a lint rule
   can be silenced by the same edit that breaks it.

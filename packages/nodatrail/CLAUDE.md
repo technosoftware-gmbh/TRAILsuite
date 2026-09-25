@@ -125,8 +125,8 @@ src/settings/     types, defaults, validate, store, links, the settings page,
                   and the one-time adoption from a sibling plugin
 src/shared/       clock, categories, note-creation, note-stamps, open-leaf,
                   rates, vault-host
-src/vault/        cross-module reading and writing: entity-types, read-notes,
-                  create-note, health/
+src/vault/        cross-module reading and writing: entity-types,
+                  notes-reader, read-notes, create-note, health/
 src/plan/         paths, detect, nav-block, labels, write-period, rollup,
                   read-day, read-schedule, day-body, defer-menu, and add-to-day
                   with its dialog
@@ -155,6 +155,16 @@ src/ui/           kit/, views/, modals/, blocks/, settings/, components/
   belongs in `src/vault/`; anything needing no `App` at all belongs in
   `src/shared/` or, if it is a statement about a file rather than about this
   plugin, in `trail-core`.
+- **Readers come in pairs.** `vault/notes-reader.ts`, `para/para-reader.ts`,
+  `finance/finance-reader.ts`, `finance/orders-reader.ts` and
+  `ledger/ledger-reader.ts` read through the core's `VaultHost` and import
+  nothing from `obsidian` at runtime; the `read-*.ts` module beside each is its
+  Obsidian twin, one delegation through `hostFor()` (the ledger's with
+  `cachedRead` in place of `read`). The split is what lets the same readers run
+  outside Obsidian (an import tool, a standalone app), and the root
+  `tests/host-free.test.ts` walks each reader's import graph to keep it true.
+  `splitList` lives in `settings/split-list.ts` for that reason: `defaults.ts`
+  pulls in the translation manager, which imports `obsidian`.
 - **Notes are identified by folder AND type together**, through
   `trail-core`'s `readNotesOfType()`. A blank folder matches nothing and a blank
   type value matches nothing, which is what makes an unconfigured setting fail
