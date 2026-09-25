@@ -126,6 +126,7 @@ npm run build                                   # core and both plugins
 npm run test --workspace packages/nodatrail     # one package
 ./scripts/install-into-vault.sh /path/to/Vault  # copy built plugins into a vault
 ./scripts/claude-project-bundle.sh              # regenerate this bundle
+./scripts/export-interchange.sh /path/to/Vault /path/to/out  # read-only export for the app
 ```
 
 `check` and `build` both run `npm run core` first, so the core is built before
@@ -176,8 +177,11 @@ A convention with a test behind it is not a preference. These fail the build:
   lowered on its own, rather than folded with the core's `caseFold()`.
 - `host-free` (root) -- a plugin's vault reader (`*-reader.ts`) that reaches
   `obsidian` at runtime anywhere in its import graph. Type-only imports are
-  allowed. There are **six** root tests, and the last three are the ones easy
-  to miss when the others are listed from memory.
+  allowed.
+- `interchange-copies` (root) -- the two plugins' copies of the interchange
+  export's disk host and command line helpers drifting apart. There are
+  **seven** root tests, and the last four are the ones easy to miss when the
+  others are listed from memory.
 - `obsidian-free` (core) -- the core imports no `obsidian`, reads no filesystem,
   and calls no unmockable clock. It reads the source text, because a lint rule
   can be silenced by the same edit that breaks it.

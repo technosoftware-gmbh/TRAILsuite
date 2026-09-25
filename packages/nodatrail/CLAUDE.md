@@ -165,6 +165,15 @@ src/ui/           kit/, views/, modals/, blocks/, settings/, components/
   `tests/host-free.test.ts` walks each reader's import graph to keep it true.
   `splitList` lives in `settings/split-list.ts` for that reason: `defaults.ts`
   pulls in the translation manager, which imports `obsidian`.
+- **The interchange export is built on those readers.**
+  `src/interchange/sections.ts` turns what they read into this plugin's
+  families for the standalone app's importer, and is host-free like them. The
+  command line half (`npm run interchange`) lives in `scripts/interchange/`,
+  never in `main.js`: a read-only filesystem host, the saved-settings lookup and an esbuild
+  launcher. Its `fs-host.ts` and `cli.ts` are copies of the
+  other plugin's, kept apart by the package boundary; change both, or the
+  root `tests/interchange-copies.test.ts` fails. See
+  `docs/interchange.md` at the root.
 - **Notes are identified by folder AND type together**, through
   `trail-core`'s `readNotesOfType()`. A blank folder matches nothing and a blank
   type value matches nothing, which is what makes an unconfigured setting fail

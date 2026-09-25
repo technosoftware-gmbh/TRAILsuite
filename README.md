@@ -52,6 +52,13 @@ To put the built plugins into a vault:
 ./scripts/install-into-vault.sh /path/to/Vault
 ```
 
+To export a vault for the standalone app's importer (read-only, see
+[docs/interchange.md](docs/interchange.md)):
+
+```
+./scripts/export-interchange.sh /path/to/Vault /path/to/out
+```
+
 `snippets/trailsuite-brand.css` is an optional Obsidian CSS snippet that paints
 the folder list and each plugin's views in the suite's colours. Copy it into
 `<vault>/.obsidian/snippets/` and enable it under Settings, Appearance. No

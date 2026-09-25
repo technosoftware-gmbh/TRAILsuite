@@ -75,7 +75,9 @@ changes: a property comes back spelled one way this release and another the
 next, and a line one half writes stops being a line the other half can read.
 That argument does not count consumers and does not need to. So `meal`, `plan`,
 `order`, `delivery` and `reheating` are here although only CULItrail imports
-them, and the CRM note format is here on this test as well as the first. What a
+them, and the CRM note format is here on this test as well as the first. The
+`interchange` format is here on both tests too: it is a file format, and each
+plugin writes its own section of it (see `docs/interchange.md` at the root). What a
 plugin keeps is what it *does* with a format: the view, the modal, the wording.
 `order/total.ts` was once named in this file as an example of what stays out,
 back when nothing here read an order. It came in under this test, not the

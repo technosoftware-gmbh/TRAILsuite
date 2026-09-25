@@ -25,6 +25,7 @@ export * from './expense/index.js';
 export * from './document/index.js';
 export * from './frontmatter/index.js';
 export * from './geo/index.js';
+export * from './interchange/index.js';
 export * from './ledger/index.js';
 export * from './links/index.js';
 export * from './markdown/index.js';

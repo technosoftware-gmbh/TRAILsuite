@@ -56,6 +56,15 @@ const READERS: { reader: string; obsidianTwin: string }[] = [
 ];
 
 /**
+ * Host-free modules with no Obsidian twin: the interchange export, which only
+ * ever runs outside Obsidian and is built on the readers above.
+ */
+const EXPORTERS: string[] = [
+  "nodatrail/src/interchange/sections.ts",
+  "apertrail/src/interchange/sections.ts",
+];
+
+/**
  * Every module specifier a file loads at runtime.
  *
  * `import type` and `export type` are erased and skipped. A mixed import
@@ -122,6 +131,13 @@ describe("host-free vault readers", () => {
     "$reader loads nothing from obsidian at runtime",
     ({ reader }) => {
       expect(modulesReachingObsidian(reader).offenders).toEqual([]);
+    },
+  );
+
+  it.each(EXPORTERS)(
+    "%s loads nothing from obsidian at runtime",
+    (exporter) => {
+      expect(modulesReachingObsidian(exporter).offenders).toEqual([]);
     },
   );
 
