@@ -19,6 +19,7 @@ import { App, Plugin, getLanguage } from 'obsidian';
 import { FALLBACK_LOCALE, LOCALES, localeEntry } from './translations';
 import { LocaleData, LocaleEntry, SupportedLocale } from './types';
 import { isPluralForms, selectPluralForm } from './plural';
+import { nestedValue, translationsOf } from './all-locales';
 
 export type { LocaleData, SupportedLocale } from './types';
 
@@ -208,13 +209,6 @@ export class I18nManager {
   }
 }
 
-function nestedValue(table: LocaleData, path: string): string | LocaleData | undefined {
-  return path.split('.').reduce<string | LocaleData | undefined>((node, part) => {
-    if (node && typeof node === 'object' && part in node) return node[part];
-    return undefined;
-  }, table);
-}
-
 /** `{name}` placeholders. An unknown one is left as written rather than blanked, so a bad key looks like a bad key. */
 function interpolate(template: string, variables: Record<string, string | number>): string {
   return template.replace(
@@ -242,11 +236,7 @@ export function tAll(key: string): string[] {
   const seen = new Set<string>();
   const current = t(key);
   if (current !== key) seen.add(current);
-
-  for (const locale of LOCALES) {
-    const value = nestedValue(locale.table, key);
-    if (typeof value === 'string') seen.add(value);
-  }
+  for (const value of translationsOf(key)) seen.add(value);
   return [...seen];
 }
 

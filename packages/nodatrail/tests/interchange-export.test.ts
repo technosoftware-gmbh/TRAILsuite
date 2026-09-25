@@ -20,7 +20,12 @@ import {
 } from '@technosoftware/trail-core';
 import { DEFAULT_SETTINGS } from '../src/settings/defaults';
 import { sampleNotes } from '../src/sample/notes';
-import { NODATRAIL_FAMILIES, nodatrailFamilies } from '../src/interchange/sections';
+import {
+  NODATRAIL_FAMILIES,
+  NODATRAIL_LINES,
+  nodatrailFamilies,
+  nodatrailLines,
+} from '../src/interchange/sections';
 import { diskVault } from '../scripts/interchange/fs-host';
 
 const settings = DEFAULT_SETTINGS;
@@ -63,11 +68,14 @@ describe('the NODAtrail interchange export', () => {
   it('writes every family, as plain JSON, and accounts for every note', async () => {
     const families = await nodatrailFamilies(disk.host, settings);
     expect(Object.keys(families)).toEqual([...NODATRAIL_FAMILIES]);
-    for (const family of ['area', 'project', 'account', 'journal', 'budget'] as const) {
+    for (const family of ['area', 'project', 'account', 'journal', 'budget', 'period'] as const) {
       expect(families[family].length, family).toBeGreaterThan(0);
     }
 
-    const section = sectionFile('nodatrail', META, families);
+    const lines = await nodatrailLines(disk.host, settings);
+    expect(Object.keys(lines)).toEqual([...NODATRAIL_LINES]);
+    expect(lines.task.length).toBeGreaterThan(0);
+    const section = sectionFile('nodatrail', META, families, lines);
     // A round trip through JSON is the file the app will read; nothing may be
     // lost on the way or refuse to serialise.
     expect(JSON.parse(JSON.stringify(section))).toEqual(section);
@@ -81,6 +89,55 @@ describe('the NODAtrail interchange export', () => {
     expect(report.danglingRefs).toEqual([]);
     expect(report.unrecognised).toContain('Loose/Müsli.md');
     expect(report.notes - report.unrecognised.length).toBeGreaterThan(0);
+  });
+
+  it('reads a day note the way the plan view does, with every link resolved to its note', async () => {
+    const { period } = await nodatrailFamilies(disk.host, settings);
+    const days = period.filter((entry) => entry.record.level === 'day');
+    expect(days.length).toBeGreaterThan(0);
+
+    const schedule = days.flatMap(
+      (entry) => entry.record.schedule as { text: string; context: unknown; start: string }[]
+    );
+    const kickoff = schedule.find((entry) => entry.text.startsWith('Week kickoff'));
+    expect(kickoff?.start).toBe('08:30');
+    const context = kickoff?.context as { title: string; note: { ref: string } | null };
+    expect(context.title).not.toBe('');
+    expect(context.note?.ref).toMatch(/\.md$/);
+
+    const thoughts = days.flatMap((entry) => entry.record.thoughts as { kind: string }[]);
+    expect(thoughts.map((entry) => entry.kind)).toEqual(expect.arrayContaining(['idea', 'note']));
+  });
+
+  it("puts a follow-up inside its meeting's line range, which is how an importer pairs them", async () => {
+    const { period } = await nodatrailFamilies(disk.host, settings);
+    const { task } = await nodatrailLines(disk.host, settings);
+    const day = period.find((entry) =>
+      (entry.record.schedule as { text: string }[]).some((one) =>
+        one.text.startsWith('Week kickoff')
+      )
+    );
+    const kickoff = (
+      day?.record.schedule as { text: string; lines: { from: number; to: number } }[]
+    ).find((one) => one.text.startsWith('Week kickoff'));
+    const followUp = task.find(
+      (line) =>
+        line.path === day?.path && (line.record.text as string).startsWith('Open the year budget')
+    );
+    expect(followUp).toBeDefined();
+    expect(followUp.line).toBeGreaterThanOrEqual(kickoff.lines.from);
+    expect(followUp.line).toBeLessThan(kickoff.lines.to);
+    // And the numbers are into the file, frontmatter included, as the vault holds it.
+    const text = await disk.host.vault.read(disk.host.vault.getFile(day.path));
+    const fileLines = text.split('\n');
+    expect(fileLines[followUp.line]).toBe(followUp.record.raw);
+    expect(fileLines[kickoff.lines.from]).toContain('Week kickoff');
+  });
+
+  it('claims a journal note once, though it carries a month title', async () => {
+    const families = await nodatrailFamilies(disk.host, settings);
+    const journals = new Set(families.journal.map((entry) => entry.path));
+    expect(families.period.some((entry) => journals.has(entry.path))).toBe(false);
   });
 
   it('refuses to write', async () => {

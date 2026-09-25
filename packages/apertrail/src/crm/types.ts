@@ -12,30 +12,39 @@
  * worth making. They stay hand-edited, like every cosmetic field
  * vault/create-entities.ts already declines to write.
  */
-import { TFile } from 'obsidian';
+import type { TFile } from 'obsidian';
+import type { VaultFile } from '@technosoftware/trail-core';
 
-export interface CrmPerson {
-  file: TFile;
+/**
+ * The file type defaults to Obsidian's so no caller inside the plugin names it;
+ * the export reads the same records over a filesystem host.
+ */
+export interface CrmPerson<F extends VaultFile = TFile> {
+  file: F;
   title: string;
   description: string | null;
   tags: string[];
+  /** What this person is to the household (`traveller`, `eater`), from `personRolesProperty`. */
+  roles: string[];
   address: string | null;
   email: string | null;
   mobile: string | null;
 }
 
-export interface CrmCompany {
-  file: TFile;
+export interface CrmCompany<F extends VaultFile = TFile> {
+  file: F;
   title: string;
   description: string | null;
   tags: string[];
+  /** What this company is to the household (`carrier`, `hotel`, `vendor`), from `companyRolesProperty`. */
+  roles: string[];
   address: string | null;
   website: string | null;
   email: string | null;
   phone: string | null;
 }
 
-export interface CrmBoard {
-  persons: CrmPerson[];
-  companies: CrmCompany[];
+export interface CrmBoard<F extends VaultFile = TFile> {
+  persons: CrmPerson<F>[];
+  companies: CrmCompany<F>[];
 }

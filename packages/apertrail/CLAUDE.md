@@ -226,7 +226,7 @@ src/trips/        the Trip module: itinerary-days, trip-note, trip-light,
 src/places/       the Places module: country-visited, photo-spot-*, solar,
                   write-photo-spot, place-stats, + ui/
 src/crm/          the CRM module: entity-types, types, crm-note,
-                  read-crm, create-crm, persons, + ui/
+                  crm-reader and its twin read-crm, create-crm, persons, + ui/
 src/ui/           shared UI: components/, dashboard/, gallery/, settings/
 ```
 
@@ -321,9 +321,11 @@ src/ui/           shared UI: components/, dashboard/, gallery/, settings/
   is ever wanted, build it symmetrically with CULItrail's
   `settings/foreign-settings-import.ts` rather than bolting it on.
 
-- **CRM reads, creates and renders; it still owns nothing.** `crm/read-crm.ts`
+- **CRM reads, creates and renders; it still owns nothing.** `crm/crm-reader.ts`
   reads Person and Company notes out of `personsFolder` and
-  `companiesFolder`, `crm/create-crm.ts` writes new ones there, and
+  `companiesFolder` through the core's vault ports, `crm/read-crm.ts` is its
+  Obsidian twin, and the interchange export hands the same records over as the
+  `person` and `company` families, roles included, `crm/create-crm.ts` writes new ones there, and
   `crm/persons.ts` is a thin projection over the reader for the trip
   editor's participant list. Creation writes a note and never touches it
   again, exactly like the travel types. The CRM dashboard and the gallery

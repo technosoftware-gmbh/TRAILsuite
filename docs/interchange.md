@@ -68,22 +68,70 @@ A section file is `families`, a map from family name to a list of entries:
 
 | Source | Families |
 |---|---|
-| apertrail | `trip`, `booking`, `country`, `state`, `city`, `place` (with `kind`), `vehicle`, `excursion` |
-| nodatrail | `area`, `goal`, `project`, `resource`, `purchase`, `bill`, `recurring`, `account`, `journal`, `budget` |
+| apertrail | `trip`, `booking`, `country`, `state`, `city`, `place` (with `kind`), `vehicle`, `excursion`, `person`, `company` |
+| nodatrail | `area`, `goal`, `project`, `resource`, `purchase`, `bill`, `recurring`, `account`, `journal`, `budget`, `period` |
 
-Not parsed yet, and carried raw in `vault.json`: periodic notes (days, weeks,
-months, quarters, years), tasks inside notes, CRM people and companies, and
-CULItrail's notes. Attachments (pictures, PDFs) are not exported in version 1;
-a record or a body names them by path.
+**People and companies leave in APERtrail's file**, although NODAtrail and
+CULItrail read them too: APERtrail creates and edits them and reads the most
+fields (description, tags, roles, address, website, email, phone, mobile).
+
+**`period` is every day, week, month, quarter and year note**, with `level`
+and the first and last day it covers (`from`, `to`). A note counts when it sits
+exactly at the path its level's template gives (`dailyPath` and the others), so
+a journal note titled `2026-09` is never taken for a month. Each carries the
+entries the plan view reads:
+
+- `schedule`: meetings and spans, with `attendance`, `start`, `end`, `text`,
+  the `context` it is about, the `place`, the `persons`, and the indented
+  `notes`;
+- `thoughts`: notes and ideas;
+- on every entry, every link as `{ title, note }`, where `note` is the
+  `{ ref }` it resolves to or `null`; `lines`, the zero-based, half-open range
+  of the entry and its children in the file; and `complete`, false when a link
+  on the entry found no field to go into. Whatever else the note says is in
+  `vault.json`.
+
+Not parsed yet, and carried raw in `vault.json`: CULItrail's notes, until its
+own repository writes a section file. Attachments (pictures, PDFs) are not
+exported in version 1; a record or a body names them by path.
+
+## Lines inside notes
+
+Some things live **inside** a note rather than being one. A section file may
+carry `lines` beside `families`, a map from a line family to entries of this
+shape:
+
+```json
+{ "path": "0 Plan/1 Daily/2026/2026-09-25.md", "line": 14,
+  "record": { "status": "todo", "text": "Steuererklärung einreichen", "due": "2026-09-30",
+              "links": [{ "title": "Steuern 2025", "note": { "ref": "3 Projects/Steuern 2025/Steuern 2025.md" } }],
+              "raw": "- [ ] Steuererklärung einreichen 📅 2026-09-30 [[Steuern 2025]]", "...": "..." } }
+```
+
+- **A line names its note and does not claim it.** A project with tasks is
+  still the project family's; a task in a note no family parses still arrives
+  parsed, and the note is still counted as carried raw.
+- **`line` is zero-based, into the whole file** as the vault holds it,
+  frontmatter included, so `body` in `vault.json` starts some lines later.
+- **`raw` is the line as written**, so a field the parser does not know (a
+  dependency, somebody's own emoji) is still handed over.
+- A file with no lines has no `lines` key. A reader treats a missing key as an
+  empty map, which is why adding it did not change the format version.
+
+The one line family in version 1 is NODAtrail's `task`: every checkbox line in
+the Obsidian Tasks format under `taskFolders`, with status, priority, the six
+dates, recurrence as written, tags and links. A follow-up written under a
+meeting is one of these, and its `line` falls inside that meeting's `lines`
+range, which is how an importer pairs the two.
 
 ## The report
 
 The report is the spike's first exit criterion made mechanical: every note is
-either claimed by a family or listed as carried raw, and three checks must come
-out zero:
+either claimed by a family or listed as carried raw, lines are counted per
+family beside them, and three checks must come out zero:
 
 - a note claimed by two families,
-- a record for a note the vault does not hold,
+- a record or a line for a note the vault does not hold,
 - a `ref` to a note the vault does not hold.
 
 It prints counts and folder names only, never a note's content, so it can be

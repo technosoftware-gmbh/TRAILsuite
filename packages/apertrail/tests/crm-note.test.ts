@@ -69,6 +69,7 @@ describe('parsePersonRecord', () => {
     ).toEqual({
       description: 'Photography friend',
       tags: ['Friends', 'Photography'],
+      roles: [],
       address: 'Länggassstrasse, 3012 Bern, Switzerland',
       email: 'marc@example.com',
       mobile: '+41 79 000 00 06',
@@ -122,6 +123,7 @@ describe('parseCompanyRecord', () => {
     ).toEqual({
       description: 'Regional tourist board',
       tags: ['Tourism'],
+      roles: [],
       address: 'Vordergasse, 8200 Schaffhausen, Switzerland',
       website: 'https://schaffhauserland.ch/',
       email: 'info@example.com',

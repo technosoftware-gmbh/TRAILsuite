@@ -78,7 +78,29 @@ export interface FamilyEntry {
   record: Record<string, unknown>;
 }
 
+/**
+ * One parsed line inside a note, and where it sits.
+ *
+ * For what lives **inside** a note rather than being one: a task is a checkbox
+ * line, and a day note, a project and a note no plugin parses can all hold them.
+ * A line entry names its note but does not claim it, so a project carrying
+ * tasks is still the project family's note, and a task in a note no family
+ * parses still arrives parsed.
+ */
+export interface LineEntry {
+  path: string;
+  /** Zero-based, into the whole file as the vault holds it, frontmatter included. */
+  line: number;
+  record: Record<string, unknown>;
+}
+
 /** A plugin's file: its note families, each a list of parsed records. */
 export interface SectionFile extends InterchangeHeader {
   families: Record<string, FamilyEntry[]>;
+  /**
+   * Line families, each a list of parsed lines. Absent from a file that has
+   * none, which is every file written before lines existed: a reader treats a
+   * missing key as an empty map, so the format version did not change.
+   */
+  lines?: Record<string, LineEntry[]>;
 }
