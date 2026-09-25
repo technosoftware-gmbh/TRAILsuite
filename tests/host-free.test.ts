@@ -50,8 +50,16 @@ const READERS: { reader: string; obsidianTwin: string }[] = [
     obsidianTwin: "nodatrail/src/para/read-para.ts",
   },
   {
+    reader: "nodatrail/src/tasks/task-reader.ts",
+    obsidianTwin: "nodatrail/src/tasks/read-tasks.ts",
+  },
+  {
     reader: "apertrail/src/vault/board-reader.ts",
     obsidianTwin: "apertrail/src/vault/read-entities.ts",
+  },
+  {
+    reader: "apertrail/src/crm/crm-reader.ts",
+    obsidianTwin: "apertrail/src/crm/read-crm.ts",
   },
 ];
 
@@ -156,7 +164,7 @@ describe("host-free vault readers", () => {
     // read-entities -> board-reader -> ... -> trail-core types: the reader's
     // own graph must be more than the reader, or the walk is not walking.
     expect(
-      modulesReachingObsidian(READERS[5].reader).walked.length,
+      modulesReachingObsidian(READERS[6].reader).walked.length,
     ).toBeGreaterThan(5);
   });
 

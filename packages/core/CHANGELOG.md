@@ -25,6 +25,19 @@ what counts as a breaking change:
 
 ### Added
 
+- **Lines inside notes, in the interchange format.** `SectionFile.lines`, an
+  optional map from a line family to `LineEntry` records (`path`, zero-based
+  `line`, `record`), built with `lineEntries()`; `sectionFile()` takes it as an
+  optional fourth argument and leaves the key out when there is none. A line
+  names its note without claiming it: `interchangeReport` counts lines per
+  family in `report.lines`, checks their paths and refs like records, and never
+  lets one make a note recognised or claimed twice. The format version stays 1,
+  since a file without `lines` reads exactly as before.
+- **`linkResolver()`**, resolving a wikilink target to a note from the list of
+  notes alone, for a reader running without Obsidian's link index: folded title,
+  `folder/title` by the end of the path, alias and heading cut off, first by
+  path where two notes share a title. `linkTargetOf()` beside it.
+
 - **A budget line can run for part of the year.** `AccountBudgetLine.fromMonth`
   and `toMonth`, read and written under the new
   `AccountBudgetProperties.lineFromField` and `lineToField`. Null is January and

@@ -38,6 +38,8 @@ export function crmPropertyNames(settings: APERtrailSettings): CrmPropertyNames 
     emailProperty: settings.emailProperty,
     phoneProperty: settings.phoneProperty,
     mobileProperty: settings.mobileProperty,
+    personRolesProperty: settings.personRolesProperty,
+    companyRolesProperty: settings.companyRolesProperty,
   };
 }
 
@@ -45,6 +47,7 @@ export function crmPropertyNames(settings: APERtrailSettings): CrmPropertyNames 
 export type ParsedPerson = {
   description: string | null;
   tags: string[];
+  roles: string[];
   address: string | null;
   email: string | null;
   mobile: string | null;
@@ -53,6 +56,7 @@ export type ParsedPerson = {
 export type ParsedCompany = {
   description: string | null;
   tags: string[];
+  roles: string[];
   address: string | null;
   website: string | null;
   email: string | null;
@@ -71,18 +75,22 @@ export function parsePersonRecord(
   frontmatter: Record<string, unknown>,
   properties: CrmPropertyNames
 ): ParsedPerson {
-  const { description, tags, address, email, mobile } = fields(frontmatter, properties, 'person');
-  return { description, tags, address, email, mobile };
+  const { description, tags, roles, address, email, mobile } = fields(
+    frontmatter,
+    properties,
+    'person'
+  );
+  return { description, tags, roles, address, email, mobile };
 }
 
 export function parseCompanyRecord(
   frontmatter: Record<string, unknown>,
   properties: CrmPropertyNames
 ): ParsedCompany {
-  const { description, tags, address, website, email, phone } = fields(
+  const { description, tags, roles, address, website, email, phone } = fields(
     frontmatter,
     properties,
     'company'
   );
-  return { description, tags, address, website, email, phone };
+  return { description, tags, roles, address, website, email, phone };
 }

@@ -65,7 +65,16 @@ describe('the APERtrail interchange export', () => {
   it('writes every family, as plain JSON, and accounts for every note', async () => {
     const families = apertrailFamilies(disk.host, settings, new Map(), '2026-09-17');
     expect(Object.keys(families)).toEqual([...APERTRAIL_FAMILIES]);
-    for (const family of ['trip', 'country', 'city', 'place', 'vehicle', 'excursion'] as const) {
+    for (const family of [
+      'trip',
+      'country',
+      'city',
+      'place',
+      'vehicle',
+      'excursion',
+      'person',
+      'company',
+    ] as const) {
       expect(families[family].length, family).toBeGreaterThan(0);
     }
 
@@ -87,6 +96,19 @@ describe('the APERtrail interchange export', () => {
     expect(report.claimedTwice).toEqual([]);
     expect(report.danglingRefs).toEqual([]);
     expect(report.unrecognised).toContain('Loose/M\u00fcsli.md');
+  });
+
+  it('hands over people and companies with their roles, which the gallery does not show', () => {
+    const families = apertrailFamilies(disk.host, settings, new Map(), '2026-09-17');
+    const roles = [...families.person, ...families.company].flatMap(
+      (entry) => entry.record.roles as string[]
+    );
+    expect(roles).toEqual(expect.arrayContaining(['traveller', 'eater', 'carrier']));
+    for (const entry of families.person) {
+      expect(Object.keys(entry.record).sort()).toEqual(
+        ['address', 'description', 'email', 'mobile', 'roles', 'tags', 'title'].sort()
+      );
+    }
   });
 
   it('refuses to write', async () => {

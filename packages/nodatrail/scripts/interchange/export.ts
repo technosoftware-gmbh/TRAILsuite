@@ -23,7 +23,7 @@ import {
   type SectionFile,
 } from '@technosoftware/trail-core';
 import { mergeSettings } from '../../src/settings/validate';
-import { nodatrailFamilies } from '../../src/interchange/sections';
+import { nodatrailFamilies, nodatrailLines } from '../../src/interchange/sections';
 import { diskVault } from './fs-host';
 import {
   exportArgs,
@@ -51,7 +51,12 @@ async function main(): Promise<void> {
 
   writeJson(
     join(out, 'nodatrail.json'),
-    sectionFile('nodatrail', meta, await nodatrailFamilies(disk.host, settings))
+    sectionFile(
+      'nodatrail',
+      meta,
+      await nodatrailFamilies(disk.host, settings),
+      await nodatrailLines(disk.host, settings)
+    )
   );
 
   if (!flags.has('--manifest')) return;

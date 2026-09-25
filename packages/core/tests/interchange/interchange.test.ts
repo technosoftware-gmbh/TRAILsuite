@@ -7,6 +7,7 @@ import {
   familyEntries,
   formatInterchangeReport,
   interchangeReport,
+  lineEntries,
   sectionFile,
   toInterchangeRecord,
   vaultManifest,
@@ -80,6 +81,30 @@ describe('vaultManifest', () => {
   });
 });
 
+describe('lineEntries and sectionFile', () => {
+  it('orders lines by note then line, and keeps the line on the record', () => {
+    const file = (path: string) => ({ path, basename: path });
+    const tasks = [
+      { file: file('b.md'), line: 1, text: 'x' },
+      { file: file('a.md'), line: 9, text: 'y' },
+      { file: file('a.md'), line: 2, text: 'z' },
+    ];
+    const entries = lineEntries(tasks);
+    expect(entries.map((entry) => `${entry.path}:${entry.line}`)).toEqual([
+      'a.md:2',
+      'a.md:9',
+      'b.md:1',
+    ]);
+    expect(entries[0]?.record).toEqual({ line: 2, text: 'z' });
+  });
+
+  it('leaves `lines` out of a file that has none, so older files and newer ones read alike', () => {
+    expect('lines' in sectionFile('a', META, {})).toBe(false);
+    expect('lines' in sectionFile('a', META, {}, {})).toBe(false);
+    expect(sectionFile('a', META, {}, { task: [] }).lines).toEqual({ task: [] });
+  });
+});
+
 describe('interchangeReport', () => {
   const manifest: VaultManifest = {
     format: INTERCHANGE_FORMAT,
@@ -134,6 +159,31 @@ describe('interchangeReport', () => {
     expect(report.missingFromVault).toEqual([{ path: 'Trips/Elsewhere.md', by: 'a/trip' }]);
     expect(report.danglingRefs).toEqual([{ from: 'Trips/T.md', ref: 'Places/Gone.md' }]);
     expect(formatInterchangeReport(report)).toContain('- dangling: Trips/T.md -> Places/Gone.md');
+  });
+
+  it('counts lines without letting them claim a note, and checks their paths and refs', () => {
+    const tasks = sectionFile(
+      'nodatrail',
+      META,
+      { trip: familyEntries([{ file: { path: 'Trips/T.md', basename: 'T' } }]) },
+      {
+        task: [
+          { path: 'Trips/T.md', line: 4, record: {} },
+          { path: 'Loose.md', line: 0, record: { links: [{ ref: 'Places/Gone.md' }] } },
+          { path: 'Nowhere.md', line: 2, record: {} },
+        ],
+      }
+    );
+    const report = interchangeReport(manifest, [tasks]);
+
+    expect(report.lines).toEqual([{ source: 'nodatrail', family: 'task', count: 3 }]);
+    // A task inside a claimed note does not claim it twice, and a task inside a
+    // loose note does not make the note recognised.
+    expect(report.claimedTwice).toEqual([]);
+    expect(report.unrecognised).toContain('Loose.md');
+    expect(report.missingFromVault).toEqual([{ path: 'Nowhere.md', by: 'nodatrail/task' }]);
+    expect(report.danglingRefs).toEqual([{ from: 'Loose.md', ref: 'Places/Gone.md' }]);
+    expect(formatInterchangeReport(report)).toContain('| nodatrail | task | 3 |');
   });
 
   it('prints counts, never note content', () => {

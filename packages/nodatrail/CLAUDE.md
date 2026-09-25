@@ -129,7 +129,9 @@ src/vault/        cross-module reading and writing: entity-types,
                   notes-reader, read-notes, create-note, health/
 src/plan/         paths, detect, nav-block, labels, write-period, rollup,
                   read-day, read-schedule, day-body, defer-menu, and add-to-day
-                  with its dialog
+                  with its dialog; the pure halves the export reads with
+                  (schedule-line, day-draft, day-headings, day-entries) and the
+                  host-free period-reader
 src/para/         types, parse, write, properties, board, read-para, create,
                   edit-para, archive, project-folder, project-tasks,
                   status-dates, status-groups, summary and summary-file,
@@ -146,7 +148,7 @@ src/ledger/       the double-entry half: properties, read-ledger, write-ledger,
                   model and an App-bound exporter per sheet)
 src/crm/          company-defaults, read-persons, read-crm-board, and the
                   new/edit Person and Company modals
-src/tasks/        read-tasks, write-tasks
+src/tasks/        task-reader and its twin read-tasks, write-tasks
 src/types/        ambient declarations only (markdown.d.ts)
 src/ui/           kit/, views/, modals/, blocks/, settings/, components/
 ```
@@ -156,18 +158,28 @@ src/ui/           kit/, views/, modals/, blocks/, settings/, components/
   `src/shared/` or, if it is a statement about a file rather than about this
   plugin, in `trail-core`.
 - **Readers come in pairs.** `vault/notes-reader.ts`, `para/para-reader.ts`,
-  `finance/finance-reader.ts`, `finance/orders-reader.ts` and
-  `ledger/ledger-reader.ts` read through the core's `VaultHost` and import
+  `finance/finance-reader.ts`, `finance/orders-reader.ts`,
+  `ledger/ledger-reader.ts` and `tasks/task-reader.ts` read through the core's `VaultHost` and import
   nothing from `obsidian` at runtime; the `read-*.ts` module beside each is its
   Obsidian twin, one delegation through `hostFor()` (the ledger's with
   `cachedRead` in place of `read`). The split is what lets the same readers run
   outside Obsidian (an import tool, a standalone app), and the root
   `tests/host-free.test.ts` walks each reader's import graph to keep it true.
   `splitList` lives in `settings/split-list.ts` for that reason: `defaults.ts`
-  pulls in the translation manager, which imports `obsidian`.
+  pulls in the translation manager, which imports `obsidian`. **The day note
+  had the same problem twice over**: parsing an entry lived beside composing
+  one, and composing asks the translation manager for the current language.
+  So the parsing sits in pure modules (`plan/schedule-line.ts`,
+  `plan/day-draft.ts`, `plan/day-headings.ts`, `plan/day-entries.ts`), the
+  Obsidian-side modules re-export them unchanged, and the edit guard arrives
+  in `day-entries.ts` as a callback. `plan/period-reader.ts` has no twin: the
+  plan views read a day through `read-day.ts`, which uses the same parsing, and
+  only the export needs every period note at once. `lang/all-locales.ts` gives
+  it every language's headings without asking which one is current.
 - **The interchange export is built on those readers.**
   `src/interchange/sections.ts` turns what they read into this plugin's
-  families for the standalone app's importer, and is host-free like them. The
+  families for the standalone app's importer, and the tasks into `task`
+  lines, which name their note without claiming it, and is host-free like them. The
   command line half (`npm run interchange`) lives in `scripts/interchange/`,
   never in `main.js`: a read-only filesystem host, the saved-settings lookup and an esbuild
   launcher. Its `fs-host.ts` and `cli.ts` are copies of the

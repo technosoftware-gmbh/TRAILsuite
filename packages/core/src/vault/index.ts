@@ -3,3 +3,4 @@ export * from './ports.js';
 export * from './notes.js';
 export * from './read-notes.js';
 export * from './write-sheet.js';
+export * from './resolve-link.js';
