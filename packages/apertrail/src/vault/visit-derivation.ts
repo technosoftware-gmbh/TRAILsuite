@@ -28,6 +28,7 @@
  * `day-visits.ts` says why that trade was taken rather than reading the day
  * note's own format.
  */
+import type { VaultFile } from '@technosoftware/trail-core';
 import { TravelCity, TravelPlace, TravelTrip } from './types';
 
 export interface DerivedVisit {
@@ -44,7 +45,10 @@ export interface DerivedVisit {
  * just an undated one -- "we went there" is the claim, and the date is
  * extra.
  */
-function stopDate(trip: TravelTrip, stopFrom: string | null): string | null {
+function stopDate<F extends VaultFile>(
+  trip: TravelTrip<F>,
+  stopFrom: string | null
+): string | null {
   const raw = stopFrom ?? trip.return ?? trip.departure;
   return raw ? raw.slice(0, 10) : null;
 }
@@ -54,7 +58,9 @@ function stopDate(trip: TravelTrip, stopFrom: string | null): string | null {
  * Built once per board read and shared by the City and place passes,
  * rather than re-walking every trip for every place.
  */
-export function buildVisitIndex(trips: TravelTrip[]): Map<string, string[]> {
+export function buildVisitIndex<F extends VaultFile>(
+  trips: TravelTrip<F>[]
+): Map<string, string[]> {
   const byTitle = new Map<string, string[]>();
   for (const trip of trips) {
     if (trip.effectiveStatus !== 'Over') continue;
@@ -100,15 +106,15 @@ export function deriveVisit(
 /**
  * Folds derived visits into the already-built Cities and places, in place.
  *
- * Mutating rather than rebuilding matches how read-entities.ts already
+ * Mutating rather than rebuilding matches how board-reader.ts already
  * resolves the Country/State/City cycle: every consumer holds references
  * to these exact objects by this point, so replacing them would leave the
  * board's own cross-references pointing at stale copies.
  */
-export function applyDerivedVisits(
-  cities: TravelCity[],
-  places: TravelPlace[],
-  trips: TravelTrip[],
+export function applyDerivedVisits<F extends VaultFile>(
+  cities: TravelCity<F>[],
+  places: TravelPlace<F>[],
+  trips: TravelTrip<F>[],
   dayVisits: Map<string, string[]> = new Map()
 ): void {
   const index = buildVisitIndex(trips);

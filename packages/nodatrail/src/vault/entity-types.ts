@@ -12,7 +12,7 @@
  * note in a different folder, so the active read simply does not see it.
  */
 import type { NoteKindQuery } from '@technosoftware/trail-core';
-import { splitList } from '../settings/defaults';
+import { splitList } from '../settings/split-list';
 import type { NODAtrailSettings, StringSettingKey } from '../settings/types';
 
 /** The four PARA kinds. These are the ones that can be archived. */

@@ -1,74 +1,37 @@
 /**
- * Reading the money notes out of the vault.
+ * Reading the money notes out of Obsidian's vault.
  *
+ * One delegation per function to finance-reader.ts through `hostFor()`.
  * Nothing is cached, and every record carries the file it came from so a view
- * can open it. The parsing is `trail-core`'s; what is here is the folder, the
- * settings mapping and the pairing with a `TFile`.
+ * can open it.
  */
 import { App, TFile } from 'obsidian';
-import {
-  parseBill,
-  parsePurchase,
-  parseRecurring,
-  type BillRecord,
-  type PurchaseRecord,
-  type RecurringRecord,
-} from '@technosoftware/trail-core';
+import type { BillRecord, PurchaseRecord, RecurringRecord } from '@technosoftware/trail-core';
+import { hostFor } from '../shared/vault-host';
 import type { NODAtrailSettings } from '../settings/types';
-import { readNotes } from '../vault/read-notes';
-import { billProperties, purchaseProperties, recurringProperties } from './properties';
+import {
+  readBillsFrom,
+  readFinanceBoardFrom,
+  readPurchasesFrom,
+  readRecurringFrom,
+  type FinanceBoard,
+} from './finance-reader';
+
+export type { FinanceBoard } from './finance-reader';
 
 export function readPurchases(app: App, settings: NODAtrailSettings): PurchaseRecord<TFile>[] {
-  const properties = purchaseProperties(settings);
-
-  return readNotes(app, settings, 'purchase').map((note) => ({
-    file: note.file,
-    title: note.title,
-    ...parsePurchase({
-      stem: note.title,
-      frontmatter: note.frontmatter,
-      properties,
-    }),
-  }));
+  return readPurchasesFrom(hostFor(app), settings);
 }
 
 export function readBills(app: App, settings: NODAtrailSettings): BillRecord<TFile>[] {
-  const properties = billProperties(settings);
-
-  return readNotes(app, settings, 'bill').map((note) => ({
-    file: note.file,
-    title: note.title,
-    ...parseBill(note.frontmatter, properties),
-  }));
+  return readBillsFrom(hostFor(app), settings);
 }
 
 export function readRecurring(app: App, settings: NODAtrailSettings): RecurringRecord<TFile>[] {
-  const properties = recurringProperties(settings);
-
-  return readNotes(app, settings, 'recurring').map((note) => ({
-    file: note.file,
-    title: note.title,
-    ...parseRecurring(note.frontmatter, properties),
-  }));
+  return readRecurringFrom(hostFor(app), settings);
 }
 
-export interface FinanceBoard {
-  purchases: PurchaseRecord<TFile>[];
-  bills: BillRecord<TFile>[];
-  recurring: RecurringRecord<TFile>[];
-}
-
-/**
- * All three in one pass.
- *
- * The budget is not among them any more: it is keyed to accounts and measured
- * against postings, so it is read with the ledger rather than beside the notes
- * it used to be measured from.
- */
+/** All three in one pass. See finance-reader.ts for why the budget is not among them. */
 export function readFinanceBoard(app: App, settings: NODAtrailSettings): FinanceBoard {
-  return {
-    purchases: readPurchases(app, settings),
-    bills: readBills(app, settings),
-    recurring: readRecurring(app, settings),
-  };
+  return readFinanceBoardFrom(hostFor(app), settings);
 }

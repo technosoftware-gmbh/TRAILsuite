@@ -499,10 +499,4 @@ export function archiveSubfolder(archiveRoot: string, category: string): string 
   return joinFolder(archiveRoot, category);
 }
 
-/** A comma-separated setting as a list, blanks dropped. */
-export function splitList(value: string): string[] {
-  return value
-    .split(',')
-    .map((entry) => entry.trim())
-    .filter((entry) => entry !== '');
-}
+export { splitList } from './split-list';

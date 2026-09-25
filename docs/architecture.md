@@ -855,6 +855,7 @@ file could enforce for itself:
 | `settings-reference` (suite) | A setting with no row in its package's settings reference, or a row for a setting that no longer exists |
 | `display-locale` (suite) | A plugin drawing a number or a date in the machine's convention: a core formatter called with no locale, `Intl` left to its own default, or a plugin not shipping the shared default |
 | `name-fold` (suite) | A name trimmed and lower-cased by hand, or a title lowered on its own, rather than folded with `caseFold()`. Reads the source with the compiler, so a comment or a string naming the shape is outside it by construction |
+| `host-free` (suite) | A plugin's host-free vault reader (`*-reader.ts`) importing `obsidian` at runtime, directly or through anything it imports. Each Obsidian-facing twin must be seen reaching `obsidian`, so a walk that stopped seeing imports fails too |
 
 Views, modals and settings pages are not unit-tested anywhere in the suite. They
 are exercised by hand against a sample vault, and that is a deliberate trade

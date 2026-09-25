@@ -11,7 +11,8 @@
  * then a second pass that mutates in the resolved cross-references once
  * every skeleton exists. See that file's own doc comment.
  */
-import { TFile } from 'obsidian';
+import type { TFile } from 'obsidian';
+import type { VaultFile } from '@technosoftware/trail-core';
 import { TravelPlaceType } from './entity-types';
 import {
   ParsedTripBudgetLine,
@@ -37,14 +38,14 @@ import { CostUnit } from '../trips/costs/line-cost';
  */
 export type TravelPhotoSpotDetail = ParsedPhotoSpot;
 
-export interface TravelCountry {
-  file: TFile;
+export interface TravelCountry<F extends VaultFile = TFile> {
+  file: F;
   title: string;
   /** Raw wikilink target from `capital:`, or null if absent/unresolved. */
   capitalTitle: string | null;
-  capital: TravelCity | null;
+  capital: TravelCity<F> | null;
   /** Every State whose `country:` names this one, alphabetically. Derived at read time; a Country note's own `states:` list is not read. */
-  states: TravelState[];
+  states: TravelState<F>[];
   /**
    * Every City whose `country:` names this one, alphabetically, whether or not
    * it sits under a State.
@@ -58,36 +59,36 @@ export interface TravelCountry {
    * link each city already carries is the answer, the same one `states` is
    * derived from.
    */
-  cities: TravelCity[]; /** What it shows on a cover: a line, a picture, the rest of them, and its highlights. See vault/read-cover.ts. */
+  cities: TravelCity<F>[]; /** What it shows on a cover: a line, a picture, the rest of them, and its highlights. See vault/read-cover.ts. */
   description: string | null;
   image: string | null;
   gallery: ParsedTripPicture[];
   highlights: string[];
 }
 
-export interface TravelState {
-  file: TFile;
+export interface TravelState<F extends VaultFile = TFile> {
+  file: F;
   title: string;
   countryTitle: string | null;
-  country: TravelCountry | null;
+  country: TravelCountry<F> | null;
   capitalTitle: string | null;
-  capital: TravelCity | null;
+  capital: TravelCity<F> | null;
   /** Every City whose `state:` names this one, alphabetically. Derived at read time; a State note's own `cities:` list is not read. */
-  cities: TravelCity[]; /** What it shows on a cover: a line, a picture, the rest of them, and its highlights. See vault/read-cover.ts. */
+  cities: TravelCity<F>[]; /** What it shows on a cover: a line, a picture, the rest of them, and its highlights. See vault/read-cover.ts. */
   description: string | null;
   image: string | null;
   gallery: ParsedTripPicture[];
   highlights: string[];
 }
 
-export interface TravelCity {
-  file: TFile;
+export interface TravelCity<F extends VaultFile = TFile> {
+  file: F;
   title: string;
   countryTitle: string | null;
-  country: TravelCountry | null;
+  country: TravelCountry<F> | null;
   /** Raw wikilink target from `state:` -- null for countries that don't use the State level. */
   stateTitle: string | null;
-  state: TravelState | null;
+  state: TravelState<F> | null;
   /**
    * The city is its own first-level division: a Stadtstaat, a city-state, a
    * federal district.
@@ -135,14 +136,14 @@ export interface TravelCity {
  * field is identical and a shared type keeps the gallery/dashboard code
  * that treats all four uniformly from needing four near-duplicate branches.
  */
-export interface TravelPlace {
-  file: TFile;
+export interface TravelPlace<F extends VaultFile = TFile> {
+  file: F;
   kind: TravelPlaceType;
   title: string;
   countryTitle: string | null;
-  country: TravelCountry | null;
+  country: TravelCountry<F> | null;
   cityTitle: string | null;
-  city: TravelCity | null;
+  city: TravelCity<F> | null;
   geoLocation: [string, string] | null;
   /** Explicit frontmatter, a finished trip that stops here, or a day note naming it -- see vault/visit-derivation.ts. */
   visited: boolean;
@@ -185,8 +186,8 @@ export interface TravelPlace {
  * that outlives every sailing; what one costs belongs to the leg that books
  * it. See places/vehicle-note.ts.
  */
-export interface TravelVehicle extends ParsedVehicle {
-  file: TFile;
+export interface TravelVehicle<F extends VaultFile = TFile> extends ParsedVehicle {
+  file: F;
   title: string;
 }
 
@@ -201,15 +202,15 @@ export interface TravelVehicle extends ParsedVehicle {
  * resolve like a place's, because "which trips did this in Stavanger" is a
  * question somebody asks of the tour note.
  */
-export interface TravelExcursion extends ParsedExcursion {
-  file: TFile;
+export interface TravelExcursion<F extends VaultFile = TFile> extends ParsedExcursion {
+  file: F;
   title: string;
-  country: TravelCountry | null;
-  city: TravelCity | null;
+  country: TravelCountry<F> | null;
+  city: TravelCity<F> | null;
 }
 
-export interface TravelTrip {
-  file: TFile;
+export interface TravelTrip<F extends VaultFile = TFile> {
+  file: F;
   title: string;
   /** What the trip is, under what it is called. Null when the note says nothing. */
   subtitle: string | null;
@@ -220,10 +221,10 @@ export interface TravelTrip {
   /** The pictures, in the order they were chosen. */
   gallery: ParsedTripPicture[];
   countryTitle: string | null;
-  country: TravelCountry | null;
+  country: TravelCountry<F> | null;
   /** The Cities this trip touches -- its geographic scope, independent of whether a city is also an itinerary stop below. */
   cityTitles: string[];
-  cities: TravelCity[];
+  cities: TravelCity<F>[];
   /** "YYYY-MM-DDTHH:mm" where a time was recorded, "YYYY-MM-DD" otherwise. Null if unset. */
   departure: string | null;
   return: string | null;
@@ -260,7 +261,7 @@ export interface TravelTrip {
    * here does.
    */
   extendsTitle: string | null;
-  extendsTrip: TravelTrip | null;
+  extendsTrip: TravelTrip<F> | null;
   /**
    * The trips that name this one as what they follow, derived rather than
    * written -- nothing derived is ever written back.
@@ -270,12 +271,12 @@ export interface TravelTrip {
    * construction rather than by a visited-set somebody has to maintain. A
    * trip is never its own extension.
    */
-  extensions: TravelTrip[];
+  extensions: TravelTrip<F>[];
   /** What each day of the trip is called and says for itself. Sparse: only the days that carry one. */
   days: ParsedTripDay[];
-  stops: TravelTripStop[];
-  nights: TravelTripNight[];
-  transport: TravelTripLeg[];
+  stops: TravelTripStop<F>[];
+  nights: TravelTripNight<F>[];
+  transport: TravelTripLeg<F>[];
   /** The currency this trip plans in, or null to inherit the `homeCurrency` setting. */
   currency: string | null;
   /** The plan: a ceiling per category, in the trip's own currency. Compared against the bookings that name this trip. */
@@ -294,14 +295,14 @@ export interface TravelTrip {
  */
 export type TravelStopTargetKind = 'city' | TravelPlaceType;
 
-export interface TravelTripStop extends ParsedTripLineChoice {
+export interface TravelTripStop<F extends VaultFile = TFile> extends ParsedTripLineChoice {
   /** Which day of the trip, or null for a stop that names its own date. Resolved against the trip's departure at render time and never written back -- see trips/relative-days.ts. */
   day: number | null;
   /** True when the entry names a place that did not parse, as against naming none at all. A brochure line is only a time and a sentence; a typo has to stay visible. */
   placeUnresolved: boolean;
   /** Raw wikilink target, or null when the entry's place field was malformed. Kept rather than dropped, so a typo stays visible in the itinerary instead of looking like a deletion. */
   placeTitle: string | null;
-  target: TravelCity | TravelPlace | null;
+  target: TravelCity<F> | TravelPlace<F> | null;
   targetKind: TravelStopTargetKind | null;
   /**
    * The excursion this stop is, as written. A wikilink reads down to its
@@ -314,7 +315,7 @@ export interface TravelTripStop extends ParsedTripLineChoice {
    */
   excursionTitle: string | null;
   /** The same, resolved. Null for a stop that names none, which is most of them. */
-  excursion: TravelExcursion | null;
+  excursion: TravelExcursion<F> | null;
   /** "YYYY-MM-DDTHH:mm", or null for a stop with no recorded time. */
   from: string | null;
   to: string | null;
@@ -332,12 +333,12 @@ export interface TravelTripStop extends ParsedTripLineChoice {
   persons: string[];
 }
 
-export interface TravelTripNight extends ParsedTripLineChoice {
+export interface TravelTripNight<F extends VaultFile = TFile> extends ParsedTripLineChoice {
   /** Which day of the trip the stay begins and ends on, or null for one that names its own dates. */
   checkInDay: number | null;
   checkOutDay: number | null;
   accommodationTitle: string | null;
-  accommodation: TravelPlace | null;
+  accommodation: TravelPlace<F> | null;
   /** Date-only -- nobody records a check-in clock time. */
   checkIn: string | null;
   checkOut: string | null;
@@ -350,7 +351,7 @@ export interface TravelTripNight extends ParsedTripLineChoice {
   persons: string[];
 }
 
-export interface TravelTripLeg extends ParsedTripLineChoice {
+export interface TravelTripLeg<F extends VaultFile = TFile> extends ParsedTripLineChoice {
   /** Which day of the trip the leg leaves and arrives on, or null for one that names its own dates. */
   day: number | null;
   toDay: number | null;
@@ -375,7 +376,7 @@ export interface TravelTripLeg extends ParsedTripLineChoice {
   /** The vehicle it is taken on, as written. A wikilink reads down to its target; a name the vault has no note for stands as typed. */
   vehicleTitle: string | null;
   /** The same, resolved. Null for a leg that names none, which is most of them, and for a name the vault has no note for. */
-  vehicle: TravelVehicle | null;
+  vehicle: TravelVehicle<F> | null;
   /** The flights it is made of, two or more, or empty for a direct leg. The ends above are theirs when there are any. */
   segments: TripLegSegment[];
 }
@@ -390,21 +391,21 @@ export interface TravelTripLeg extends ParsedTripLineChoice {
  * this plugin is followed. Resolving would buy nothing and would put
  * bookings into the board's two-pass cross-referencing for no reason.
  */
-export interface TravelBooking extends ParsedBooking {
-  file: TFile;
+export interface TravelBooking<F extends VaultFile = TFile> extends ParsedBooking {
+  file: F;
   title: string;
 }
 
-export interface TravelBoard {
-  trips: TravelTrip[];
+export interface TravelBoard<F extends VaultFile = TFile> {
+  trips: TravelTrip<F>[];
   /** Every vehicle note in the vault, in title order. */
-  vehicles: TravelVehicle[];
+  vehicles: TravelVehicle<F>[];
   /** Every excursion note in the vault, in title order. */
-  excursions: TravelExcursion[];
+  excursions: TravelExcursion<F>[];
   /** Every booking in the vault, in title order. Attached to trips by title rather than by reference; see TravelBooking. */
-  bookings: TravelBooking[];
-  countries: TravelCountry[];
-  states: TravelState[];
-  cities: TravelCity[];
-  places: TravelPlace[];
+  bookings: TravelBooking<F>[];
+  countries: TravelCountry<F>[];
+  states: TravelState<F>[];
+  cities: TravelCity<F>[];
+  places: TravelPlace<F>[];
 }
