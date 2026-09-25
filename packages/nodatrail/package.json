@@ -12,6 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:typecheck": "tsc -noEmit -skipLibCheck -p tests/tsconfig.json",
+    "interchange": "node scripts/interchange/run.mjs",
     "version": "node sync-version.js && git add manifest.json"
   },
   "keywords": [],

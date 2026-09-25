@@ -243,6 +243,16 @@ src/ui/           shared UI: components/, dashboard/, gallery/, settings/
   `tests/host-free.test.ts` walks the reader's import graph to keep it true.
   Records are generic over the file type and default to `TFile`, so no
   Obsidian caller writes a type argument.
+- **The interchange export is built on that reader.**
+  `src/interchange/sections.ts` turns what it reads into this plugin's
+  families for the standalone app's importer, and is host-free like it. The
+  command line half (`npm run interchange`) lives in `scripts/interchange/`,
+  never in `main.js`: a read-only filesystem host, the saved-settings lookup, an esbuild
+  launcher, and `link-index.ts`, which stands in for Obsidian's resolved-link
+  cache when the day-note visits are counted. Its `fs-host.ts` and `cli.ts` are copies of the
+  other plugin's, kept apart by the package boundary; change both, or the
+  root `tests/interchange-copies.test.ts` fails. See
+  `docs/interchange.md` at the root.
 - **Frontmatter, links and paths come from `trail-core` too.**
   `src/shared/wikilink.ts`, `src/shared/wikilink-strip.ts`,
   `src/shared/frontmatter-lookup.ts` and `src/shared/tag-list.ts` are gone.

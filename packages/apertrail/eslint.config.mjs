@@ -70,8 +70,10 @@ export default [
   //     (tests/lang/translation-keys.test.ts) has to read src/ off disk to
   //     scan every t() call site. That check can't be done from inside the
   //     bundle it's checking.
+  // scripts/** runs under Node from the command line, never inside Obsidian,
+  // for the same reasons as tests/** above.
   {
-    files: ['tests/**/*.ts'],
+    files: ['tests/**/*.ts', 'scripts/**/*.{ts,mjs}'],
     rules: {
       'obsidianmd/no-global-this': 'off',
       'obsidianmd/no-tfile-tfolder-cast': 'off',
