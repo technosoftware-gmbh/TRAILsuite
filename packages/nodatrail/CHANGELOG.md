@@ -18,6 +18,11 @@ note carries is not an error. See
 
 ### Fixed
 
+- **A meeting whose end moved in the calendar is corrected on the next import.**
+  The import matched a line by its day, start and text only, so a meeting
+  shortened after it had been imported stayed at its old end. The dialog now
+  shows it as ending at another time and rewrites the end in place, the same
+  guarded rewrite that already corrects a changed answer.
 - **An area, goal, project or company whose title carries an umlaut now matches
   the notes that name it**, whichever way the two sides happen to be normalized.
   macOS writes an umlaut two ways and the two spellings compare unequal, so a

@@ -397,3 +397,44 @@ describe('correcting an answer given after the line was written', () => {
     expect(body).toContain('- 👥 11:00-09:30 Review');
   });
 });
+
+describe('correcting the end of a meeting shortened in the calendar', () => {
+  const NOTE = [
+    '---',
+    'type: daily',
+    '---',
+    '',
+    SCHEDULE,
+    '',
+    '- 👥 08:00-09:00 Out of Office',
+    '',
+  ].join('\n');
+
+  const shortened = () =>
+    proposal({
+      summary: 'Out of Office',
+      from: '08:00',
+      to: '08:30',
+      partstat: '',
+      status: 'time-changed',
+      writes: false,
+      updates: {
+        day: '2026-09-14',
+        from: '08:00',
+        to: '09:00',
+        text: 'Out of Office',
+        partstat: '',
+      },
+    });
+
+  it('rewrites the end and keeps one line', async () => {
+    const { app, held } = vaultOf({ [path('2026-09-14')]: NOTE });
+    const result = await writeCalendarImport(app, DEFAULT_SETTINGS, [shortened()], NOW);
+
+    const body = held[path('2026-09-14')] ?? '';
+    expect(body).toContain('- 👥 08:00-08:30 Out of Office');
+    expect(body).not.toContain('08:00-09:00');
+    expect(body.split('\n').filter((l) => l.startsWith('- '))).toHaveLength(1);
+    expect(result).toMatchObject({ updated: 1, written: 0, refused: [] });
+  });
+});

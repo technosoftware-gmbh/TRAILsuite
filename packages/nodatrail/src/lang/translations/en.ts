@@ -293,6 +293,7 @@ export const enTranslations = {
     checkedSkipped: '{count} were already on the list',
     answer: { tentative: 'You said maybe', unanswered: 'Not answered', declined: 'You declined' },
     statusAnswerChanged: 'You answered differently since',
+    statusTimeChanged: 'Now ends at another time (was {old})',
     updated: '{count} meeting markers corrected',
     refused:
       '{count} could not be corrected; they say more than the dialog can write. Edit them in the note.',

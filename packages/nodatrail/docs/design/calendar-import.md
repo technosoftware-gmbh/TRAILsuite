@@ -662,6 +662,14 @@ the note, with the answer replaced, so the text, the context and every child
 line stay the note's own. A line it will not touch is reported rather than
 silently skipped.
 
+**A meeting whose end moved is corrected the same way.** The key is the day,
+the start and the text, so a meeting shortened in the calendar after the import
+was `already-present` and kept its old end. The plan is now also told each
+line's end, and a line whose end differs comes back as `time-changed` naming the
+line to rewrite: the end is replaced by the export's and the answer brought up
+to date with it, under the same three guards. A moved start or a changed title
+is still another meeting, because those are the key.
+
 The corrections run before the appends, because both rewrite the same note and
 the append reads the body immediately before writing it.
 
