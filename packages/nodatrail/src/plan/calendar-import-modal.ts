@@ -36,6 +36,7 @@ import {
   parseDayTitle,
   parseIcs,
   planCalendarImport,
+  rewrites,
   type CalendarImportPlan,
   type CalendarProposal,
   type ExistingEntry,
@@ -265,6 +266,7 @@ export class ImportCalendarModal extends Modal {
         out.push({
           day,
           from: entry.from,
+          to: entry.to,
           text: entry.text,
           partstat: partstatOf(entry.attendance),
         });
@@ -334,7 +336,7 @@ export class ImportCalendarModal extends Modal {
       // Written out rather than assembled: a class name built in a template
       // literal is one the stylesheet check cannot see, and a rule nobody can
       // prove is used is a rule nobody dares delete.
-      if (proposal.writes || proposal.status === 'answer-changed') {
+      if (proposal.writes || rewrites(proposal)) {
         line.addClass('nod-import-ready');
       } else if (proposal.status === 'already-present') line.addClass('nod-import-skipped');
       else line.addClass('nod-import-attention');
@@ -480,6 +482,8 @@ function statusOf(proposal: CalendarProposal): string {
       return t('calendar.statusPresent');
     case 'answer-changed':
       return t('calendar.statusAnswerChanged');
+    case 'time-changed':
+      return t('calendar.statusTimeChanged', { old: proposal.updates?.to || '-' });
     case 'changed-upstream':
       return t('calendar.statusChanged', { old: proposal.stale?.text ?? '' });
     case 'edited-here':

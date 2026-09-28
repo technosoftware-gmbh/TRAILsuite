@@ -296,6 +296,7 @@ export const deTranslations: Translations = {
     checkedSkipped: '{count} standen schon auf der Liste',
     answer: { tentative: 'Vielleicht', unanswered: 'Nicht beantwortet', declined: 'Abgesagt' },
     statusAnswerChanged: 'Seither anders beantwortet',
+    statusTimeChanged: 'Endet jetzt zu einer anderen Zeit (bisher {old})',
     updated: '{count} Terminzeichen korrigiert',
     refused:
       '{count} konnten nicht korrigiert werden; sie sagen mehr als der Dialog schreiben kann. Bitte in der Notiz bearbeiten.',

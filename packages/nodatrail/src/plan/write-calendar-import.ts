@@ -23,6 +23,7 @@ import type { App } from 'obsidian';
 import {
   parseDayTitle,
   splitFrontmatterBlock,
+  rewrites,
   type CalendarProposal,
   type PriorLine,
 } from '@technosoftware/trail-core';
@@ -180,7 +181,8 @@ export async function writeCalendarImport(
 }
 
 /**
- * Corrects the marker on lines already in a note, and nothing else about them.
+ * Corrects the marker on lines already in a note, and nothing else about them;
+ * or, for a meeting whose end moved in the calendar, the end and the marker.
  *
  * **The one write in this feature that touches a line somebody already has.**
  * Everything else appends. It exists because the derived key deliberately
@@ -209,7 +211,7 @@ async function updateAnswers(
 ): Promise<void> {
   const byDay = new Map<string, CalendarProposal[]>();
   for (const proposal of proposals) {
-    if (proposal.status !== 'answer-changed' || !proposal.updates) continue;
+    if (!rewrites(proposal) || !proposal.updates) continue;
     const held = byDay.get(proposal.day);
     if (held) held.push(proposal);
     else byDay.set(proposal.day, [proposal]);
@@ -228,9 +230,11 @@ async function updateAnswers(
       // -- a marker swap keeps the line count -- but the record's positions
       // come from a read, and a second correction on the same note has to be
       // measured against what the first one left.
+      // Found by what the line says now: its end is the note's, which for a
+      // meeting whose end moved is not the export's.
       const record = await findDayEntry(app, settings, file, {
         from: proposal.from,
-        to: proposal.to,
+        to: proposal.updates?.to ?? proposal.to,
         text: proposal.summary,
       });
       if (!record?.editable) {
@@ -240,6 +244,8 @@ async function updateAnswers(
 
       const lines = entryLines(settings, {
         ...record.draft,
+        // A moved end takes the export's; an answer alone leaves the note's end.
+        endTime: proposal.status === 'time-changed' ? proposal.to : record.draft.endTime,
         attendance: attendanceOf(proposal.partstat),
       });
       const text = await host.vault.read(file);

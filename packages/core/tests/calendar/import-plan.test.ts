@@ -719,3 +719,64 @@ describe("the zone the file states, read into the vault's", () => {
     expect(out.missing).toEqual([]);
   });
 });
+
+describe('a meeting whose end moved in the calendar', () => {
+  // One day of a daily series shortened in the calendar: an override
+  // (RECURRENCE-ID) for that day ending at 08:30 instead of 09:00. The day, the
+  // start and the text are the series', so the key is too, and the import used
+  // to call the line present and leave the series' end in the note.
+  const series = file(
+    event(
+      'UID:sick@example.ch',
+      'DTSTART;TZID=Europe/Zurich:20260921T080000',
+      'DTEND;TZID=Europe/Zurich:20260921T090000',
+      'RRULE:FREQ=DAILY;COUNT=10',
+      'SUMMARY:Out of Office'
+    ),
+    event(
+      'UID:sick@example.ch',
+      'RECURRENCE-ID;TZID=Europe/Zurich:20260928T080000',
+      'DTSTART;TZID=Europe/Zurich:20260928T080000',
+      'DTEND;TZID=Europe/Zurich:20260928T083000',
+      'SUMMARY:Out of Office'
+    )
+  );
+  const held = (to?: string): ExistingEntry[] => [
+    {
+      day: '2026-09-28',
+      from: '08:00',
+      text: 'Out of Office',
+      ...(to === undefined ? {} : { to }),
+    },
+    {
+      day: '2026-09-29',
+      from: '08:00',
+      text: 'Out of Office',
+      ...(to === undefined ? {} : { to }),
+    },
+  ];
+  const planFor = (existing: ExistingEntry[]) =>
+    planCalendarImport(expandEvents(parseIcs(series), '2026-09-28', '2026-09-29'), {
+      from: '2026-09-28',
+      to: '2026-09-29',
+      existing,
+      zone: 'Europe/Zurich',
+    });
+
+  it('rewrites the end of the shortened day in place and leaves the others', () => {
+    const out = planFor(held('09:00'));
+    const shortened = out.proposals.find((one) => one.day === '2026-09-28');
+    expect(shortened).toMatchObject({ status: 'time-changed', to: '08:30', writes: false });
+    expect(shortened?.updates).toMatchObject({ day: '2026-09-28', from: '08:00', to: '09:00' });
+    expect(out.proposals.find((one) => one.day === '2026-09-29')?.status).toBe('already-present');
+    expect(out).toMatchObject({ toUpdate: 1, toWrite: 0, alreadyPresent: 1, needsAttention: 0 });
+    expect(out.days).toEqual(['2026-09-28']);
+  });
+
+  it('says nothing when the caller does not report where its lines end', () => {
+    expect(planFor(held()).proposals.map((one) => one.status)).toEqual([
+      'already-present',
+      'already-present',
+    ]);
+  });
+});

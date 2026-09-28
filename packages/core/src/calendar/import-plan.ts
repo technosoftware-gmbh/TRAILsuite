@@ -52,6 +52,14 @@ export interface ExistingEntry {
   /** The line's text, with the marker, the times and the wikilink brackets already off. */
   text: string;
   /**
+   * `10:00`, or empty: when the line says the meeting ends.
+   *
+   * Not part of the key, like the answer: a meeting whose end moved is the same
+   * meeting. Omitted means the caller does not say, and then a moved end is
+   * never noticed, which is what every caller did before this existed.
+   */
+  to?: string;
+  /**
    * What the line says was answered, as a `PARTSTAT`.
    *
    * The caller reads it back off whatever the line carries and states it in the
@@ -132,6 +140,12 @@ export type CalendarProposalStatus =
    * differently since it was written.
    */
   | 'answer-changed'
+  /**
+   * The line is here, but the meeting now ends at another time: one day of a
+   * series shortened or lengthened in the calendar. Its end is rewritten in
+   * place, with the answer, and nothing else about it.
+   */
+  | 'time-changed'
   /** An earlier export said this one and no line of either wording remains. */
   | 'edited-here'
   /** An earlier proposal in this same run would write the identical line. */
@@ -164,6 +178,14 @@ export function answerOf(partstat: string): '' | 'TENTATIVE' | 'NEEDS-ACTION' | 
     default:
       return '';
   }
+}
+
+/**
+ * Whether a proposal corrects a line already in a note, in place: its answer,
+ * or its end and answer. Neither adds a line; both are writes.
+ */
+export function rewrites(proposal: Pick<CalendarProposal, 'status'>): boolean {
+  return proposal.status === 'answer-changed' || proposal.status === 'time-changed';
 }
 
 /** The statuses that would put a line in a note. Everything else is shown and skipped. */
@@ -216,7 +238,7 @@ export interface CalendarProposal {
   /**
    * The line this proposal would rewrite **in place**, and only its marker.
    *
-   * Set on `answer-changed` and nowhere else. It is the one write in this
+   * Set on `answer-changed` and `time-changed` and nowhere else. It is the one write in this
    * feature that touches a line already in a note, so it is a named field
    * rather than something a caller infers from a status: the day, the time and
    * the text are kept exactly, and a caller that cannot reproduce the line
@@ -489,7 +511,15 @@ export function planCalendarImport(
         // what it says you answered, which the key deliberately ignores -- see
         // `partstat` on the proposal. Comparing it here is what makes an answer
         // given after the import reach the note at all.
-        if (
+        //
+        // So can when it ends, which the key ignores for the same reason: a
+        // meeting whose end moved is the same meeting, and keying on it would
+        // offer it again beside the old line. Without this a day of a series
+        // shortened in the calendar kept the series' end in the note.
+        if (here.to !== undefined && clockOf(here.to) !== clockOf(line.to)) {
+          status = 'time-changed';
+          updates = here;
+        } else if (
           here.partstat !== undefined &&
           answerOf(here.partstat) !== answerOf(occurrence.partstat)
         ) {
@@ -573,22 +603,20 @@ export function planCalendarImport(
   // it is counted here as well: the preview's promise is that it names every
   // day the import will write in, and an in-place edit is a write.
   const days = [
-    ...new Set(
-      proposals.filter((one) => one.writes || one.status === 'answer-changed').map((one) => one.day)
-    ),
+    ...new Set(proposals.filter((one) => one.writes || rewrites(one)).map((one) => one.day)),
   ].sort();
 
   return {
     proposals,
     days,
     toWrite: proposals.filter((one) => one.writes).length,
-    /** Lines already right, and lines whose marker this run would correct. */
-    toUpdate: proposals.filter((one) => one.status === 'answer-changed').length,
+    /** Lines already in a note that this run would correct in place: their answer or their end. */
+    toUpdate: proposals.filter(rewrites).length,
     alreadyPresent: proposals.filter((one) => one.status === 'already-present').length,
     // An answer this run would correct is work the import does, not work it is
     // asking somebody else to do.
     needsAttention: proposals.filter(
-      (one) => !one.writes && one.status !== 'already-present' && one.status !== 'answer-changed'
+      (one) => !one.writes && one.status !== 'already-present' && !rewrites(one)
     ).length,
     missing,
     gap: gapBefore(from, history),

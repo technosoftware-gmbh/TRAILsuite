@@ -25,6 +25,12 @@ what counts as a breaking change:
 
 ### Added
 
+- **`time-changed`, for a meeting whose end moved in the calendar.**
+  `ExistingEntry` takes an optional `to`; when the caller gives it and it
+  differs from the export's end, the proposal is `time-changed` with `updates`
+  naming the line, and counts in `toUpdate` like `answer-changed`. The new
+  `rewrites()` says whether a proposal rewrites a line in place. A caller that
+  does not pass `to` sees no change.
 - **Lines inside notes, in the interchange format.** `SectionFile.lines`, an
   optional map from a line family to `LineEntry` records (`path`, zero-based
   `line`, `record`), built with `lineEntries()`; `sectionFile()` takes it as an
